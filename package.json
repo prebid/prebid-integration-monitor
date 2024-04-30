@@ -1,0 +1,24 @@
+{
+  "name": "prebid-integration-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prebid/prebid-integration-monitor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prebid/prebid-integration-monitor/issues"
+  },
+  "homepage": "https://github.com/prebid/prebid-integration-monitor#readme",
+  "dependencies": {
+    "puppeteer": "^22.7.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
