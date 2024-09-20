@@ -44,8 +44,7 @@ async function prebidExplorer() {
             return {
                 url : location.href,
                 version : pbjs.version,
-                modules : pbjs.installedModules,
-                eids : pbjs.getUserIdsAsEids()
+                modules : pbjs.installedModules
             }
 
         } else {
