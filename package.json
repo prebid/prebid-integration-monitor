@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +18,10 @@
   },
   "homepage": "https://github.com/prebid/prebid-integration-monitor#readme",
   "dependencies": {
+    "csv-writer": "^1.6.0",
+    "line-reader": "^0.4.0",
     "puppeteer": "^22.7.1",
+    "puppeteer-cluster": "^0.24.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
