@@ -65,7 +65,7 @@ async function prebidExplorer() {
         try {
             // Write results as valid JSON array
             const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
-            fs.writeFileSync('output/10k.json', jsonOutput, 'utf8');
+            fs.writeFileSync('output/results.json', jsonOutput, 'utf8');
         } catch (err) {
             console.error(err);
         }
