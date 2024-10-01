@@ -22,8 +22,14 @@ async function prebidExplorer() {
     });
 
     try {
-        for await (const url of urls) {
-            console.log(`Line from file: ${url}`);
+      for await (const url of urls) {
+        console.log(`Line from file: ${url}`);
+        
+        await page.goto(url , { timeout: 70000, waitUntil: 'networkidle2' });
+        await page.evaluate(async () => {
+          const sleep = ms => new Promise(res => setTimeout(res, ms));
+          await sleep((1000 * 60) * .12);
+        })
 
             await page.goto(url.trim(), { timeout: 70000, waitUntil: 'networkidle2' });
             await page.evaluate(async () => {
