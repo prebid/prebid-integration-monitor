@@ -31,31 +31,32 @@ async function prebidExplorer() {
                 await sleep((1000 * 60) * 0.12);
             });
 
-            const hasPrebid = await page.evaluate(() => {
-                return !!window._pbjsGlobals; // Return true if _pbjsGlobals exists
-            });
+            const prebidData = await page.evaluate(() => {
+                const data = [];
 
-            const prebidObj = await page.evaluate(() => {
                 if (window._pbjsGlobals) {
-                    const prebidData = [];
-
                     // Iterate through all keys in _pbjsGlobals
                     for (const key in window._pbjsGlobals) {
-                        if (window._pbjsGlobals.hasOwnProperty(key) && window._pbjsGlobals[key].includes('pbjs')) {
-                            prebidData.push({
-                                url: location.href,
-                                version: window._pbjsGlobals[key].version,  // Assuming each module has a version property
-                                modules: window._pbjsGlobals[key].installedModules // Assuming each module has an installedModules property
-                            });
+                        if (window._pbjsGlobals.hasOwnProperty(key)) {
+                            // Access the properties of each global object
+                            const moduleData = window._pbjsGlobals[key];
+
+                            // Check if it has the necessary properties
+                            if (moduleData.version && moduleData.installedModules) {
+                                data.push({
+                                    url: location.href,
+                                    version: moduleData.version,
+                                    modules: moduleData.installedModules
+                                });
+                            }
                         }
                     }
-                    return prebidData.length ? prebidData : null; // Return data if available
                 }
-                return null; // Return null if no prebid data found
+                return data.length ? data : null; // Return data if available
             });
 
-            if (prebidObj != null) {
-                results.push(...prebidObj); // Spread operator to push multiple results
+            if (prebidData != null) {
+                results.push(...prebidData); // Spread operator to push multiple results
             }
         }
     } catch (error) {
