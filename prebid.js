@@ -31,7 +31,7 @@ async function prebidExplorer() {
         await page.goto(url , { timeout: 70000, waitUntil: 'networkidle2' });
         await page.evaluate(async () => {
           const sleep = ms => new Promise(res => setTimeout(res, ms));
-          await sleep((1000 * 60) * .11);
+          await sleep((1000 * 60) * .12);
         })
 
         const hasPrebid = await page.evaluate(() => {
