@@ -22,46 +22,80 @@ async function prebidExplorer() {
     });
 
     try {
-      for await (const url of urls) {
-        console.log(`Line from file: ${url}`);
-        
-            await page.goto(url.trim(), { timeout: 70000, waitUntil: 'networkidle2' });
-            await page.evaluate(async () => {
-                const sleep = ms => new Promise(res => setTimeout(res, ms));
-                await sleep((1000 * 60) * 0.11);  // Slight delay to ensure page is loaded
-            });
+        for await (const url of urls) {
+            const trimmedUrl = url.trim();
+            console.log(`Processing URL: ${trimmedUrl}`);
 
-            const hasPrebid = await page.evaluate(() => {
-                return window._pbjsGlobals ? true : false;
-            });
+            await page.goto(trimmedUrl, { timeout: 70000, waitUntil: 'networkidle2' });
 
-            const prebidObj = await page.evaluate(() => {
-                if (window._pbjsGlobals && window._pbjsGlobals.includes('pbjs')) {
-                    return {
-                        url: location.href,
-                        version: pbjs.version,
-                        modules: pbjs.installedModules
-                    };
-                } else {
-                    return null;
+            // Slight delay to ensure the page is fully loaded
+            await page.waitForTimeout(7000);
+
+            // Collect data from the page
+            const pageData = await page.evaluate(() => {
+                const data = {};
+
+                // Initialize libraries array
+                data.libraries = [];
+
+                // Check for apstag
+                if (window.apstag) {
+                    data.libraries.push('apstag');
                 }
+
+                // Check for googletag
+                if (window.googletag) {
+                    data.libraries.push('googletag');
+                }
+
+                // Check for ats
+                if (window.ats) {
+                    data.libraries.push('ats');
+                }
+
+                // Check for Prebid.js instances
+                if (window._pbjsGlobals && Array.isArray(window._pbjsGlobals)) {
+                    data.prebidInstances = [];
+
+                    window._pbjsGlobals.forEach(function(globalVarName) {
+                        const pbjsInstance = window[globalVarName];
+                        if (pbjsInstance && pbjsInstance.version && pbjsInstance.installedModules) {
+                            data.prebidInstances.push({
+                                globalVarName: globalVarName,
+                                version: pbjsInstance.version,
+                                modules: pbjsInstance.installedModules
+                            });
+                        }
+                    });
+                }
+
+                return data;
             });
 
-            if (prebidObj != null) {
-                results.push(prebidObj);
+            // Add the input URL to the pageData
+            pageData.url = trimmedUrl;
+
+            // Only push data if any libraries are found or Prebid.js is present
+            if (pageData.libraries.length > 0 || (pageData.prebidInstances && pageData.prebidInstances.length > 0)) {
+                results.push(pageData);
             }
         }
     } catch (error) {
-        console.error(error);
-        throw new Error(error);
+        console.error('An error occurred:', error);
     } finally {
-        console.log(results);
+        console.log('Results:', results);
         try {
-            // Write results as valid JSON array
+            // Ensure the output directory exists
+            if (!fs.existsSync('output')) {
+                fs.mkdirSync('output');
+            }
+
+            // Write results as a JSON array
             const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
             fs.writeFileSync('output/results.json', jsonOutput, 'utf8');
+            console.log('Results have been saved to output/results.json');
         } catch (err) {
-            console.error(err);
+            console.error('Failed to write results:', err);
         }
 
         if (browser) {
