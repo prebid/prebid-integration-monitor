@@ -23,9 +23,10 @@ async function prebidExplorer() {
 
     try {
         for await (const url of urls) {
-            console.log(`Processing URL: ${url.trim()}`);
+            const trimmedUrl = url.trim();
+            console.log(`Processing URL: ${trimmedUrl}`);
 
-            await page.goto(url.trim(), { timeout: 70000, waitUntil: 'networkidle2' });
+            await page.goto(trimmedUrl, { timeout: 70000, waitUntil: 'networkidle2' });
 
             // Slight delay to ensure the page is fully loaded
             await page.waitForTimeout(7000);
@@ -33,14 +34,6 @@ async function prebidExplorer() {
             // Collect data from the page
             const pageData = await page.evaluate(() => {
                 const data = {};
-
-                data.url = location.href;
-
-                // Check for Prebid.js
-                if (window._pbjsGlobals && window._pbjsGlobals.includes('pbjs')) {
-                    data.version = pbjs.version;
-                    data.modules = pbjs.installedModules;
-                }
 
                 // Initialize libraries array
                 data.libraries = [];
@@ -60,8 +53,17 @@ async function prebidExplorer() {
                     data.libraries.push('ats');
                 }
 
+                // Check for Prebid.js
+                if (window._pbjsGlobals && window._pbjsGlobals.includes('pbjs')) {
+                    data.version = pbjs.version;
+                    data.modules = pbjs.installedModules;
+                }
+
                 return data;
             });
+
+            // Add the input URL to the pageData
+            pageData.url = trimmedUrl;
 
             // Only push data if any libraries are found or Prebid.js is present
             if (pageData.libraries.length > 0 || pageData.version) {
