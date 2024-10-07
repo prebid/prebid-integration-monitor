@@ -29,7 +29,10 @@ async function prebidExplorer() {
             await page.goto(trimmedUrl, { timeout: 70000, waitUntil: 'networkidle2' });
 
             // Slight delay to ensure the page is fully loaded
-            await page.waitForTimeout(7000);
+            await page.evaluate(async () => {
+                const sleep = ms => new Promise(res => setTimeout(res, ms));
+                await sleep((1000 * 60) * .12);
+            })
 
             // Collect data from the page
             const pageData = await page.evaluate(() => {
