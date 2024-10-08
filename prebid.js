@@ -36,10 +36,7 @@ async function prebidExplorer() {
             await page.goto(url, { timeout: 70000, waitUntil: 'networkidle2' });
 
             // Slight delay to ensure the page is fully loaded
-            await page.evaluate(async () => {
-                const sleep = ms => new Promise(res => setTimeout(res, ms));
-                await sleep((1000 * 60) * 0.12); // 7.2 seconds delay
-            });
+            await page.waitForTimeout(7200); // 7.2 seconds delay
 
             // Collect data from the page
             const pageData = await page.evaluate(() => {
@@ -89,21 +86,21 @@ async function prebidExplorer() {
     };
 
     // A function to handle limited parallel execution
-    const asyncPool = async (concurrencyLimit, array, iteratorFn) => {
+    const asyncPool = async (poolLimit, array, iteratorFn) => {
         const ret = [];
         const executing = [];
         for (const item of array) {
-            const p = Promise.resolve().then(() => iteratorFn(item));
+            const p = iteratorFn(item);
             ret.push(p);
 
-            if (concurrencyLimit <= array.length) {
-                const e = p.then(() => executing.splice(executing.indexOf(e), 1));
-                executing.push(e);
-
-                if (executing.length >= concurrencyLimit) {
-                    await Promise.race(executing);
-                }
+            // When the number of executing promises reaches the pool limit, wait for the first one to finish
+            if (poolLimit <= executing.length) {
+                await Promise.race(executing);
             }
+
+            // Add the new promise to the executing list
+            const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+            executing.push(e);
         }
         return Promise.all(ret);
     };
@@ -121,7 +118,7 @@ async function prebidExplorer() {
             }
 
             const jsonOutput = JSON.stringify(results, null, 2);
-            fs.appendFileSync('output/results.json', jsonOutput, 'utf8');
+            fs.writeFileSync('output/results.json', jsonOutput, 'utf8');
             console.log('Results have been saved to output/results.json');
         } catch (err) {
             console.error('Failed to write results:', err);
