@@ -31,7 +31,7 @@ async function prebidExplorer() {
             // Slight delay to ensure the page is fully loaded
             await page.evaluate(async () => {
                 const sleep = ms => new Promise(res => setTimeout(res, ms));
-                await sleep((1000 * 60) * .12);
+                await sleep((1000 * 60) * .10);
             })
 
             // Collect data from the page
