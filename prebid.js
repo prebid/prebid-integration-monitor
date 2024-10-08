@@ -14,49 +14,47 @@ async function prebidExplorer() {
 
     let results = [];
 
-    const page = await browser.newPage();
-    page.setDefaultTimeout(75000);
-
     const urls = readline.createInterface({
         input: fs.createReadStream('input.txt')
     });
 
-    try {
-        for await (const url of urls) {
-            const trimmedUrl = url.trim();
-            console.log(`Processing URL: ${trimmedUrl}`);
+    const urlArray = [];
+    for await (const url of urls) {
+        urlArray.push(url.trim());
+    }
 
-            await page.goto(trimmedUrl, { timeout: 70000, waitUntil: 'networkidle2' });
+    // Set concurrency limit
+    const concurrencyLimit = 5;
+
+    // A helper function to process a single URL
+    const processUrl = async (url) => {
+        const page = await browser.newPage();
+        page.setDefaultTimeout(75000);
+
+        try {
+            console.log(`Processing URL: ${url}`);
+            await page.goto(url, { timeout: 70000, waitUntil: 'networkidle2' });
 
             // Slight delay to ensure the page is fully loaded
-            await page.evaluate(async () => {
-                const sleep = ms => new Promise(res => setTimeout(res, ms));
-                await sleep((1000 * 60) * .12);
-            })
+            await page.waitForTimeout(7200); // 7.2 seconds delay
 
             // Collect data from the page
             const pageData = await page.evaluate(() => {
                 const data = {};
-
-                // Initialize libraries array
                 data.libraries = [];
 
-                // Check for apstag
                 if (window.apstag) {
                     data.libraries.push('apstag');
                 }
 
-                // Check for googletag
                 if (window.googletag) {
                     data.libraries.push('googletag');
                 }
 
-                // Check for ats
                 if (window.ats) {
                     data.libraries.push('ats');
                 }
 
-                // Check for Prebid.js instances
                 if (window._pbjsGlobals && Array.isArray(window._pbjsGlobals)) {
                     data.prebidInstances = [];
 
@@ -75,27 +73,52 @@ async function prebidExplorer() {
                 return data;
             });
 
-            // Add the input URL to the pageData
-            pageData.url = trimmedUrl;
+            pageData.url = url;
 
-            // Only push data if any libraries are found or Prebid.js is present
             if (pageData.libraries.length > 0 || (pageData.prebidInstances && pageData.prebidInstances.length > 0)) {
                 results.push(pageData);
             }
+        } catch (error) {
+            console.error(`Error processing URL: ${url}`, error);
+        } finally {
+            await page.close();
         }
+    };
+
+    // A function to handle limited parallel execution
+    const asyncPool = async (poolLimit, array, iteratorFn) => {
+        const ret = [];
+        const executing = [];
+        for (const item of array) {
+            const p = iteratorFn(item);
+            ret.push(p);
+
+            // When the number of executing promises reaches the pool limit, wait for the first one to finish
+            if (poolLimit <= executing.length) {
+                await Promise.race(executing);
+            }
+
+            // Add the new promise to the executing list
+            const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+            executing.push(e);
+        }
+        return Promise.all(ret);
+    };
+
+    try {
+        await asyncPool(concurrencyLimit, urlArray, processUrl);
     } catch (error) {
         console.error('An error occurred:', error);
     } finally {
         console.log('Results:', results);
+
         try {
-            // Ensure the output directory exists
             if (!fs.existsSync('output')) {
                 fs.mkdirSync('output');
             }
 
-            // Write results as a JSON array
-            const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
-            fs.appendFileSync('output/results.json', jsonOutput, 'utf8');
+            const jsonOutput = JSON.stringify(results, null, 2);
+            fs.writeFileSync('output/results.json', jsonOutput, 'utf8');
             console.log('Results have been saved to output/results.json');
         } catch (err) {
             console.error('Failed to write results:', err);
