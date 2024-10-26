@@ -15,7 +15,7 @@ async function prebidExplorer() {
     let results = [];
 
     const page = await browser.newPage();
-    page.setDefaultTimeout(75000);
+    page.setDefaultTimeout(65000);
 
     const urls = readline.createInterface({
         input: fs.createReadStream('input.txt')
