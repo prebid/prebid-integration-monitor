@@ -15,7 +15,10 @@ async function prebidExplorer() {
     let results = [];
 
     const page = await browser.newPage();
-    page.setDefaultTimeout(65000);
+    page.setDefaultTimeout(55000);
+
+    // Set to Googlebot user agent
+    await page.setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 
     const urls = readline.createInterface({
         input: fs.createReadStream('input.txt')
@@ -26,7 +29,7 @@ async function prebidExplorer() {
             const trimmedUrl = url.trim();
             console.log(`Processing URL: ${trimmedUrl}`);
 
-            await page.goto(trimmedUrl, { timeout: 70000, waitUntil: 'networkidle2' });
+            await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
 
             // Slight delay to ensure the page is fully loaded
             await page.evaluate(async () => {
