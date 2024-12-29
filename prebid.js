@@ -91,10 +91,17 @@ async function prebidExplorer() {
     } finally {
         console.log('Results:', results);
         try {
+            if (results.length == 0) {
+                await browser.close();
+                return null
+            }
+
+
             // Ensure the output directory exists
             if (!fs.existsSync('output')) {
                 fs.mkdirSync('output');
             }
+
 
             // Write results as a JSON array
             const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
