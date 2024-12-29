@@ -27,7 +27,14 @@ async function prebidExplorer() {
     try {
         for await (const url of urls) {
             const trimmedUrl = url.trim();
-            console.log(`Processing URL: ${trimmedUrl}`);
+
+            page.on('request', request => {
+                console.log(request.url());
+            });
+
+            page.on('response', response => {
+                console.log(response.ok());
+            });
 
             await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
 
@@ -87,7 +94,7 @@ async function prebidExplorer() {
             }
         }
     } catch (error) {
-        console.error('An error occurred:', error);
+        console.error(error);
     } finally {
         console.log('Results:', results);
         try {
