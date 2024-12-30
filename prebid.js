@@ -27,14 +27,18 @@ async function prebidExplorer() {
     try {
         for await (const url of urls) {
             const trimmedUrl = url.trim();
+            console.log(trimmedUrl)
 
-            page.on('request', request => {
+            /* page.on('request', request => {
                 console.log(request.url());
+                console.log(request.failure());
             });
 
             page.on('response', response => {
                 console.log(response.ok());
-            });
+                console.log(response.status());
+                console.log(response.statusText());
+            }); */
 
             await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
 

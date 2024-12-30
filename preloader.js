@@ -32,7 +32,7 @@ async function processUrls(urls) {
 
 async function main() {
   const urls = [
-  
+    
   ];
 
   const { validUrls, invalidUrls } = await processUrls(urls);
@@ -40,7 +40,7 @@ async function main() {
   console.log('Valid URLs:');
   validUrls.forEach(url => console.log(url));
 
-  console.log('\nInvalid URLs:');
+  /* console.log('\nInvalid URLs:');
   invalidUrls.forEach(url => {
     console.log(url);
     if(url.statusCode){
@@ -50,7 +50,7 @@ async function main() {
       console.log(`Error: ${url.error}`);
     }
     console.log("---")
-  });
+  }); */
 }
 
 main();
