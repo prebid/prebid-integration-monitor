@@ -55,6 +55,8 @@ async function prebidExplorer() {
                 // Initialize libraries array
                 data.libraries = [];
 
+                data.date = new Date().toISOString().slice(0, 10)
+
                 // Check for apstag
                 if (window.apstag) {
                     data.libraries.push('apstag');
@@ -116,7 +118,7 @@ async function prebidExplorer() {
 
             // Write results as a JSON array
             const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
-            fs.appendFileSync('output/results.json', jsonOutput, 'utf8');
+            fs.appendFileSync('output/JlistResults.json', jsonOutput, 'utf8');
             console.log('Results have been saved to output/results.json');
         } catch (err) {
             console.error('Failed to write results:', err);
