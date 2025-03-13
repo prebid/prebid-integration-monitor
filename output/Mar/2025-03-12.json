@@ -1,0 +1,7943 @@
+[
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abc-israel.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "gnpb",
+        "version": "v8.52.1",
+        "modules": [
+          "adagioBidAdapter",
+          "adgenerationBidAdapter",
+          "adkernelBidAdapter",
+          "adstirBidAdapter",
+          "adtelligentBidAdapter",
+          "ajaBidAdapter",
+          "appnexusBidAdapter",
+          "asealBidAdapter",
+          "browsiRtdProvider",
+          "compassBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dsp_genieeBidAdapter",
+          "fluctBidAdapter",
+          "fpdModule",
+          "genieeBidAdapter",
+          "geoedgeRtdProvider",
+          "gmosspBidAdapter",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "imuIdSystem",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "logicadBidAdapter",
+          "luponmediaBidAdapter",
+          "medianetBidAdapter",
+          "microadBidAdapter",
+          "nobidBidAdapter",
+          "oguryBidAdapter",
+          "openxBidAdapter",
+          "pangleBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "ucfunnelBidAdapter",
+          "unicornBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "yahoosspBidAdapter",
+          "yieldoneBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.abc-talks.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abc-tarot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abc.af"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcallenamento.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcargent.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcatividadespedagogicas.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abccurriculumconnection.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcdailynews.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcdatos.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcdblue.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcderecho.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcdiamond.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcdiamond.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcdiario.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcgames.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcgazetesi.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcidcard.co.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcidcard.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v6.25.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adpod",
+          "aolBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "freewheel-sspBidAdapter",
+          "gdprEnforcement",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "instreamTracking",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "oneVideoBidAdapter",
+          "pubProvidedIdSystem",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "sublimeBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "vidazooBidAdapter",
+          "yahoosspBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.abcinemasny.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs325474",
+        "version": "v8.20.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adfBidAdapter",
+          "admaticBidAdapter",
+          "adpod",
+          "adtargetBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "gptPreAuction",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "luponmediaBidAdapter",
+          "mgidBidAdapter",
+          "mgidXBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "sspBCBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.abcjanikowo24.pl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcmarket.com.py"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcmedico.cl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcmedico.co"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcmedico.es"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcmedico.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcmedicopr.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcnewsgh.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "r89_pbjs",
+        "version": "v9.24.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "adheseBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "anPspParamsConverter",
+          "appnexusBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "currency",
+          "dfpAdServerVideo",
+          "freewheel-sspBidAdapter",
+          "genericAnalyticsAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "invibesBidAdapter",
+          "justpremiumBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "outbrainBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "showheroes-bsBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "teadsBidAdapter",
+          "timeoutRtdProvider",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.abcnoticias.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.52.2",
+        "modules": [
+          "adfBidAdapter",
+          "adnuntiusBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "currency",
+          "gdprEnforcement",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "livewrappedAnalyticsAdapter",
+          "livewrappedBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "readpeakBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sizeMappingV2",
+          "teadsBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.abcnyheter.no"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcplay.games"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcplay.online"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcpokerinfo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcportal.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcportalrecetas.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcpozyczki.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v7.48.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adotBidAdapter",
+          "adyoulikeBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "gdprEnforcement",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "inskinBidAdapter",
+          "ixBidAdapter",
+          "justpremiumBidAdapter",
+          "missenaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "outbrainBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "spotxBidAdapter",
+          "sublimeBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.abcroisiere.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.abcsaladillo.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abcspark.ca"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abda3.xyz"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abdulibrahim.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abdurrahmanatabas.net.tr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abenteuer-mit-den-schmidts.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aberdareonline.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abestit.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abfbanditbaseball.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhahealthcard.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhiguru.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhikkundu.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhindme.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhira.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhishekinfotech.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abhith.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abiathinktanknews.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abiertos.es"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abigailmariethechefwithibd.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abileneonline.us"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abilitykeen.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abipur.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjsYLHH",
+        "version": "v9.18.0",
+        "modules": [
+          "prebidCustom",
+          "currency",
+          "consentManagementTcf",
+          "tcfControl",
+          "dsaControl",
+          "userId",
+          "adfBidAdapter",
+          "dspxBidAdapter",
+          "stroeerCoreBidAdapter",
+          "orbidderBidAdapter",
+          "appnexusBidAdapter",
+          "gumgumBidAdapter",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "sharedIdSystem",
+          "schain"
+        ]
+      }
+    ],
+    "url": "http://www.abirechner.org"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.52.0",
+        "modules": [
+          "adfBidAdapter",
+          "adnuntiusBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "currency",
+          "gdprEnforcement",
+          "ixBidAdapter",
+          "livewrappedAnalyticsAdapter",
+          "livewrappedBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "smaatoBidAdapter",
+          "smilewantedBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.abiteofbitting.se"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ablanian.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ablehere.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abletricks.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ablogtowatch.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abnehmen.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abnhe791.com"
+  },
+  {
+    "libraries": [],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.14.0",
+        "modules": []
+      }
+    ],
+    "url": "http://www.abnnews.pk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abnnews24.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abntv.com.ng"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abo-boxen.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboalkasim.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abogadosmexico.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abookgeek.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abosaadblog.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abouhou.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abousino.club"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.about-drinks.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.about-garden.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.about-history.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutbasquecountry.eus"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutcivil.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutdevice.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "stpd",
+        "version": "v8.27.0",
+        "modules": [
+          "schain",
+          "userId",
+          "sharedIdSystem",
+          "id5IdSystem",
+          "criteoIdSystem",
+          "currency",
+          "setupadBidAdapter",
+          "adfBidAdapter",
+          "openxBidAdapter",
+          "criteoBidAdapter",
+          "rtbhouseBidAdapter",
+          "luponmediaBidAdapter",
+          "amxBidAdapter",
+          "prebidServerBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.abouteverything.fun"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abouther.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutmarketing.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutmusictheory.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutpreschool.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutscotland.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutsemarang.id"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutsims.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abouttheartists.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aboutzenlife.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "owpbjs",
+        "version": "v8.30.0",
+        "modules": [
+          "adpod",
+          "adtelligentBidAdapter",
+          "appnexusBidAdapter",
+          "auctionUserDetails",
+          "criteoBidAdapter",
+          "dfpAdServerVideo",
+          "geoDetection",
+          "gptPreAuction",
+          "id5IdSystem",
+          "instreamTracking",
+          "ixBidAdapter",
+          "openxBidAdapter",
+          "prebidJSDebugUI",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "taboolaBidAdapter",
+          "teadsBidAdapter",
+          "truereachBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.abpganga.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abpic.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abrabbit.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abreak4mommy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abrircorreooutlook.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abroadcareerplus.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abroadwayeaqui.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abruzzoinvideo.tv"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abruzzooggi.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absba.cc"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolu-flash.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolu-puzzle.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.absolutebritney.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolutehome.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolutelyfreebies.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolutestudy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolutevouchers.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.absolutist.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abstemiologia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abstrak.id"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabi.red"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabi.tel"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabiadvisor.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabidegree.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabifilm.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabik.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabime.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabionline.ae"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabischool.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabiventure.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abudhabivideo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abujabizreports.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abukeiba.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abunawaf.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abuosama.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abutrenews.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.abv.bg"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ac-companion.app"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ac-data.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acadaace.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acadanow.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academhub.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academia-lab.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academiaabc.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academiaaberta.pt"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academiacentrum.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academic.kr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academic.ru"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academicgates.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academichive.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academictraveling.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academistan.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academy.sk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.academyworksheets.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acadiaparishtoday.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acadpills.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acaixaquejafoimagica.pt"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acajetenoticias.com.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acameraandacookbook.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acanet.co.za"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acapa.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acapella-extractor.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acaproso.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acc-arab.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accademia.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accarab.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accentingorj.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accentpros.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accents-poetiques.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.access-programmers.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "ihowpbjs",
+        "version": "v8.50.0",
+        "modules": [
+          "criteoIdSystem",
+          "enrichmentFpdModule",
+          "id5IdSystem",
+          "lotamePanoramaIdSystem",
+          "pubmaticIHAnalyticsAdapter",
+          "sharedIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.accessatlanta.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.11.0",
+        "modules": [
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "consentManagementTcf",
+          "criteoIdSystem",
+          "fluctBidAdapter",
+          "gptPreAuction",
+          "identityLinkIdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "pairIdSystem",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "smartadserverBidAdapter",
+          "sovrnBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "ttdBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.accessibilitacentristorici.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accessiodocs.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.accesskardashian.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accesstr.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accesswebpage.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acchibaat.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.24.0",
+        "modules": [
+          "fpdModule",
+          "tcfControl",
+          "medianetBidAdapter",
+          "omsBidAdapter",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "medianetFAnalyticsAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.acchsathletics.org"
+  },
+  {
+    "libraries": [
+      "apstag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "owpbjs",
+        "version": "v6.18.0",
+        "modules": [
+          "consentManagement",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "ga_pbjs",
+        "version": "v9.3.0-pre",
+        "modules": [
+          "1plusXRtdProvider",
+          "33acrossAnalyticsAdapter",
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "51DegreesRtdProvider",
+          "AsteriobidPbmAnalyticsAdapter",
+          "BTBidAdapter",
+          "a1MediaBidAdapter",
+          "a1MediaRtdProvider",
+          "a4gBidAdapter",
+          "aaxBlockmeterRtdProvider",
+          "ablidaBidAdapter",
+          "acuityadsBidAdapter",
+          "ad2ictionBidAdapter",
+          "adWMGAnalyticsAdapter",
+          "adWMGBidAdapter",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adbutlerBidAdapter",
+          "addefendBidAdapter",
+          "adfBidAdapter",
+          "adfusionBidAdapter",
+          "adgenerationBidAdapter",
+          "adhashBidAdapter",
+          "adheseBidAdapter",
+          "adkernelAdnAnalyticsAdapter",
+          "adkernelAdnBidAdapter",
+          "adkernelBidAdapter",
+          "adlooxAnalyticsAdapter",
+          "adlooxAdServerVideo",
+          "adlooxRtdProvider",
+          "admanBidAdapter",
+          "admaruBidAdapter",
+          "admaticBidAdapter",
+          "admediaBidAdapter",
+          "admixerBidAdapter",
+          "admixerIdSystem",
+          "adnowBidAdapter",
+          "adnuntiusBidAdapter",
+          "adnuntiusRtdProvider",
+          "adoceanBidAdapter",
+          "adotBidAdapter",
+          "adpartnerBidAdapter",
+          "adplusBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "adprimeBidAdapter",
+          "adqueryBidAdapter",
+          "adqueryIdSystem",
+          "adrelevantisBidAdapter",
+          "adrinoBidAdapter",
+          "adriverBidAdapter",
+          "adriverIdSystem",
+          "adsinteractiveBidAdapter",
+          "adspiritBidAdapter",
+          "adstirBidAdapter",
+          "adtargetBidAdapter",
+          "adtelligentBidAdapter",
+          "adtelligentIdSystem",
+          "adtrgtmeBidAdapter",
+          "adtrueBidAdapter",
+          "aduptechBidAdapter",
+          "advangelistsBidAdapter",
+          "adxcgAnalyticsAdapter",
+          "adxcgBidAdapter",
+          "adxpremiumAnalyticsAdapter",
+          "adyoulikeBidAdapter",
+          "afpBidAdapter",
+          "agmaAnalyticsAdapter",
+          "aidemBidAdapter",
+          "airgridRtdProvider",
+          "ajaBidAdapter",
+          "akamaiDapRtdProvider",
+          "alkimiBidAdapter",
+          "allowActivities",
+          "ampliffyBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "anPspParamsConverter",
+          "aniviewBidAdapter",
+          "anonymisedRtdProvider",
+          "anyclipBidAdapter",
+          "apacdexBidAdapter",
+          "appierAnalyticsAdapter",
+          "appierBidAdapter",
+          "appnexusAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "appushBidAdapter",
+          "apstreamBidAdapter",
+          "arcspanRtdProvider",
+          "asealBidAdapter",
+          "asoBidAdapter",
+          "asteriobidAnalyticsAdapter",
+          "astraoneBidAdapter",
+          "atsAnalyticsAdapter",
+          "audiencerunBidAdapter",
+          "automatadAnalyticsAdapter",
+          "automatadBidAdapter",
+          "axisBidAdapter",
+          "axonixBidAdapter",
+          "azerionedgeRtdProvider",
+          "beachfrontBidAdapter",
+          "bedigitechBidAdapter",
+          "beopBidAdapter",
+          "betweenBidAdapter",
+          "beyondmediaBidAdapter",
+          "bidViewability",
+          "bidViewabilityIO",
+          "biddoBidAdapter",
+          "bidglassBidAdapter",
+          "bidmaticBidAdapter",
+          "bidscubeBidAdapter",
+          "bidwatchAnalyticsAdapter",
+          "big-richmediaBidAdapter",
+          "blastoBidAdapter",
+          "bliinkBidAdapter",
+          "blueconicRtdProvider",
+          "boldwinBidAdapter",
+          "brandmetricsRtdProvider",
+          "braveBidAdapter",
+          "bridBidAdapter",
+          "bridgewellBidAdapter",
+          "brightMountainMediaBidAdapter",
+          "browsiBidAdapter",
+          "browsiRtdProvider",
+          "bucksenseBidAdapter",
+          "buzzoolaBidAdapter",
+          "byDataAnalyticsAdapter",
+          "c1xBidAdapter",
+          "cadentApertureMXBidAdapter",
+          "carodaBidAdapter",
+          "categoryTranslation",
+          "ccxBidAdapter",
+          "ceeIdSystem",
+          "chtnwBidAdapter",
+          "cleanioRtdProvider",
+          "cleanmedianetBidAdapter",
+          "clickforceBidAdapter",
+          "codefuelBidAdapter",
+          "cointrafficBidAdapter",
+          "coinzillaBidAdapter",
+          "colombiaBidAdapter",
+          "colossussspBidAdapter",
+          "compassBidAdapter",
+          "conceptxBidAdapter",
+          "concertAnalyticsAdapter",
+          "concertBidAdapter",
+          "confiantRtdProvider",
+          "connatixBidAdapter",
+          "connectIdSystem",
+          "connectadBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consumableBidAdapter",
+          "contentexchangeBidAdapter",
+          "contxtfulRtdProvider",
+          "conversantAnalyticsAdapter",
+          "conversantBidAdapter",
+          "copper6sspBidAdapter",
+          "cpmstarBidAdapter",
+          "craftBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "cwireBidAdapter",
+          "czechAdIdSystem",
+          "dacIdSystem",
+          "dailyhuntBidAdapter",
+          "dailymotionBidAdapter",
+          "dataControllerModule",
+          "datablocksAnalyticsAdapter",
+          "datablocksBidAdapter",
+          "datawrkzBidAdapter",
+          "dchain",
+          "debugging",
+          "deepintentBidAdapter",
+          "deepintentDpesIdSystem",
+          "deltaprojectsBidAdapter",
+          "dfpAdServerVideo",
+          "dfpAdpod",
+          "dgkeywordRtdProvider",
+          "dianomiBidAdapter",
+          "discoveryBidAdapter",
+          "displayioBidAdapter",
+          "distroscaleBidAdapter",
+          "dmdIdSystem",
+          "docereeAdManagerBidAdapter",
+          "docereeBidAdapter",
+          "driftpixelBidAdapter",
+          "dsaControl",
+          "dsp_genieeBidAdapter",
+          "dspxBidAdapter",
+          "dxkultureBidAdapter",
+          "dynamicAdBoostRtdProvider",
+          "e_volutionBidAdapter",
+          "edge226BidAdapter",
+          "eightPodAnalyticsAdapter",
+          "eightPodBidAdapter",
+          "emtvBidAdapter",
+          "engageyaBidAdapter",
+          "eplanningBidAdapter",
+          "eskimiBidAdapter",
+          "etargetBidAdapter",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "exadsBidAdapter",
+          "experianRtdProvider",
+          "express",
+          "fabrickIdSystem",
+          "feedadBidAdapter",
+          "finativeBidAdapter",
+          "fintezaAnalyticsAdapter",
+          "flippBidAdapter",
+          "fluctBidAdapter",
+          "fpdModule",
+          "freeWheelAdserverVideo",
+          "freepassBidAdapter",
+          "freepassIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gammaBidAdapter",
+          "gamoshiBidAdapter",
+          "genericAnalyticsAdapter",
+          "geoedgeRtdProvider",
+          "geolocationRtdProvider",
+          "getintentBidAdapter",
+          "gjirafaBidAdapter",
+          "globalsunBidAdapter",
+          "glomexBidAdapter",
+          "gmosspBidAdapter",
+          "gnetBidAdapter",
+          "goldbachBidAdapter",
+          "goldfishAdsRtdProvider",
+          "gothamadsBidAdapter",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "gravitoIdSystem",
+          "greenbidsAnalyticsAdapter",
+          "greenbidsRtdProvider",
+          "gridBidAdapter",
+          "growadvertisingBidAdapter",
+          "growthCodeAnalyticsAdapter",
+          "growthCodeIdSystem",
+          "growthCodeRtdProvider",
+          "gumgumBidAdapter",
+          "h12mediaBidAdapter",
+          "hadronAnalyticsAdapter",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "holidBidAdapter",
+          "hybridBidAdapter",
+          "hypelabBidAdapter",
+          "iasRtdProvider",
+          "id5AnalyticsAdapter",
+          "id5IdSystem",
+          "idImportLibrary",
+          "identityLinkIdSystem",
+          "idxBidAdapter",
+          "idxIdSystem",
+          "illuminBidAdapter",
+          "imRtdProvider",
+          "imdsBidAdapter",
+          "impactifyBidAdapter",
+          "improvedigitalBidAdapter",
+          "imuIdSystem",
+          "incrxBidAdapter",
+          "innityBidAdapter",
+          "insticatorBidAdapter",
+          "instreamTracking",
+          "integr8BidAdapter",
+          "intentIqIdSystem",
+          "interactiveOffersBidAdapter",
+          "intersectionRtdProvider",
+          "invamiaBidAdapter",
+          "invibesBidAdapter",
+          "invisiblyAnalyticsAdapter",
+          "ipromBidAdapter",
+          "iqxBidAdapter",
+          "iqzoneBidAdapter",
+          "ivsBidAdapter",
+          "ixBidAdapter",
+          "jixieBidAdapter",
+          "justIdSystem",
+          "justpremiumBidAdapter",
+          "jwplayerBidAdapter",
+          "jwplayerRtdProvider",
+          "jwplayerVideoProvider",
+          "kargoAnalyticsAdapter",
+          "kargoBidAdapter",
+          "kimberliteBidAdapter",
+          "kinessoIdSystem",
+          "kiviadsBidAdapter",
+          "koblerBidAdapter",
+          "konduitAnalyticsAdapter",
+          "konduitWrapper",
+          "krushmediaBidAdapter",
+          "kubientBidAdapter",
+          "kueezBidAdapter",
+          "kueezRtbBidAdapter",
+          "lassoBidAdapter",
+          "lemmaDigitalBidAdapter",
+          "lifestreetBidAdapter",
+          "limelightDigitalBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "livewrappedAnalyticsAdapter",
+          "livewrappedBidAdapter",
+          "lkqdBidAdapter",
+          "lm_kiviadsBidAdapter",
+          "lmpIdSystem",
+          "lockerdomeBidAdapter",
+          "lockrAIMIdSystem",
+          "loganBidAdapter",
+          "logicadBidAdapter",
+          "loglyliftBidAdapter",
+          "lotamePanoramaIdSystem",
+          "loyalBidAdapter",
+          "luceadBidAdapter",
+          "lunamediahbBidAdapter",
+          "luponmediaBidAdapter",
+          "mabidderBidAdapter",
+          "madvertiseBidAdapter",
+          "magniteAnalyticsAdapter",
+          "malltvAnalyticsAdapter",
+          "malltvBidAdapter",
+          "mantisBidAdapter",
+          "marsmediaBidAdapter",
+          "mathildeadsBidAdapter",
+          "mediabramaBidAdapter",
+          "mediafilterRtdProvider",
+          "mediaforceBidAdapter",
+          "mediafuseBidAdapter",
+          "mediagoBidAdapter",
+          "mediaimpactBidAdapter",
+          "mediakeysBidAdapter",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "medianetRtdProvider",
+          "mediasniperBidAdapter",
+          "mediasquareBidAdapter",
+          "merkleIdSystem",
+          "mgidBidAdapter",
+          "mgidRtdProvider",
+          "mgidXBidAdapter",
+          "microadBidAdapter",
+          "minutemediaBidAdapter",
+          "missenaBidAdapter",
+          "mobfoxpbBidAdapter",
+          "mobianRtdProvider",
+          "multibid",
+          "mwOpenLinkIdSystem",
+          "my6senseBidAdapter",
+          "mygaruIdSystem",
+          "mytargetBidAdapter",
+          "nativeRendering",
+          "nativoBidAdapter",
+          "naveggIdSystem",
+          "netIdSystem",
+          "neuwoRtdProvider",
+          "newspassidBidAdapter",
+          "nextMillenniumBidAdapter",
+          "nextrollBidAdapter",
+          "nexx360BidAdapter",
+          "nobidAnalyticsAdapter",
+          "nobidBidAdapter",
+          "novatiqIdSystem",
+          "oguryBidAdapter",
+          "omsBidAdapter",
+          "oneKeyIdSystem",
+          "oneKeyRtdProvider",
+          "onetagBidAdapter",
+          "onomagicBidAdapter",
+          "ooloAnalyticsAdapter",
+          "open8BidAdapter",
+          "openwebBidAdapter",
+          "openxBidAdapter",
+          "operaadsBidAdapter",
+          "operaadsIdSystem",
+          "opscoBidAdapter",
+          "optableBidAdapter",
+          "optidigitalBidAdapter",
+          "optimeraRtdProvider",
+          "optimonAnalyticsAdapter",
+          "optoutBidAdapter",
+          "orakiBidAdapter",
+          "orbidderBidAdapter",
+          "orbitsoftBidAdapter",
+          "otmBidAdapter",
+          "outbrainBidAdapter",
+          "oxxionAnalyticsAdapter",
+          "oxxionRtdProvider",
+          "ozoneBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "padsquadBidAdapter",
+          "pairIdSystem",
+          "pangleBidAdapter",
+          "performaxBidAdapter",
+          "permutiveRtdProvider",
+          "pgamsspBidAdapter",
+          "pianoDmpAnalyticsAdapter",
+          "pilotxBidAdapter",
+          "pixfutureBidAdapter",
+          "playdigoBidAdapter",
+          "prebidServerBidAdapter",
+          "precisoBidAdapter",
+          "priceFloors",
+          "prismaBidAdapter",
+          "programmaticaBidAdapter",
+          "proxistoreBidAdapter",
+          "pstudioBidAdapter",
+          "pubCircleBidAdapter",
+          "pubProvidedIdSystem",
+          "pubgeniusBidAdapter",
+          "publinkIdSystem",
+          "publirBidAdapter",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "pubperfAnalyticsAdapter",
+          "pubstackAnalyticsAdapter",
+          "pubwiseAnalyticsAdapter",
+          "pubwiseBidAdapter",
+          "pubxBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "pulsepointAnalyticsAdapter",
+          "pulsepointBidAdapter",
+          "pxyzBidAdapter",
+          "qortexRtdProvider",
+          "qtBidAdapter",
+          "quantcastBidAdapter",
+          "quantcastIdSystem",
+          "qwarryBidAdapter",
+          "r2b2BidAdapter",
+          "radsBidAdapter",
+          "rakutenBidAdapter",
+          "raynRtdProvider",
+          "readpeakBidAdapter",
+          "reconciliationRtdProvider",
+          "redtramBidAdapter",
+          "relaidoBidAdapter",
+          "relayBidAdapter",
+          "relevadRtdProvider",
+          "relevantAnalyticsAdapter",
+          "relevantdigitalBidAdapter",
+          "relevatehealthBidAdapter",
+          "resetdigitalBidAdapter",
+          "retailspotBidAdapter",
+          "revcontentBidAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "ringieraxelspringerBidAdapter",
+          "riseBidAdapter",
+          "rivrAnalyticsAdapter",
+          "rixengineBidAdapter",
+          "roxotAnalyticsAdapter",
+          "rtbhouseBidAdapter",
+          "rtbsapeBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "saambaaBidAdapter",
+          "scaleableAnalyticsAdapter",
+          "scatteredBidAdapter",
+          "schain",
+          "seedingAllianceBidAdapter",
+          "seedtagBidAdapter",
+          "setupadBidAdapter",
+          "sharedIdSystem",
+          "sharethroughAnalyticsAdapter",
+          "sharethroughBidAdapter",
+          "shinezBidAdapter",
+          "shinezRtbBidAdapter",
+          "showheroes-bsBidAdapter",
+          "silvermobBidAdapter",
+          "silverpushBidAdapter",
+          "sirdataRtdProvider",
+          "sizeMapping",
+          "sizeMappingV2",
+          "slimcutBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smarthubBidAdapter",
+          "smarticoBidAdapter",
+          "smartxBidAdapter",
+          "smartyadsAnalyticsAdapter",
+          "smartyadsBidAdapter",
+          "smartytechBidAdapter",
+          "smilewantedBidAdapter",
+          "snigelBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "ssmasBidAdapter",
+          "sspBCBidAdapter",
+          "stnBidAdapter",
+          "stroeerCoreBidAdapter",
+          "stvBidAdapter",
+          "sublimeBidAdapter",
+          "taboolaBidAdapter",
+          "tagorasBidAdapter",
+          "talkadsBidAdapter",
+          "tapadIdSystem",
+          "tappxBidAdapter",
+          "targetVideoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "telariaBidAdapter",
+          "temedyaBidAdapter",
+          "terceptAnalyticsAdapter",
+          "theAdxBidAdapter",
+          "themoneytizerBidAdapter",
+          "timeoutRtdProvider",
+          "tncIdSystem",
+          "topLevelPaapi",
+          "topicsFpdModule",
+          "tpmnBidAdapter",
+          "trafficgateBidAdapter",
+          "trionBidAdapter",
+          "tripleliftBidAdapter",
+          "truereachBidAdapter",
+          "ttdBidAdapter",
+          "twistDigitalBidAdapter",
+          "ucfunnelAnalyticsAdapter",
+          "ucfunnelBidAdapter",
+          "uid2IdSystem",
+          "underdogmediaBidAdapter",
+          "undertoneBidAdapter",
+          "unicornBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "utiqIdSystem",
+          "utiqMtpIdSystem",
+          "validationFpdModule",
+          "vdoaiBidAdapter",
+          "ventesBidAdapter",
+          "verizonMediaIdSystem",
+          "viantOrtbBidAdapter",
+          "vibrantmediaBidAdapter",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videobyteBidAdapter",
+          "videoheroesBidAdapter",
+          "videojsVideoProvider",
+          "videonowBidAdapter",
+          "videoreachBidAdapter",
+          "vidoomyBidAdapter",
+          "viewdeosDXBidAdapter",
+          "viouslyBidAdapter",
+          "viqeoBidAdapter",
+          "visiblemeasuresBidAdapter",
+          "visxBidAdapter",
+          "vlybyBidAdapter",
+          "voxBidAdapter",
+          "vrtcalBidAdapter",
+          "vuukleBidAdapter",
+          "waardexBidAdapter",
+          "weboramaRtdProvider",
+          "welectBidAdapter",
+          "widespaceBidAdapter",
+          "winrBidAdapter",
+          "wipesBidAdapter",
+          "xeBidAdapter",
+          "yahooAdsBidAdapter",
+          "yandexAnalyticsAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldlabBidAdapter",
+          "yieldliftBidAdapter",
+          "yieldloveBidAdapter",
+          "yieldmoBidAdapter",
+          "yieldmoSyntheticInventoryModule",
+          "yieldoneAnalyticsAdapter",
+          "yieldoneBidAdapter",
+          "yuktamediaAnalyticsAdapter",
+          "zeotapIdPlusIdSystem",
+          "zetaBidAdapter",
+          "zeta_global_sspAnalyticsAdapter",
+          "zeta_global_sspBidAdapter",
+          "zmaticooBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.accidentallycrunchy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accidentesdecostarica.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accidentetrabajo.info"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.52.2",
+        "modules": [
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "currency",
+          "improvedigitalBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubxaiAnalyticsAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sovrnBidAdapter",
+          "teadsBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.accionesdebolsa.com"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "ats"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acclon.online"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodation4u.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationasia.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationaustralia.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationbnb.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationbookings.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationbrisbane.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationbrokenhill.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationburleigh.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationcairns.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationcoffsharbour.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationcooktown.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationdirectory.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationeurope.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationfind.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationfremantle.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationgeorgetown.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationgoldcoast.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationgreatoceanroad.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationguide.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationinsurfersparadise.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationkalgoorlie.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationlondon.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationmainbeach.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationmelbourne.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationmelbourne.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationmooloolaba.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationnelsonbay.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationnt.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationperth.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationperth.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationporthedland.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationqld.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationredcliffe.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationrockhampton.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationsearch.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationsunshinecoast.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationsunshinecoast.net.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationvic.com.au"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationworld.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accommodationyamba.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accordietesto.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accordsetparoles.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountancy4all.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountant-info.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountantbrisbane.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountantnextdoor.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountantscanberra.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountantsydney.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountingforeveryone.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountingonline2021.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountingtitan.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountingtools.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accountsplace.co.ke"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accramail.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accronline.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accsports.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accuhoroscope.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accuratebuddy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.accuratecyber.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acdwyer.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acedentalresource.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehasia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehconnect.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehground.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehherald.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehinfo.id"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehonline.co"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehportal.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehpungo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acehvoice.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aceidlo.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aceitcert.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs325474",
+        "version": "v8.20.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adfBidAdapter",
+          "admaticBidAdapter",
+          "adpod",
+          "adtargetBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "gptPreAuction",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "luponmediaBidAdapter",
+          "mgidBidAdapter",
+          "mgidXBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "sspBCBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.acelenakliye.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acelessons.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acesgolf.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbSimpleAds",
+        "version": "v9.12.0-pre",
+        "modules": [
+          "criteoIdSystem",
+          "naveggIdSystem",
+          "rubiconBidAdapter",
+          "schain",
+          "smartadserverBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.acessocultural.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acgbox.link"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acgnews.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achamelnews.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achau.tw"
+  },
+  {
+    "libraries": [],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "tmzr",
+        "version": "v8.38.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoIdSystem",
+          "currency",
+          "eplanningBidAdapter",
+          "fpdModule",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "justpremiumBidAdapter",
+          "lotamePanoramaIdSystem",
+          "moneytizerBidAdapter",
+          "onetagBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "quantcastIdSystem",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sirdataRtdProvider",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "themoneytizerBidAdapter",
+          "topicsFpdModule",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.acheilegall.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acheiusa.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achengula.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achhiadvice.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achicarimagenes.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achievedge.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achievementgames.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achievinginlife.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achingfoodie.tw"
+  },
+  {
+    "libraries": [],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.16.0-pre",
+        "modules": [
+          "33acrossIdSystem",
+          "adServer",
+          "adServerAdmixer",
+          "adValidationWrapper",
+          "adagioRtdProvider",
+          "admixerAnalyticsAdapter",
+          "admixerBidAdapter",
+          "admixerIdSystem",
+          "anPspParamsConverter",
+          "currency",
+          "id5IdSystem",
+          "intersectionRtdProvider",
+          "lotamePanoramaIdSystem",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.achizitii.md"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achkayen.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achotendencia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achotv.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.6.0-pre",
+        "modules": [
+          "appnexusBidAdapter",
+          "gptPreAuction",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "seedtagBidAdapter",
+          "smartadserverBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.achougastronomia.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achrafdk.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.achyutaya.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acidadeon.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acidcow.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aciktercih.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acilissaati.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acindia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acionando.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acipach.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aciprensa.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acken.com.ng"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acknowledgementsample.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acl-2022.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acmemarkets.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vmpbjs",
+        "version": "v8.52.8",
+        "modules": [
+          "33acrossIdSystem",
+          "adfBidAdapter",
+          "adpod",
+          "adtelligentBidAdapter",
+          "allowSizes",
+          "amxBidAdapter",
+          "bidsizematch",
+          "consentManagement",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "debugging",
+          "dfpAdServerVideo",
+          "eplanningBidAdapter",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mygaruRtdProvider",
+          "nobidBidAdapter",
+          "onetagBidAdapter",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "sovrnBidAdapter",
+          "unrulyBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.acmods.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acmoustafa.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "tmzr",
+        "version": "v9.23.0",
+        "modules": [
+          "33acrossIdSystem",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "eplanningBidAdapter",
+          "fpdModule",
+          "id5IdSystem",
+          "justpremiumBidAdapter",
+          "lotamePanoramaIdSystem",
+          "moneytizerBidAdapter",
+          "nativeRendering",
+          "onetagBidAdapter",
+          "outbrainBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubxaiAnalyticsAdapter",
+          "quantcastIdSystem",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "themoneytizerBidAdapter",
+          "topicsFpdModule",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.acn.com.ve"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acnh.co"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "$$PREBID_GLOBAL$$",
+        "version": "v8.50.0",
+        "modules": [
+          "currency",
+          "gptPreAuction",
+          "schain",
+          "rtbhouseBidAdapter",
+          "pubmaticBidAdapter",
+          "ixBidAdapter",
+          "criteoBidAdapter",
+          "unicornBidAdapter",
+          "microadBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.50.0",
+        "modules": [
+          "currency",
+          "gptPreAuction",
+          "schain",
+          "rtbhouseBidAdapter",
+          "pubmaticBidAdapter",
+          "ixBidAdapter",
+          "criteoBidAdapter",
+          "unicornBidAdapter",
+          "microadBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.aco-mom.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acolita.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acolunafinanceira.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acontecenabahia.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acordesdcanciones.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acordesgaditanos.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acordocerto.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acortar.link"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acousticmusicarchive.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acousticpost.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acovalue.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acppadel.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acquario.top"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acquavivalive.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acquistoapprovato.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acre.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acrinews.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acrinrete.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acrius.co.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acroanim.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acronym-maker.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acronym.co.kr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "apdpbjs",
+        "version": "v9.26.0",
+        "modules": [
+          "adagioRtdProvider",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "apacdexBidAdapter",
+          "bidtestBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "currency",
+          "experianRtdProvider",
+          "id5IdSystem",
+          "onetagBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "priceFloors",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "tcfControl",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.acrosstheculture.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acrostic.ai"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acrylbilder-acrylmalerei.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acsace.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acsjprojetos.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actgameslog.net"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.31.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adotBidAdapter",
+          "adyoulikeBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "beopBidAdapter",
+          "bidwatchAnalyticsAdapter",
+          "bliinkBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "eplanningBidAdapter",
+          "fledgeForGpt",
+          "gdprEnforcement",
+          "greenbidsAnalyticsAdapter",
+          "greenbidsRtdProvider",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "iasRtdProvider",
+          "id5IdSystem",
+          "impactifyBidAdapter",
+          "improvedigitalBidAdapter",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "mediakeysBidAdapter",
+          "mediasquareBidAdapter",
+          "missenaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "permutiveRtdProvider",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "qwarryBidAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sublimeBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "userId",
+          "utiqSystem"
+        ]
+      }
+    ],
+    "url": "http://www.actiefwonen.be"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs325474",
+        "version": "v8.20.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adfBidAdapter",
+          "admaticBidAdapter",
+          "adpod",
+          "adtargetBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "gptPreAuction",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "luponmediaBidAdapter",
+          "mgidBidAdapter",
+          "mgidXBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "sspBCBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.actince.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actinginlondon.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actingpassions.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actionfantasyhub.top"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actiongames.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actiongamesnow.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actionmidia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actionquiz.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actiox.xyz"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activegearreview.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.26.0",
+        "modules": [
+          "appnexusBidAdapter",
+          "brightcomSSPBidAdapter",
+          "ixBidAdapter",
+          "openxBidAdapter",
+          "sharethroughAnalyticsAdapter",
+          "sharethroughBidAdapter",
+          "tripleliftBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.activekids.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activel.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activeoutdoors.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activercarte.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activesearchresults.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.12.0",
+        "modules": [
+          "adyoulikeBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "richaudienceBidAdapter",
+          "smartadserverBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.actividadesdeinfantilyprimaria.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activityjapan.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activitypedia.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activityschoolkids.com"
+  },
+  {
+    "libraries": [],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.2.0",
+        "modules": [
+          "1plusXRtdProvider",
+          "33acrossAnalyticsAdapter",
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "51DegreesRtdProvider",
+          "AsteriobidPbmAnalyticsAdapter",
+          "BTBidAdapter",
+          "a1MediaBidAdapter",
+          "a1MediaRtdProvider",
+          "a4gBidAdapter",
+          "aaxBlockmeterRtdProvider",
+          "ablidaBidAdapter",
+          "acuityadsBidAdapter",
+          "ad2ictionBidAdapter",
+          "adWMGAnalyticsAdapter",
+          "adWMGBidAdapter",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adbutlerBidAdapter",
+          "addefendBidAdapter",
+          "adfBidAdapter",
+          "adfusionBidAdapter",
+          "adgenerationBidAdapter",
+          "adhashBidAdapter",
+          "adheseBidAdapter",
+          "adkernelAdnAnalyticsAdapter",
+          "adkernelAdnBidAdapter",
+          "adkernelBidAdapter",
+          "adlooxAnalyticsAdapter",
+          "adlooxAdServerVideo",
+          "adlooxRtdProvider",
+          "admanBidAdapter",
+          "admaruBidAdapter",
+          "admaticBidAdapter",
+          "admediaBidAdapter",
+          "admixerBidAdapter",
+          "admixerIdSystem",
+          "adnowBidAdapter",
+          "adnuntiusBidAdapter",
+          "adnuntiusRtdProvider",
+          "adoceanBidAdapter",
+          "adotBidAdapter",
+          "adpartnerBidAdapter",
+          "adplusBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "adprimeBidAdapter",
+          "adqueryBidAdapter",
+          "adqueryIdSystem",
+          "adrelevantisBidAdapter",
+          "adrinoBidAdapter",
+          "adriverBidAdapter",
+          "adriverIdSystem",
+          "adsinteractiveBidAdapter",
+          "adspiritBidAdapter",
+          "adstirBidAdapter",
+          "adtargetBidAdapter",
+          "adtelligentBidAdapter",
+          "adtelligentIdSystem",
+          "adtrgtmeBidAdapter",
+          "adtrueBidAdapter",
+          "aduptechBidAdapter",
+          "advangelistsBidAdapter",
+          "adxcgAnalyticsAdapter",
+          "adxcgBidAdapter",
+          "adxpremiumAnalyticsAdapter",
+          "adyoulikeBidAdapter",
+          "afpBidAdapter",
+          "agmaAnalyticsAdapter",
+          "aidemBidAdapter",
+          "airgridRtdProvider",
+          "ajaBidAdapter",
+          "akamaiDapRtdProvider",
+          "alkimiBidAdapter",
+          "allowActivities",
+          "ampliffyBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "anPspParamsConverter",
+          "aniviewBidAdapter",
+          "anonymisedRtdProvider",
+          "anyclipBidAdapter",
+          "apacdexBidAdapter",
+          "appierAnalyticsAdapter",
+          "appierBidAdapter",
+          "appnexusBidAdapter",
+          "appushBidAdapter",
+          "apstreamBidAdapter",
+          "arcspanRtdProvider",
+          "asealBidAdapter",
+          "asoBidAdapter",
+          "asteriobidAnalyticsAdapter",
+          "astraoneBidAdapter",
+          "atsAnalyticsAdapter",
+          "audiencerunBidAdapter",
+          "automatadAnalyticsAdapter",
+          "automatadBidAdapter",
+          "axisBidAdapter",
+          "axonixBidAdapter",
+          "azerionedgeRtdProvider",
+          "beachfrontBidAdapter",
+          "bedigitechBidAdapter",
+          "beopBidAdapter",
+          "betweenBidAdapter",
+          "beyondmediaBidAdapter",
+          "bidViewability",
+          "bidViewabilityIO",
+          "biddoBidAdapter",
+          "bidglassBidAdapter",
+          "bidmaticBidAdapter",
+          "bidscubeBidAdapter",
+          "bidwatchAnalyticsAdapter",
+          "big-richmediaBidAdapter",
+          "blastoBidAdapter",
+          "bliinkBidAdapter",
+          "blueconicRtdProvider",
+          "boldwinBidAdapter",
+          "brandmetricsRtdProvider",
+          "braveBidAdapter",
+          "bridBidAdapter",
+          "bridgewellBidAdapter",
+          "brightMountainMediaBidAdapter",
+          "browsiBidAdapter",
+          "browsiRtdProvider",
+          "bucksenseBidAdapter",
+          "buzzoolaBidAdapter",
+          "byDataAnalyticsAdapter",
+          "c1xBidAdapter",
+          "cadentApertureMXBidAdapter",
+          "carodaBidAdapter",
+          "categoryTranslation",
+          "ccxBidAdapter",
+          "ceeIdSystem",
+          "chtnwBidAdapter",
+          "cleanioRtdProvider",
+          "cleanmedianetBidAdapter",
+          "clickforceBidAdapter",
+          "codefuelBidAdapter",
+          "cointrafficBidAdapter",
+          "coinzillaBidAdapter",
+          "colombiaBidAdapter",
+          "colossussspBidAdapter",
+          "compassBidAdapter",
+          "conceptxBidAdapter",
+          "concertAnalyticsAdapter",
+          "concertBidAdapter",
+          "confiantRtdProvider",
+          "connatixBidAdapter",
+          "connectIdSystem",
+          "connectadBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consumableBidAdapter",
+          "contentexchangeBidAdapter",
+          "contxtfulRtdProvider",
+          "conversantAnalyticsAdapter",
+          "conversantBidAdapter",
+          "cpmstarBidAdapter",
+          "craftBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "cwireBidAdapter",
+          "czechAdIdSystem",
+          "dacIdSystem",
+          "dailyhuntBidAdapter",
+          "dailymotionBidAdapter",
+          "dataControllerModule",
+          "datablocksAnalyticsAdapter",
+          "datablocksBidAdapter",
+          "datawrkzBidAdapter",
+          "dchain",
+          "debugging",
+          "deepintentBidAdapter",
+          "deepintentDpesIdSystem",
+          "deltaprojectsBidAdapter",
+          "dfpAdServerVideo",
+          "dfpAdpod",
+          "dgkeywordRtdProvider",
+          "dianomiBidAdapter",
+          "discoveryBidAdapter",
+          "displayioBidAdapter",
+          "distroscaleBidAdapter",
+          "dmdIdSystem",
+          "docereeAdManagerBidAdapter",
+          "docereeBidAdapter",
+          "driftpixelBidAdapter",
+          "dsaControl",
+          "dsp_genieeBidAdapter",
+          "dspxBidAdapter",
+          "dxkultureBidAdapter",
+          "dynamicAdBoostRtdProvider",
+          "e_volutionBidAdapter",
+          "edge226BidAdapter",
+          "eightPodAnalyticsAdapter",
+          "eightPodBidAdapter",
+          "emtvBidAdapter",
+          "engageyaBidAdapter",
+          "eplanningBidAdapter",
+          "eskimiBidAdapter",
+          "etargetBidAdapter",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "exadsBidAdapter",
+          "experianRtdProvider",
+          "express",
+          "fabrickIdSystem",
+          "feedadBidAdapter",
+          "finativeBidAdapter",
+          "fintezaAnalyticsAdapter",
+          "flippBidAdapter",
+          "fluctBidAdapter",
+          "fpdModule",
+          "freeWheelAdserverVideo",
+          "freepassBidAdapter",
+          "freepassIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gammaBidAdapter",
+          "gamoshiBidAdapter",
+          "genericAnalyticsAdapter",
+          "geoedgeRtdProvider",
+          "geolocationRtdProvider",
+          "getintentBidAdapter",
+          "gjirafaBidAdapter",
+          "globalsunBidAdapter",
+          "glomexBidAdapter",
+          "gmosspBidAdapter",
+          "gnetBidAdapter",
+          "goldbachBidAdapter",
+          "goldfishAdsRtdProvider",
+          "gothamadsBidAdapter",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "gravitoIdSystem",
+          "greenbidsAnalyticsAdapter",
+          "greenbidsRtdProvider",
+          "gridBidAdapter",
+          "growadvertisingBidAdapter",
+          "growthCodeAnalyticsAdapter",
+          "growthCodeIdSystem",
+          "growthCodeRtdProvider",
+          "gumgumBidAdapter",
+          "h12mediaBidAdapter",
+          "hadronAnalyticsAdapter",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "holidBidAdapter",
+          "hybridBidAdapter",
+          "hypelabBidAdapter",
+          "iasRtdProvider",
+          "id5AnalyticsAdapter",
+          "id5IdSystem",
+          "idImportLibrary",
+          "identityLinkIdSystem",
+          "idxBidAdapter",
+          "idxIdSystem",
+          "illuminBidAdapter",
+          "imRtdProvider",
+          "imdsBidAdapter",
+          "impactifyBidAdapter",
+          "improvedigitalBidAdapter",
+          "imuIdSystem",
+          "incrxBidAdapter",
+          "innityBidAdapter",
+          "insticatorBidAdapter",
+          "instreamTracking",
+          "integr8BidAdapter",
+          "intentIqIdSystem",
+          "interactiveOffersBidAdapter",
+          "intersectionRtdProvider",
+          "invamiaBidAdapter",
+          "invibesBidAdapter",
+          "invisiblyAnalyticsAdapter",
+          "ipromBidAdapter",
+          "iqxBidAdapter",
+          "iqzoneBidAdapter",
+          "ivsBidAdapter",
+          "ixBidAdapter",
+          "jixieBidAdapter",
+          "justIdSystem",
+          "justpremiumBidAdapter",
+          "jwplayerBidAdapter",
+          "jwplayerRtdProvider",
+          "jwplayerVideoProvider",
+          "kargoAnalyticsAdapter",
+          "kargoBidAdapter",
+          "kimberliteBidAdapter",
+          "kinessoIdSystem",
+          "kiviadsBidAdapter",
+          "koblerBidAdapter",
+          "konduitAnalyticsAdapter",
+          "konduitWrapper",
+          "krushmediaBidAdapter",
+          "kubientBidAdapter",
+          "kueezBidAdapter",
+          "kueezRtbBidAdapter",
+          "lassoBidAdapter",
+          "lemmaDigitalBidAdapter",
+          "lifestreetBidAdapter",
+          "limelightDigitalBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "livewrappedAnalyticsAdapter",
+          "livewrappedBidAdapter",
+          "lkqdBidAdapter",
+          "lm_kiviadsBidAdapter",
+          "lmpIdSystem",
+          "lockerdomeBidAdapter",
+          "lockrAIMIdSystem",
+          "loganBidAdapter",
+          "logicadBidAdapter",
+          "loglyliftBidAdapter",
+          "lotamePanoramaIdSystem",
+          "loyalBidAdapter",
+          "luceadBidAdapter",
+          "lunamediahbBidAdapter",
+          "luponmediaBidAdapter",
+          "mabidderBidAdapter",
+          "madvertiseBidAdapter",
+          "magniteAnalyticsAdapter",
+          "malltvAnalyticsAdapter",
+          "malltvBidAdapter",
+          "mantisBidAdapter",
+          "marsmediaBidAdapter",
+          "mathildeadsBidAdapter",
+          "mediabramaBidAdapter",
+          "mediafilterRtdProvider",
+          "mediaforceBidAdapter",
+          "mediafuseBidAdapter",
+          "mediagoBidAdapter",
+          "mediaimpactBidAdapter",
+          "mediakeysBidAdapter",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "medianetRtdProvider",
+          "mediasniperBidAdapter",
+          "mediasquareBidAdapter",
+          "merkleIdSystem",
+          "mgidBidAdapter",
+          "mgidRtdProvider",
+          "mgidXBidAdapter",
+          "microadBidAdapter",
+          "minutemediaBidAdapter",
+          "missenaBidAdapter",
+          "mobfoxpbBidAdapter",
+          "mobianRtdProvider",
+          "multibid",
+          "mwOpenLinkIdSystem",
+          "my6senseBidAdapter",
+          "mygaruIdSystem",
+          "mytargetBidAdapter",
+          "nativeRendering",
+          "nativoBidAdapter",
+          "naveggIdSystem",
+          "netIdSystem",
+          "neuwoRtdProvider",
+          "newspassidBidAdapter",
+          "nextMillenniumBidAdapter",
+          "nextrollBidAdapter",
+          "nexx360BidAdapter",
+          "nobidAnalyticsAdapter",
+          "nobidBidAdapter",
+          "novatiqIdSystem",
+          "oguryBidAdapter",
+          "omsBidAdapter",
+          "oneKeyIdSystem",
+          "oneKeyRtdProvider",
+          "onetagBidAdapter",
+          "onomagicBidAdapter",
+          "ooloAnalyticsAdapter",
+          "open8BidAdapter",
+          "openwebBidAdapter",
+          "openxBidAdapter",
+          "operaadsBidAdapter",
+          "operaadsIdSystem",
+          "opscoBidAdapter",
+          "optableBidAdapter",
+          "optidigitalBidAdapter",
+          "optimeraRtdProvider",
+          "optimonAnalyticsAdapter",
+          "optoutBidAdapter",
+          "orbidderBidAdapter",
+          "orbitsoftBidAdapter",
+          "otmBidAdapter",
+          "outbrainBidAdapter",
+          "oxxionAnalyticsAdapter",
+          "oxxionRtdProvider",
+          "ozoneBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "padsquadBidAdapter",
+          "pairIdSystem",
+          "pangleBidAdapter",
+          "performaxBidAdapter",
+          "permutiveRtdProvider",
+          "pgamsspBidAdapter",
+          "pianoDmpAnalyticsAdapter",
+          "pilotxBidAdapter",
+          "pixfutureBidAdapter",
+          "playdigoBidAdapter",
+          "prebidServerBidAdapter",
+          "precisoBidAdapter",
+          "priceFloors",
+          "prismaBidAdapter",
+          "programmaticaBidAdapter",
+          "proxistoreBidAdapter",
+          "pstudioBidAdapter",
+          "pubCircleBidAdapter",
+          "pubProvidedIdSystem",
+          "pubgeniusBidAdapter",
+          "publinkIdSystem",
+          "publirBidAdapter",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "pubperfAnalyticsAdapter",
+          "pubstackAnalyticsAdapter",
+          "pubwiseAnalyticsAdapter",
+          "pubwiseBidAdapter",
+          "pubxBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "pulsepointAnalyticsAdapter",
+          "pulsepointBidAdapter",
+          "pxyzBidAdapter",
+          "qortexRtdProvider",
+          "qtBidAdapter",
+          "quantcastBidAdapter",
+          "quantcastIdSystem",
+          "qwarryBidAdapter",
+          "r2b2BidAdapter",
+          "radsBidAdapter",
+          "rakutenBidAdapter",
+          "raynRtdProvider",
+          "readpeakBidAdapter",
+          "reconciliationRtdProvider",
+          "redtramBidAdapter",
+          "relaidoBidAdapter",
+          "relayBidAdapter",
+          "relevadRtdProvider",
+          "relevantAnalyticsAdapter",
+          "relevantdigitalBidAdapter",
+          "relevatehealthBidAdapter",
+          "resetdigitalBidAdapter",
+          "retailspotBidAdapter",
+          "revcontentBidAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "ringieraxelspringerBidAdapter",
+          "riseBidAdapter",
+          "rivrAnalyticsAdapter",
+          "rixengineBidAdapter",
+          "roxotAnalyticsAdapter",
+          "rtbhouseBidAdapter",
+          "rtbsapeBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "saambaaBidAdapter",
+          "scaleableAnalyticsAdapter",
+          "scatteredBidAdapter",
+          "schain",
+          "seedingAllianceBidAdapter",
+          "seedtagBidAdapter",
+          "setupadBidAdapter",
+          "sharedIdSystem",
+          "sharethroughAnalyticsAdapter",
+          "sharethroughBidAdapter",
+          "shinezBidAdapter",
+          "shinezRtbBidAdapter",
+          "showheroes-bsBidAdapter",
+          "silvermobBidAdapter",
+          "silverpushBidAdapter",
+          "sirdataRtdProvider",
+          "sizeMapping",
+          "sizeMappingV2",
+          "slimcutBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smarthubBidAdapter",
+          "smarticoBidAdapter",
+          "smartxBidAdapter",
+          "smartyadsAnalyticsAdapter",
+          "smartyadsBidAdapter",
+          "smartytechBidAdapter",
+          "smilewantedBidAdapter",
+          "snigelBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "ssmasBidAdapter",
+          "sspBCBidAdapter",
+          "stnBidAdapter",
+          "stroeerCoreBidAdapter",
+          "stvBidAdapter",
+          "sublimeBidAdapter",
+          "taboolaBidAdapter",
+          "tagorasBidAdapter",
+          "talkadsBidAdapter",
+          "tapadIdSystem",
+          "tappxBidAdapter",
+          "targetVideoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "telariaBidAdapter",
+          "temedyaBidAdapter",
+          "terceptAnalyticsAdapter",
+          "theAdxBidAdapter",
+          "themoneytizerBidAdapter",
+          "timeoutRtdProvider",
+          "tncIdSystem",
+          "topLevelPaapi",
+          "topicsFpdModule",
+          "tpmnBidAdapter",
+          "trafficgateBidAdapter",
+          "trionBidAdapter",
+          "tripleliftBidAdapter",
+          "truereachBidAdapter",
+          "ttdBidAdapter",
+          "twistDigitalBidAdapter",
+          "ucfunnelAnalyticsAdapter",
+          "ucfunnelBidAdapter",
+          "uid2IdSystem",
+          "underdogmediaBidAdapter",
+          "undertoneBidAdapter",
+          "unicornBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "utiqIdSystem",
+          "utiqMtpIdSystem",
+          "validationFpdModule",
+          "vdoaiBidAdapter",
+          "ventesBidAdapter",
+          "verizonMediaIdSystem",
+          "viantOrtbBidAdapter",
+          "vibrantmediaBidAdapter",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videobyteBidAdapter",
+          "videoheroesBidAdapter",
+          "videojsVideoProvider",
+          "videonowBidAdapter",
+          "videoreachBidAdapter",
+          "vidoomyBidAdapter",
+          "viewdeosDXBidAdapter",
+          "viouslyBidAdapter",
+          "viqeoBidAdapter",
+          "visiblemeasuresBidAdapter",
+          "visxBidAdapter",
+          "vlybyBidAdapter",
+          "voxBidAdapter",
+          "vrtcalBidAdapter",
+          "vuukleBidAdapter",
+          "waardexBidAdapter",
+          "weboramaRtdProvider",
+          "welectBidAdapter",
+          "widespaceBidAdapter",
+          "winrBidAdapter",
+          "wipesBidAdapter",
+          "xeBidAdapter",
+          "yahooAdsBidAdapter",
+          "yandexAnalyticsAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldlabBidAdapter",
+          "yieldliftBidAdapter",
+          "yieldloveBidAdapter",
+          "yieldmoBidAdapter",
+          "yieldmoSyntheticInventoryModule",
+          "yieldoneAnalyticsAdapter",
+          "yieldoneBidAdapter",
+          "yuktamediaAnalyticsAdapter",
+          "zeotapIdPlusIdSystem",
+          "zetaBidAdapter",
+          "zeta_global_sspAnalyticsAdapter",
+          "zeta_global_sspBidAdapter",
+          "zmaticooBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.activoforo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activonline.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.activopr.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actor.lk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actressspicystills.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acts.co.za"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actu-moteurs.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualidad-24.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualidadcastellon.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualidadcristiana.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.actualidadenfoco.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualidadmp.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualidadradio.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualitatealiterara.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualnetworth.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualnewsng.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualno.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actualradio.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actuarialninja.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actuateatro.es"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actudacia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.actunimo.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v6.25.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adpod",
+          "aolBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "freewheel-sspBidAdapter",
+          "gdprEnforcement",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "instreamTracking",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "oneVideoBidAdapter",
+          "pubProvidedIdSystem",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "sublimeBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "vidazooBidAdapter",
+          "yahoosspBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.actvtheaters.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acueducto2.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aculovernaum.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acum-tv.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acupof30.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acuraconnected.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acuriosa.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acurrentaffairs.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.30.0",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "schain",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "fpdModule",
+          "topicsFpdModule",
+          "id5IdSystem",
+          "rtdModule",
+          "contxtfulRtdProvider"
+        ]
+      }
+    ],
+    "url": "http://www.acvg.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.acw-614.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ad-hoc-news.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ad.co.il"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ad120.org.il"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs_broly241216",
+        "version": "v8.52.2",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adfBidAdapter",
+          "adkernelBidAdapter",
+          "admaticBidAdapter",
+          "admixerBidAdapter",
+          "adponeBidAdapter",
+          "adtargetBidAdapter",
+          "adtelligentBidAdapter",
+          "adyoulikeBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "apacdexBidAdapter",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "bidViewabilityIO",
+          "bizzclickBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "consentManagementGpp",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "debugging",
+          "eplanningBidAdapter",
+          "gamoshiBidAdapter",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "h12mediaBidAdapter",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "medianetBidAdapter",
+          "netpubBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "outbrainBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "teadsBidAdapter",
+          "timeoutRtdProvider",
+          "tripleliftBidAdapter",
+          "userId",
+          "voxBidAdapter",
+          "yahoosspBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.ad2trade.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ad9g.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adaderana.lk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adaham.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adamchoi.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adamlea.ch"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adamsbrickjunction.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adana24.com"
+  },
+  {
+    "libraries": [],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.31.0",
+        "modules": [
+          "adfBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "dfpAdServerVideo",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "paapi",
+          "paapiForGpt",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "tcfControl",
+          "yandexBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.adanamersin.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adanel.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adanichell.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adarbepari.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adarshbadri.me"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adarshbarnwal.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adasale.co.id"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adat.one"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adaymag.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.27.0",
+        "modules": [
+          "adfBidAdapter",
+          "anPspParamsConverter",
+          "appnexusBidAdapter",
+          "connectadBidAdapter",
+          "consentManagementTcf",
+          "cpexAnalyticsAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "czechAdIdSystem",
+          "equativBidAdapter",
+          "id5AnalyticsAdapter",
+          "id5IdSystem",
+          "ixBidAdapter",
+          "performaxBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "setupadBidAdapter",
+          "seznamBidAdapter",
+          "smartadserverBidAdapter",
+          "sspBCBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "userId",
+          "videoModule",
+          "videojsVideoProvider"
+        ]
+      },
+      {
+        "globalVarName": "ihowpbjs",
+        "version": "v7.39.0",
+        "modules": [
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "enrichmentFpdModule",
+          "id5IdSystem",
+          "lotamePanoramaIdSystem",
+          "pubmaticIHAnalyticsAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.adbz.cz"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adcasher.one"
+  },
+  {
+    "libraries": [
+      "apstag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "owpbjs",
+        "version": "v6.18.0",
+        "modules": [
+          "consentManagement",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "ga_pbjs",
+        "version": "v9.3.0-pre",
+        "modules": [
+          "1plusXRtdProvider",
+          "33acrossAnalyticsAdapter",
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "51DegreesRtdProvider",
+          "AsteriobidPbmAnalyticsAdapter",
+          "BTBidAdapter",
+          "a1MediaBidAdapter",
+          "a1MediaRtdProvider",
+          "a4gBidAdapter",
+          "aaxBlockmeterRtdProvider",
+          "ablidaBidAdapter",
+          "acuityadsBidAdapter",
+          "ad2ictionBidAdapter",
+          "adWMGAnalyticsAdapter",
+          "adWMGBidAdapter",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adbutlerBidAdapter",
+          "addefendBidAdapter",
+          "adfBidAdapter",
+          "adfusionBidAdapter",
+          "adgenerationBidAdapter",
+          "adhashBidAdapter",
+          "adheseBidAdapter",
+          "adkernelAdnAnalyticsAdapter",
+          "adkernelAdnBidAdapter",
+          "adkernelBidAdapter",
+          "adlooxAnalyticsAdapter",
+          "adlooxAdServerVideo",
+          "adlooxRtdProvider",
+          "admanBidAdapter",
+          "admaruBidAdapter",
+          "admaticBidAdapter",
+          "admediaBidAdapter",
+          "admixerBidAdapter",
+          "admixerIdSystem",
+          "adnowBidAdapter",
+          "adnuntiusBidAdapter",
+          "adnuntiusRtdProvider",
+          "adoceanBidAdapter",
+          "adotBidAdapter",
+          "adpartnerBidAdapter",
+          "adplusBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "adprimeBidAdapter",
+          "adqueryBidAdapter",
+          "adqueryIdSystem",
+          "adrelevantisBidAdapter",
+          "adrinoBidAdapter",
+          "adriverBidAdapter",
+          "adriverIdSystem",
+          "adsinteractiveBidAdapter",
+          "adspiritBidAdapter",
+          "adstirBidAdapter",
+          "adtargetBidAdapter",
+          "adtelligentBidAdapter",
+          "adtelligentIdSystem",
+          "adtrgtmeBidAdapter",
+          "adtrueBidAdapter",
+          "aduptechBidAdapter",
+          "advangelistsBidAdapter",
+          "adxcgAnalyticsAdapter",
+          "adxcgBidAdapter",
+          "adxpremiumAnalyticsAdapter",
+          "adyoulikeBidAdapter",
+          "afpBidAdapter",
+          "agmaAnalyticsAdapter",
+          "aidemBidAdapter",
+          "airgridRtdProvider",
+          "ajaBidAdapter",
+          "akamaiDapRtdProvider",
+          "alkimiBidAdapter",
+          "allowActivities",
+          "ampliffyBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "anPspParamsConverter",
+          "aniviewBidAdapter",
+          "anonymisedRtdProvider",
+          "anyclipBidAdapter",
+          "apacdexBidAdapter",
+          "appierAnalyticsAdapter",
+          "appierBidAdapter",
+          "appnexusAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "appushBidAdapter",
+          "apstreamBidAdapter",
+          "arcspanRtdProvider",
+          "asealBidAdapter",
+          "asoBidAdapter",
+          "asteriobidAnalyticsAdapter",
+          "astraoneBidAdapter",
+          "atsAnalyticsAdapter",
+          "audiencerunBidAdapter",
+          "automatadAnalyticsAdapter",
+          "automatadBidAdapter",
+          "axisBidAdapter",
+          "axonixBidAdapter",
+          "azerionedgeRtdProvider",
+          "beachfrontBidAdapter",
+          "bedigitechBidAdapter",
+          "beopBidAdapter",
+          "betweenBidAdapter",
+          "beyondmediaBidAdapter",
+          "bidViewability",
+          "bidViewabilityIO",
+          "biddoBidAdapter",
+          "bidglassBidAdapter",
+          "bidmaticBidAdapter",
+          "bidscubeBidAdapter",
+          "bidwatchAnalyticsAdapter",
+          "big-richmediaBidAdapter",
+          "blastoBidAdapter",
+          "bliinkBidAdapter",
+          "blueconicRtdProvider",
+          "boldwinBidAdapter",
+          "brandmetricsRtdProvider",
+          "braveBidAdapter",
+          "bridBidAdapter",
+          "bridgewellBidAdapter",
+          "brightMountainMediaBidAdapter",
+          "browsiBidAdapter",
+          "browsiRtdProvider",
+          "bucksenseBidAdapter",
+          "buzzoolaBidAdapter",
+          "byDataAnalyticsAdapter",
+          "c1xBidAdapter",
+          "cadentApertureMXBidAdapter",
+          "carodaBidAdapter",
+          "categoryTranslation",
+          "ccxBidAdapter",
+          "ceeIdSystem",
+          "chtnwBidAdapter",
+          "cleanioRtdProvider",
+          "cleanmedianetBidAdapter",
+          "clickforceBidAdapter",
+          "codefuelBidAdapter",
+          "cointrafficBidAdapter",
+          "coinzillaBidAdapter",
+          "colombiaBidAdapter",
+          "colossussspBidAdapter",
+          "compassBidAdapter",
+          "conceptxBidAdapter",
+          "concertAnalyticsAdapter",
+          "concertBidAdapter",
+          "confiantRtdProvider",
+          "connatixBidAdapter",
+          "connectIdSystem",
+          "connectadBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consumableBidAdapter",
+          "contentexchangeBidAdapter",
+          "contxtfulRtdProvider",
+          "conversantAnalyticsAdapter",
+          "conversantBidAdapter",
+          "copper6sspBidAdapter",
+          "cpmstarBidAdapter",
+          "craftBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "cwireBidAdapter",
+          "czechAdIdSystem",
+          "dacIdSystem",
+          "dailyhuntBidAdapter",
+          "dailymotionBidAdapter",
+          "dataControllerModule",
+          "datablocksAnalyticsAdapter",
+          "datablocksBidAdapter",
+          "datawrkzBidAdapter",
+          "dchain",
+          "debugging",
+          "deepintentBidAdapter",
+          "deepintentDpesIdSystem",
+          "deltaprojectsBidAdapter",
+          "dfpAdServerVideo",
+          "dfpAdpod",
+          "dgkeywordRtdProvider",
+          "dianomiBidAdapter",
+          "discoveryBidAdapter",
+          "displayioBidAdapter",
+          "distroscaleBidAdapter",
+          "dmdIdSystem",
+          "docereeAdManagerBidAdapter",
+          "docereeBidAdapter",
+          "driftpixelBidAdapter",
+          "dsaControl",
+          "dsp_genieeBidAdapter",
+          "dspxBidAdapter",
+          "dxkultureBidAdapter",
+          "dynamicAdBoostRtdProvider",
+          "e_volutionBidAdapter",
+          "edge226BidAdapter",
+          "eightPodAnalyticsAdapter",
+          "eightPodBidAdapter",
+          "emtvBidAdapter",
+          "engageyaBidAdapter",
+          "eplanningBidAdapter",
+          "eskimiBidAdapter",
+          "etargetBidAdapter",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "exadsBidAdapter",
+          "experianRtdProvider",
+          "express",
+          "fabrickIdSystem",
+          "feedadBidAdapter",
+          "finativeBidAdapter",
+          "fintezaAnalyticsAdapter",
+          "flippBidAdapter",
+          "fluctBidAdapter",
+          "fpdModule",
+          "freeWheelAdserverVideo",
+          "freepassBidAdapter",
+          "freepassIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gammaBidAdapter",
+          "gamoshiBidAdapter",
+          "genericAnalyticsAdapter",
+          "geoedgeRtdProvider",
+          "geolocationRtdProvider",
+          "getintentBidAdapter",
+          "gjirafaBidAdapter",
+          "globalsunBidAdapter",
+          "glomexBidAdapter",
+          "gmosspBidAdapter",
+          "gnetBidAdapter",
+          "goldbachBidAdapter",
+          "goldfishAdsRtdProvider",
+          "gothamadsBidAdapter",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "gravitoIdSystem",
+          "greenbidsAnalyticsAdapter",
+          "greenbidsRtdProvider",
+          "gridBidAdapter",
+          "growadvertisingBidAdapter",
+          "growthCodeAnalyticsAdapter",
+          "growthCodeIdSystem",
+          "growthCodeRtdProvider",
+          "gumgumBidAdapter",
+          "h12mediaBidAdapter",
+          "hadronAnalyticsAdapter",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "holidBidAdapter",
+          "hybridBidAdapter",
+          "hypelabBidAdapter",
+          "iasRtdProvider",
+          "id5AnalyticsAdapter",
+          "id5IdSystem",
+          "idImportLibrary",
+          "identityLinkIdSystem",
+          "idxBidAdapter",
+          "idxIdSystem",
+          "illuminBidAdapter",
+          "imRtdProvider",
+          "imdsBidAdapter",
+          "impactifyBidAdapter",
+          "improvedigitalBidAdapter",
+          "imuIdSystem",
+          "incrxBidAdapter",
+          "innityBidAdapter",
+          "insticatorBidAdapter",
+          "instreamTracking",
+          "integr8BidAdapter",
+          "intentIqIdSystem",
+          "interactiveOffersBidAdapter",
+          "intersectionRtdProvider",
+          "invamiaBidAdapter",
+          "invibesBidAdapter",
+          "invisiblyAnalyticsAdapter",
+          "ipromBidAdapter",
+          "iqxBidAdapter",
+          "iqzoneBidAdapter",
+          "ivsBidAdapter",
+          "ixBidAdapter",
+          "jixieBidAdapter",
+          "justIdSystem",
+          "justpremiumBidAdapter",
+          "jwplayerBidAdapter",
+          "jwplayerRtdProvider",
+          "jwplayerVideoProvider",
+          "kargoAnalyticsAdapter",
+          "kargoBidAdapter",
+          "kimberliteBidAdapter",
+          "kinessoIdSystem",
+          "kiviadsBidAdapter",
+          "koblerBidAdapter",
+          "konduitAnalyticsAdapter",
+          "konduitWrapper",
+          "krushmediaBidAdapter",
+          "kubientBidAdapter",
+          "kueezBidAdapter",
+          "kueezRtbBidAdapter",
+          "lassoBidAdapter",
+          "lemmaDigitalBidAdapter",
+          "lifestreetBidAdapter",
+          "limelightDigitalBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "livewrappedAnalyticsAdapter",
+          "livewrappedBidAdapter",
+          "lkqdBidAdapter",
+          "lm_kiviadsBidAdapter",
+          "lmpIdSystem",
+          "lockerdomeBidAdapter",
+          "lockrAIMIdSystem",
+          "loganBidAdapter",
+          "logicadBidAdapter",
+          "loglyliftBidAdapter",
+          "lotamePanoramaIdSystem",
+          "loyalBidAdapter",
+          "luceadBidAdapter",
+          "lunamediahbBidAdapter",
+          "luponmediaBidAdapter",
+          "mabidderBidAdapter",
+          "madvertiseBidAdapter",
+          "magniteAnalyticsAdapter",
+          "malltvAnalyticsAdapter",
+          "malltvBidAdapter",
+          "mantisBidAdapter",
+          "marsmediaBidAdapter",
+          "mathildeadsBidAdapter",
+          "mediabramaBidAdapter",
+          "mediafilterRtdProvider",
+          "mediaforceBidAdapter",
+          "mediafuseBidAdapter",
+          "mediagoBidAdapter",
+          "mediaimpactBidAdapter",
+          "mediakeysBidAdapter",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "medianetRtdProvider",
+          "mediasniperBidAdapter",
+          "mediasquareBidAdapter",
+          "merkleIdSystem",
+          "mgidBidAdapter",
+          "mgidRtdProvider",
+          "mgidXBidAdapter",
+          "microadBidAdapter",
+          "minutemediaBidAdapter",
+          "missenaBidAdapter",
+          "mobfoxpbBidAdapter",
+          "mobianRtdProvider",
+          "multibid",
+          "mwOpenLinkIdSystem",
+          "my6senseBidAdapter",
+          "mygaruIdSystem",
+          "mytargetBidAdapter",
+          "nativeRendering",
+          "nativoBidAdapter",
+          "naveggIdSystem",
+          "netIdSystem",
+          "neuwoRtdProvider",
+          "newspassidBidAdapter",
+          "nextMillenniumBidAdapter",
+          "nextrollBidAdapter",
+          "nexx360BidAdapter",
+          "nobidAnalyticsAdapter",
+          "nobidBidAdapter",
+          "novatiqIdSystem",
+          "oguryBidAdapter",
+          "omsBidAdapter",
+          "oneKeyIdSystem",
+          "oneKeyRtdProvider",
+          "onetagBidAdapter",
+          "onomagicBidAdapter",
+          "ooloAnalyticsAdapter",
+          "open8BidAdapter",
+          "openwebBidAdapter",
+          "openxBidAdapter",
+          "operaadsBidAdapter",
+          "operaadsIdSystem",
+          "opscoBidAdapter",
+          "optableBidAdapter",
+          "optidigitalBidAdapter",
+          "optimeraRtdProvider",
+          "optimonAnalyticsAdapter",
+          "optoutBidAdapter",
+          "orakiBidAdapter",
+          "orbidderBidAdapter",
+          "orbitsoftBidAdapter",
+          "otmBidAdapter",
+          "outbrainBidAdapter",
+          "oxxionAnalyticsAdapter",
+          "oxxionRtdProvider",
+          "ozoneBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "padsquadBidAdapter",
+          "pairIdSystem",
+          "pangleBidAdapter",
+          "performaxBidAdapter",
+          "permutiveRtdProvider",
+          "pgamsspBidAdapter",
+          "pianoDmpAnalyticsAdapter",
+          "pilotxBidAdapter",
+          "pixfutureBidAdapter",
+          "playdigoBidAdapter",
+          "prebidServerBidAdapter",
+          "precisoBidAdapter",
+          "priceFloors",
+          "prismaBidAdapter",
+          "programmaticaBidAdapter",
+          "proxistoreBidAdapter",
+          "pstudioBidAdapter",
+          "pubCircleBidAdapter",
+          "pubProvidedIdSystem",
+          "pubgeniusBidAdapter",
+          "publinkIdSystem",
+          "publirBidAdapter",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "pubperfAnalyticsAdapter",
+          "pubstackAnalyticsAdapter",
+          "pubwiseAnalyticsAdapter",
+          "pubwiseBidAdapter",
+          "pubxBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "pulsepointAnalyticsAdapter",
+          "pulsepointBidAdapter",
+          "pxyzBidAdapter",
+          "qortexRtdProvider",
+          "qtBidAdapter",
+          "quantcastBidAdapter",
+          "quantcastIdSystem",
+          "qwarryBidAdapter",
+          "r2b2BidAdapter",
+          "radsBidAdapter",
+          "rakutenBidAdapter",
+          "raynRtdProvider",
+          "readpeakBidAdapter",
+          "reconciliationRtdProvider",
+          "redtramBidAdapter",
+          "relaidoBidAdapter",
+          "relayBidAdapter",
+          "relevadRtdProvider",
+          "relevantAnalyticsAdapter",
+          "relevantdigitalBidAdapter",
+          "relevatehealthBidAdapter",
+          "resetdigitalBidAdapter",
+          "retailspotBidAdapter",
+          "revcontentBidAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "ringieraxelspringerBidAdapter",
+          "riseBidAdapter",
+          "rivrAnalyticsAdapter",
+          "rixengineBidAdapter",
+          "roxotAnalyticsAdapter",
+          "rtbhouseBidAdapter",
+          "rtbsapeBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "saambaaBidAdapter",
+          "scaleableAnalyticsAdapter",
+          "scatteredBidAdapter",
+          "schain",
+          "seedingAllianceBidAdapter",
+          "seedtagBidAdapter",
+          "setupadBidAdapter",
+          "sharedIdSystem",
+          "sharethroughAnalyticsAdapter",
+          "sharethroughBidAdapter",
+          "shinezBidAdapter",
+          "shinezRtbBidAdapter",
+          "showheroes-bsBidAdapter",
+          "silvermobBidAdapter",
+          "silverpushBidAdapter",
+          "sirdataRtdProvider",
+          "sizeMapping",
+          "sizeMappingV2",
+          "slimcutBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smarthubBidAdapter",
+          "smarticoBidAdapter",
+          "smartxBidAdapter",
+          "smartyadsAnalyticsAdapter",
+          "smartyadsBidAdapter",
+          "smartytechBidAdapter",
+          "smilewantedBidAdapter",
+          "snigelBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "ssmasBidAdapter",
+          "sspBCBidAdapter",
+          "stnBidAdapter",
+          "stroeerCoreBidAdapter",
+          "stvBidAdapter",
+          "sublimeBidAdapter",
+          "taboolaBidAdapter",
+          "tagorasBidAdapter",
+          "talkadsBidAdapter",
+          "tapadIdSystem",
+          "tappxBidAdapter",
+          "targetVideoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "telariaBidAdapter",
+          "temedyaBidAdapter",
+          "terceptAnalyticsAdapter",
+          "theAdxBidAdapter",
+          "themoneytizerBidAdapter",
+          "timeoutRtdProvider",
+          "tncIdSystem",
+          "topLevelPaapi",
+          "topicsFpdModule",
+          "tpmnBidAdapter",
+          "trafficgateBidAdapter",
+          "trionBidAdapter",
+          "tripleliftBidAdapter",
+          "truereachBidAdapter",
+          "ttdBidAdapter",
+          "twistDigitalBidAdapter",
+          "ucfunnelAnalyticsAdapter",
+          "ucfunnelBidAdapter",
+          "uid2IdSystem",
+          "underdogmediaBidAdapter",
+          "undertoneBidAdapter",
+          "unicornBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "utiqIdSystem",
+          "utiqMtpIdSystem",
+          "validationFpdModule",
+          "vdoaiBidAdapter",
+          "ventesBidAdapter",
+          "verizonMediaIdSystem",
+          "viantOrtbBidAdapter",
+          "vibrantmediaBidAdapter",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videobyteBidAdapter",
+          "videoheroesBidAdapter",
+          "videojsVideoProvider",
+          "videonowBidAdapter",
+          "videoreachBidAdapter",
+          "vidoomyBidAdapter",
+          "viewdeosDXBidAdapter",
+          "viouslyBidAdapter",
+          "viqeoBidAdapter",
+          "visiblemeasuresBidAdapter",
+          "visxBidAdapter",
+          "vlybyBidAdapter",
+          "voxBidAdapter",
+          "vrtcalBidAdapter",
+          "vuukleBidAdapter",
+          "waardexBidAdapter",
+          "weboramaRtdProvider",
+          "welectBidAdapter",
+          "widespaceBidAdapter",
+          "winrBidAdapter",
+          "wipesBidAdapter",
+          "xeBidAdapter",
+          "yahooAdsBidAdapter",
+          "yandexAnalyticsAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldlabBidAdapter",
+          "yieldliftBidAdapter",
+          "yieldloveBidAdapter",
+          "yieldmoBidAdapter",
+          "yieldmoSyntheticInventoryModule",
+          "yieldoneAnalyticsAdapter",
+          "yieldoneBidAdapter",
+          "yuktamediaAnalyticsAdapter",
+          "zeotapIdPlusIdSystem",
+          "zetaBidAdapter",
+          "zeta_global_sspAnalyticsAdapter",
+          "zeta_global_sspBidAdapter",
+          "zmaticooBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.add1tbsp.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addcrazy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.22.0",
+        "modules": [
+          "akceloBidAdapter",
+          "allowActivities",
+          "audiencerunBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "debugging",
+          "gppControl_usnat",
+          "gptPreAuction",
+          "id5IdSystem",
+          "paapi",
+          "paapiForGpt",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "tcfControl",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.addict-figurines.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addify.ae"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addonbiz.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.address-hazardmap.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addresspage.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addrom.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addtext.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.addtothelist.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeex.cn"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeex.co.nz"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeex.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeex.us"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeexaustralia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.adelaide-kane.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adelaidechildcare.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.adele-exarchopoulos.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.22.0",
+        "modules": [
+          "akceloBidAdapter",
+          "allowActivities",
+          "audiencerunBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "debugging",
+          "gppControl_usnat",
+          "gptPreAuction",
+          "id5IdSystem",
+          "paapi",
+          "paapiForGpt",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "tcfControl",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.adelette.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.adelgazarencasa.co"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adelightlife.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adelonsi.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ademocut.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ademocut.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aden-hura.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aden-tm.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeptosdebancada.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aderezo.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aderlab.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adesignare.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adeudo.com.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adevarurisecrete.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adformatie.nl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adharnewsnetwork.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adhaya.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adhdreimagined.co.za"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adhilyrics.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adhunu.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adiariocr.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adibarbu.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adibet.co.ke"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adictec.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adidas10kparis.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adigitalboom.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adioficatgras.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adital.org.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adivasitvindia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adiyamanlilar.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adiyoso.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adjora.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adkps.me"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adltop.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adly.pk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admdireito.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admeonline.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adminfusion.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.administrare.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.administrarproyectos.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admint.com.ua"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admintem.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.admiring-knightley.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admisionuniversitaria.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissioncare.co.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissioncompanion.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissionnepal.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissions.blog"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissionsdirect.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissiontechbd.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.admissionwar.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adn40.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adnamerica.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adnance.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adnansaani.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adnantrinata.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adncuba.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adnsur.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ado.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adocmedi.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adokveszek.hu"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adolescentes.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adolescents.cat"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adomin-itsumono-omaetachi.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adomonline.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.adonai.pl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adonde.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adondevoyconmifamilia.es"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adondexportar.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adopsinsider.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adoptaunchuchito.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.22.0",
+        "modules": [
+          "akceloBidAdapter",
+          "allowActivities",
+          "audiencerunBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "debugging",
+          "gppControl_usnat",
+          "gptPreAuction",
+          "id5IdSystem",
+          "paapi",
+          "paapiForGpt",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "tcfControl",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.adoptiongroschiens.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adoracionyliberacion.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adorei.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adoroperfume.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adotar.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adpeak.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adpostchacha.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adproceed.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adr168.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adres-gov.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adria.fun"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v6.6.0",
+        "modules": [
+          "adfBidAdapter",
+          "adxpremiumAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "lotamePanoramaIdSystem",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smilewantedBidAdapter",
+          "teadsBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.adria.tv"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adriaeco.eu"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "tmzr",
+        "version": "v9.16.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adyoulikeBidAdapter",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "eplanningBidAdapter",
+          "fpdModule",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "justpremiumBidAdapter",
+          "lotamePanoramaIdSystem",
+          "missenaBidAdapter",
+          "moneytizerBidAdapter",
+          "nativeRendering",
+          "nobidBidAdapter",
+          "onetagBidAdapter",
+          "outbrainBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "quantcastIdSystem",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sirdataRtdProvider",
+          "smilewantedBidAdapter",
+          "themoneytizerBidAdapter",
+          "topicsFpdModule",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.adrianafansite.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adrpress.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adrsupportuk.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ads2020.marketing"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.ads4ae.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsalad.co.kr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsayam.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adscookies.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adseed.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsenseforum2.co.kr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsenseturkiye.com.tr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adshoo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsload.online"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adslov.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adslynk.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsnity.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adspecials.us"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adspiritenergie.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adspostoday.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adsthumb.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adtagmacros.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aduparosnie.pl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advance-africa.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advancecricket.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advanced-personality.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advancedlearnersacademy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advancedoneroofing.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adventmusicplus.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.30.0",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "schain",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "fpdModule",
+          "topicsFpdModule",
+          "id5IdSystem",
+          "rtdModule",
+          "contxtfulRtdProvider"
+        ]
+      }
+    ],
+    "url": "http://www.adventurejeep.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adventurerfamily.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adventuretaco.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "vlipb",
+        "version": "v9.14.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adtelligentBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "apacdexBidAdapter",
+          "appnexusBidAdapter",
+          "bidtestBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "eplanningBidAdapter",
+          "experianRtdProvider",
+          "id5IdSystem",
+          "intentIqIdSystem",
+          "ixBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "richaudienceBidAdapter",
+          "riseBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ucfunnelBidAdapter",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "verizonMediaIdSystem",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.adverb1.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advertiseera.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advertisernewsnorth.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advertisernewssouth.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advicefunda.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advisor.travel"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advisoranx.ca"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advisorkhoj.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advitree.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advntr.cc"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.24.0",
+        "modules": [
+          "adGridAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "colossussspBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "kargoBidAdapter",
+          "resetdigitalBidAdapter",
+          "rubiconBidAdapter",
+          "undertoneBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.advocate.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.24.0",
+        "modules": [
+          "adGridAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "colossussspBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "kargoBidAdapter",
+          "resetdigitalBidAdapter",
+          "rubiconBidAdapter",
+          "undertoneBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.advocatechannel.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.advoga.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adwordsguide.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adwyaa.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adyare.ma"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.adzper.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aedelmetaller.dk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aedownloadpro.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aefiles.website"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aefreetemplates.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aegamer.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aekempire.gr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aelitaxtranslate.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aem4beginner.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aenlagency.co"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aera.gr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aerikes-epoxes.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs325474",
+        "version": "v8.20.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adfBidAdapter",
+          "admaticBidAdapter",
+          "adpod",
+          "adtargetBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "gptPreAuction",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "luponmediaBidAdapter",
+          "mgidBidAdapter",
+          "mgidXBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "sspBCBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.aero-naves.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjsYLHH",
+        "version": "v9.18.0",
+        "modules": [
+          "prebidCustom",
+          "currency",
+          "consentManagementTcf",
+          "tcfControl",
+          "dsaControl",
+          "userId",
+          "appnexusBidAdapter",
+          "ixBidAdapter",
+          "openxBidAdapter",
+          "stroeerCoreBidAdapter",
+          "adfBidAdapter",
+          "seedingAllianceBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "sharedIdSystem",
+          "schain",
+          "agmaAnalyticsAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.aero.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aerocareers.co.uk"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aeroinsta.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aeroinsta.dev"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aerointernational.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aerolla.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-12",
+    "url": "http://www.aeropeep.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeroportogru.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuerto-bilbao.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuerto-palmademallorca.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuerto-sevilla.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuerto-valencia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuertoalicante-elche.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuertobarcelona-elprat.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuertodemalaga-costadelsol.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuertoezeiza.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeropuertosenred.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aerosavvy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aerospace-schools.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aerospaceanswers.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aerospacenotes.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjsYLHH",
+        "version": "v9.18.0",
+        "modules": [
+          "prebidCustom",
+          "currency",
+          "consentManagementTcf",
+          "tcfControl",
+          "dsaControl",
+          "userId",
+          "adnuntiusBidAdapter",
+          "appnexusBidAdapter",
+          "omsBidAdapter",
+          "stroeerCoreBidAdapter",
+          "dspxBidAdapter",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "sharedIdSystem",
+          "schain",
+          "agmaAnalyticsAdapter",
+          "prebidServerBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.aerotelegraph.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aeroweb.cz"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aerowitter.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aerzteblatt.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.22.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adkernelBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagementGpp",
+          "criteoIdSystem",
+          "currency",
+          "fabrickIdSystem",
+          "gptPreAuction",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentIdSystem",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "relevadRtdProvider",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sovrnBidAdapter",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "owpbjs",
+        "version": "v6.18.0",
+        "modules": [
+          "33acrossIdSystem",
+          "consentManagement",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "lotamePanoramaIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.aes-staging.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aestetica.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aestheticbeats.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.34.0",
+        "modules": [
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "adkernelBidAdapter",
+          "admaticBidAdapter",
+          "admixerBidAdapter",
+          "adplusBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "connectadBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "eskimiBidAdapter",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "insticatorBidAdapter",
+          "intentIqIdSystem",
+          "ixBidAdapter",
+          "novatiqIdSystem",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sovrnBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId",
+          "yandexAnalyticsAdapter",
+          "yandexBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.aetherscape.top"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aethersx2.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-03-13",
+    "url": "http://www.aetos-apokalypsis.com"
+  }
+]
