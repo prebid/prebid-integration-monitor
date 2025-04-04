@@ -118,7 +118,7 @@ async function prebidExplorer() {
 
             // Write results as a JSON array
             const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
-            fs.appendFileSync('output/Apr/2025-04-03.json', jsonOutput, 'utf8');
+            fs.appendFileSync('output/Apr/2025-04-04.json', jsonOutput, 'utf8');
             console.log('Results have been saved');
         } catch (err) {
             console.error('Failed to write results:', err);
