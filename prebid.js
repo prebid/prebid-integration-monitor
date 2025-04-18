@@ -118,10 +118,26 @@ async function prebidExplorer() {
                 console.error(`Error processing ${trimmedUrl}:`, pageError.message);
                 // Mark URL as processed because an error occurred
                 processedUrls.add(trimmedUrl);
-                // Extract error code after "net::"
+                // Extract error code after "net::" or the general message after the URL prefix
                 const errorMessage = pageError.message || '';
                 const netErrorMatch = errorMessage.match(/net::([A-Z_]+)/);
-                const errorCode = netErrorMatch ? netErrorMatch[1] : 'UNKNOWN_ERROR';
+                let errorCode;
+                if (netErrorMatch) {
+                    errorCode = netErrorMatch[1];
+                } else {
+                    // Try to get the message part after "Error processing URL: "
+                    const prefix = `Error processing ${trimmedUrl}: `;
+                    if (errorMessage.startsWith(prefix)) {
+                        errorCode = errorMessage.substring(prefix.length).trim();
+                    } else {
+                        // Fallback if the message format is unexpected
+                        errorCode = errorMessage.trim() || 'UNKNOWN_ERROR';
+                    }
+                    // Replace spaces with underscores and convert to uppercase for consistency if needed
+                    errorCode = errorCode.replace(/\s+/g, '_').toUpperCase();
+                    // Limit length if necessary
+                    // errorCode = errorCode.substring(0, 50); // Example length limit
+                }
                 errorUrls.add(`${trimmedUrl},${errorCode}`); // Add "url,error_code" to the set for logging later
             }
         }
