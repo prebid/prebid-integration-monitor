@@ -1,7 +1,16 @@
 import * as fs from 'fs';
-import * as readline from 'readline';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
+// Helper function to configure a new page
+async function configurePage(browser) {
+    const page = await browser.newPage();
+    page.setDefaultTimeout(55000);
+    // Set to Googlebot user agent
+    await page.setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+    return page;
+}
+
 
 async function prebidExplorer() {
     const browser = await puppeteer
@@ -9,7 +18,7 @@ async function prebidExplorer() {
         .launch({
             protocolTimeout: 300000,
             defaultViewport: null,
-            headless: true,
+            headless: true, // Consider 'new' for future compatibility, but 'true' is fine for now
         });
 
     let results = [];
@@ -20,11 +29,7 @@ async function prebidExplorer() {
     const errorUrls = new Set(); // Keep track of URLs that caused errors (stores "url,error_code")
 
 
-    const page = await browser.newPage();
-    page.setDefaultTimeout(55000);
-
-    // Set to Googlebot user agent
-    await page.setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+    let page = await configurePage(browser); // Use the helper function
 
     // Remove the readline interface as we read the file directly now
     /* const urls = readline.createInterface({
@@ -54,7 +59,7 @@ async function prebidExplorer() {
                 // Slight delay to ensure the page is fully loaded
                 await page.evaluate(async () => {
                     const sleep = ms => new Promise(res => setTimeout(res, ms));
-                    await sleep((1000 * 60) * .10);
+                    await sleep((1000 * 60) * .10); // 6 seconds delay
                 })
 
                 // Collect data from the page
@@ -139,6 +144,21 @@ async function prebidExplorer() {
                     // errorCode = errorCode.substring(0, 50); // Example length limit
                 }
                 errorUrls.add(`${trimmedUrl},${errorCode}`); // Add "url,error_code" to the set for logging later
+
+                // Check for DETACHED IFRAME error to reset the page
+                if (errorMessage.includes('DETACHED IFRAME') || errorMessage.includes('Target closed')) {
+                    console.warn(`Detached iframe or target closed error detected for ${trimmedUrl}. Closing current page and opening a new one.`);
+                    try {
+                        await page.close();
+                    } catch (closeError) {
+                        console.error(`Error closing the page after detached iframe error: ${closeError.message}`);
+                        // If closing fails, we might need to terminate the browser instance,
+                        // but for now, we'll try creating a new page anyway.
+                    }
+                    page = await configurePage(browser); // Create and configure a new page
+                    console.log("New page created. Continuing with the next URL.");
+                    continue; // Skip to the next URL in the loop
+                }
             }
         }
     } catch (error) {
