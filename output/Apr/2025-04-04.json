@@ -1,0 +1,1050 @@
+[
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinebreak.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinebuds.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinefily.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinehorizons.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinejosh.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "tmzr",
+        "version": "v9.23.0",
+        "modules": [
+          "33acrossIdSystem",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "betweenBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "eplanningBidAdapter",
+          "fpdModule",
+          "id5IdSystem",
+          "justpremiumBidAdapter",
+          "kueezRtbBidAdapter",
+          "lotamePanoramaIdSystem",
+          "missenaBidAdapter",
+          "moneytizerBidAdapter",
+          "nativeRendering",
+          "onetagBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubxaiAnalyticsAdapter",
+          "quantcastIdSystem",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "themoneytizerBidAdapter",
+          "topicsFpdModule",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.cinelibreonline.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cineloungefilm.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinema-a1.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinema-dachau.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinema-paradise.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinema-prerow.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinema.ne.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinema64.de"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemacafe.net"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemacamplanding.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemaclub.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemadaddy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemadailyus.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemalands.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.30.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "bliinkBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "freewheel-sspBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "instreamTracking",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "mediasquareBidAdapter",
+          "missenaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "optidigitalBidAdapter",
+          "outbrainBidAdapter",
+          "paapi",
+          "pairIdSystem",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "tcfControl",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "utiqIdSystem",
+          "utiqMtpIdSystem"
+        ]
+      }
+    ],
+    "url": "http://www.cinemalemelies.fr"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.52.2",
+        "modules": [
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "gdprEnforcement",
+          "identityLinkIdSystem",
+          "pairIdSystem",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smartxBidAdapter",
+          "taboolaBidAdapter",
+          "teadsBidAdapter",
+          "ttdBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "utiqSystem"
+        ]
+      }
+    ],
+    "url": "http://www.cinemania.es"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "gnpb",
+        "version": "v8.52.1",
+        "modules": [
+          "adagioBidAdapter",
+          "adgenerationBidAdapter",
+          "adkernelBidAdapter",
+          "adstirBidAdapter",
+          "adtelligentBidAdapter",
+          "ajaBidAdapter",
+          "appnexusBidAdapter",
+          "asealBidAdapter",
+          "browsiRtdProvider",
+          "compassBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dsp_genieeBidAdapter",
+          "fluctBidAdapter",
+          "fpdModule",
+          "genieeBidAdapter",
+          "geoedgeRtdProvider",
+          "gmosspBidAdapter",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "imuIdSystem",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "logicadBidAdapter",
+          "luponmediaBidAdapter",
+          "medianetBidAdapter",
+          "microadBidAdapter",
+          "nobidBidAdapter",
+          "oguryBidAdapter",
+          "openxBidAdapter",
+          "pangleBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "ucfunnelBidAdapter",
+          "unicornBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "yahoosspBidAdapter",
+          "yieldoneBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.cinemaonline.sg"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemapedia.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemapettai.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "$$PREBID_GLOBAL$$",
+        "version": "v8.50.0",
+        "modules": [
+          "currency",
+          "gptPreAuction",
+          "schain",
+          "rtbhouseBidAdapter",
+          "pubmaticBidAdapter",
+          "ixBidAdapter",
+          "criteoBidAdapter",
+          "appnexusBidAdapter",
+          "ajaBidAdapter",
+          "adgenerationBidAdapter",
+          "microadBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.50.0",
+        "modules": [
+          "currency",
+          "gptPreAuction",
+          "schain",
+          "rtbhouseBidAdapter",
+          "pubmaticBidAdapter",
+          "ixBidAdapter",
+          "criteoBidAdapter",
+          "appnexusBidAdapter",
+          "ajaBidAdapter",
+          "adgenerationBidAdapter",
+          "microadBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.cinemart.co.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemasonly.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinematografo.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinematone.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinematreasures.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemavista.jp"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.33.0",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "schain",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "fpdModule",
+          "topicsFpdModule",
+          "id5IdSystem",
+          "rtdModule",
+          "contxtfulRtdProvider",
+          "paapi",
+          "paapiForGpt"
+        ]
+      }
+    ],
+    "url": "http://www.cinemawavesblog.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinemore.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "vpbjs",
+        "version": "v9.30.0-pre",
+        "modules": [
+          "adfBidAdapter",
+          "admixerBidAdapter",
+          "admixerIdSystem",
+          "adtelligentBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "bidmaticBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "currency",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "lemmaDigitalBidAdapter",
+          "limelightDigitalBidAdapter",
+          "mgidBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "pgamsspBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "tcfControl",
+          "trafficgateBidAdapter",
+          "tripleliftBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.cinenuovo.hu"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cineparc.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinephilia.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinepolis.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinepremiere.com.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinerama.es"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinesamugam.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.30.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "bliinkBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "freewheel-sspBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "instreamTracking",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "mediasquareBidAdapter",
+          "missenaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "optidigitalBidAdapter",
+          "outbrainBidAdapter",
+          "paapi",
+          "pairIdSystem",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "tcfControl",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "utiqIdSystem",
+          "utiqMtpIdSystem"
+        ]
+      }
+    ],
+    "url": "http://www.cinesevigne.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinestar.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinetimes.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cineuropa.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cineworld-luenen.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinexx.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinimirror.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinmu.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinquecolonne.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinquewnews.blogspot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cinreservas.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "ihowpbjs",
+        "version": "v9.27.0",
+        "modules": [
+          "criteoIdSystem",
+          "id5IdSystem",
+          "lotamePanoramaIdSystem",
+          "pubmaticIHAnalyticsAdapter",
+          "sharedIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.cio.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.ciobanugigel.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.31.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "freewheel-sspBidAdapter",
+          "gptPreAuction",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.ciocanitoare.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.ciociariaturismo.it"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cioinsight.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs_vdo",
+        "version": "v7.45.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adkernelBidAdapter",
+          "admixerBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "adprimeBidAdapter",
+          "adtelligentBidAdapter",
+          "adyoulikeBidAdapter",
+          "appnexusBidAdapter",
+          "beachfrontBidAdapter",
+          "betweenBidAdapter",
+          "bidscubeBidAdapter",
+          "brightcomSSPBidAdapter",
+          "colossussspBidAdapter",
+          "consentManagement",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "currency",
+          "dfpAdServerVideo",
+          "eplanningBidAdapter",
+          "freewheel-sspBidAdapter",
+          "improvedigitalBidAdapter",
+          "iqzoneBidAdapter",
+          "lunamediahbBidAdapter",
+          "nextMillenniumBidAdapter",
+          "nobidBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "operaadsBidAdapter",
+          "prebidServerBidAdapter",
+          "pubCommonId",
+          "pubmaticBidAdapter",
+          "pubwiseBidAdapter",
+          "resetdigitalBidAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "synacormediaBidAdapter",
+          "tripleliftBidAdapter",
+          "unrulyBidAdapter",
+          "vdoaiBidAdapter",
+          "videobyteBidAdapter",
+          "vidoomyBidAdapter",
+          "yahoosspBidAdapter",
+          "yandexBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "http://www.ciolex.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cipchile.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cipinet.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.ciptavisual.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbSimpleAds",
+        "version": "v9.12.0-pre",
+        "modules": [
+          "criteoIdSystem",
+          "naveggIdSystem",
+          "rubiconBidAdapter",
+          "schain",
+          "smartadserverBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.ciranda.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circle-book.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circleoffifths.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circlesamachar.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circlesontv.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circuitcoil.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circuitofrontera.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circuitoxanaes.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circulaires.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circuloastronomico.cl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circuloinformador.mx"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circulopadel.com.ar"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circusdaily.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.circusf1.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.22.0",
+        "modules": [
+          "akceloBidAdapter",
+          "allowActivities",
+          "audiencerunBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "debugging",
+          "gppControl_usnat",
+          "gptPreAuction",
+          "id5IdSystem",
+          "paapi",
+          "paapiForGpt",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "smilewantedBidAdapter",
+          "tcfControl",
+          "userId"
+        ]
+      }
+    ],
+    "url": "http://www.cirso32.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cismis.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cisnfm.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cisoadvisor.com.br"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-04-04",
+    "url": "http://www.cisotimes.com"
+  }
+]
