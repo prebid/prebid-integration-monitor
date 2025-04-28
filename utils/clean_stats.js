@@ -36,15 +36,21 @@ async function cleanStats() {
     // Process versionDistribution
     for (const version of versions) {
       const count = versionDistribution[version];
+      const cleanedVersion = version.startsWith('v') ? version.substring(1) : version; // Remove leading 'v'
+
       if (version.endsWith('-pre')) {
-        outputData.buildVersions[version] = count;
+        outputData.buildVersions[cleanedVersion] = count;
       } else if (version.includes('-')) {
-        outputData.customVersions[version] = count;
+        outputData.customVersions[cleanedVersion] = count;
       } else {
-        if (version.startsWith('v') && version.includes('.')) {
-             outputData.releaseVersions[version] = count;
+        // Check if it's a standard semantic version or potentially missing patch/minor
+        // Simple check: contains '.' and no dash (after potential 'v' removal).
+        if (cleanedVersion.includes('.')) {
+             outputData.releaseVersions[cleanedVersion] = count;
         } else {
-             outputData.customVersions[version] = count;
+             // Treat other cases (like '9.35') potentially as custom or decide on a rule
+             // For now, placing in custom as it deviates from standard semver X.Y.Z
+             outputData.customVersions[cleanedVersion] = count;
         }
       }
     }
