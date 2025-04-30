@@ -16,7 +16,7 @@ async function prebidExplorer() {
     const browser = await puppeteer
         .use(StealthPlugin())
         .launch({
-            protocolTimeout: 300000,
+            protocolTimeout: 1000000,
             defaultViewport: null,
             headless: true, // Consider 'new' for future compatibility, but 'true' is fine for now
         });
