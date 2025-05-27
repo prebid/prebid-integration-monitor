@@ -1,98 +1,115 @@
-import fetch from 'node-fetch';
-import { writeFile } from 'fs/promises'; // Use promises for async/await with fs
+import { promises as fs } from 'fs';
+import path from 'path';
+
+// Define the base directory for your output files and the name of the output text file.
+// Assuming 'extract_urls.js' is in the root of your 'prebid-integration-monitor' project.
+// If it's in a 'scripts' subdirectory, you might change baseOutputDir to '../output'.
+const baseOutputDir = './output';
+const storeDirPath = './store'; // Directory to store individual month files
 
 /**
- * Fetches a JSON file from a GitHub URL, extracts URLs from a specific key,
- * and writes them to a new file.
- *
- * @param {string} githubFileUrl - The URL to the file page on GitHub (e.g., https://github.com/...)
- * @param {string} outputFilePath - The path for the new file to write URLs to (e.g., 'output_urls.txt').
- * @param {string} urlKey - The key within the JSON objects that holds the URL value. Defaults to 'url'.
+ * Extracts URLs from JSON files that contain a 'prebidInstances' array,
+ * groups them by month, and writes them to separate text files per month
+ * in the 'store' directory.
  */
-async function extractUrlsFromGithubJson(githubFileUrl, outputFilePath, urlKey = 'url') {
-    console.log(`Starting URL extraction from: ${githubFileUrl}`);
+async function extractAndWriteUrlsByMonth() {
+    const urlsByMonth = {};
+    let महीनेFolders;
 
-    // --- 1. Convert GitHub page URL to Raw Content URL ---
-    let rawUrl;
     try {
-        // Try parsing as a standard GitHub blob URL
-        const githubRepoRegex = /github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.*)/;
-        const match = githubFileUrl.match(githubRepoRegex);
-
-        if (match) {
-            const [, owner, repo, branch, filePath] = match;
-            rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`;
-            console.log(`Converted to raw content URL: ${rawUrl}`);
-        } else if (githubFileUrl.startsWith('https://raw.githubusercontent.com/')) {
-             // It might already be a raw URL
-             rawUrl = githubFileUrl;
-             console.log(`Input is already a raw content URL: ${rawUrl}`);
-        }
-         else {
-            throw new Error('Invalid GitHub URL format provided. Expected format like https://github.com/user/repo/blob/branch/path/to/file.json');
-        }
+        महीनेFolders = await fs.readdir(baseOutputDir, { withFileTypes: true });
     } catch (error) {
-        console.error("Error determining raw URL:", error.message);
-        return; // Stop execution if URL is invalid
+        console.error(`Error reading base output directory ${baseOutputDir}:`, error);
+        return;
     }
 
+    const monthDirectoryNames = महीनेFolders
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
 
+    console.log(`Found month folders: ${monthDirectoryNames.join(', ')}`);
+
+    for (const monthName of monthDirectoryNames) {
+        const monthPath = path.join(baseOutputDir, monthName);
+        urlsByMonth[monthName] = new Set(); // Use a Set to automatically handle duplicate URLs within the same month
+
+        let dailyFiles;
+        try {
+            dailyFiles = await fs.readdir(monthPath, { withFileTypes: true });
+        } catch (error) {
+            console.error(`Error reading month directory ${monthPath}:`, error);
+            continue; // Skip to the next month
+        }
+
+        const jsonFileNames = dailyFiles
+            .filter(dirent => dirent.isFile() && dirent.name.endsWith('.json'))
+            .map(dirent => dirent.name);
+
+        if (jsonFileNames.length === 0) {
+            console.log(`No JSON files found in ${monthPath}`);
+            continue;
+        }
+
+        console.log(`Processing files in ${monthPath}: ${jsonFileNames.join(', ')}`);
+
+        for (const jsonFileName of jsonFileNames) {
+            const filePath = path.join(monthPath, jsonFileName);
+            try {
+                const fileContent = await fs.readFile(filePath, 'utf-8');
+                const dataArray = JSON.parse(fileContent);
+
+                if (!Array.isArray(dataArray)) {
+                    console.warn(`Warning: Content of ${filePath} is not an array. Skipping.`);
+                    continue;
+                }
+
+                for (const item of dataArray) {
+                    if (item && item.prebidInstances && Array.isArray(item.prebidInstances) && item.prebidInstances.length > 0 && item.url) {
+                        urlsByMonth[monthName].add(item.url);
+                    }
+                }
+            } catch (parseError) {
+                console.error(`Error parsing JSON from file ${filePath}:`, parseError);
+            }
+        }
+    }
+
+    // Ensure the store directory exists
     try {
-        // --- 2. Fetch the JSON data ---
-        console.log(`Workspaceing data from ${rawUrl}...`);
-        const response = await fetch(rawUrl);
+        await fs.mkdir(storeDirPath, { recursive: true });
+        console.log(`Ensured 'store' directory exists at ${storeDirPath}`);
+    } catch (mkdirError) {
+        console.error(`Error creating store directory ${storeDirPath}:`, mkdirError);
+        return; // Stop if we can't create the output directory
+    }
 
-        if (!response.ok) {
-            // Throw an error if the request failed (e.g., 404 Not Found)
-            throw new Error(`HTTP error fetching file: ${response.status} ${response.statusText}`);
-        }
+    let anyUrlsWritten = false;
+    const sortedMonths = Object.keys(urlsByMonth).sort(); // Sort months for consistent output
 
-        // --- 3. Parse the JSON response ---
-        console.log("Parsing JSON data...");
-        const jsonData = await response.json(); // Automatically parses the response body as JSON
+    for (const month of sortedMonths) {
+        if (urlsByMonth[month].size > 0) {
+            const monthFilePath = path.join(storeDirPath, `${month}.txt`);
+            const urlsForMonth = Array.from(urlsByMonth[month]);
+            const fileContent = urlsForMonth.join('\n') + '\n'; // Add a newline at the end
 
-        // --- 4. Extract URLs ---
-        // Assuming the JSON is an array of objects, and each object has a key specified by urlKey
-        if (!Array.isArray(jsonData)) {
-            throw new Error(`Expected JSON data to be an array, but got ${typeof jsonData}`);
-        }
-
-        console.log(`Extracting URLs using key: '${urlKey}'...`);
-        const urls = jsonData
-            .map(item => item && typeof item === 'object' ? item[urlKey] : undefined) // Safely access the key
-            .filter(urlValue => typeof urlValue === 'string' && urlValue.trim().length > 0); // Keep only valid, non-empty string URLs
-
-        if (urls.length === 0) {
-            console.warn(`No URLs found using the key '${urlKey}' in the fetched JSON data.`);
-            // Optionally write an empty file or just exit
-            // await writeFile(outputFilePath, '', 'utf8');
-            // console.log(`Wrote empty file to ${outputFilePath}`);
-            return;
-        }
-
-        // --- 5. Write URLs to the output file ---
-        console.log(`Writing ${urls.length} URLs to ${outputFilePath}...`);
-        const fileContent = urls.join('\n'); // Join URLs with newline characters
-        await writeFile(outputFilePath, fileContent, 'utf8'); // Write asynchronously
-
-        console.log(`Successfully extracted ${urls.length} URLs and saved them to ${outputFilePath}`);
-
-    } catch (error) {
-        console.error("An error occurred during the process:");
-        if (error instanceof SyntaxError) {
-            console.error(" -> Failed to parse JSON. The fetched content might not be valid JSON.");
-        } else if (error.code === 'ENOENT') {
-             console.error(" -> File system error: Could not write the output file. Check if the directory exists and you have permissions.");
+            try {
+                await fs.writeFile(monthFilePath, fileContent);
+                console.log(`Successfully extracted URLs for ${month} to ${monthFilePath}`);
+                anyUrlsWritten = true;
+            } catch (writeError) {
+                console.error(`Error writing to output file ${monthFilePath}:`, writeError);
+            }
         } else {
-            console.error(` -> ${error.message}`);
+            console.log(`No URLs with prebidInstances found for month: ${month}`);
         }
-         // console.error(error); // Uncomment for full stack trace if needed
+    }
+
+    if (!anyUrlsWritten) {
+        console.log('No URLs with prebidInstances found across all months to write to files.');
     }
 }
 
-// --- How to Use ---
-const inputFileUrl = 'https://github.com/prebid/prebid-integration-monitor/blob/main/output/results.json';
-const outputFile = 'extracted_urls.txt'; // The name of the file to create
-
-// Call the function
-extractUrlsFromGithubJson(inputFileUrl, outputFile);
+// Run the function
+extractAndWriteUrlsByMonth().catch(error => {
+    console.error("An unexpected error occurred:", error);
+});
