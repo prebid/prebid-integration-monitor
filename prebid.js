@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import blockResourcesPlugin from 'puppeteer-extra-plugin-block-resources';
 
 // Helper function to configure a new page
 async function configurePage(browser) {
@@ -13,6 +14,18 @@ async function configurePage(browser) {
 
 
 async function prebidExplorer() {
+    puppeteer.use(blockResourcesPlugin({
+        blockedTypes: new Set([
+            'image',
+            'font',
+            'websocket',
+            'media',
+            'texttrack',
+            'eventsource',
+            'manifest',
+            'other'
+        ])
+    }));
     const browser = await puppeteer
         .use(StealthPlugin())
         .launch({
