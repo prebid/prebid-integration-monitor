@@ -24,6 +24,7 @@
     "puppeteer": "^22.15.0",
     "puppeteer-cluster": "^0.24.0",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-extra-plugin-block-resources": "^2.4.1"
   }
 }
