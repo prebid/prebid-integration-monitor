@@ -62,8 +62,15 @@ async function main() {
 
     // Write valid URLs to input.txt, each on a new line
   try {
-    fs.appendFileSync('input.txt', validUrls.join('\n'));
-    console.log(`Successfully wrote ${validUrls.length} valid URLs to input.txt`);
+    // Ensure that if there are valid URLs, the file is written, and an empty line isn't added if validUrls is empty.
+    const outputContent = validUrls.length > 0 ? validUrls.join('\n') + '\n' : '';
+    fs.writeFileSync('input.txt', outputContent); // Overwrite instead of append
+    // Add a check to ensure the log message is accurate based on whether URLs were written
+    if (validUrls.length > 0) {
+      console.log(`Successfully overwrote input.txt with ${validUrls.length} valid URLs.`);
+    } else {
+      console.log('No valid URLs to write to input.txt. File was cleared/created.');
+    }
   } catch (err) {
     console.error('Error writing to input.txt:', err);
   }
@@ -82,22 +89,20 @@ async function main() {
         fs.mkdirSync(errorDir, { recursive: true }); // Create directory if it doesn't exist
         console.log(`Created directory: ${errorDir}`);
       }
-      fs.appendFileSync(errorOutputFile, errorLines.join('\n'));
-      console.log(`Successfully wrote ${invalidUrls.length} invalid URL details to ${errorOutputFile}`);
+      // Ensure that if there are invalid URLs, they are appended with a newline.
+      const errorOutputContent = invalidUrls.length > 0 ? errorLines.join('\n') + '\n' : '';
+      if (errorOutputContent) { // Only append if there's something to append
+          fs.appendFileSync(errorOutputFile, errorOutputContent);
+          console.log(`Successfully appended ${invalidUrls.length} invalid URL details to ${errorOutputFile}`);
+      }
     } catch (err) {
       console.error(`Error writing to ${errorOutputFile}:`, err);
     }
   } else {
     console.log('No invalid URLs found to write to the error file.');
     // Optionally clear the error file if it exists and no errors were found
-    try {
-        if (fs.existsSync(errorOutputFile)) {
-            fs.appendFileSync(errorOutputFile, ''); // Write an empty string to clear it
-            console.log(`Cleared existing error file: ${errorOutputFile}`);
-        }
-    } catch (err) {
-        console.error(`Error clearing ${errorOutputFile}:`, err);
-    }
+    // To avoid clearing it if it was intentionally kept with old errors, this part is removed.
+    // If clearing is desired, it should be explicit, e.g. by deleting the file before running.
   }
 }
 

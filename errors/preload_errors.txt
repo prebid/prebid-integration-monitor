@@ -1,0 +1,5 @@
+Previous_error.com , 404 , N/A
+Another_error.com , 500 , N/A
+https://www.thissitedefinitelydoesnotexistatall.com/ , N/A , Command failed: curl --max-time 25 -I -s -o /dev/null -w "%{http_code}" https://www.thissitedefinitelydoesnotexistatall.com/
+
+https://anothernonexistentsite.org/ , N/A , Command failed: curl --max-time 25 -I -s -o /dev/null -w "%{http_code}" https://anothernonexistentsite.org/
