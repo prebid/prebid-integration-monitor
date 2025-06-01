@@ -1,7 +1,8 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import fs from 'fs';
+import fs from 'fs'; // Keep for reading and writing input.txt
 import path from 'path';
+import logger from './utils/logger.js'; // .js extension may be needed
 
 const execAsync = promisify(exec);
 
@@ -32,7 +33,7 @@ async function checkUrl(url: string): Promise<CheckUrlResult> {
     }
   } catch (error: any) {
     // Handle errors like network issues or invalid URLs that curl can't process
-    console.error(`Error checking ${url}:`, error.message);
+    logger.error(`Error checking URL via curl: ${url}`, { url, error: error.message, stack: error.stack });
     return { url, valid: false, error: error.message }; // Include the error message
   }
 }
@@ -53,70 +54,65 @@ async function processUrls(urls: string[]): Promise<ProcessUrlsResult> {
 
 async function main(): Promise<void> {
   const inputFile: string = path.join('input', 'preload_urls.txt'); // Define the input file path
-  const errorOutputFile: string = path.join('errors', 'preload_errors.txt'); // Define the error output file path
-  const errorDir: string = path.dirname(errorOutputFile); // Get the directory for the error file
+  // const errorOutputFile: string = path.join('errors', 'preload_errors.txt'); // Replaced by Winston logs
+  // const errorDir: string = path.dirname(errorOutputFile); // Not needed
 
   let urls: string[] = [];
 
   // Read URLs from the input file
   try {
     const fileContent: string = fs.readFileSync(inputFile, 'utf8');
-    urls = fileContent.split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0); // Split by newline, trim whitespace, remove empty lines
+    urls = fileContent.split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
   } catch (err: any) {
-    console.error(`Error reading URLs from ${inputFile}:`, err.message);
+    logger.error(`Error reading URLs from ${inputFile}`, { error: err.message, stack: err.stack, code: err.code });
     if (err.code === 'ENOENT') {
-      console.error(`Please ensure the file exists and the script has permission to read it.`);
+      logger.error(`Please ensure the file ${inputFile} exists and the script has permission to read it.`);
     }
     return; // Exit if the file cannot be read
   }
 
-
   if (urls.length === 0) {
-    console.log(`No URLs found in ${inputFile}.`);
+    logger.info(`No URLs found in ${inputFile}.`);
     return;
   }
 
-  console.log(`Processing ${urls.length} URLs...`);
+  logger.info(`Processing ${urls.length} URLs from ${inputFile}...`);
   const { validUrls, invalidUrls } = await processUrls(urls);
 
-    // Write valid URLs to input.txt, each on a new line
+  // Write valid URLs to input.txt, each on a new line
   try {
-    fs.appendFileSync('input.txt', validUrls.join('\n') + (validUrls.length > 0 ? '\n' : '')); // Add newline only if there are URLs
-    console.log(`Successfully wrote ${validUrls.length} valid URLs to input.txt`);
+    // Assuming input.txt is for the main prebid script, clear it first or append carefully.
+    // For this example, appending. Consider if this should be 'w' (write) to overwrite.
+    fs.appendFileSync('input.txt', validUrls.join('\n') + (validUrls.length > 0 ? '\n' : ''));
+    logger.info(`Successfully wrote ${validUrls.length} valid URLs to input.txt`);
   } catch (err: any) {
-    console.error('Error writing to input.txt:', err);
+    logger.error('Error writing to input.txt', { error: err.message, stack: err.stack });
   }
 
-  // Write invalid URLs to the error file
+  // Log invalid URLs using Winston
   if (invalidUrls.length > 0) {
-    const errorLines: string[] = invalidUrls.map((item: CheckUrlResultInvalid) => {
-      const statusCode: string | number = item.statusCode || 'N/A'; // Handle cases where statusCode might not exist (e.g., curl error)
-      const errorMsg: string = item.error || 'N/A'; // Handle cases where error message might not exist
-      return `${item.url} , ${statusCode} , ${errorMsg}`;
+    logger.warn(`Found ${invalidUrls.length} invalid URLs during preload check.`);
+    invalidUrls.forEach((item: CheckUrlResultInvalid) => {
+      logger.warn('Invalid URL detected', {
+        url: item.url,
+        statusCode: item.statusCode || 'N/A',
+        error: item.error || 'N/A'
+      });
     });
-
-    try {
-      // Ensure the errors directory exists
-      if (!fs.existsSync(errorDir)) {
-        fs.mkdirSync(errorDir, { recursive: true }); // Create directory if it doesn't exist
-        console.log(`Created directory: ${errorDir}`);
-      }
-      fs.appendFileSync(errorOutputFile, errorLines.join('\n') + '\n'); // Add newline at the end
-      console.log(`Successfully wrote ${invalidUrls.length} invalid URL details to ${errorOutputFile}`);
-    } catch (err: any) {
-      console.error(`Error writing to ${errorOutputFile}:`, err);
-    }
+    // The old method of writing to errorOutputFile is removed.
+    // fs.appendFileSync(errorOutputFile, errorLines.join('\n') + '\n');
+    // logger.info(`Successfully wrote ${invalidUrls.length} invalid URL details to ${errorOutputFile}`);
   } else {
-    console.log('No invalid URLs found to write to the error file.');
-    // Optionally clear the error file if it exists and no errors were found
-    try {
-        if (fs.existsSync(errorOutputFile)) {
-            fs.appendFileSync(errorOutputFile, ''); // Write an empty string to clear it
-            console.log(`Cleared existing error file: ${errorOutputFile}`);
-        }
-    } catch (err: any) {
-        console.error(`Error clearing ${errorOutputFile}:`, err);
-    }
+    logger.info('No invalid URLs found during preload check.');
+    // Clearing the old error file is not necessary as it's no longer used.
+    // try {
+    //     if (fs.existsSync(errorOutputFile)) {
+    //         fs.appendFileSync(errorOutputFile, '');
+    //         logger.info(`Cleared existing error file: ${errorOutputFile}`);
+    //     }
+    // } catch (err: any) {
+    //     logger.error(`Error clearing ${errorOutputFile}:`, { error: err.message, stack: err.stack });
+    // } // This closing brace for the commented out try-catch was the issue.
   }
 }
 
