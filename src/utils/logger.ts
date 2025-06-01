@@ -1,19 +1,20 @@
-import winston from 'winston';
+import winston, { Logger } from 'winston'; // Import Logger type
 import fs from 'fs';
 import path from 'path';
 import { trace } from '@opentelemetry/api';
 
-const logDir = 'logs';
+let logger: Logger; // Declare logger variable
 
-// Create logs directory if it doesn't exist
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true }); // Added recursive: true for safety, though 'logs' is top-level here
-}
+export function initializeLogger(logDir: string): Logger {
+  // Create logs directory if it doesn't exist
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
 
-const logger = winston.createLogger({
-  levels: winston.config.npm.levels, // Standard npm levels (error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6)
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  logger = winston.createLogger({
+    levels: winston.config.npm.levels,
+    format: winston.format.combine(
+      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }), // Log the full stack trace for errors
     winston.format.splat() // Essential for formatting messages like printf: logger.info('Hello %s', 'world')
   ),
@@ -58,8 +59,8 @@ const logger = winston.createLogger({
       )
     }),
     new winston.transports.File({
-      filename: path.join(logDir, 'app.log'),
-      level: process.env.LOG_LEVEL_APP || 'info', // Default to 'info', configurable
+      filename: path.join(logDir, 'app.log'), // Use dynamic logDir
+      level: process.env.LOG_LEVEL_APP || 'info',
       format: winston.format.combine(
         winston.format(info => {
           const activeSpan = trace.getActiveSpan();
@@ -76,8 +77,8 @@ const logger = winston.createLogger({
       )
     }),
     new winston.transports.File({
-      filename: path.join(logDir, 'error.log'),
-      level: 'error', // Log only 'error' level and above to this file
+      filename: path.join(logDir, 'error.log'), // Use dynamic logDir
+      level: 'error',
       format: winston.format.combine(
         winston.format(info => {
           const activeSpan = trace.getActiveSpan();
@@ -94,14 +95,31 @@ const logger = winston.createLogger({
       )
     })
   ],
-  exitOnError: false // Do not exit on handled exceptions
+  exitOnError: false
 });
 
-// A simple test to ensure logger is working
-logger.info('Logger initialized successfully.');
-logger.error('This is a test error message.');
-logger.warn('This is a test warning message.');
-logger.debug('This is a test debug message (won\'t show in console by default).');
+  // A simple test to ensure logger is working
+  logger.info(`Logger initialized successfully. Log directory: ${logDir}`);
+  // logger.error('This is a test error message.'); // Optional: remove test messages after setup
+  // logger.warn('This is a test warning message.');
+  // logger.debug('This is a test debug message (won\'t show in console by default).');
+  return logger;
+}
 
-
-export default logger;
+// Export the logger instance directly for convenience,
+// but ensure initializeLogger is called first from the application entry point.
+// This default export might be problematic if not initialized.
+// Consider exporting only initializeLogger and managing the instance in the calling code.
+export default {
+  // Getter to ensure logger is initialized before use
+  get instance() {
+    if (!logger) {
+      // Initialize with a default directory if not already done, or throw error
+      // For now, let's assume it will be initialized by the app.
+      // Consider throwing an error or initializing with a default path if used before explicit initialization.
+      // initializeLogger('logs'); // Default initialization
+      throw new Error("Logger has not been initialized. Call initializeLogger(logDir) first.");
+    }
+    return logger;
+  }
+};

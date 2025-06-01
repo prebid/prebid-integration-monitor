@@ -1,7 +1,9 @@
 import * as fs from 'fs'; // Keep fs for readFileSync, existsSync, mkdirSync, writeFileSync
-import logger from './utils/logger.js'; // .js extension may be needed
+// Import initializeLogger and winston Logger type
+import { initializeLogger } from './utils/logger.js';
+import type { Logger as WinstonLogger } from 'winston';
 import { addExtra } from 'puppeteer-extra';
-import puppeteerVanilla from 'puppeteer'; // Reverted to simple default import
+import puppeteerVanilla, { Browser, PuppeteerLaunchOptions } from 'puppeteer'; // Reverted to simple default import, added Browser and PuppeteerLaunchOptions
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources'; // Renamed for clarity
 import { Cluster } from 'puppeteer-cluster';
@@ -47,10 +49,30 @@ interface TaskResultError {
 
 type TaskResult = TaskResultSuccess | TaskResultNoData | TaskResultError;
 
+// Step 1: Define PrebidExplorerOptions interface
+export interface PrebidExplorerOptions {
+    inputFile: string;
+    puppeteerType: 'vanilla' | 'cluster';
+    concurrency: number;
+    headless: boolean; // This will be used for puppeteerOptions
+    monitor: boolean; // This will be used for cluster options
+    outputDir: string;
+    logDir: string; // This will be used to initialize the logger
+    // Allow passing any puppeteer launch options
+    puppeteerLaunchOptions?: PuppeteerLaunchOptions;
+}
+
+// Declare logger at module level, to be initialized by prebidExplorer
+let logger: WinstonLogger;
 
 const puppeteer = addExtra(puppeteerVanilla as any); // Initialize puppeteer-extra, cast to any
 
-async function prebidExplorer(): Promise<void> {
+// Step 2: Modify prebidExplorer to accept an object of type PrebidExplorerOptions
+// Step 8: Export the prebidExplorer function
+export async function prebidExplorer(options: PrebidExplorerOptions): Promise<void> {
+    // Step 3: Update prebid.ts to call this new logger initialization function.
+    logger = initializeLogger(options.logDir);
+
     // Apply puppeteer-extra plugins
     puppeteer.use(StealthPlugin());
 
@@ -68,34 +90,31 @@ async function prebidExplorer(): Promise<void> {
       logger.warn('Could not configure blockResourcesPlugin: blockedTypes property or .add method not available on instance.', { plugin: blockResources });
     }
 
-    const cluster: Cluster<string, any> = await Cluster.launch({ // Added types for Cluster
-        concurrency: Cluster.CONCURRENCY_CONTEXT,
-        maxConcurrency: 5, // Set a reasonable maxConcurrency
-        // monitor: true, // Enable this for debugging cluster behavior, consider making it configurable
-        puppeteer, // Use the puppeteer-extra instance with plugins
-        puppeteerOptions: {
-            protocolTimeout: 1000000, // Increased from default 180000
-            defaultViewport: null,
-            headless: true, // Consider 'new' for future compatibility
-        },
-    });
+    // Step 4: Update to use options.inputFile for reading URLs
+    // Step 5: Update to use options.outputDir for saving results
+    // Step 6: Implement logic to switch between 'vanilla' Puppeteer and 'cluster'
+    // Step 7: Ensure puppeteer.launch options are configurable
 
-    let results: PageData[] = []; // Typed results
-    const taskResults: TaskResult[] = []; // Array to store results from all tasks
-    const allUrls: string[] = fs.readFileSync('input.txt', 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
-    logger.info('Initial URLs read from input.txt', { count: allUrls.length, urls: allUrls }); // Log the URLs
+    const basePuppeteerOptions: PuppeteerLaunchOptions = {
+        protocolTimeout: 1000000,
+        defaultViewport: null,
+        headless: options.headless, // Use headless from options
+        args: options.puppeteerLaunchOptions?.args || [], // Pass through args
+        ...options.puppeteerLaunchOptions // Spread other potential options
+    };
+
+    let results: PageData[] = [];
+    const taskResults: TaskResult[] = [];
+    const allUrls: string[] = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
+    logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length, urls: allUrls });
     const processedUrls: Set<string> = new Set();
-    // noPrebidUrls and errorUrls sets are effectively replaced by logger calls with specific metadata
 
-
-    // Define the task for the cluster
-    await cluster.task(async ({ page, data: url }: { page: Page, data: string }) => { // Added types for task callback
-        const trimmedUrl: string = url; // URL is already trimmed and validated
+    // Define the core processing task (used by both vanilla and cluster)
+    const processPageTask = async (page: Page, url: string): Promise<TaskResult> => {
+        const trimmedUrl: string = url;
         logger.info(`Processing: ${trimmedUrl}`, { url: trimmedUrl });
-        let taskResult: TaskResult; // To store the result of this specific task
-
         try {
-            await configurePage(page); // Configure the page provided by the cluster
+            await configurePage(page);
             await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
 
             await page.evaluate(async () => {
@@ -104,21 +123,18 @@ async function prebidExplorer(): Promise<void> {
             });
 
             const pageData: PageData = await page.evaluate((): PageData => {
-                const data: Partial<PageData> = {}; // Use Partial for incremental building
+                const data: Partial<PageData> = {};
                 data.libraries = [];
                 data.date = new Date().toISOString().slice(0, 10);
-
-                // TODO: Define window types more accurately if possible
                 if ((window as any).apstag) data.libraries.push('apstag');
                 if ((window as any).googletag) data.libraries.push('googletag');
                 if ((window as any).ats) data.libraries.push('ats');
-
                 if ((window as any)._pbjsGlobals && Array.isArray((window as any)._pbjsGlobals)) {
                     data.prebidInstances = [];
                     (window as any)._pbjsGlobals.forEach(function(globalVarName: string) {
                         const pbjsInstance = (window as any)[globalVarName];
                         if (pbjsInstance && pbjsInstance.version && pbjsInstance.installedModules) {
-                            data.prebidInstances!.push({ // Use non-null assertion as we initialized it
+                            data.prebidInstances!.push({
                                 globalVarName: globalVarName,
                                 version: pbjsInstance.version,
                                 modules: pbjsInstance.installedModules
@@ -126,16 +142,14 @@ async function prebidExplorer(): Promise<void> {
                         }
                     });
                 }
-                return data as PageData; // Cast to PageData
+                return data as PageData;
             });
-
             pageData.url = trimmedUrl;
-
             if (pageData.libraries.length > 0 || (pageData.prebidInstances && pageData.prebidInstances.length > 0)) {
-                taskResult = { type: 'success', data: pageData };
+                return { type: 'success', data: pageData };
             } else {
                 logger.warn(`No relevant Prebid or ad library data found for ${trimmedUrl}`, { url: trimmedUrl });
-                taskResult = { type: 'no_data', url: trimmedUrl };
+                return { type: 'no_data', url: trimmedUrl };
             }
         } catch (pageError: any) {
             logger.error(`Error processing ${trimmedUrl}`, { url: trimmedUrl, error: pageError });
@@ -153,105 +167,139 @@ async function prebidExplorer(): Promise<void> {
                 }
                 errorCode = errorCode.replace(/\s+/g, '_').toUpperCase();
             }
-            taskResult = { type: 'error', url: trimmedUrl, error: errorCode };
+            return { type: 'error', url: trimmedUrl, error: errorCode };
         }
-        taskResults.push(taskResult); // Push result to the central array
-    });
+    };
 
-    try {
-        allUrls.forEach((url: string) => {
-            if (url) { // Ensure URL is not empty
-                cluster.queue(url);
-                processedUrls.add(url); // Mark URL as processed when queued
-            }
+
+    if (options.puppeteerType === 'cluster') {
+        const cluster: Cluster<string, TaskResult> = await Cluster.launch({
+            concurrency: Cluster.CONCURRENCY_CONTEXT,
+            maxConcurrency: options.concurrency,
+            monitor: options.monitor,
+            puppeteer,
+            puppeteerOptions: basePuppeteerOptions,
         });
 
-        await cluster.idle(); // Wait for all queued tasks to complete
-
-        // Process results accumulated in taskResults
-        for (const taskResult of taskResults) {
-            if (!taskResult) {
-                logger.warn(`A task returned no result. This should not happen.`);
-                // Decide how to handle this, perhaps add the URL to errorUrls if identifiable
-                continue;
-            }
-
-            if (taskResult.type === 'success') {
-                logger.info(`Data found for ${taskResult.data.url}`, { url: taskResult.data.url });
-                results.push(taskResult.data);
-            } else if (taskResult.type === 'no_data') {
-                // Already logged by the task itself, but we can add a summary log if needed.
-                // For now, this is handled by logger.warn in the task.
-                // No need for the separate noPrebidUrls set.
-                logger.warn('No Prebid data found for URL (summary)', { url: taskResult.url });
-            } else if (taskResult.type === 'error') {
-                // Already logged by the task itself.
-                // No need for the separate errorUrls set.
-                logger.error('Error processing URL (summary)', { url: taskResult.url, error: taskResult.error });
-            }
-        }
-
-        await cluster.close(); // Close the cluster
-
-    } catch (error: any) {
-        logger.error("An unexpected error occurred during cluster processing or setup", { error });
-        // Ensure cluster is closed on error if it was initialized
-        // Removed !cluster.isClosed as it's a private property.
-        // cluster.close() is idempotent so calling it again if already closed is not an issue.
-        if (cluster) {
-            await cluster.close();
-        }
-    } finally {
-        logger.info('Final Results Array Count:', { count: results.length });
-        // The specific URLs for noPrebidUrls and errorUrls are now in the logs.
-        // We don't need to log the sets themselves.
+        // The task function now returns TaskResult
+        await cluster.task(async ({ page, data: url }: { page: Page, data: string }): Promise<TaskResult> => {
+            const result = await processPageTask(page, url);
+            // taskResults.push(result); // Results can be collected from cluster.execute or by processing queue returns
+            return result;
+        });
 
         try {
-            // const errorsDir: string = 'errors'; // This directory is handled by Winston's file transports ('logs/')
-            if (!fs.existsSync('output')) {
-                fs.mkdirSync('output');
-            }
-            // if (!fs.existsSync(errorsDir)) { // Not needed anymore
-            //     fs.mkdirSync(errorsDir);
-            // }
+            const promises = allUrls.filter(url => url).map(url => {
+                processedUrls.add(url); // Mark as processed when queuing starts
+                return cluster.queue(url)
+                    .then(resultFromQueue => {
+                        // Ensure successful results are correctly typed for pushing or further processing
+                        return resultFromQueue; // This is already TaskResult
+                    })
+                    .catch(error => {
+                        logger.error(`Error from cluster.queue for ${url}:`, { error });
+                        // Create and return a TaskResult for errors during queueing/task execution
+                        const errorResult: TaskResult = { type: 'error', url: url, error: 'QUEUE_ERROR_OR_TASK_FAILED' };
+                        return errorResult;
+                    });
+            });
 
-            if (results.length > 0) {
-                const now: Date = new Date();
-                const month: string = now.toLocaleString('default', { month: 'short' });
-                const year: number = now.getFullYear();
-                const day: string = String(now.getDate()).padStart(2, '0');
-                const monthDir: string = `output/${month}`;
-                const dateFilename: string = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
+            const settledResults = await Promise.allSettled(promises);
 
-                if (!fs.existsSync(monthDir)) {
-                    fs.mkdirSync(monthDir, { recursive: true });
+            settledResults.forEach(settledResult => {
+                if (settledResult.status === 'fulfilled') {
+                    // Value should be TaskResult. Explicitly cast for diagnostics.
+                    taskResults.push(settledResult.value as TaskResult);
+                } else {
+                    // This case should ideally not be reached if .catch handles errors and returns a TaskResult.
+                    // However, if cluster.queue() itself throws an error that isn't caught by the .catch
+                    // (e.g., an issue before the task even runs, not covered by the task's try/catch),
+                    // it might end up here. We need a URL for error reporting.
+                    // This part is tricky as the original URL isn't directly available in settledResult.reason if it's a generic error.
+                    // For now, we'll log a generic error. This implies a URL might not be processed.
+                    // A more robust solution would involve mapping original URLs to promises if this becomes an issue.
+                    logger.error('A promise from cluster.queue settled as rejected, which was not expected as errors should be converted to TaskResult.', { reason: settledResult.reason });
+                    // To maintain data integrity, we might need to know which URL failed here.
+                    // This might require associating URLs with promises more explicitly if direct cluster.queue rejections are possible.
                 }
+            });
 
-                const jsonOutput: string = JSON.stringify(results, null, 2);
-                // Changed from append to write, assuming one run produces one complete file for the day.
-                // If appending is desired, fs.appendFileSync can be kept. For now, using write for simplicity.
-                fs.writeFileSync(`${monthDir}/${dateFilename}`, jsonOutput + '\n', 'utf8');
-                logger.info(`Results have been written to ${monthDir}/${dateFilename}`);
-            } else {
-                logger.info('No results to save.');
+            await cluster.idle(); // Should be quick if all tasks are done via Promise.allSettled
+            await cluster.close();
+        } catch (error: any) {
+            logger.error("An unexpected error occurred during cluster processing orchestration", { error });
+            if (cluster) await cluster.close();
+        }
+    } else { // 'vanilla' Puppeteer
+        let browser: Browser | null = null;
+        try {
+            browser = await puppeteer.launch(basePuppeteerOptions);
+            for (const url of allUrls) {
+                if (url) {
+                    const page = await browser.newPage();
+                    const result = await processPageTask(page, url);
+                    taskResults.push(result);
+                    await page.close();
+                    processedUrls.add(url);
+                }
+            }
+        } catch (error: any) {
+            logger.error("An unexpected error occurred during vanilla Puppeteer processing", { error });
+        } finally {
+            if (browser) await browser.close();
+        }
+    }
+
+    // Common result processing and file writing logic
+    for (const taskResult of taskResults) {
+        if (!taskResult) {
+            logger.warn(`A task returned no result. This should not happen.`);
+            continue;
+        }
+        if (taskResult.type === 'success') {
+            logger.info(`Data found for ${taskResult.data.url}`, { url: taskResult.data.url });
+            results.push(taskResult.data);
+        } else if (taskResult.type === 'no_data') {
+            logger.warn('No Prebid data found for URL (summary)', { url: taskResult.url });
+        } else if (taskResult.type === 'error') {
+            logger.error('Error processing URL (summary)', { url: taskResult.url, error: taskResult.error });
+        }
+    }
+
+    logger.info('Final Results Array Count:', { count: results.length });
+
+    try {
+        if (!fs.existsSync(options.outputDir)) {
+            fs.mkdirSync(options.outputDir, { recursive: true });
+        }
+
+        if (results.length > 0) {
+            const now: Date = new Date();
+            const month: string = now.toLocaleString('default', { month: 'short' });
+            const year: number = now.getFullYear();
+            const day: string = String(now.getDate()).padStart(2, '0');
+            const monthDir: string = `${options.outputDir}/${month}`; // Use options.outputDir
+            const dateFilename: string = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
+
+            if (!fs.existsSync(monthDir)) {
+                fs.mkdirSync(monthDir, { recursive: true });
             }
 
-            // The error files (no_prebid.txt, error_processing.txt) are replaced by Winston's logging.
-            // If a summary text file is still desired, it would need to be reconstructed from logs or by keeping the sets.
-            // For this refactoring, we assume Winston's structured logs are the primary source for error analysis.
-
-            // Remaining URLs logic needs to be sure all URLs were attempted.
-            // `processedUrls` now correctly reflects all URLs that were passed to `cluster.queue`.
-            const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
-
-            fs.writeFileSync('input.txt', remainingUrls.join('\n'), 'utf8');
-            logger.info(`input.txt updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
-
-        } catch (err: any) {
-            logger.error('Failed to write results, or update input.txt', { error: err });
+            const jsonOutput: string = JSON.stringify(results, null, 2);
+            fs.writeFileSync(`${monthDir}/${dateFilename}`, jsonOutput + '\n', 'utf8');
+            logger.info(`Results have been written to ${monthDir}/${dateFilename}`);
+        } else {
+            logger.info('No results to save.');
         }
-        // Browser closing is handled by cluster.close()
+
+        const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
+        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8'); // Use options.inputFile
+        logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
+
+    } catch (err: any) {
+        logger.error('Failed to write results, or update input.txt', { error: err });
     }
 }
 
-prebidExplorer();
+// Step 7: Remove the direct call to prebidExplorer()
+// prebidExplorer();

@@ -43,7 +43,8 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth'); // Changed to r
 const puppeteer_cluster_1 = require("puppeteer-cluster");
 const fs = __importStar(require("fs")); // Keep fs for readFileSync for now
 const path = __importStar(require("path"));
-const logger_js_1 = __importDefault(require("./utils/logger.js")); // Corrected path
+const logger_js_1 = __importDefault(require("./utils/logger.js")); // Corrected path, renamed to loggerModule
+const logger = logger_js_1.default.instance; // Use the logger instance
 const puppeteer = (0, puppeteer_extra_1.addExtra)(puppeteer_1.default); // Reinitialize puppeteer with puppeteer-extra
 puppeteer.use(StealthPlugin()); // Apply StealthPlugin
 // Helper function to log errors (modified to use Winston)
@@ -58,7 +59,7 @@ const logError = (url, message, error) => {
     }
     // The first argument to logger.error is the primary message string.
     // The second argument is an object for additional metadata.
-    logger_js_1.default.error(message, logDetails);
+    logger.error(message, logDetails); // This logger is now the instance
 };
 // Function to wait for pbjs.version
 const getPbjsVersionWithWait = async (pageOrFrame) => {
@@ -108,11 +109,11 @@ const clusterSearch = async () => {
                 try {
                     const message = dialog.message();
                     await dialog.dismiss();
-                    logger_js_1.default.info(`Dismissed dialog for ${url}: ${message}`, { url });
+                    logger.info(`Dismissed dialog for ${url}: ${message}`, { url }); // This logger is now the instance
                     // logError(url, `Dialog dismissed: ${message}`, null); // Replaced by logger.info or logger.warn if needed
                 }
                 catch (e) {
-                    logger_js_1.default.error(`Error dismissing dialog for ${url}`, { url, error: e });
+                    logger.error(`Error dismissing dialog for ${url}`, { url, error: e }); // This logger is now the instance
                     // logError(url, `Error dismissing dialog: ${e.message}`, e); // Replaced by logger.error
                 }
             });
@@ -126,10 +127,10 @@ const clusterSearch = async () => {
                 version = null;
             }
             if (version) {
-                logger_js_1.default.info(`PBJS Version: ${version}`, { url });
+                logger.info(`PBJS Version: ${version}`, { url }); // This logger is now the instance
             }
             else {
-                logger_js_1.default.info(`PBJS Version: Not found on main page after waiting. Checking frames...`, { url });
+                logger.info(`PBJS Version: Not found on main page after waiting. Checking frames...`, { url }); // This logger is now the instance
                 // logError(url, "pbjs.version not found on main page after waiting or initial evaluate failed", null); // Captured by getPbjsVersionWithWait's error log
                 const frames = page.frames(); // Added Frame[] type
                 let versionFoundInFrame = false;
@@ -139,7 +140,7 @@ const clusterSearch = async () => {
                             continue;
                         if (frame.isDetached()) {
                             const detachedFrameUrl = frame.url(); // Get URL before it's completely inaccessible
-                            logger_js_1.default.warn(`Skipping detached frame: ${detachedFrameUrl}`, { url, frameUrl: detachedFrameUrl });
+                            logger.warn(`Skipping detached frame: ${detachedFrameUrl}`, { url, frameUrl: detachedFrameUrl }); // This logger is now the instance
                             // console.log(`URL: ${url}, Skipping detached frame: ${detachedFrameUrl}`); // Replaced
                             continue;
                         }
@@ -147,7 +148,7 @@ const clusterSearch = async () => {
                             const frameUrl = frame.url(); // Get URL for logging before potential errors
                             const frameVersion = await getPbjsVersionWithWait(frame);
                             if (frameVersion) {
-                                logger_js_1.default.info(`PBJS Version (found in frame ${frameUrl}): ${frameVersion}`, { url, frameUrl });
+                                logger.info(`PBJS Version (found in frame ${frameUrl}): ${frameVersion}`, { url, frameUrl }); // This logger is now the instance
                                 versionFoundInFrame = true;
                                 break;
                             }
@@ -166,7 +167,7 @@ const clusterSearch = async () => {
                     }
                 }
                 if (!versionFoundInFrame) {
-                    logger_js_1.default.warn(`PBJS Version: Not found in any (accessible/non-timed-out) frame after waiting.`, { url });
+                    logger.warn(`PBJS Version: Not found in any (accessible/non-timed-out) frame after waiting.`, { url }); // This logger is now the instance
                     // logError(url, "pbjs.version not found in any (accessible/non-timed-out) frame after waiting", null); // Replaced
                 }
             }
@@ -184,16 +185,16 @@ const clusterSearch = async () => {
     try {
         const urls = fs.readFileSync(inputFile, 'utf8').split('\n').filter(line => line.trim() !== '');
         if (urls.length === 0) {
-            logger_js_1.default.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile });
+            logger.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile }); // This logger is now the instance
             // logError("N/A", "input.txt is empty or contains no valid URLs", null); // Replaced
         }
         else {
-            logger_js_1.default.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile });
+            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile }); // This logger is now the instance
             urls.forEach((url) => cluster.queue(url));
         }
     }
     catch (error) {
-        logger_js_1.default.error(`Failed to read or process input.txt: ${error.message}`, { file: inputFile, error });
+        logger.error(`Failed to read or process input.txt: ${error.message}`, { file: inputFile, error }); // This logger is now the instance
         // logError("N/A", "Failed to read or process input.txt", error); // Replaced
         // If input.txt cannot be read, we might not want to proceed further,
         // or proceed with some default/no URLs. For now, it will just log and proceed to idle.
@@ -208,9 +209,9 @@ clusterSearch().catch((error) => {
     // If error is not an Error instance, or for more context:
     const message = "Unhandled error in clusterSearch";
     if (error instanceof Error) {
-        logError("N/A", message, error);
+        logError("N/A", message, error); // logError uses the instance
     }
     else {
-        logger_js_1.default.error(message, { errorDetails: String(error) });
+        logger.error(message, { errorDetails: String(error) }); // This logger is now the instance
     }
 });

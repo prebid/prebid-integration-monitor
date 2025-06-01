@@ -1,10 +1,23 @@
 import {Command, Flags} from '@oclif/core';
-import { initTracer } from '../../tracer.js'; // Adjusted path
-import logger from '../../utils/logger.js'; // Adjusted path
+import { initTracer } from '../../tracer.js'; // Added .js extension back
+// Updated logger import, Added .js extension back
+import loggerModule, { initializeLogger } from '../../utils/logger.js';
+import type { Logger as WinstonLogger } from 'winston';
 import { trace } from '@opentelemetry/api';
+
+let logger: WinstonLogger; // Module-level logger variable
 
 export default class Index extends Command {
   static description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.'
+
+  // Add a logDir flag similar to the scan command for consistency
+  static flags = {
+    logDir: Flags.string({
+      description: 'Directory to save log files',
+      default: 'logs',
+    }),
+    // help: Flags.help({char: 'h'}), // Example, if needed
+  };
 
   // If the original script accepted command-line arguments that should be flags or args:
   // static flags = {
@@ -17,9 +30,13 @@ export default class Index extends Command {
   // ];
 
   async run(): Promise<void> {
+    const {flags} = await this.parse(Index);
+    // Initialize logger with the logDir from flags
+    logger = initializeLogger(flags.logDir);
+
     try {
       // Initialize the tracer as the first step
-      initTracer();
+      initTracer(); // This might still have issues if tracer.js is not found
       logger.info("Default oclif command starting...");
 
       const tracer = trace.getTracer('prebid-integration-monitor-tracer');
