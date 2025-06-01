@@ -1,56 +1,128 @@
-import { describe, it, expect } from 'vitest';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import * as cp from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+// import { expect } from 'chai'; // Remove Chai import
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 
-const execAsync = promisify(exec);
+// Helper function to execute CLI command
+interface ExecResult {
+    stdout: string;
+    stderr: string;
+    code: number | null;
+}
 
-describe('CLI Tests', () => {
-  const cliCommand = 'node ./bin/run.js'; // For compiled version
-  // For development, you might use 'node ./bin/dev.js'
-  // However, for CI/testing, it's often better to test the compiled output.
-  // Ensure you run `npm run build` before these tests if using `bin/run.js`.
-  // Vitest default timeout is 5000ms. If your command takes longer, adjust it in vitest.config.ts or per test.
-  const defaultTimeout = 10000; // 10 seconds, adjust if needed
+function executeCommand(command: string, cwd: string = '.'): Promise<ExecResult> {
+    return new Promise((resolve) => {
+        cp.exec(command, { cwd }, (error, stdout, stderr) => {
+            resolve({
+                stdout: stdout.toString(),
+                stderr: stderr.toString(),
+                code: error ? error.code : 0,
+            });
+        });
+    });
+}
 
-  it('should run the default command successfully and log completion', async () => {
-    try {
-      const { stdout, stderr } = await execAsync(cliCommand);
-      // console.log('Default command stdout:', stdout); // For debugging
-      // console.log('Default command stderr:', stderr); // For debugging
+// Helper to create a dummy input file
+function createInputFile(filePath: string, urls: string[]): void {
+    fs.writeFileSync(filePath, urls.join('\n'));
+}
 
-      // We won't check stderr strictly, as oclif might output warnings or info there
-      // even on successful execution if commands are not yet compiled or fully set up.
-      // The main check is for the success message and no error throw.
-      expect(stdout).toContain('Main application processing finished (oclif command).');
-      // If execAsync throws (e.g. for a non-zero exit code), the catch block will handle it.
-    } catch (error: any) {
-      // console.error('Default command execution error stdout:', error.stdout);
-      // console.error('Default command execution error stderr:', error.stderr);
-      // This assertion will fail the test if execAsync itself threw an error (e.g. non-zero exit)
-      // or if an expect inside the try block failed.
-      throw new Error(`Default command execution failed: ${error.message}\nSTDOUT: ${error.stdout}\nSTDERR: ${error.stderr}`);
+// Helper to remove files/directories
+function cleanup(itemPath: string): void {
+    if (!fs.existsSync(itemPath)) {
+        return;
     }
-  }, defaultTimeout);
-
-  it('should display help information for --help flag', async () => {
-    try {
-      const { stdout, stderr } = await execAsync(`${cliCommand} --help`);
-      // console.log('--help stdout:', stdout); // For debugging
-      // console.log('--help stderr:', stderr); // For debugging
-
-      // Oclif help output can go to stdout or stderr.
-      const output = stdout || stderr;
-
-      expect(output).toMatch(/USAGE/i);
-      // The "COMMANDS" section might not appear if `dist/commands` is empty or not found.
-      // This test will be more robust after a build. For now, let's make it less strict.
-      // expect(output).toMatch(/COMMANDS/i);
-      expect(output).toMatch(/FLAGS/i);
-      // If execAsync throws, the catch block will handle it.
-    } catch (error: any) {
-      // console.error('--help execution error stdout:', error.stdout);
-      // console.error('--help execution error stderr:', error.stderr);
-      throw new Error(`Help command execution failed: ${error.message}\nSTDOUT: ${error.stdout}\nSTDERR: ${error.stderr}`);
+    if (fs.lstatSync(itemPath).isDirectory()) {
+        fs.rmSync(itemPath, { recursive: true, force: true });
+    } else {
+        fs.unlinkSync(itemPath);
     }
-  }, defaultTimeout);
+}
+
+// Determine the project root directory, assuming tests are in <root>/tests/
+const projectRoot = path.resolve(__dirname, '..');
+const cliCommand = `node ${path.join(projectRoot, 'bin', 'run')} scan`; // Path to CLI
+
+describe('CLI Tests for Scan Command', () => {
+    const defaultInputFilePath = path.join(projectRoot, 'input.txt');
+    const testInputFilePath = path.join(projectRoot, 'test_input_cli.txt');
+    const testOutputDirPath = path.join(projectRoot, 'test_output_cli');
+
+    // Cleanup before and after all tests in this suite
+    beforeAll(() => {
+        cleanup(defaultInputFilePath);
+        cleanup(testInputFilePath);
+        cleanup(testOutputDirPath);
+    });
+
+    afterAll(() => {
+        cleanup(defaultInputFilePath);
+        cleanup(testInputFilePath);
+        cleanup(testOutputDirPath);
+    });
+
+    // Cleanup before each test
+    beforeEach(() => {
+        cleanup(defaultInputFilePath); // Ensure clean state for default input file
+        cleanup(testInputFilePath);
+        cleanup(testOutputDirPath);
+    });
+
+    // Test Case 1
+    it('Command runs with default options', async () => {
+        createInputFile(defaultInputFilePath, ['https://example.com']);
+        const result = await executeCommand(`${cliCommand}`, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain(`Initial URLs read from input.txt`);
+        const inputFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8');
+        expect(inputFileContent.trim()).toBe('', 'Input file should be empty after processing');
+    }, 60000); // 60s timeout
+
+    // Test Case 2
+    it('Command runs with puppeteerType=vanilla', async () => {
+        createInputFile(defaultInputFilePath, ['https://example.com']);
+        const result = await executeCommand(`${cliCommand} --puppeteerType=vanilla`, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('"puppeteerType": "vanilla"');
+        expect(result.stdout).toContain(`Initial URLs read from input.txt`);
+    }, 60000); // 60s timeout
+
+    // Test Case 3
+    it('Input and output files', async () => {
+        const testUrls = ['https://example.com', 'https://www.google.com'];
+        createInputFile(testInputFilePath, testUrls);
+
+        const result = await executeCommand(`${cliCommand} ${testInputFilePath} --outputDir=${testOutputDirPath}`, projectRoot);
+        expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+
+        expect(fs.existsSync(testOutputDirPath), 'Output directory was not created').toBe(true);
+
+        const now = new Date();
+        const month = now.toLocaleString('default', { month: 'short' });
+        const dateFilename = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.json`;
+        const monthDir = path.join(testOutputDirPath, month);
+        const expectedOutputFile = path.join(monthDir, dateFilename);
+
+        expect(fs.existsSync(expectedOutputFile), `Expected output file ${expectedOutputFile} was not created`).toBe(true);
+
+        const inputFileContent = fs.readFileSync(testInputFilePath, 'utf-8');
+        expect(inputFileContent.trim()).toBe('', 'Input file should be empty after processing successful URLs');
+    }, 60000); // 60s timeout
+
+    // Test Case 4
+    it('Help command', async () => {
+        const result = await executeCommand(`${cliCommand} --help`, projectRoot);
+        expect(result.code).toBe(0, `Help command failed with code ${result.code}. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Scans websites for Prebid.js integrations.');
+        expect(result.stdout).toContain('USAGE');
+        expect(result.stdout).toContain('$ app scan [INPUTFILE]');
+        expect(result.stdout).toContain('--puppeteerType');
+        expect(result.stdout).toContain('--concurrency');
+        expect(result.stdout).toContain('--headless');
+        expect(result.stdout).toContain('--outputDir');
+        expect(result.stdout).toContain('--logDir');
+    }, 60000); // 60s timeout
 });

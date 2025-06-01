@@ -3,6 +3,11 @@
 // Commands are located in src/commands/
 // The main logic previously in this file has been moved to src/commands/index.ts
 
+import loggerModule, { initializeLogger } from './utils/logger.js'; // Renamed import and added initializeLogger
+
+initializeLogger('logs'); // Initialize with a default directory
+const logger = loggerModule.instance; // Get the instance
+
 console.log('DEBUG: src/index.ts is being executed - this should not happen if oclif is the entry point.');
 logger.warn('src/index.ts executed - this might indicate an issue with entry point configuration. Oclif should use bin/run or bin/dev.');
 
@@ -11,4 +16,3 @@ logger.warn('src/index.ts executed - this might indicate an issue with entry poi
 // that *must* happen before oclif itself loads, it could potentially go here,
 // but that's an advanced and uncommon use case.
 // For now, oclif's `init` hook or the command's `init` method is preferred for setup.
-import logger from './utils/logger.js';
