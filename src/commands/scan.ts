@@ -31,7 +31,7 @@ export default class Scan extends Command {
     }),
     outputDir: Flags.string({
       description: 'Directory to save output files',
-      default: 'output',
+      default: 'store',
     }),
     logDir: Flags.string({
       description: 'Directory to save log files',

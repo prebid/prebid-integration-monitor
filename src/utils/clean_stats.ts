@@ -37,8 +37,8 @@ interface OutputData {
 }
 
 async function cleanStats(): Promise<void> {
-  const inputPath: string = path.join(__dirname, '..', 'output', 'summarization.json');
-  const outputPath: string = path.join(__dirname, '..', 'output', 'api.json');
+  const inputPath: string = path.join(__dirname, '..', '..', 'api', 'summarization.json');
+  const outputPath: string = path.join(__dirname, '..', '..', 'api', 'api.json');
   const MIN_COUNT_THRESHOLD: number = 5;
 
   try {
@@ -108,6 +108,13 @@ async function cleanStats(): Promise<void> {
         }
     }
 
+    // Ensure the target directory exists before writing
+    const targetApiDir = path.dirname(outputPath);
+    try {
+      await fs.access(targetApiDir);
+    } catch (error) { // If access fails (e.g., directory doesn't exist), try to create it
+      await fs.mkdir(targetApiDir, { recursive: true });
+    }
 
     // Write the new structure to api.json
     await fs.writeFile(outputPath, JSON.stringify(outputData, null, 2));
