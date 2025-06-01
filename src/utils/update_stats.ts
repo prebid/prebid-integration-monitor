@@ -8,7 +8,7 @@ const __filename: string = fileURLToPath(import.meta.url); // No changes needed 
 const __dirname: string = dirname(__filename);
 
 const outputDir: string = path.join(__dirname, '..', 'store');
-const summaryFilePath: string = path.join(outputDir, 'summarization.json'); // No changes needed here
+const summaryFilePath: string = path.join(__dirname, '..', '..', 'api', 'summarization.json');
 
 interface VersionComponents {
     major: number;
@@ -202,6 +202,12 @@ async function summarizeStats(): Promise<void> {
             versionDistribution: sortedVersionCounts,
             moduleDistribution: sortedModuleCounts, // Add sorted module counts
         };
+
+        // Ensure the target directory exists
+        const targetApiDir = path.dirname(summaryFilePath);
+        if (!fs.existsSync(targetApiDir)) {
+            fs.mkdirSync(targetApiDir, { recursive: true });
+        }
 
         // Write the summary to summarization.json
         await fs.promises.writeFile(summaryFilePath, JSON.stringify(summaryData, null, 2)); // Changed fsPromises to fs.promises
