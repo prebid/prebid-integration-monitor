@@ -1,21 +1,25 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { Resource } from '@opentelemetry/resources';
+import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node'; // Added ConsoleSpanExporter and BatchSpanProcessor
+import { Resource } from '@opentelemetry/resources'; // Reverted to original import
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 let sdk: NodeSDK; // Define sdk in a broader scope
 
 export const initTracer = () => {
-  const traceExporter = new OTLPTraceExporter({
+  const otlpExporter = new OTLPTraceExporter({ // Renamed to otlpExporter for clarity
     // optional - default url is http://localhost:4318/v1/traces
     // You can use environment variables to configure the endpoint, e.g.,
     // url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318/v1/traces',
   });
 
+  const consoleExporter = new ConsoleSpanExporter();
+
   sdk = new NodeSDK({
-    traceExporter, // Re-enabled exporter
-    instrumentations: [getNodeAutoInstrumentations()], // Re-enabled instrumentations
+    // traceExporter: otlpExporter, // Can use multiple exporters or switch as needed
+    spanProcessors: [new BatchSpanProcessor(consoleExporter), new BatchSpanProcessor(otlpExporter)], // Added ConsoleSpanExporter via BatchSpanExporter
+    instrumentations: [getNodeAutoInstrumentations()],
     // resource: new Resource({
     //   [SemanticResourceAttributes.SERVICE_NAME]: 'prebid-integration-monitor',
     // }),
