@@ -1,173 +1,157 @@
 import * as fs from 'fs';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Cluster } from 'puppeteer-cluster';
 
 // Helper function to configure a new page
-async function configurePage(browser) {
-    const page = await browser.newPage();
+async function configurePage(page) { // page is passed directly by puppeteer-cluster
     page.setDefaultTimeout(55000);
     // Set to Googlebot user agent
     await page.setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
-    return page;
+    // No need to return page, modifications are done in place
 }
 
 
 async function prebidExplorer() {
-    const browser = await puppeteer
-        .use(StealthPlugin())
-        .launch({
+    const cluster = await Cluster.launch({
+        concurrency: Cluster.CONCURRENCY_CONTEXT,
+        maxConcurrency: 5, // Set a reasonable maxConcurrency
+        puppeteer, // Use the imported puppeteer-extra
+        puppeteerOptions: {
             protocolTimeout: 1000000,
             defaultViewport: null,
-            headless: true, // Consider 'new' for future compatibility, but 'true' is fine for now
-        });
+            headless: true, // Consider 'new' for future compatibility
+        },
+        perBrowserOptions: [ // Apply StealthPlugin to each browser instance in the cluster
+            { plugins: [StealthPlugin()] },
+            { plugins: [StealthPlugin()] },
+            { plugins: [StealthPlugin()] },
+            { plugins: [StealthPlugin()] },
+            { plugins: [StealthPlugin()] },
+        ],
+    });
 
     let results = [];
-    // Read all URLs from input.txt into an array
+    const taskResults = []; // Array to store results from all tasks
     const allUrls = fs.readFileSync('input.txt', 'utf8').split('\n').map(url => url.trim()).filter(url => url.length > 0);
+    console.log('Initial URLs read from input.txt:', allUrls); // Log the URLs
     const processedUrls = new Set();
-    const noPrebidUrls = new Set(); // Keep track of URLs without prebid/libs
-    const errorUrls = new Set(); // Keep track of URLs that caused errors (stores "url,error_code")
+    const noPrebidUrls = new Set();
+    const errorUrls = new Set();
 
 
-    let page = await configurePage(browser); // Use the helper function
+    // Define the task for the cluster
+    await cluster.task(async ({ page, data: url }) => {
+        const trimmedUrl = url; // URL is already trimmed and validated
+        console.log(`Processing: ${trimmedUrl}`);
+        let taskResult; // To store the result of this specific task
 
-    // Remove the readline interface as we read the file directly now
-    /* const urls = readline.createInterface({
-        input: fs.createReadStream('input.txt')
-    }); */
+        try {
+            await configurePage(page); // Configure the page provided by the cluster
+            await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
 
-    try {
-        // Iterate over the array of URLs
-        for (const url of allUrls) {
-            const trimmedUrl = url; // Already trimmed
-            console.log(`Processing: ${trimmedUrl}`)
-
-            /* page.on('request', request => {
-                console.log(request.url());
-                console.log(request.failure());
+            await page.evaluate(async () => {
+                const sleep = ms => new Promise(res => setTimeout(res, ms));
+                await sleep((1000 * 60) * .10); // 6 seconds delay
             });
 
-            page.on('response', response => {
-                console.log(response.ok());
-                console.log(response.status());
-                console.log(response.statusText());
-            }); */
+            const pageData = await page.evaluate(() => {
+                const data = {};
+                data.libraries = [];
+                data.date = new Date().toISOString().slice(0, 10);
 
-            try { // Add try-catch around page processing for individual URL errors
-                await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
+                if (window.apstag) data.libraries.push('apstag');
+                if (window.googletag) data.libraries.push('googletag');
+                if (window.ats) data.libraries.push('ats');
 
-                // Slight delay to ensure the page is fully loaded
-                await page.evaluate(async () => {
-                    const sleep = ms => new Promise(res => setTimeout(res, ms));
-                    await sleep((1000 * 60) * .10); // 6 seconds delay
-                })
+                if (window._pbjsGlobals && Array.isArray(window._pbjsGlobals)) {
+                    data.prebidInstances = [];
+                    window._pbjsGlobals.forEach(function(globalVarName) {
+                        const pbjsInstance = window[globalVarName];
+                        if (pbjsInstance && pbjsInstance.version && pbjsInstance.installedModules) {
+                            data.prebidInstances.push({
+                                globalVarName: globalVarName,
+                                version: pbjsInstance.version,
+                                modules: pbjsInstance.installedModules
+                            });
+                        }
+                    });
+                }
+                return data;
+            });
 
-                // Collect data from the page
-                const pageData = await page.evaluate(() => {
-                    const data = {};
+            pageData.url = trimmedUrl;
 
-                    // Initialize libraries array
-                    data.libraries = [];
-
-                    data.date = new Date().toISOString().slice(0, 10)
-
-                    // Check for apstag
-                    if (window.apstag) {
-                        data.libraries.push('apstag');
-                    }
-
-                    // Check for googletag
-                    if (window.googletag) {
-                        data.libraries.push('googletag');
-                    }
-
-                    // Check for ats
-                    if (window.ats) {
-                        data.libraries.push('ats');
-                    }
-
-                    // Check for Prebid.js instances
-                    if (window._pbjsGlobals && Array.isArray(window._pbjsGlobals)) {
-                        data.prebidInstances = [];
-
-                        window._pbjsGlobals.forEach(function(globalVarName) {
-                            const pbjsInstance = window[globalVarName];
-                            if (pbjsInstance && pbjsInstance.version && pbjsInstance.installedModules) {
-                                data.prebidInstances.push({
-                                    globalVarName: globalVarName,
-                                    version: pbjsInstance.version,
-                                    modules: pbjsInstance.installedModules
-                                });
-                            }
-                        });
-                    }
-
-                    return data;
-                });
-
-                // Add the input URL to the pageData
-                pageData.url = trimmedUrl;
-
-                // Only push data if any libraries are found or Prebid.js is present
-                if (pageData.libraries.length > 0 || (pageData.prebidInstances && pageData.prebidInstances.length > 0)) {
-                    results.push(pageData);
-                    // Mark URL as processed if data was found
-                    processedUrls.add(trimmedUrl);
+            if (pageData.libraries.length > 0 || (pageData.prebidInstances && pageData.prebidInstances.length > 0)) {
+                taskResult = { type: 'success', data: pageData };
+            } else {
+                console.log(`No relevant data found for ${trimmedUrl}`);
+                taskResult = { type: 'no_data', url: trimmedUrl };
+            }
+        } catch (pageError) {
+            console.error(`Error processing ${trimmedUrl}:`, pageError.message);
+            const errorMessage = pageError.message || '';
+            const netErrorMatch = errorMessage.match(/net::([A-Z_]+)/);
+            let errorCode;
+            if (netErrorMatch) {
+                errorCode = netErrorMatch[1];
+            } else {
+                const prefix = `Error processing ${trimmedUrl}: `;
+                if (errorMessage.startsWith(prefix)) {
+                    errorCode = errorMessage.substring(prefix.length).trim();
                 } else {
-                    // Mark URL as processed because no relevant data was found
-                    processedUrls.add(trimmedUrl);
-                    noPrebidUrls.add(trimmedUrl); // Add to the set for logging later
-                    console.log(`No relevant data found for ${trimmedUrl}`);
+                    errorCode = errorMessage.trim() || 'UNKNOWN_ERROR';
                 }
-            } catch (pageError) {
-                console.error(`Error processing ${trimmedUrl}:`, pageError.message);
-                // Mark URL as processed because an error occurred
-                processedUrls.add(trimmedUrl);
-                // Extract error code after "net::" or the general message after the URL prefix
-                const errorMessage = pageError.message || '';
-                const netErrorMatch = errorMessage.match(/net::([A-Z_]+)/);
-                let errorCode;
-                if (netErrorMatch) {
-                    errorCode = netErrorMatch[1];
-                } else {
-                    // Try to get the message part after "Error processing URL: "
-                    const prefix = `Error processing ${trimmedUrl}: `;
-                    if (errorMessage.startsWith(prefix)) {
-                        errorCode = errorMessage.substring(prefix.length).trim();
-                    } else {
-                        // Fallback if the message format is unexpected
-                        errorCode = errorMessage.trim() || 'UNKNOWN_ERROR';
-                    }
-                    // Replace spaces with underscores and convert to uppercase for consistency if needed
-                    errorCode = errorCode.replace(/\s+/g, '_').toUpperCase();
-                    // Limit length if necessary
-                    // errorCode = errorCode.substring(0, 50); // Example length limit
-                }
-                errorUrls.add(`${trimmedUrl},${errorCode}`); // Add "url,error_code" to the set for logging later
+                errorCode = errorCode.replace(/\s+/g, '_').toUpperCase();
+            }
+            taskResult = { type: 'error', url: trimmedUrl, error: errorCode };
+        }
+        taskResults.push(taskResult); // Push result to the central array
+    });
 
-                // Check for DETACHED IFRAME error to reset the page
-                if (errorMessage.includes('DETACHED IFRAME') || errorMessage.includes('Target closed')) {
-                    console.warn(`Detached iframe or target closed error detected for ${trimmedUrl}. Closing current page and opening a new one.`);
-                    try {
-                        await page.close();
-                    } catch (closeError) {
-                        console.error(`Error closing the page after detached iframe error: ${closeError.message}`);
-                        // If closing fails, we might need to terminate the browser instance,
-                        // but for now, we'll try creating a new page anyway.
-                    }
-                    page = await configurePage(browser); // Create and configure a new page
-                    console.log("New page created. Continuing with the next URL.");
-                    continue; // Skip to the next URL in the loop
-                }
+    try {
+        allUrls.forEach(url => {
+            if (url) { // Ensure URL is not empty
+                cluster.queue(url);
+                processedUrls.add(url); // Mark URL as processed when queued
+            }
+        });
+
+        await cluster.idle(); // Wait for all queued tasks to complete
+
+        // Process results accumulated in taskResults
+        for (const taskResult of taskResults) {
+            if (!taskResult) {
+                console.log(`A task returned no result. This should not happen if tasks always push a result.`);
+                // Decide how to handle this, perhaps add the URL to errorUrls if identifiable
+                continue;
+            }
+
+            if (taskResult.type === 'success') {
+                console.log(`Data found for ${taskResult.data.url}`);
+                results.push(taskResult.data);
+            } else if (taskResult.type === 'no_data') {
+                console.log(`No data for ${taskResult.url}, adding to noPrebidUrls.`);
+                noPrebidUrls.add(taskResult.url);
+            } else if (taskResult.type === 'error') {
+                console.log(`Error for ${taskResult.url}: ${taskResult.error}, adding to errorUrls.`);
+                errorUrls.add(`${taskResult.url},${taskResult.error}`);
             }
         }
+
+        await cluster.close(); // Close the cluster
+
     } catch (error) {
-        // Catch errors outside the loop (e.g., browser launch)
-        console.error("An unexpected error occurred:", error);
+        console.error("An unexpected error occurred during cluster processing or setup:", error);
+        // Ensure cluster is closed on error if it was initialized
+        if (cluster && !cluster.isClosed) {
+            await cluster.close();
+        }
     } finally {
-        console.log('Results:', results);
+        console.log('Final Results Array:', results);
+        console.log('Final noPrebidUrls Set:', noPrebidUrls);
+        console.log('Final errorUrls Set:', errorUrls);
         try {
-            // Ensure the output and errors directories exist
             const errorsDir = 'errors';
             if (!fs.existsSync('output')) {
                 fs.mkdirSync('output');
@@ -176,56 +160,45 @@ async function prebidExplorer() {
                 fs.mkdirSync(errorsDir);
             }
 
-            // Write results if any
             if (results.length > 0) {
-                 // Ensure the monthly directory exists (e.g., output/Apr)
                 const now = new Date();
-                const month = now.toLocaleString('default', { month: 'short' }); // e.g., Apr
+                const month = now.toLocaleString('default', { month: 'short' });
                 const year = now.getFullYear();
                 const day = String(now.getDate()).padStart(2, '0');
                 const monthDir = `output/${month}`;
-                const dateFilename = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`; // YYYY-MM-DD.json
+                const dateFilename = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
 
                 if (!fs.existsSync(monthDir)) {
-                    fs.mkdirSync(monthDir, { recursive: true }); // Create parent dirs if needed
+                    fs.mkdirSync(monthDir, { recursive: true });
                 }
 
-                // Write results as a JSON array
-                const jsonOutput = JSON.stringify(results, null, 2);  // Pretty print with 2 spaces
-                // Use dynamic path
-                fs.appendFileSync(`${monthDir}/${dateFilename}`, jsonOutput + '\n', 'utf8'); // Append with newline
+                const jsonOutput = JSON.stringify(results, null, 2);
+                fs.appendFileSync(`${monthDir}/${dateFilename}`, jsonOutput + '\n', 'utf8');
                 console.log(`Results have been appended to ${monthDir}/${dateFilename}`);
             } else {
-                 console.log('No results to save.');
+                console.log('No results to save.');
             }
 
-            // Append URLs to error files if any
             if (noPrebidUrls.size > 0) {
                 fs.appendFileSync(`${errorsDir}/no_prebid.txt`, Array.from(noPrebidUrls).join('\n') + '\n', 'utf8');
                 console.log(`${noPrebidUrls.size} URLs appended to ${errorsDir}/no_prebid.txt`);
             }
             if (errorUrls.size > 0) {
-                // errorUrls now contains strings like "url,error_code"
                 fs.appendFileSync(`${errorsDir}/error_processing.txt`, Array.from(errorUrls).join('\n') + '\n', 'utf8');
-                 console.log(`${errorUrls.size} URLs with errors appended to ${errorsDir}/error_processing.txt`);
+                console.log(`${errorUrls.size} URLs with errors appended to ${errorsDir}/error_processing.txt`);
             }
 
-
-            // Calculate remaining URLs (all original URLs minus the processed ones)
+            // Remaining URLs logic needs to be sure all URLs were attempted.
+            // `processedUrls` now correctly reflects all URLs that were passed to `cluster.queue`.
             const remainingUrls = allUrls.filter(url => !processedUrls.has(url));
 
-            // Write remaining URLs back to input.txt
             fs.writeFileSync('input.txt', remainingUrls.join('\n'), 'utf8');
-            console.log(`input.txt updated. ${processedUrls.size} URLs removed, ${remainingUrls.length} URLs remain.`);
-
+            console.log(`input.txt updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
 
         } catch (err) {
             console.error('Failed to write results, update error files, or update input.txt:', err);
         }
-
-        if (browser) {
-            await browser.close();
-        }
+        // Browser closing is handled by cluster.close()
     }
 }
 

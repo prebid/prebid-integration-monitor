@@ -1,0 +1,100 @@
+[
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "date": "2025-06-01",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.51.0",
+        "modules": [
+          "consentManagement",
+          "consentManagementGpp",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "enrichmentFpdModule",
+          "gdprEnforcement",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "identityLinkIdSystem",
+          "ixBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentIdSystem",
+          "medianetBidAdapter",
+          "openxBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "taboolaBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "userId",
+          "yahoosspBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "url": "https://www.yahoo.com"
+  }
+]
+[
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "date": "2025-06-01",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.37.0",
+        "modules": [
+          "adpod",
+          "appnexusBidAdapter",
+          "categoryTranslation",
+          "concertAnalyticsAdapter",
+          "concertBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "debugging",
+          "fpdModule",
+          "freeWheelAdserverVideo",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "medianetBidAdapter",
+          "openwebBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "url": "https://edition.cnn.com/"
+  }
+]

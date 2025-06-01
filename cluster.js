@@ -22,12 +22,6 @@ const clusterSearch = async () => {
         console.log(url, version);
     });
     
-      cluster.queue('https://www.techcrunch.com/');    
-      cluster.queue('https://www.google.com/');
-      cluster.queue('https://www.wikipedia.org/');
-      cluster.queue('https://www.abcnews.go.com/');
-      cluster.queue('https://www.foxnews.com/');
-    
       await cluster.idle();
       await cluster.close();
     }
