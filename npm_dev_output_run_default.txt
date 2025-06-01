@@ -1,0 +1,21 @@
+
+> prebid-integration-monitor@1.0.0 dev
+> node --loader ts-node/esm ./bin/dev.js default
+
+(node:5050) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+2025-06-01 21:41:40 [32minfo[39m: Logger initialized successfully. Log directory: logs
+TEST_CONSOLE_OUTPUT: This is a test message from default command.
+DEBUG: NodeSDK initialized with OTLPTraceExporter and Instrumentations (Resource commented out). Calling sdk.start().
+2025-06-01 21:41:40 [32minfo[39m: Default oclif command starting...
+2025-06-01 21:41:40 [32minfo[39m: Inside parent span (oclif command). (trace_id: 53c05e953ebcb6857695d0377723147e, span_id: 36baf4122ff8daba)
+Inside parent span (oclif command).
+2025-06-01 21:41:40 [32minfo[39m: Inside child span, performing a task (oclif command)... (trace_id: 53c05e953ebcb6857695d0377723147e, span_id: c58ddd88ca5140f1)
+Inside child span, performing a task (oclif command)...
+2025-06-01 21:41:41 [32minfo[39m: Child span task complete (oclif command). (trace_id: 53c05e953ebcb6857695d0377723147e, span_id: c58ddd88ca5140f1)
+Child span task complete (oclif command).
+2025-06-01 21:41:41 [32minfo[39m: Parent span continuing after child span (oclif command). (trace_id: 53c05e953ebcb6857695d0377723147e, span_id: 36baf4122ff8daba)
+Parent span continuing after child span (oclif command).
+2025-06-01 21:41:41 [32minfo[39m: Main application processing finished (oclif command).
+Main application processing finished (oclif command).

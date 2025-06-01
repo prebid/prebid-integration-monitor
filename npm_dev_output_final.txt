@@ -1,0 +1,5 @@
+
+> prebid-integration-monitor@1.0.0 dev
+> node --loader ts-node/esm --disable-warning=ExperimentalWarning ./bin/dev.js
+
+node: bad option: --disable-warning=ExperimentalWarning

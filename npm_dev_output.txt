@@ -1,0 +1,62 @@
+
+> prebid-integration-monitor@1.0.0 dev
+> node ./bin/dev.js
+
+(node:1603) [ERR_UNKNOWN_FILE_EXTENSION] Warning: TypeError
+module: @oclif/core@4.3.0
+task: findCommand (default)
+plugin: prebid-integration-monitor
+root: /app
+code: ERR_UNKNOWN_FILE_EXTENSION
+message: Unknown file extension ".ts" for /app/src/commands/default.ts
+See more details with DEBUG=*
+(Use `node --trace-warnings ...` to show where the warning was created)
+Warning: TypeError
+    at Plugin.warn (/app/node_modules/@oclif/core/lib/config/plugin.js:371:17)
+    at /app/node_modules/@oclif/core/lib/config/plugin.js:273:30
+    at async Promise.all (index 0)
+    at async Plugin._manifest (/app/node_modules/@oclif/core/lib/config/plugin.js:254:24)
+    at async Plugin.load (/app/node_modules/@oclif/core/lib/config/plugin.js:205:25)
+    at async PluginLoader.loadRoot (/app/node_modules/@oclif/core/lib/config/plugin-loader.js:43:13)
+    at async Config.load (/app/node_modules/@oclif/core/lib/config/config.js:312:27)
+    at async Function.load (/app/node_modules/@oclif/core/lib/config/config.js:178:9)
+    at async run (/app/node_modules/@oclif/core/lib/main.js:55:20)
+    at async file:///app/bin/dev.js:5:1
+module: @oclif/core@4.3.0
+task: findCommand (default)
+plugin: prebid-integration-monitor
+root: /app
+code: ERR_UNKNOWN_FILE_EXTENSION
+message: Unknown file extension ".ts" for /app/src/commands/default.ts
+See more details with DEBUG=*
+(node:1603) [ERR_UNKNOWN_FILE_EXTENSION] Warning: TypeError
+module: @oclif/core@4.3.0
+task: findCommand (scan)
+plugin: prebid-integration-monitor
+root: /app
+code: ERR_UNKNOWN_FILE_EXTENSION
+message: Unknown file extension ".ts" for /app/src/commands/scan.ts
+See more details with DEBUG=*
+Warning: TypeError
+    at Plugin.warn (/app/node_modules/@oclif/core/lib/config/plugin.js:371:17)
+    at /app/node_modules/@oclif/core/lib/config/plugin.js:273:30
+    at async Promise.all (index 1)
+    at async Plugin._manifest (/app/node_modules/@oclif/core/lib/config/plugin.js:254:24)
+    at async Plugin.load (/app/node_modules/@oclif/core/lib/config/plugin.js:205:25)
+    at async PluginLoader.loadRoot (/app/node_modules/@oclif/core/lib/config/plugin-loader.js:43:13)
+    at async Config.load (/app/node_modules/@oclif/core/lib/config/config.js:312:27)
+    at async Function.load (/app/node_modules/@oclif/core/lib/config/config.js:178:9)
+    at async run (/app/node_modules/@oclif/core/lib/main.js:55:20)
+    at async file:///app/bin/dev.js:5:1
+module: @oclif/core@4.3.0
+task: findCommand (scan)
+plugin: prebid-integration-monitor
+root: /app
+code: ERR_UNKNOWN_FILE_EXTENSION
+message: Unknown file extension ".ts" for /app/src/commands/scan.ts
+See more details with DEBUG=*
+VERSION
+  prebid-integration-monitor/1.0.0 linux-x64 node-v18.19.1
+
+USAGE
+  $ app [COMMAND]

@@ -1,0 +1,17 @@
+
+> prebid-integration-monitor@1.0.0 dev
+> node --loader ts-node/esm ./bin/dev.js
+
+(node:4502) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+VERSION
+  prebid-integration-monitor/1.0.0 linux-x64 node-v18.19.1
+
+USAGE
+  $ app [COMMAND]
+
+COMMANDS
+  default  Default command for prebid-integration-monitor. Runs the main
+           monitoring logic.
+  scan     Scans websites for Prebid.js integrations.
