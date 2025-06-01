@@ -29,23 +29,34 @@ export function initializeLogger(logDir) {
                             message += ` (trace_id: ${spanContext.traceId}, span_id: ${spanContext.spanId})`;
                         }
                     }
-                    // Include other metadata if present (e.g., from splat)
-                    const splat = info[Symbol.for('splat')];
-                    if (splat) {
-                        if (Array.isArray(splat)) {
-                            const metadata = splat.map((s) => typeof s === 'object' ? JSON.stringify(s) : s).join(' ');
-                            if (metadata) {
-                                message += ` ${metadata}`;
+                    // Special handling for "Initial URLs read"
+                    // The actual log call is: logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length, urls: allUrls });
+                    // The properties 'count' and 'urls' will be directly on the 'info' object.
+                    if (typeof info.message === 'string' && info.message.startsWith('Initial URLs read from') && typeof info.count === 'number') {
+                        message += ` count: ${info.count}`;
+                    }
+                    else {
+                        // Original metadata handling for other messages
+                        const splat = info[Symbol.for('splat')];
+                        if (splat) {
+                            if (Array.isArray(splat)) {
+                                const metadata = splat.map((s) => typeof s === 'object' ? JSON.stringify(s) : s).join(' ');
+                                if (metadata) {
+                                    message += ` ${metadata}`;
+                                }
                             }
-                        }
-                        else if (typeof splat === 'object' && splat !== null) {
-                            const metadata = JSON.stringify(splat);
-                            if (metadata && metadata !== '{}') {
-                                message += ` ${metadata}`;
+                            else if (typeof splat === 'object' && splat !== null) {
+                                const metadataString = JSON.stringify(splat);
+                                // Avoid printing empty object or already handled metadata for the specific message
+                                if (metadataString && metadataString !== '{}') {
+                                    if (!(typeof info.message === 'string' && info.message.startsWith('Initial URLs read from') && info.urls && typeof info.count === 'number')) {
+                                        message += ` ${metadataString}`;
+                                    }
+                                }
                             }
-                        }
-                        else {
-                            message += ` ${splat}`;
+                            else {
+                                message += ` ${splat}`;
+                            }
                         }
                     }
                     return message;
