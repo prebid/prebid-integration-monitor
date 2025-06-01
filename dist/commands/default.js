@@ -3,7 +3,7 @@ import { initTracer } from '../tracer.js';
 import { initializeLogger } from '../utils/logger.js';
 import { trace } from '@opentelemetry/api';
 let logger; // Module-level logger variable
-class Index extends Command {
+class Default extends Command {
     // If the original script accepted command-line arguments that should be flags or args:
     // static flags = {
     //   help: Flags.help({char: 'h'}),
@@ -13,7 +13,7 @@ class Index extends Command {
     //   {name: 'exampleArg', description: 'example argument'},
     // ];
     async run() {
-        const { flags } = await this.parse(Index);
+        const { flags } = await this.parse(Default);
         // Initialize logger with the logDir from flags
         logger = initializeLogger(flags.logDir);
         try {
@@ -48,13 +48,13 @@ class Index extends Command {
         }
     }
 }
-Index.description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.';
+Default.description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.';
 // Add a logDir flag similar to the scan command for consistency
-Index.flags = {
+Default.flags = {
     logDir: Flags.string({
         description: 'Directory to save log files',
         default: 'logs',
     }),
     // help: Flags.help({char: 'h'}), // Example, if needed
 };
-export default Index;
+export default Default;
