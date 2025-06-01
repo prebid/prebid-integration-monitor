@@ -98,6 +98,69 @@ This application is now structured as an oclif (Open CLI Framework) command-line
         node ./bin/run.js [COMMAND] --help
         ```
 
+### `scan` Command
+
+The `scan` command is used to analyze a list of websites for Prebid.js integrations and other specified ad technology libraries. It processes URLs from an input file, launches Puppeteer instances to visit these pages, and collects data, saving the results to an output directory.
+
+**Syntax:**
+
+```bash
+./bin/run scan [INPUTFILE] [FLAGS...]
+# or in development: node ./bin/dev.js scan [INPUTFILE] [FLAGS...]
+# or using npm script: npm run prebid:scan -- [INPUTFILE] [FLAGS...] (note the -- to pass arguments to the script)
+```
+
+**Argument:**
+
+-   `INPUTFILE`: (Optional) Path to the input file containing a list of URLs to scan (one URL per line).
+    -   Defaults to `input.txt` in the project root if not specified.
+
+**Flags:**
+
+-   `--puppeteerType <option>`: Specifies the Puppeteer operational mode.
+    -   Options: `vanilla`, `cluster` (default)
+    -   `vanilla`: Processes URLs sequentially using a single Puppeteer browser instance.
+    -   `cluster`: Uses `puppeteer-cluster` to process URLs in parallel, according to the concurrency settings.
+-   `--concurrency <value>`: Sets the number of concurrent Puppeteer instances when using `puppeteerType=cluster`.
+    -   Default: `5`
+-   `--headless`: Runs Puppeteer in headless mode (no UI). This is the default.
+    -   `--no-headless`: Runs Puppeteer with a visible browser UI.
+-   `--monitor`: Enables `puppeteer-cluster`'s web monitoring interface (available at `http://localhost:21337` by default) when `puppeteerType=cluster`.
+    -   Default: `false`
+-   `--outputDir <value>`: Specifies the directory where scan results (JSON files) will be saved.
+    -   Default: `output` (in the project root)
+    -   Results are typically saved in a subdirectory structure like `output/Month/YYYY-MM-DD.json`.
+-   `--logDir <value>`: Specifies the directory where log files (`app.log`, `error.log`) will be saved.
+    -   Default: `logs` (in the project root)
+
+**Usage Examples:**
+
+1.  **Basic scan (using default `input.txt` and cluster mode):**
+    ```bash
+    ./bin/run scan
+    ```
+    *(Ensure `./bin/run` has execute permissions or use `node ./bin/run scan`)*
+
+2.  **Scan using vanilla Puppeteer:**
+    ```bash
+    ./bin/run scan --puppeteerType=vanilla
+    ```
+
+3.  **Scan with a specific input file and output directory:**
+    ```bash
+    ./bin/run scan my_urls.txt --outputDir=./my_results
+    ```
+
+4.  **Scan in non-headless (headed) mode:**
+    ```bash
+    ./bin/run scan --no-headless
+    ```
+
+5.  **Scan with increased concurrency and monitoring for cluster mode:**
+    ```bash
+    ./bin/run scan --concurrency=10 --monitor
+    ```
+
 ## Running Tests
 
 To run the test suite using Vitest:
