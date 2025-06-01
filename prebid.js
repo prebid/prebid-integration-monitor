@@ -7,7 +7,7 @@ async function configurePage(browser) {
     const page = await browser.newPage();
     page.setDefaultTimeout(55000);
     // Set to Googlebot user agent
-    await page.setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
     return page;
 }
 
