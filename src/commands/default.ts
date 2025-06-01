@@ -6,7 +6,7 @@ import { trace } from '@opentelemetry/api';
 
 let logger: WinstonLogger; // Module-level logger variable
 
-export default class Index extends Command {
+export default class Default extends Command {
   static description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.'
 
   // Add a logDir flag similar to the scan command for consistency
@@ -29,7 +29,7 @@ export default class Index extends Command {
   // ];
 
   async run(): Promise<void> {
-    const {flags} = await this.parse(Index);
+    const {flags} = await this.parse(Default);
     // Initialize logger with the logDir from flags
     logger = initializeLogger(flags.logDir);
 
