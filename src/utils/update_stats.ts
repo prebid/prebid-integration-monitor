@@ -1,30 +1,16 @@
-import * as fs from 'fs'; // Changed to import * as fs
+import { promises as fsPromises } from 'fs'; // Renamed to fsPromises for clarity
 import * as path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from 'url'; // For robust __dirname
 
-// Replicate __dirname functionality in ES Modules
-const __filename: string = fileURLToPath(import.meta.url); // No changes needed here
-const __dirname: string = dirname(__filename);
+// Replicate __dirname functionality for ES modules
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = path.dirname(__filename);
 
 const outputDir: string = path.join(__dirname, '..', 'store');
-const summaryFilePath: string = path.join(__dirname, '..', '..', 'api', 'summarization.json');
+const finalApiFilePath: string = path.join(__dirname, '..', '..', 'api', 'api.json'); // Changed from summaryFilePath
+const MIN_COUNT_THRESHOLD: number = 5; // Added from clean_stats.ts
 
-interface VersionComponents {
-    major: number;
-    minor: number;
-    patch: number;
-    preRelease: string | null;
-}
-
-interface VersionCounts {
-    [version: string]: number;
-}
-
-interface ModuleCounts {
-    [moduleName: string]: number;
-}
-
+// Interfaces from update_stats.ts (SiteData, PrebidInstanceData remain the same)
 interface SiteData {
     url?: string;
     prebidInstances?: PrebidInstanceData[];
@@ -35,29 +21,55 @@ interface PrebidInstanceData {
     modules?: string[];
 }
 
-interface SummaryData {
-    monitoredSites: number;
-    prebidSites: number;
-    versionDistribution: VersionCounts;
-    moduleDistribution: ModuleCounts;
+// Interfaces that were in clean_stats.ts or are combined
+interface VersionDistribution { // From clean_stats.ts - used for categorized versions
+    [version: string]: number;
 }
 
-/**
- * Parses a version string (e.g., "v9.30.0", "v9.31.0-pre") into components.
- * @param {string} versionString
- * @returns {VersionComponents}
- */
+interface ModuleDistribution { // From clean_stats.ts - used for categorized modules
+    [moduleName: string]: number;
+}
+
+// This is the structure of the data after initial summarization
+interface SummarizationData { // Was SummaryData in update_stats.ts and SummarizationData in clean_stats.ts
+    visitedSites: number; // Added from clean_stats.ts, was monitoredSites
+    monitoredSites: number; // Kept from update_stats.ts
+    prebidSites: number;
+    versionDistribution: VersionDistribution; // This will be the raw versions before categorization
+    moduleDistribution: ModuleDistribution; // This will be the raw modules before filtering/categorization
+}
+
+// This is the final output structure, similar to OutputData in clean_stats.ts
+interface FinalApiData {
+    visitedSites: number;
+    monitoredSites: number;
+    prebidSites: number;
+    releaseVersions: VersionDistribution;
+    buildVersions: VersionDistribution;
+    customVersions: VersionDistribution;
+    bidAdapterInst: ModuleDistribution;
+    idModuleInst: ModuleDistribution;
+    rtdModuleInst: ModuleDistribution;
+    analyticsAdapterInst: ModuleDistribution;
+    otherModuleInst: ModuleDistribution;
+}
+
+// Version parsing and comparison functions from update_stats.ts (kept as they are more detailed)
+interface VersionComponents {
+    major: number;
+    minor: number;
+    patch: number;
+    preRelease: string | null;
+}
+
 function parseVersion(versionString: string | undefined): VersionComponents {
-    // Added robustness: handle potential null/undefined input
     if (!versionString) {
         console.warn(`Attempted to parse null or undefined version string.`);
         return { major: 0, minor: 0, patch: 0, preRelease: 'invalid' };
     }
     const match: RegExpMatchArray | null = versionString.match(/^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/);
     if (!match) {
-        // Handle non-standard versions or return a default low value
         console.warn(`Could not parse version: ${versionString}`);
-        // Return a structure that allows comparison but marks it as non-standard
         return { major: 0, minor: 0, patch: 0, preRelease: versionString };
     }
     return {
@@ -68,12 +80,6 @@ function parseVersion(versionString: string | undefined): VersionComponents {
     };
 }
 
-/**
- * Compares two version strings based on semantic versioning rules (descending order).
- * @param {string} a Version string a
- * @param {string} b Version string b
- * @returns {number} -1 if a > b, 1 if a < b, 0 if a === b
- */
 function compareVersions(a: string, b: string): number {
     const vA: VersionComponents = parseVersion(a);
     const vB: VersionComponents = parseVersion(b);
@@ -82,144 +88,204 @@ function compareVersions(a: string, b: string): number {
     if (vA.minor !== vB.minor) return vB.minor - vA.minor;
     if (vA.patch !== vB.patch) return vB.patch - vA.patch;
 
-    // Versions without pre-release tags are considered newer
     if (vA.preRelease === null && vB.preRelease !== null) return -1;
     if (vA.preRelease !== null && vB.preRelease === null) return 1;
 
-    // If both have pre-release tags, compare them lexicographically (ascending)
     if (vA.preRelease && vB.preRelease) {
-        if (vA.preRelease < vB.preRelease) return -1; // a comes before b
-        if (vA.preRelease > vB.preRelease) return 1;  // a comes after b
+        if (vA.preRelease < vB.preRelease) return -1;
+        if (vA.preRelease > vB.preRelease) return 1;
     }
-
-    return 0; // Versions are identical or only differ in ways not covered (e.g., build metadata)
+    return 0;
 }
 
+interface UpdateStatsOptions {
+  logError?: (message: string, errorName: string, errorMessage: string) => void;
+}
 
 /**
- * Extracts data from monthly JSON files and summarizes Prebid version distribution,
- * module distribution, total monitored sites, and sites with Prebid detected.
- * Assumes version information is located at `entry.prebidInstances[].version`.
- * Assumes module information is located at `entry.prebidInstances[].modules`.
- * Assumes URL information is located at `entry.url`.
+ * Main function to summarize and then clean statistics.
  */
-async function summarizeStats(): Promise<void> {
-    const versionCounts: VersionCounts = {};
-    const moduleCounts: ModuleCounts = {}; // Added to count modules
-    const uniqueUrls: Set<string> = new Set(); // Use a Set to store all unique URLs found
-    const urlsWithPrebid: Set<string> = new Set(); // Use a Set to store unique URLs with Prebid
-    const monthAbbrRegex: RegExp = /^[A-Z][a-z]{2}$/; // Matches month abbreviations like Apr, Feb, Mar
+async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> {
+    // Part 1: Summarization (adapted from original summarizeStats in update_stats.ts)
+    const rawVersionCounts: VersionDistribution = {}; // Was versionCounts
+    const rawModuleCounts: ModuleDistribution = {}; // Was moduleCounts
+    const uniqueUrls: Set<string> = new Set();
+    const urlsWithPrebid: Set<string> = new Set();
+    const monthAbbrRegex: RegExp = /^[A-Z][a-z]{2}$/;
 
     try {
-        const outputEntries: fs.Dirent[] = await fs.promises.readdir(outputDir, { withFileTypes: true }); // Changed fsPromises to fs.promises
+        const outputEntries: import('fs').Dirent[] = await fsPromises.readdir(outputDir, { withFileTypes: true });
 
         for (const entry of outputEntries) {
-            // Process only directories matching the month abbreviation pattern
             if (entry.isDirectory() && monthAbbrRegex.test(entry.name)) {
                 const monthDirPath: string = path.join(outputDir, entry.name);
-                const files: string[] = await fs.promises.readdir(monthDirPath); // Changed fsPromises to fs.promises
+                const files: string[] = await fsPromises.readdir(monthDirPath);
 
                 for (const file of files) {
+                    // console.log(`TEMPORARY DEBUG: Processing file: ${path.join(monthDirPath, file)}`); // Restore
                     if (path.extname(file).toLowerCase() === '.json') {
                         const filePath: string = path.join(monthDirPath, file);
                         try {
-                            const fileContent: string = await fs.promises.readFile(filePath, 'utf8'); // Changed fsPromises to fs.promises
-                            const data: SiteData[] = JSON.parse(fileContent);
+                            const fileContent: string = await fsPromises.readFile(filePath, 'utf8');
+                            // console.log(`TEMPORARY DEBUG: Content of ${filePath}: ###${fileContent}###`); // Restore
 
-                            if (Array.isArray(data)) {
-                                data.forEach((siteData: SiteData) => { // No changes needed here
+                            // Removed temporary diagnostic block for invalid.json
+
+                            const siteEntries: SiteData[] = JSON.parse(fileContent); // Renamed for clarity
+
+                            if (Array.isArray(siteEntries)) {
+                                siteEntries.forEach((siteData: SiteData) => {
                                     const currentUrl: string | undefined = siteData?.url?.trim();
-                                    let hasPrebidInstance: boolean = false; // No changes needed here
+                                    let hasPrebidInstance: boolean = false;
 
-                                    // Count unique URLs
                                     if (currentUrl) {
                                         uniqueUrls.add(currentUrl);
                                     }
 
-                                    // Process Prebid instances
                                     if (Array.isArray(siteData.prebidInstances)) {
                                         siteData.prebidInstances.forEach((instance: PrebidInstanceData) => {
                                             if (instance) {
-                                                hasPrebidInstance = true; // Mark site as having Prebid if any instance exists
+                                                hasPrebidInstance = true;
 
-                                                // Count versions
                                                 if (typeof instance.version === 'string') {
                                                     const version: string = instance.version.trim();
                                                     if (version) {
-                                                        versionCounts[version] = (versionCounts[version] || 0) + 1;
+                                                        rawVersionCounts[version] = (rawVersionCounts[version] || 0) + 1;
                                                     }
                                                 }
 
-                                                // --- Assumption: Modules are in instance.modules array ---
                                                 if (Array.isArray(instance.modules)) {
                                                     instance.modules.forEach((moduleName: string) => {
                                                         if (typeof moduleName === 'string') {
                                                             const trimmedModule: string = moduleName.trim();
                                                             if (trimmedModule) {
-                                                                moduleCounts[trimmedModule] = (moduleCounts[trimmedModule] || 0) + 1;
+                                                                rawModuleCounts[trimmedModule] = (rawModuleCounts[trimmedModule] || 0) + 1;
                                                             }
                                                         }
                                                     });
                                                 }
-                                                // --- End Module Assumption ---
                                             }
                                         });
                                     }
-
-                                    // If the site had a URL and at least one Prebid instance, add URL to the set
                                     if (currentUrl && hasPrebidInstance) {
                                         urlsWithPrebid.add(currentUrl);
                                     }
                                 });
                             }
                         } catch (parseError: any) {
-                            console.error(`Error parsing JSON file ${filePath}:`, parseError);
+                            const errorMessage = `Error parsing JSON file ${filePath}:`;
+                            if (options?.logError) {
+                                options.logError(errorMessage, parseError.name, parseError.message);
+                            } else {
+                                // console.log('TEMPORARY DEBUG: Entered catch block for parseError in update_stats.ts. Error message:', parseError.message); // Restore
+                                console.error(errorMessage, parseError); // Restore original error logging
+                            }
                         }
                     }
                 }
             }
         }
 
-        // Sort the versions (descending semantic version)
-        const sortedVersions: string[] = Object.keys(versionCounts).sort(compareVersions);
-        const sortedVersionCounts: VersionCounts = {};
-        for (const version of sortedVersions) {
-            sortedVersionCounts[version] = versionCounts[version];
+        const sortedRawVersions: string[] = Object.keys(rawVersionCounts).sort(compareVersions);
+        const sortedRawVersionCounts: VersionDistribution = {};
+        for (const version of sortedRawVersions) {
+            sortedRawVersionCounts[version] = rawVersionCounts[version];
         }
 
-        // Sort the modules (descending count)
-        const sortedModules: string[] = Object.keys(moduleCounts).sort((a, b) => moduleCounts[b] - moduleCounts[a]);
-        const sortedModuleCounts: ModuleCounts = {};
-        for (const moduleName of sortedModules) {
-            sortedModuleCounts[moduleName] = moduleCounts[moduleName];
+        const sortedRawModules: string[] = Object.keys(rawModuleCounts).sort((a, b) => rawModuleCounts[b] - rawModuleCounts[a]);
+        const sortedRawModuleCounts: ModuleDistribution = {};
+        for (const moduleName of sortedRawModules) {
+            sortedRawModuleCounts[moduleName] = rawModuleCounts[moduleName];
         }
 
-
-        // Prepare the summary object
-        const summaryData: SummaryData = {
-            monitoredSites: uniqueUrls.size,
+        const summarizationData: SummarizationData = {
+            visitedSites: uniqueUrls.size, // This now correctly represents all sites found in logs
+            monitoredSites: uniqueUrls.size, // Keeping monitoredSites as per original update_stats, perhaps it means the same
             prebidSites: urlsWithPrebid.size,
-            versionDistribution: sortedVersionCounts,
-            moduleDistribution: sortedModuleCounts, // Add sorted module counts
+            versionDistribution: sortedRawVersionCounts,
+            moduleDistribution: sortedRawModuleCounts,
         };
 
-        // Ensure the target directory exists
-        const targetApiDir = path.dirname(summaryFilePath);
-        if (!fs.existsSync(targetApiDir)) {
-            fs.mkdirSync(targetApiDir, { recursive: true });
+        // Part 2: Cleaning (adapted from cleanStats in clean_stats.ts)
+        const finalApiData: FinalApiData = {
+            visitedSites: summarizationData.visitedSites,
+            monitoredSites: summarizationData.monitoredSites,
+            prebidSites: summarizationData.prebidSites,
+            releaseVersions: {},
+            buildVersions: {},
+            customVersions: {},
+            bidAdapterInst: {},
+            idModuleInst: {},
+            rtdModuleInst: {},
+            analyticsAdapterInst: {},
+            otherModuleInst: {}
+        };
+
+        // Process versionDistribution from summarizationData
+        const versionDistributionForCleaning: VersionDistribution = summarizationData.versionDistribution;
+        for (const version in versionDistributionForCleaning) {
+            const count: number = versionDistributionForCleaning[version];
+            const cleanedVersion: string = version.startsWith('v') ? version.substring(1) : version;
+
+            if (version.endsWith('-pre')) {
+                finalApiData.buildVersions[cleanedVersion] = count;
+            } else if (version.includes('-')) { // Covers cases like '1.2.3-custom' or 'v1.2.3-custom'
+                finalApiData.customVersions[cleanedVersion] = count;
+            } else {
+                if (cleanedVersion.includes('.')) { // Standard X.Y.Z or X.Y
+                    finalApiData.releaseVersions[cleanedVersion] = count;
+                } else { // Single numbers or other non-standard, treat as custom
+                    finalApiData.customVersions[cleanedVersion] = count;
+                }
+            }
         }
 
-        // Write the summary to summarization.json
-        await fs.promises.writeFile(summaryFilePath, JSON.stringify(summaryData, null, 2)); // Changed fsPromises to fs.promises
-        console.log(`Summary successfully written to ${summaryFilePath}`);
+        // Process moduleDistribution from summarizationData
+        const moduleDistributionForCleaning: ModuleDistribution = summarizationData.moduleDistribution;
+        for (const moduleName in moduleDistributionForCleaning) {
+            const count: number = moduleDistributionForCleaning[moduleName];
+
+            if (count < MIN_COUNT_THRESHOLD) {
+                continue;
+            }
+
+            if (moduleName.includes('BidAdapter')) {
+                finalApiData.bidAdapterInst[moduleName] = count;
+            } else if (moduleName.includes('IdSystem') || moduleName === 'userId' || moduleName === 'idImportLibrary' || moduleName === 'pubCommonId' || moduleName === 'utiqSystem' || moduleName === 'trustpidSystem') {
+                finalApiData.idModuleInst[moduleName] = count;
+            } else if (moduleName.includes('RtdProvider') || moduleName === 'rtdModule') {
+                finalApiData.rtdModuleInst[moduleName] = count;
+            } else if (moduleName.includes('AnalyticsAdapter')) {
+                finalApiData.analyticsAdapterInst[moduleName] = count;
+            } else {
+                finalApiData.otherModuleInst[moduleName] = count;
+            }
+        }
+
+        // Ensure the target directory exists before writing
+        const targetApiDir = path.dirname(finalApiFilePath);
+        try {
+            await fsPromises.access(targetApiDir);
+        } catch (error) {
+            await fsPromises.mkdir(targetApiDir, { recursive: true });
+        }
+
+        // Write the final cleaned data to api.json
+        await fsPromises.writeFile(finalApiFilePath, JSON.stringify(finalApiData, null, 2));
+        console.log(`Successfully created ${finalApiFilePath}`);
 
     } catch (err: any) {
-        console.error('Error processing output directories:', err);
+        const errorMessage = 'Error processing stats:';
+        if (options?.logError) {
+            options.logError(errorMessage, err.name, err.message);
+        } else {
+            console.error(errorMessage, err); // Changed error message for broader scope
+        }
     }
 }
 
-// Example usage: Call the function
-summarizeStats();
+// Run the function
+// updateAndCleanStats(); // Commented out: This should not run on import for testing
 
 // If you need to export the function:
-// export { summarizeStats };
+export { updateAndCleanStats };
