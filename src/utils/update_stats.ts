@@ -7,7 +7,7 @@ import { dirname } from 'path';
 const __filename: string = fileURLToPath(import.meta.url); // No changes needed here
 const __dirname: string = dirname(__filename);
 
-const outputDir: string = path.join(__dirname, '..', 'output');
+const outputDir: string = path.join(__dirname, '..', 'store');
 const summaryFilePath: string = path.join(outputDir, 'summarization.json'); // No changes needed here
 
 interface VersionComponents {

@@ -37,8 +37,8 @@ interface OutputData {
 }
 
 async function cleanStats(): Promise<void> {
-  const inputPath: string = path.join(__dirname, '..', 'output', 'summarization.json');
-  const outputPath: string = path.join(__dirname, '..', 'output', 'api.json');
+  const inputPath: string = path.join(__dirname, '..', 'store', 'summarization.json');
+  const outputPath: string = path.join(__dirname, '..', 'store', 'api.json');
   const MIN_COUNT_THRESHOLD: number = 5;
 
   try {
