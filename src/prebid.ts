@@ -1,5 +1,6 @@
 import * as fs from 'fs'; // Keep fs for readFileSync, existsSync, mkdirSync, writeFileSync
 import logger from './utils/logger.js'; // .js extension may be needed
+import { INPUT_FILE_PATH } from './utils/parser.js';
 import { addExtra } from 'puppeteer-extra';
 import puppeteerVanilla from 'puppeteer'; // Reverted to simple default import
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
@@ -82,7 +83,7 @@ async function prebidExplorer(): Promise<void> {
 
     let results: PageData[] = []; // Typed results
     const taskResults: TaskResult[] = []; // Array to store results from all tasks
-    const allUrls: string[] = fs.readFileSync('input.txt', 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
+    const allUrls: string[] = fs.readFileSync(INPUT_FILE_PATH, 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
     logger.info('Initial URLs read from input.txt', { count: allUrls.length, urls: allUrls }); // Log the URLs
     const processedUrls: Set<string> = new Set();
     // noPrebidUrls and errorUrls sets are effectively replaced by logger calls with specific metadata
@@ -244,7 +245,7 @@ async function prebidExplorer(): Promise<void> {
             // `processedUrls` now correctly reflects all URLs that were passed to `cluster.queue`.
             const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
 
-            fs.writeFileSync('input.txt', remainingUrls.join('\n'), 'utf8');
+            fs.writeFileSync(INPUT_FILE_PATH, remainingUrls.join('\n'), 'utf8');
             logger.info(`input.txt updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
 
         } catch (err: any) {

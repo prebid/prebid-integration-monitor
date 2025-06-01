@@ -4,9 +4,10 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth'); // Changed to r
 // const puppeteer = require('puppeteer'); // This line is replaced by puppeteer-extra initialization
 import { Cluster } from 'puppeteer-cluster';
 import * as fs from 'fs'; // Keep fs for readFileSync for now
-import * as path from 'path';
+import * as path from 'path'; // path is still used by INPUT_FILE_PATH definition, keep it for now.
 import { Page, Frame, Dialog } from 'puppeteer'; // Import Page, Frame, Dialog types
 import logger from './utils/logger.js'; // Corrected path
+import { INPUT_FILE_PATH } from './utils/parser.js'; // Import the centralized path
 
 const puppeteer = addExtra(puppeteerVanilla); // Reinitialize puppeteer with puppeteer-extra
 puppeteer.use(StealthPlugin()); // Apply StealthPlugin
@@ -148,14 +149,15 @@ const clusterSearch = async (): Promise<void> => {
     // cluster.queue('https://example.com');
     // cluster.queue('https://prebid.org/examples/adops/integration-testing.html');
 
-    const inputFile: string = path.join(__dirname, 'input.txt'); // __dirname is fine in .cts
+    // const inputFile: string = path.join(__dirname, 'input.txt'); // Replaced by imported INPUT_FILE_PATH
+    const inputFile: string = INPUT_FILE_PATH; // Use the imported centralized path
     try {
         const urls: string[] = fs.readFileSync(inputFile, 'utf8').split('\n').filter(line => line.trim() !== '');
         if (urls.length === 0) {
             logger.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile });
             // logError("N/A", "input.txt is empty or contains no valid URLs", null); // Replaced
         } else {
-            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile });
+            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile }); // Log message still refers to "input.txt" but uses the variable path
             urls.forEach((url: string) => cluster.queue(url));
         }
     } catch (error: any) {

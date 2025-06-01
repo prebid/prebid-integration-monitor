@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import fs from 'fs'; // Keep for reading and writing input.txt
 import path from 'path';
 import logger from './utils/logger.js'; // .js extension may be needed
+import { INPUT_FILE_PATH } from './utils/parser.js';
 
 const execAsync = promisify(exec);
 
@@ -83,10 +84,10 @@ async function main(): Promise<void> {
   try {
     // Assuming input.txt is for the main prebid script, clear it first or append carefully.
     // For this example, appending. Consider if this should be 'w' (write) to overwrite.
-    fs.appendFileSync('input.txt', validUrls.join('\n') + (validUrls.length > 0 ? '\n' : ''));
-    logger.info(`Successfully wrote ${validUrls.length} valid URLs to input.txt`);
+    fs.appendFileSync(INPUT_FILE_PATH, validUrls.join('\n') + (validUrls.length > 0 ? '\n' : ''));
+    logger.info(`Successfully wrote ${validUrls.length} valid URLs to ${INPUT_FILE_PATH}`);
   } catch (err: any) {
-    logger.error('Error writing to input.txt', { error: err.message, stack: err.stack });
+    logger.error(`Error writing to ${INPUT_FILE_PATH}`, { error: err.message, stack: err.stack });
   }
 
   // Log invalid URLs using Winston

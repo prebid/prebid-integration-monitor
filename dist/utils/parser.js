@@ -1,9 +1,11 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
+import * as path from 'path';
+export const INPUT_FILE_PATH = path.join(__dirname, 'input.txt');
 async function parsePreloadUrls() {
     let loadList = [];
     const urlsRl = readline.createInterface({
-        input: fs.createReadStream('src/input.txt'), // Adjusted path
+        input: fs.createReadStream(INPUT_FILE_PATH), // Adjusted path
         crlfDelay: Infinity // Ensure correct line splitting
     });
     for await (const url of urlsRl) {
