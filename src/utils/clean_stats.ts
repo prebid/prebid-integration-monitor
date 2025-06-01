@@ -1,22 +1,52 @@
 import { promises as fs } from 'fs';
-import path from 'path';
+import * as path from 'path'; // Changed to namespace import
 import { fileURLToPath } from 'url';
 
 // Replicate __dirname functionality for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = path.dirname(__filename);
 
-async function cleanStats() {
-  const inputPath = path.join(__dirname, '..', 'output', 'summarization.json');
-  const outputPath = path.join(__dirname, '..', 'output', 'api.json');
-  const MIN_COUNT_THRESHOLD = 5;
+interface VersionDistribution {
+    [version: string]: number;
+}
+
+interface ModuleDistribution {
+    [moduleName: string]: number;
+}
+
+interface SummarizationData {
+    visitedSites: number;
+    monitoredSites: number;
+    prebidSites: number;
+    versionDistribution: VersionDistribution;
+    moduleDistribution: ModuleDistribution;
+}
+
+interface OutputData {
+    visitedSites: number;
+    monitoredSites: number;
+    prebidSites: number;
+    releaseVersions: VersionDistribution;
+    buildVersions: VersionDistribution;
+    customVersions: VersionDistribution;
+    bidAdapterInst: ModuleDistribution;
+    idModuleInst: ModuleDistribution;
+    rtdModuleInst: ModuleDistribution;
+    analyticsAdapterInst: ModuleDistribution;
+    otherModuleInst: ModuleDistribution;
+}
+
+async function cleanStats(): Promise<void> {
+  const inputPath: string = path.join(__dirname, '..', 'output', 'summarization.json');
+  const outputPath: string = path.join(__dirname, '..', 'output', 'api.json');
+  const MIN_COUNT_THRESHOLD: number = 5;
 
   try {
     // Read the summarization.json file
-    const rawData = await fs.readFile(inputPath, 'utf8');
-    const data = JSON.parse(rawData);
+    const rawData: string = await fs.readFile(inputPath, 'utf8');
+    const data: SummarizationData = JSON.parse(rawData);
 
-    const outputData = {
+    const outputData: OutputData = {
       visitedSites: data.visitedSites,
       monitoredSites: data.monitoredSites,
       prebidSites: data.prebidSites,
@@ -30,13 +60,13 @@ async function cleanStats() {
       otherModuleInst: {}
     };
 
-    const versionDistribution = data.versionDistribution;
-    const versions = Object.keys(versionDistribution);
+    const versionDistribution: VersionDistribution = data.versionDistribution;
+    const versions: string[] = Object.keys(versionDistribution);
 
     // Process versionDistribution
     for (const version of versions) {
-      const count = versionDistribution[version];
-      const cleanedVersion = version.startsWith('v') ? version.substring(1) : version; // Remove leading 'v'
+      const count: number = versionDistribution[version];
+      const cleanedVersion: string = version.startsWith('v') ? version.substring(1) : version; // Remove leading 'v'
 
       if (version.endsWith('-pre')) {
         outputData.buildVersions[cleanedVersion] = count;
@@ -56,9 +86,9 @@ async function cleanStats() {
     }
 
     // Process moduleDistribution
-    const moduleDistribution = data.moduleDistribution;
+    const moduleDistribution: ModuleDistribution = data.moduleDistribution;
     for (const moduleName in moduleDistribution) {
-        const count = moduleDistribution[moduleName];
+        const count: number = moduleDistribution[moduleName];
 
         // Ignore modules with count less than the threshold
         if (count < MIN_COUNT_THRESHOLD) {
@@ -83,7 +113,7 @@ async function cleanStats() {
     await fs.writeFile(outputPath, JSON.stringify(outputData, null, 2));
     console.log(`Successfully created ${outputPath}`);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error processing stats:', error);
   }
 }

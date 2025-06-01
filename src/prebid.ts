@@ -3,21 +3,54 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import blockResourcesPlugin from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
+import { Page } from 'puppeteer'; // Import Page type
 
 // Helper function to configure a new page
-async function configurePage(page) { // page is passed directly by puppeteer-cluster
+async function configurePage(page: Page): Promise<Page> { // page is passed directly by puppeteer-cluster
     page.setDefaultTimeout(55000);
     // Set to Googlebot user agent
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
     return page;
 }
 
+// Define interfaces for page data
+interface PrebidInstance {
+    globalVarName: string;
+    version: string;
+    modules: string[];
+}
 
-async function prebidExplorer() {
+interface PageData {
+    libraries: string[];
+    date: string;
+    prebidInstances?: PrebidInstance[];
+    url?: string; // Added url to PageData
+}
+
+interface TaskResultSuccess {
+    type: 'success';
+    data: PageData;
+}
+
+interface TaskResultNoData {
+    type: 'no_data';
+    url: string;
+}
+
+interface TaskResultError {
+    type: 'error';
+    url: string;
+    error: string;
+}
+
+type TaskResult = TaskResultSuccess | TaskResultNoData | TaskResultError;
+
+
+async function prebidExplorer(): Promise<void> {
     // Apply puppeteer-extra plugins
     puppeteer.use(StealthPlugin());
     puppeteer.use(blockResourcesPlugin({
-        blockedTypes: new Set([
+        blockedTypes: new Set<any>([ // Added 'any' for blockedTypes
             'image',
             'font',
             'websocket',
@@ -29,7 +62,7 @@ async function prebidExplorer() {
         ])
     }));
 
-    const cluster = await Cluster.launch({
+    const cluster: Cluster<string, any> = await Cluster.launch({ // Added types for Cluster
         concurrency: Cluster.CONCURRENCY_CONTEXT,
         maxConcurrency: 5, // Set a reasonable maxConcurrency
         puppeteer, // Use the puppeteer-extra instance with plugins
@@ -40,45 +73,46 @@ async function prebidExplorer() {
         },
     });
 
-    let results = [];
-    const taskResults = []; // Array to store results from all tasks
-    const allUrls = fs.readFileSync('input.txt', 'utf8').split('\n').map(url => url.trim()).filter(url => url.length > 0);
+    let results: PageData[] = []; // Typed results
+    const taskResults: TaskResult[] = []; // Array to store results from all tasks
+    const allUrls: string[] = fs.readFileSync('input.txt', 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
     console.log('Initial URLs read from input.txt:', allUrls); // Log the URLs
-    const processedUrls = new Set();
-    const noPrebidUrls = new Set();
-    const errorUrls = new Set();
+    const processedUrls: Set<string> = new Set();
+    const noPrebidUrls: Set<string> = new Set();
+    const errorUrls: Set<string> = new Set();
 
 
     // Define the task for the cluster
-    await cluster.task(async ({ page, data: url }) => {
-        const trimmedUrl = url; // URL is already trimmed and validated
+    await cluster.task(async ({ page, data: url }: { page: Page, data: string }) => { // Added types for task callback
+        const trimmedUrl: string = url; // URL is already trimmed and validated
         console.log(`Processing: ${trimmedUrl}`);
-        let taskResult; // To store the result of this specific task
+        let taskResult: TaskResult; // To store the result of this specific task
 
         try {
             await configurePage(page); // Configure the page provided by the cluster
             await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
 
             await page.evaluate(async () => {
-                const sleep = ms => new Promise(res => setTimeout(res, ms));
+                const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
                 await sleep((1000 * 60) * .10); // 6 seconds delay
             });
 
-            const pageData = await page.evaluate(() => {
-                const data = {};
+            const pageData: PageData = await page.evaluate((): PageData => {
+                const data: Partial<PageData> = {}; // Use Partial for incremental building
                 data.libraries = [];
                 data.date = new Date().toISOString().slice(0, 10);
 
-                if (window.apstag) data.libraries.push('apstag');
-                if (window.googletag) data.libraries.push('googletag');
-                if (window.ats) data.libraries.push('ats');
+                // TODO: Define window types more accurately if possible
+                if ((window as any).apstag) data.libraries.push('apstag');
+                if ((window as any).googletag) data.libraries.push('googletag');
+                if ((window as any).ats) data.libraries.push('ats');
 
-                if (window._pbjsGlobals && Array.isArray(window._pbjsGlobals)) {
+                if ((window as any)._pbjsGlobals && Array.isArray((window as any)._pbjsGlobals)) {
                     data.prebidInstances = [];
-                    window._pbjsGlobals.forEach(function(globalVarName) {
-                        const pbjsInstance = window[globalVarName];
+                    (window as any)._pbjsGlobals.forEach(function(globalVarName: string) {
+                        const pbjsInstance = (window as any)[globalVarName];
                         if (pbjsInstance && pbjsInstance.version && pbjsInstance.installedModules) {
-                            data.prebidInstances.push({
+                            data.prebidInstances!.push({ // Use non-null assertion as we initialized it
                                 globalVarName: globalVarName,
                                 version: pbjsInstance.version,
                                 modules: pbjsInstance.installedModules
@@ -86,7 +120,7 @@ async function prebidExplorer() {
                         }
                     });
                 }
-                return data;
+                return data as PageData; // Cast to PageData
             });
 
             pageData.url = trimmedUrl;
@@ -97,15 +131,15 @@ async function prebidExplorer() {
                 console.log(`No relevant data found for ${trimmedUrl}`);
                 taskResult = { type: 'no_data', url: trimmedUrl };
             }
-        } catch (pageError) {
+        } catch (pageError: any) {
             console.error(`Error processing ${trimmedUrl}:`, pageError.message);
-            const errorMessage = pageError.message || '';
-            const netErrorMatch = errorMessage.match(/net::([A-Z_]+)/);
-            let errorCode;
+            const errorMessage: string = pageError.message || '';
+            const netErrorMatch: RegExpMatchArray | null = errorMessage.match(/net::([A-Z_]+)/);
+            let errorCode: string;
             if (netErrorMatch) {
                 errorCode = netErrorMatch[1];
             } else {
-                const prefix = `Error processing ${trimmedUrl}: `;
+                const prefix: string = `Error processing ${trimmedUrl}: `;
                 if (errorMessage.startsWith(prefix)) {
                     errorCode = errorMessage.substring(prefix.length).trim();
                 } else {
@@ -119,7 +153,7 @@ async function prebidExplorer() {
     });
 
     try {
-        allUrls.forEach(url => {
+        allUrls.forEach((url: string) => {
             if (url) { // Ensure URL is not empty
                 cluster.queue(url);
                 processedUrls.add(url); // Mark URL as processed when queued
@@ -150,10 +184,12 @@ async function prebidExplorer() {
 
         await cluster.close(); // Close the cluster
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("An unexpected error occurred during cluster processing or setup:", error);
         // Ensure cluster is closed on error if it was initialized
-        if (cluster && !cluster.isClosed) {
+        // Removed !cluster.isClosed as it's a private property.
+        // cluster.close() is idempotent so calling it again if already closed is not an issue.
+        if (cluster) {
             await cluster.close();
         }
     } finally {
@@ -161,7 +197,7 @@ async function prebidExplorer() {
         console.log('Final noPrebidUrls Set:', noPrebidUrls);
         console.log('Final errorUrls Set:', errorUrls);
         try {
-            const errorsDir = 'errors';
+            const errorsDir: string = 'errors';
             if (!fs.existsSync('output')) {
                 fs.mkdirSync('output');
             }
@@ -170,18 +206,18 @@ async function prebidExplorer() {
             }
 
             if (results.length > 0) {
-                const now = new Date();
-                const month = now.toLocaleString('default', { month: 'short' });
-                const year = now.getFullYear();
-                const day = String(now.getDate()).padStart(2, '0');
-                const monthDir = `output/${month}`;
-                const dateFilename = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
+                const now: Date = new Date();
+                const month: string = now.toLocaleString('default', { month: 'short' });
+                const year: number = now.getFullYear();
+                const day: string = String(now.getDate()).padStart(2, '0');
+                const monthDir: string = `output/${month}`;
+                const dateFilename: string = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
 
                 if (!fs.existsSync(monthDir)) {
                     fs.mkdirSync(monthDir, { recursive: true });
                 }
 
-                const jsonOutput = JSON.stringify(results, null, 2);
+                const jsonOutput: string = JSON.stringify(results, null, 2);
                 fs.appendFileSync(`${monthDir}/${dateFilename}`, jsonOutput + '\n', 'utf8');
                 console.log(`Results have been appended to ${monthDir}/${dateFilename}`);
             } else {
@@ -199,12 +235,12 @@ async function prebidExplorer() {
 
             // Remaining URLs logic needs to be sure all URLs were attempted.
             // `processedUrls` now correctly reflects all URLs that were passed to `cluster.queue`.
-            const remainingUrls = allUrls.filter(url => !processedUrls.has(url));
+            const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
 
             fs.writeFileSync('input.txt', remainingUrls.join('\n'), 'utf8');
             console.log(`input.txt updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to write results, update error files, or update input.txt:', err);
         }
         // Browser closing is handled by cluster.close()
