@@ -3,20 +3,27 @@ import puppeteerVanilla from 'puppeteer'; // Renaming to puppeteerVanilla for cl
 const StealthPlugin = require('puppeteer-extra-plugin-stealth'); // Changed to require
 // const puppeteer = require('puppeteer'); // This line is replaced by puppeteer-extra initialization
 import { Cluster } from 'puppeteer-cluster';
-import * as fs from 'fs';
+import * as fs from 'fs'; // Keep fs for readFileSync for now
 import * as path from 'path';
 import { Page, Frame, Dialog } from 'puppeteer'; // Import Page, Frame, Dialog types
+import logger from './utils/logger.js'; // Corrected path
 
 const puppeteer = addExtra(puppeteerVanilla); // Reinitialize puppeteer with puppeteer-extra
 puppeteer.use(StealthPlugin()); // Apply StealthPlugin
 
-const errorLogPath: string = path.join(__dirname, 'errors', 'navigation_errors.txt');
-
-// Helper function to log errors
-const logError = (url: string, message: string, error: Error | null) => {
-  const timestamp: string = new Date().toISOString();
-  const logMessage: string = `${timestamp} | URL: ${url} | Message: ${message} | Error: ${error ? error.message : 'N/A'}\n`;
-  fs.appendFileSync(errorLogPath, logMessage);
+// Helper function to log errors (modified to use Winston)
+const logError = (url: string, message: string, error: Error | any | null) => { // Allow 'any' for error to capture various types
+  const logDetails: { url: string, errorMessage: string, errorDetails?: string, stack?: string } = {
+    url: url,
+    errorMessage: message, // Renamed to avoid conflict with Winston's 'message'
+  };
+  if (error) {
+    logDetails.errorDetails = error.message || 'N/A';
+    logDetails.stack = error.stack;
+  }
+  // The first argument to logger.error is the primary message string.
+  // The second argument is an object for additional metadata.
+  logger.error(message, logDetails);
 };
 
 // Function to wait for pbjs.version
@@ -70,11 +77,11 @@ const clusterSearch = async (): Promise<void> => {
                 try {
                     const message: string = dialog.message();
                     await dialog.dismiss();
-                    console.log(`Dismissed dialog for ${url}: ${message}`);
-                    logError(url, `Dialog dismissed: ${message}`, null);
+                    logger.info(`Dismissed dialog for ${url}: ${message}`, { url });
+                    // logError(url, `Dialog dismissed: ${message}`, null); // Replaced by logger.info or logger.warn if needed
                 } catch (e: any) {
-                    console.error(`Error dismissing dialog for ${url}: ${e.message}`);
-                    logError(url, `Error dismissing dialog: ${e.message}`, e);
+                    logger.error(`Error dismissing dialog for ${url}`, { url, error: e });
+                    // logError(url, `Error dismissing dialog: ${e.message}`, e); // Replaced by logger.error
                 }
             });
 
@@ -88,14 +95,10 @@ const clusterSearch = async (): Promise<void> => {
             }
 
             if (version) {
-                console.log(`URL: ${url}, PBJS Version: ${version}`);
+                logger.info(`PBJS Version: ${version}`, { url });
             } else {
-                // This log might be redundant if getPbjsVersionWithWait throws and is caught,
-                // but good for cases where it might return null/undefined differently.
-                // The error log above will capture the timeout.
-                console.log(`URL: ${url}, PBJS Version: Not found on main page after waiting. Checking frames...`);
-                // Log that initial check failed, specific error is in the catch block
-                logError(url, "pbjs.version not found on main page after waiting or initial evaluate failed", null);
+                logger.info(`PBJS Version: Not found on main page after waiting. Checking frames...`, { url });
+                // logError(url, "pbjs.version not found on main page after waiting or initial evaluate failed", null); // Captured by getPbjsVersionWithWait's error log
                 const frames: Frame[] = page.frames(); // Added Frame[] type
                 let versionFoundInFrame: boolean = false;
                 if (frames.length > 1) {
@@ -104,8 +107,8 @@ const clusterSearch = async (): Promise<void> => {
 
                         if (frame.isDetached()) {
                             const detachedFrameUrl: string = frame.url(); // Get URL before it's completely inaccessible
-                            logError(url, `Skipping detached frame: ${detachedFrameUrl}`, null);
-                            console.log(`URL: ${url}, Skipping detached frame: ${detachedFrameUrl}`);
+                            logger.warn(`Skipping detached frame: ${detachedFrameUrl}`, { url, frameUrl: detachedFrameUrl });
+                            // console.log(`URL: ${url}, Skipping detached frame: ${detachedFrameUrl}`); // Replaced
                             continue;
                         }
 
@@ -113,7 +116,7 @@ const clusterSearch = async (): Promise<void> => {
                             const frameUrl: string = frame.url(); // Get URL for logging before potential errors
                             const frameVersion: string | null = await getPbjsVersionWithWait(frame);
                             if (frameVersion) {
-                                console.log(`URL: ${url}, PBJS Version (found in frame ${frameUrl}): ${frameVersion}`);
+                                logger.info(`PBJS Version (found in frame ${frameUrl}): ${frameVersion}`, { url, frameUrl });
                                 versionFoundInFrame = true;
                                 break;
                             }
@@ -130,17 +133,14 @@ const clusterSearch = async (): Promise<void> => {
                     }
                 }
                 if (!versionFoundInFrame) {
-                    console.log(`URL: ${url}, PBJS Version: Not found in any frame after waiting.`);
-                    // No need to log "pbjs.version not found in any frame" here if individual frames already logged errors/timeouts.
-                    // However, if all frames were skipped (e.g. detached) or simply didn't have pbjs, this is useful.
-                    // We can refine this log if it becomes too noisy. For now, keeping the original intent.
-                    logError(url, "pbjs.version not found in any (accessible/non-timed-out) frame after waiting", null);
+                    logger.warn(`PBJS Version: Not found in any (accessible/non-timed-out) frame after waiting.`, { url });
+                    // logError(url, "pbjs.version not found in any (accessible/non-timed-out) frame after waiting", null); // Replaced
                 }
             }
         } catch (e: any) {
             // This catch is for page.goto() errors or other unexpected issues in the task
-            logError(url, "Navigation or task processing error", e);
-            console.error(`Error processing ${url}: ${e.message}`);
+            logError(url, "Navigation or task processing error", e); // logError now uses logger.error
+            // console.error(`Error processing ${url}: ${e.message}`); // Covered by logError
         }
     });
 
@@ -148,19 +148,19 @@ const clusterSearch = async (): Promise<void> => {
     // cluster.queue('https://example.com');
     // cluster.queue('https://prebid.org/examples/adops/integration-testing.html');
 
-    const inputFile: string = path.join(__dirname, 'input.txt');
+    const inputFile: string = path.join(__dirname, 'input.txt'); // __dirname is fine in .cts
     try {
         const urls: string[] = fs.readFileSync(inputFile, 'utf8').split('\n').filter(line => line.trim() !== '');
         if (urls.length === 0) {
-            console.log('input.txt is empty or contains no valid URLs. Exiting.');
-            logError("N/A", "input.txt is empty or contains no valid URLs", null);
+            logger.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile });
+            // logError("N/A", "input.txt is empty or contains no valid URLs", null); // Replaced
         } else {
-            console.log(`Queueing ${urls.length} URLs from input.txt`);
+            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile });
             urls.forEach((url: string) => cluster.queue(url));
         }
     } catch (error: any) {
-        console.error(`Failed to read or process input.txt: ${error.message}`);
-        logError("N/A", "Failed to read or process input.txt", error);
+        logger.error(`Failed to read or process input.txt: ${error.message}`, { file: inputFile, error });
+        // logError("N/A", "Failed to read or process input.txt", error); // Replaced
         // If input.txt cannot be read, we might not want to proceed further,
         // or proceed with some default/no URLs. For now, it will just log and proceed to idle.
     }
@@ -170,8 +170,14 @@ const clusterSearch = async (): Promise<void> => {
 }
 
 clusterSearch().catch((error: Error) => { // Added Error type for catch
-    console.error("Unhandled error in clusterSearch:", error);
-    const timestamp: string = new Date().toISOString();
-    const logMessage: string = `${timestamp} | Message: Unhandled error in clusterSearch | Error: ${error ? error.message : 'N/A'}\n`;
-    fs.appendFileSync(errorLogPath, logMessage);
+    // console.error("Unhandled error in clusterSearch:", error); // Replaced by logger
+    // The old fs.appendFileSync is removed. Winston's error transport will handle this.
+    // The logError function itself uses logger.error.
+    // If error is not an Error instance, or for more context:
+    const message = "Unhandled error in clusterSearch";
+    if (error instanceof Error) {
+        logError("N/A", message, error);
+    } else {
+        logger.error(message, { errorDetails: String(error) });
+    }
 });

@@ -84,3 +84,29 @@ npx -p vitest vitest run
 ```
 
 This will execute all tests found in the `tests/` directory.
+
+## Logging
+
+This application utilizes the Winston logging library to provide detailed and structured logging.
+
+### Log Files
+
+Log files are stored in the `logs/` directory, which is excluded from Git commits via `.gitignore`.
+
+-   **`logs/app.log`**: This file contains all general application logs, including informational messages, warnings, and errors (typically `info` level and above). Log entries are stored in JSON format, allowing for easy parsing and querying. Each entry includes a timestamp, log level, message, and any additional metadata.
+-   **`logs/error.log`**: This file is dedicated to error-level logs only. It provides a focused view of errors that have occurred within the application, also in JSON format. Error logs will include stack traces when available.
+
+### Console Output
+
+In addition to file logging, messages are also output to the console:
+-   Log messages are colorized for better readability based on their severity level (e.g., errors in red, warnings in yellow).
+-   The console typically displays `info` level messages and above.
+-   The format includes the timestamp, log level, and message, similar to the file logs.
+
+### Log Format
+
+All log entries, whether in files or on the console, follow a consistent format:
+-   **Timestamp**: `YYYY-MM-DD HH:mm:ss`
+-   **Level**: The severity of the log (e.g., `info`, `warn`, `error`).
+-   **Message**: The main content of the log entry.
+-   **Stack Trace**: For error logs, a stack trace is included if available, aiding in debugging.
