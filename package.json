@@ -8,8 +8,8 @@
     "build": "tsc",
     "test": "vitest",
     "build:check": "tsc --noEmit",
-    "start": "node dist/index.js",
-    "dev": "NODE_OPTIONS='--loader ts-node/esm --trace-warnings' ts-node src/index.ts"
+    "start": "node ./bin/run.js",
+    "dev": "node ./bin/dev.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,9 @@
   },
   "homepage": "https://github.com/prebid/prebid-integration-monitor#readme",
   "dependencies": {
+    "@oclif/core": "^4.3.0",
+    "@oclif/plugin-help": "^6.2.28",
+    "@oclif/plugin-plugins": "^5.4.38",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.59.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.201.1",
@@ -41,5 +44,14 @@
   "devDependencies": {
     "@types/node": "^20.14.13",
     "vitest": "^3.1.4"
+  },
+  "bin": {
+    "app": "./bin/run.js"
+  },
+  "oclif": {
+    "bin": "app",
+    "commands": "./dist/commands",
+    "dirname": "app",
+    "topicSeparator": " "
   }
 }
