@@ -43,12 +43,28 @@ const clusterSearch = async () => {
         maxConcurrency: 1, // Keeping concurrency low for demonstration and resource management
         puppeteerOptions: {
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'] // Common args for running in restricted environments
+            args: ['--no-sandbox', '--disable-setuid-sandbox'], // Common args for running in restricted environments
+            ignoreHTTPSErrors: true // 1. Ignore HTTPS errors in launch options
         }
     });
 
     await cluster.task(async ({ page, data: url }) => {
         try {
+            // await page.setIgnoreHTTPSErrors(true); // 1. This line is removed. Global option should suffice.
+
+            // 2. Dialog Handler
+            page.on('dialog', async dialog => {
+                try {
+                    const message = dialog.message();
+                    await dialog.dismiss();
+                    console.log(`Dismissed dialog for ${url}: ${message}`);
+                    logError(url, `Dialog dismissed: ${message}`, null);
+                } catch (e) {
+                    console.error(`Error dismissing dialog for ${url}: ${e.message}`);
+                    logError(url, `Error dismissing dialog: ${e.message}`, e);
+                }
+            });
+
             await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
             let version;
             try {
@@ -69,25 +85,43 @@ const clusterSearch = async () => {
                 logError(url, "pbjs.version not found on main page after waiting or initial evaluate failed", null);
                 const frames = page.frames();
                 let versionFoundInFrame = false;
-                if (frames.length > 1) { // Only check frames if there are any besides the main one
+                if (frames.length > 1) {
                     for (const frame of frames) {
-                        // Skip the main frame, already checked
                         if (frame === page.mainFrame()) continue;
+
+                        if (frame.isDetached()) {
+                            const detachedFrameUrl = frame.url(); // Get URL before it's completely inaccessible
+                            logError(url, `Skipping detached frame: ${detachedFrameUrl}`, null);
+                            console.log(`URL: ${url}, Skipping detached frame: ${detachedFrameUrl}`);
+                            continue;
+                        }
+
                         try {
+                            const frameUrl = frame.url(); // Get URL for logging before potential errors
                             const frameVersion = await getPbjsVersionWithWait(frame);
                             if (frameVersion) {
-                                console.log(`URL: ${url}, PBJS Version (found in frame ${frame.url()}): ${frameVersion}`);
+                                console.log(`URL: ${url}, PBJS Version (found in frame ${frameUrl}): ${frameVersion}`);
                                 versionFoundInFrame = true;
                                 break;
                             }
                         } catch (frameError) {
-                            logError(url, `Error evaluating frame ${frame.url()} or timed out: ${frameError.message}`, frameError);
+                            // Use frame.url() in the error log. If frame.url() itself errors due to detachment, handle it.
+                            let currentFrameUrl = 'unknown';
+                            try {
+                                currentFrameUrl = frame.url();
+                            } catch (e) {
+                                currentFrameUrl = 'detached or inaccessible';
+                            }
+                            logError(url, `Error evaluating frame ${currentFrameUrl} or timed out: ${frameError.message}`, frameError);
                         }
                     }
                 }
                 if (!versionFoundInFrame) {
                     console.log(`URL: ${url}, PBJS Version: Not found in any frame after waiting.`);
-                    logError(url, "pbjs.version not found in any frame after waiting", null);
+                    // No need to log "pbjs.version not found in any frame" here if individual frames already logged errors/timeouts.
+                    // However, if all frames were skipped (e.g. detached) or simply didn't have pbjs, this is useful.
+                    // We can refine this log if it becomes too noisy. For now, keeping the original intent.
+                    logError(url, "pbjs.version not found in any (accessible/non-timed-out) frame after waiting", null);
                 }
             }
         } catch (e) {
