@@ -43,9 +43,20 @@ const clusterSearch = async () => {
         maxConcurrency: 1, // Keeping concurrency low for demonstration and resource management
         puppeteerOptions: {
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'], // Common args for running in restricted environments
-            ignoreHTTPSErrors: true // 1. Ignore HTTPS errors in launch options
-        }
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-web-security',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--disable-gpu',
+                '--disable-features=TranslateUI,BlinkGenPropertyTrees,IsolateOrigins,site-per-process'
+            ],
+            ignoreHTTPSErrors: true
+        },
+        retryLimit: 3,
+        retryDelay: 10000,
+        timeout: 120000 // Increased timeout for the whole task including retries
     });
 
     await cluster.task(async ({ page, data: url }) => {
