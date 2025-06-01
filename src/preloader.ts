@@ -5,45 +5,64 @@ import path from 'path';
 
 const execAsync = promisify(exec);
 
-async function checkUrl(url) {
+interface CheckUrlResultValid {
+    url: string;
+    valid: true;
+}
+
+interface CheckUrlResultInvalid {
+    url: string;
+    valid: false;
+    statusCode?: number;
+    error?: string;
+}
+
+type CheckUrlResult = CheckUrlResultValid | CheckUrlResultInvalid;
+
+async function checkUrl(url: string): Promise<CheckUrlResult> {
   try {
     // Use curl to check the HTTP status code. -I for header-only, -s for silent, -o /dev/null to discard output.
     const { stdout, stderr } = await execAsync(`curl --max-time 25 -I -s -o /dev/null -w "%{http_code}" ${url}`);
-    const statusCode = parseInt(stdout.trim(), 10);
+    const statusCode: number = parseInt(stdout.trim(), 10);
 
     if (statusCode >= 200 && statusCode < 400) {
       return { url, valid: true };
     } else {
       return { url, valid: false, statusCode }; // Include status code for invalid URLs
     }
-  } catch (error) {
+  } catch (error: any) {
     // Handle errors like network issues or invalid URLs that curl can't process
     console.error(`Error checking ${url}:`, error.message);
     return { url, valid: false, error: error.message }; // Include the error message
   }
 }
 
-async function processUrls(urls) {
-  const results = await Promise.all(urls.map(checkUrl));
+interface ProcessUrlsResult {
+    validUrls: string[];
+    invalidUrls: CheckUrlResultInvalid[];
+}
 
-  const validUrls = results.filter(result => result.valid).map(result => result.url);
-  const invalidUrls = results.filter(result => !result.valid);
+async function processUrls(urls: string[]): Promise<ProcessUrlsResult> {
+  const results: CheckUrlResult[] = await Promise.all(urls.map(checkUrl));
+
+  const validUrls: string[] = results.filter((result): result is CheckUrlResultValid => result.valid).map(result => result.url);
+  const invalidUrls: CheckUrlResultInvalid[] = results.filter((result): result is CheckUrlResultInvalid => !result.valid);
 
   return { validUrls, invalidUrls };
 }
 
-async function main() {
-  const inputFile = path.join('input', 'preload_urls.txt'); // Define the input file path
-  const errorOutputFile = path.join('errors', 'preload_errors.txt'); // Define the error output file path
-  const errorDir = path.dirname(errorOutputFile); // Get the directory for the error file
+async function main(): Promise<void> {
+  const inputFile: string = path.join('input', 'preload_urls.txt'); // Define the input file path
+  const errorOutputFile: string = path.join('errors', 'preload_errors.txt'); // Define the error output file path
+  const errorDir: string = path.dirname(errorOutputFile); // Get the directory for the error file
 
-  let urls = [];
+  let urls: string[] = [];
 
   // Read URLs from the input file
   try {
-    const fileContent = fs.readFileSync(inputFile, 'utf8');
-    urls = fileContent.split('\n').map(url => url.trim()).filter(url => url.length > 0); // Split by newline, trim whitespace, remove empty lines
-  } catch (err) {
+    const fileContent: string = fs.readFileSync(inputFile, 'utf8');
+    urls = fileContent.split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0); // Split by newline, trim whitespace, remove empty lines
+  } catch (err: any) {
     console.error(`Error reading URLs from ${inputFile}:`, err.message);
     if (err.code === 'ENOENT') {
       console.error(`Please ensure the file exists and the script has permission to read it.`);
@@ -62,17 +81,17 @@ async function main() {
 
     // Write valid URLs to input.txt, each on a new line
   try {
-    fs.appendFileSync('input.txt', validUrls.join('\n'));
+    fs.appendFileSync('input.txt', validUrls.join('\n') + (validUrls.length > 0 ? '\n' : '')); // Add newline only if there are URLs
     console.log(`Successfully wrote ${validUrls.length} valid URLs to input.txt`);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error writing to input.txt:', err);
   }
 
   // Write invalid URLs to the error file
   if (invalidUrls.length > 0) {
-    const errorLines = invalidUrls.map(item => {
-      const statusCode = item.statusCode || 'N/A'; // Handle cases where statusCode might not exist (e.g., curl error)
-      const errorMsg = item.error || 'N/A'; // Handle cases where error message might not exist
+    const errorLines: string[] = invalidUrls.map((item: CheckUrlResultInvalid) => {
+      const statusCode: string | number = item.statusCode || 'N/A'; // Handle cases where statusCode might not exist (e.g., curl error)
+      const errorMsg: string = item.error || 'N/A'; // Handle cases where error message might not exist
       return `${item.url} , ${statusCode} , ${errorMsg}`;
     });
 
@@ -82,9 +101,9 @@ async function main() {
         fs.mkdirSync(errorDir, { recursive: true }); // Create directory if it doesn't exist
         console.log(`Created directory: ${errorDir}`);
       }
-      fs.appendFileSync(errorOutputFile, errorLines.join('\n'));
+      fs.appendFileSync(errorOutputFile, errorLines.join('\n') + '\n'); // Add newline at the end
       console.log(`Successfully wrote ${invalidUrls.length} invalid URL details to ${errorOutputFile}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Error writing to ${errorOutputFile}:`, err);
     }
   } else {
@@ -95,7 +114,7 @@ async function main() {
             fs.appendFileSync(errorOutputFile, ''); // Write an empty string to clear it
             console.log(`Cleared existing error file: ${errorOutputFile}`);
         }
-    } catch (err) {
+    } catch (err: any) {
         console.error(`Error clearing ${errorOutputFile}:`, err);
     }
   }
