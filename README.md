@@ -110,3 +110,12 @@ All log entries, whether in files or on the console, follow a consistent format:
 -   **Level**: The severity of the log (e.g., `info`, `warn`, `error`).
 -   **Message**: The main content of the log entry.
 -   **Stack Trace**: For error logs, a stack trace is included if available, aiding in debugging.
+
+## OpenTelemetry Integration
+
+OpenTelemetry has been integrated to provide distributed tracing capabilities.
+- The main tracer configuration can be found in `src/tracer.ts`.
+- Log messages (both console and file) are now automatically enriched with `trace_id` and `span_id` when generated within an active trace.
+- The default OTLP HTTP exporter is used. You may need to configure the `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable to point to your OpenTelemetry collector (e.g., `http://localhost:4318/v1/traces`).
+- **Known Issue 1:** Running the application with `npm run dev` (which uses `ts-node`) might result in suppressed console output due to an interaction with the OpenTelemetry SDK. It's recommended to build and run the JavaScript version for now (`npm run build && node dist/index.js`).
+- **Known Issue 2:** The `Resource` attribute in `src/tracer.ts` (for setting service name directly in code) is currently commented out due to a TypeScript build error (TS2693). The service name should be configured via the `OTEL_SERVICE_NAME` environment variable (e.g., `export OTEL_SERVICE_NAME="prebid-integration-monitor"`).
