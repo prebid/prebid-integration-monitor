@@ -9,7 +9,7 @@
     "test": "vitest",
     "build:check": "tsc --noEmit",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "dev": "NODE_OPTIONS='--loader ts-node/esm --trace-warnings' ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,10 @@
   },
   "homepage": "https://github.com/prebid/prebid-integration-monitor#readme",
   "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.59.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.201.1",
+    "@opentelemetry/sdk-node": "^0.201.1",
     "csv-writer": "^1.6.0",
     "line-reader": "^0.4.0",
     "node-fetch": "^3.3.2",

@@ -1,6 +1,7 @@
 import winston from 'winston';
 import fs from 'fs';
 import path from 'path';
+import { trace } from '@opentelemetry/api';
 
 const logDir = 'logs';
 
@@ -22,11 +23,19 @@ const logger = winston.createLogger({
       format: winston.format.combine(
         winston.format.colorize(), // Colorize log levels
         winston.format.printf(info => {
-          // Handle metadata like stack traces for errors
           let message = `${info.timestamp} ${info.level}: ${info.message}`;
           if (info.stack) {
             message += `\n${info.stack}`;
           }
+
+          const activeSpan = trace.getActiveSpan();
+          if (activeSpan) {
+            const spanContext = activeSpan.spanContext();
+            if (spanContext) {
+              message += ` (trace_id: ${spanContext.traceId}, span_id: ${spanContext.spanId})`;
+            }
+          }
+
           // Include other metadata if present (e.g., from splat)
           const splat = info[Symbol.for('splat')];
           if (splat) {
@@ -36,13 +45,11 @@ const logger = winston.createLogger({
                 message += ` ${metadata}`;
               }
             } else if (typeof splat === 'object' && splat !== null) {
-              // If splat is a single object, stringify it.
               const metadata = JSON.stringify(splat);
-              if (metadata && metadata !== '{}') { // Avoid adding empty object string
+              if (metadata && metadata !== '{}') {
                 message += ` ${metadata}`;
               }
             } else {
-              // If splat is a primitive, just append it.
               message += ` ${splat}`;
             }
           }
@@ -53,12 +60,38 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: path.join(logDir, 'app.log'),
       level: process.env.LOG_LEVEL_APP || 'info', // Default to 'info', configurable
-      format: winston.format.json() // JSON format for file logs
+      format: winston.format.combine(
+        winston.format(info => {
+          const activeSpan = trace.getActiveSpan();
+          if (activeSpan) {
+            const spanContext = activeSpan.spanContext();
+            if (spanContext) {
+              info.trace_id = spanContext.traceId;
+              info.span_id = spanContext.spanId;
+            }
+          }
+          return info;
+        })(),
+        winston.format.json() // JSON format for file logs
+      )
     }),
     new winston.transports.File({
       filename: path.join(logDir, 'error.log'),
       level: 'error', // Log only 'error' level and above to this file
-      format: winston.format.json() // JSON format for file logs
+      format: winston.format.combine(
+        winston.format(info => {
+          const activeSpan = trace.getActiveSpan();
+          if (activeSpan) {
+            const spanContext = activeSpan.spanContext();
+            if (spanContext) {
+              info.trace_id = spanContext.traceId;
+              info.span_id = spanContext.spanId;
+            }
+          }
+          return info;
+        })(),
+        winston.format.json() // JSON format for file logs
+      )
     })
   ],
   exitOnError: false // Do not exit on handled exceptions
