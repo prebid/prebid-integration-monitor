@@ -1,7 +1,6 @@
 import {Command, Flags} from '@oclif/core';
-import { initTracer } from '../../tracer.js'; // Added .js extension back
-// Updated logger import, Added .js extension back
-import loggerModule, { initializeLogger } from '../../utils/logger.js';
+import { initTracer } from '../tracer.js';
+import loggerModule, { initializeLogger } from '../utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
 import { trace } from '@opentelemetry/api';
 

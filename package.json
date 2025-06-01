@@ -10,8 +10,8 @@
     "build:check": "tsc --noEmit",
     "start": "node ./bin/run.js",
     "dev": "node ./bin/dev.js",
-    "scan": "npm run build && ./bin/run scan",
-    "prebid:scan": "./bin/run scan"
+    "scan": "npm run build && node ./bin/run.js scan",
+    "prebid:scan": "node ./bin/run.js scan"
   },
   "repository": {
     "type": "git",

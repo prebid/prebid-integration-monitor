@@ -1,7 +1,6 @@
 import { Command, Flags } from '@oclif/core';
-import { initTracer } from '../../tracer.js'; // Added .js extension back
-// Updated logger import, Added .js extension back
-import { initializeLogger } from '../../utils/logger.js';
+import { initTracer } from '../tracer.js';
+import { initializeLogger } from '../utils/logger.js';
 import { trace } from '@opentelemetry/api';
 let logger; // Module-level logger variable
 class Index extends Command {
