@@ -32,6 +32,7 @@ export default class Default extends Command {
     const {flags} = await this.parse(Default);
     // Initialize logger with the logDir from flags
     logger = initializeLogger(flags.logDir);
+    console.log('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
 
     try {
       // Initialize the tracer as the first step
