@@ -125,17 +125,10 @@ async function updateAndCleanStats(options) {
         for (const moduleName of sortedRawModules) {
             sortedRawModuleCounts[moduleName] = rawModuleCounts[moduleName];
         }
-        const summarizationData = {
+        const finalApiData = {
             visitedSites: uniqueUrls.size,
             monitoredSites: uniqueUrls.size,
             prebidSites: urlsWithPrebid.size,
-            versionDistribution: sortedRawVersionCounts,
-            moduleDistribution: sortedRawModuleCounts,
-        };
-        const finalApiData = {
-            visitedSites: summarizationData.visitedSites,
-            monitoredSites: summarizationData.monitoredSites,
-            prebidSites: summarizationData.prebidSites,
             releaseVersions: {},
             buildVersions: {},
             customVersions: {},
@@ -145,8 +138,8 @@ async function updateAndCleanStats(options) {
             analyticsAdapterInst: {},
             otherModuleInst: {}
         };
-        // Process versionDistribution from summarizationData
-        const versionDistributionForCleaning = summarizationData.versionDistribution;
+        // Process versionDistribution from sortedRawVersionCounts
+        const versionDistributionForCleaning = sortedRawVersionCounts;
         for (const version in versionDistributionForCleaning) {
             const count = versionDistributionForCleaning[version];
             const cleanedVersion = version.startsWith('v') ? version.substring(1) : version;
@@ -165,8 +158,8 @@ async function updateAndCleanStats(options) {
                 }
             }
         }
-        // Process moduleDistribution from summarizationData
-        const moduleDistributionForCleaning = summarizationData.moduleDistribution;
+        // Process moduleDistribution from sortedRawModuleCounts
+        const moduleDistributionForCleaning = sortedRawModuleCounts;
         for (const moduleName in moduleDistributionForCleaning) {
             const count = moduleDistributionForCleaning[moduleName];
             if (count < MIN_COUNT_THRESHOLD) {
@@ -186,6 +179,28 @@ async function updateAndCleanStats(options) {
             }
             else {
                 finalApiData.otherModuleInst[moduleName] = count;
+            }
+        }
+        // Process moduleWebsiteCounts to populate website count fields
+        for (const moduleName in moduleWebsiteCounts) { // moduleWebsiteCounts was populated earlier
+            const count = moduleWebsiteCounts[moduleName];
+            if (count < MIN_COUNT_THRESHOLD) {
+                continue;
+            }
+            if (moduleName.includes('BidAdapter')) {
+                finalApiData.bidAdapterWebsites[moduleName] = count;
+            }
+            else if (moduleName.includes('IdSystem') || moduleName === 'userId' || moduleName === 'idImportLibrary' || moduleName === 'pubCommonId' || moduleName === 'utiqSystem' || moduleName === 'trustpidSystem') {
+                finalApiData.idModuleWebsites[moduleName] = count;
+            }
+            else if (moduleName.includes('RtdProvider') || moduleName === 'rtdModule') {
+                finalApiData.rtdModuleWebsites[moduleName] = count;
+            }
+            else if (moduleName.includes('AnalyticsAdapter')) {
+                finalApiData.analyticsAdapterWebsites[moduleName] = count;
+            }
+            else {
+                finalApiData.otherModuleWebsites[moduleName] = count;
             }
         }
         const targetApiDir = path.dirname(finalApiFilePath);

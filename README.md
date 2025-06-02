@@ -125,7 +125,10 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
     -   Alternatively, it can be a direct link to a specific processable file within a repository (e.g., `https://github.com/owner/repo/blob/main/some/path/file.txt`). In this case, only the specified file will be fetched and processed.
     -   Example (repository): `--githubRepo https://github.com/owner/repo`
     -   Example (direct file): `--githubRepo https://github.com/owner/repo/blob/main/urls.txt`
--   `--numUrls <number>`: When used with `--githubRepo`, this flag limits the number of URLs to be extracted and processed from the repository.
+-   `--csvFile <path_or_url>`: Path to a local CSV file or a URL (e.g., a raw GitHub CSV link) from which to load URLs for scanning. The scanner expects URLs to be in the first column of the CSV. This flag takes precedence over `--githubRepo` and the `INPUTFILE` argument.
+    -   Example (local): `--csvFile ./path/to/your/urls.csv`
+    -   Example (remote): `--csvFile https://raw.githubusercontent.com/user/repo/main/path/to/your/urls.csv`
+-   `--numUrls <number>`: When used with `--githubRepo`, this flag limits the number of URLs to be extracted and processed from the repository. (Note: This flag does not currently apply to URLs loaded via `--csvFile`.)
     -   Default: `100`
     -   Example: `--numUrls 50`
 -   `--puppeteerType <option>`: Specifies the Puppeteer operational mode.
@@ -180,6 +183,16 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 7.  **Scan a limited number of URLs from a GitHub repository:**
     ```bash
     ./bin/run scan --githubRepo https://github.com/owner/repo --numUrls 50
+    ```
+
+8.  **Scan URLs from a local CSV file:**
+    ```bash
+    ./bin/run scan --csvFile ./data/urls_to_scan.csv
+    ```
+
+9.  **Scan URLs from a remote CSV file (raw GitHub link):**
+    ```bash
+    ./bin/run scan --csvFile https://raw.githubusercontent.com/prebid/prebid-integration-monitor/main/tests/fixtures/sample_urls.csv
     ```
 
 #### Notes on URL Extraction

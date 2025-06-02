@@ -5,6 +5,8 @@ import puppeteerVanilla from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
+import { parse } from 'csv-parse/sync';
+import fetch from 'node-fetch'; // Ensure fetch is available, already used by fetchUrlsFromGitHub
 // Helper function to configure a new page
 async function configurePage(page) {
     page.setDefaultTimeout(55000);
@@ -14,6 +16,151 @@ async function configurePage(page) {
 }
 let logger;
 const puppeteer = addExtra(puppeteerVanilla);
+// Helper function to fetch URLs from GitHub
+async function fetchUrlsFromGitHub(repoUrl, numUrls, logger) {
+    logger.info(`Fetching URLs from GitHub repository source: ${repoUrl}`);
+    const extractedUrls = [];
+    const urlRegex = /(https?:\/\/[^\s"]+)/gi;
+    try {
+        // Check if the URL is a direct link to a file view (contains /blob/)
+        if (repoUrl.includes('/blob/')) {
+            logger.info(`Detected direct file link: ${repoUrl}. Attempting to fetch raw content.`);
+            // Transform GitHub file view URL to raw content URL
+            // Example: https://github.com/owner/repo/blob/branch/path/to/file.txt
+            // Becomes: https://raw.githubusercontent.com/owner/repo/branch/path/to/file.txt
+            const rawUrl = repoUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+            logger.info(`Fetching content directly from raw URL: ${rawUrl}`);
+            const fileResponse = await fetch(rawUrl);
+            if (fileResponse.ok) {
+                const content = await fileResponse.text();
+                const matches = content.match(urlRegex);
+                if (matches) {
+                    matches.forEach(url => extractedUrls.push(url.trim()));
+                    logger.info(`Extracted ${matches.length} URLs from ${rawUrl}`);
+                }
+                else {
+                    logger.info(`No URLs found in content from ${rawUrl}`);
+                }
+            }
+            else {
+                logger.error(`Failed to download direct file content: ${rawUrl} - ${fileResponse.status} ${fileResponse.statusText}`);
+                const errorBody = await fileResponse.text();
+                logger.error(`Error body: ${errorBody}`);
+                return []; // Return empty if direct file fetch fails
+            }
+        }
+        else {
+            // Existing logic for repository directory listing
+            logger.info(`Processing as repository URL: ${repoUrl}`);
+            const repoPathMatch = repoUrl.match(/github\.com\/([^/]+\/[^/]+)/);
+            if (!repoPathMatch || !repoPathMatch[1]) {
+                logger.error(`Invalid GitHub repository URL format: ${repoUrl}. Expected format like https://github.com/owner/repo`);
+                return [];
+            }
+            const repoPath = repoPathMatch[1].replace(/\.git$/, '');
+            const contentsUrl = `https://api.github.com/repos/${repoPath}/contents`;
+            logger.info(`Fetching repository contents from: ${contentsUrl}`);
+            const response = await fetch(contentsUrl, {
+                headers: { Accept: 'application/vnd.github.v3+json' },
+            });
+            if (!response.ok) {
+                logger.error(`Failed to fetch repository contents: ${response.status} ${response.statusText}`, { url: contentsUrl });
+                const errorBody = await response.text();
+                logger.error(`Error body: ${errorBody}`);
+                return [];
+            }
+            const files = await response.json();
+            if (!Array.isArray(files)) {
+                logger.error('Expected an array of files from GitHub API, but received something else.', { response: files });
+                return [];
+            }
+            const targetExtensions = ['.txt', '.md'];
+            logger.info(`Found ${files.length} items in the repository. Filtering for ${targetExtensions.join(', ')} files.`);
+            for (const file of files) {
+                if (file.type === 'file' && targetExtensions.some(ext => file.name.endsWith(ext))) {
+                    logger.info(`Fetching content for file: ${file.path} from ${file.download_url}`);
+                    try {
+                        const fileResponse = await fetch(file.download_url);
+                        if (fileResponse.ok) {
+                            const content = await fileResponse.text();
+                            const matches = content.match(urlRegex);
+                            if (matches) {
+                                matches.forEach(url => extractedUrls.push(url.trim()));
+                                logger.info(`Extracted ${matches.length} URLs from ${file.path}`);
+                            }
+                        }
+                        else {
+                            logger.warn(`Failed to download file content: ${file.path} - ${fileResponse.status}`);
+                        }
+                    }
+                    catch (fileError) {
+                        logger.error(`Error fetching or processing file ${file.path}: ${fileError.message}`, { fileUrl: file.download_url });
+                    }
+                    if (numUrls && extractedUrls.length >= numUrls) {
+                        logger.info(`Reached URL limit of ${numUrls}. Stopping further file processing.`);
+                        break;
+                    }
+                }
+            }
+        }
+        logger.info(`Total URLs extracted before limiting: ${extractedUrls.length}`);
+        return numUrls ? extractedUrls.slice(0, numUrls) : extractedUrls;
+    }
+    catch (error) {
+        logger.error(`Error processing GitHub URL ${repoUrl}: ${error.message}`, { stack: error.stack });
+        return [];
+    }
+}
+// Helper function to fetch URLs from a CSV file (local or remote)
+async function fetchUrlsFromCsv(csvPathOrUrl, logger) {
+    logger.info(`Fetching URLs from CSV source: ${csvPathOrUrl}`);
+    const extractedUrls = [];
+    let content;
+    try {
+        if (csvPathOrUrl.startsWith('http://') || csvPathOrUrl.startsWith('https://')) {
+            logger.info(`Detected remote CSV URL: ${csvPathOrUrl}`);
+            let fetchUrl = csvPathOrUrl;
+            // Transform GitHub blob URLs to raw content URLs
+            if (fetchUrl.includes('github.com') && fetchUrl.includes('/blob/')) {
+                fetchUrl = fetchUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+                logger.info(`Transformed GitHub blob URL to raw content URL: ${fetchUrl}`);
+            }
+            const response = await fetch(fetchUrl);
+            if (!response.ok) {
+                logger.error(`Failed to download CSV content from ${fetchUrl}: ${response.status} ${response.statusText}`);
+                const errorBody = await response.text();
+                logger.error(`Error body: ${errorBody}`);
+                return [];
+            }
+            content = await response.text();
+        }
+        else {
+            logger.info(`Reading local CSV file: ${csvPathOrUrl}`);
+            content = fs.readFileSync(csvPathOrUrl, 'utf8');
+        }
+        const records = parse(content, {
+            columns: false,
+            skip_empty_lines: true,
+        });
+        for (const record of records) {
+            if (record && record.length > 0 && typeof record[0] === 'string') {
+                const url = record[0].trim();
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                    extractedUrls.push(url);
+                }
+                else if (url) {
+                    logger.warn(`Skipping invalid or non-HTTP/S URL from CSV: "${url}"`);
+                }
+            }
+        }
+        logger.info(`Extracted ${extractedUrls.length} URLs from CSV: ${csvPathOrUrl}`);
+    }
+    catch (error) {
+        logger.error(`Error processing CSV from ${csvPathOrUrl}: ${error.message}`, { stack: error.stack });
+        return [];
+    }
+    return extractedUrls;
+}
 export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir);
     // Apply puppeteer-extra plugins
@@ -39,9 +186,50 @@ export async function prebidExplorer(options) {
     };
     let results = [];
     const taskResults = [];
-    const allUrls = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url) => url.trim()).filter((url) => url.length > 0);
-    logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length, urls: allUrls });
+    let allUrls = [];
     const processedUrls = new Set();
+    let urlSourceType = ''; // To track the source for logging and file updates
+    if (options.csvFile) {
+        urlSourceType = 'CSV';
+        allUrls = await fetchUrlsFromCsv(options.csvFile, logger);
+        if (allUrls.length > 0) {
+            logger.info(`Successfully loaded ${allUrls.length} URLs from CSV file: ${options.csvFile}`);
+        }
+        else {
+            logger.warn(`No URLs found or fetched from CSV file: ${options.csvFile}.`);
+        }
+    }
+    else if (options.githubRepo) {
+        urlSourceType = 'GitHub';
+        allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
+        if (allUrls.length > 0) {
+            logger.info(`Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`);
+        }
+        else {
+            logger.warn(`No URLs found or fetched from GitHub repository: ${options.githubRepo}.`);
+        }
+    }
+    else if (options.inputFile) {
+        urlSourceType = 'InputFile';
+        try {
+            allUrls = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url) => url.trim()).filter((url) => url.length > 0);
+            logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length });
+        }
+        catch (fileError) {
+            logger.error(`Failed to read input file ${options.inputFile}: ${fileError.message}`);
+            throw new Error(`Failed to read input file: ${options.inputFile}`);
+        }
+    }
+    else {
+        // This case should ideally be prevented by CLI validation in scan.ts
+        logger.error('No URL source provided. Either --csvFile, --githubRepo, or inputFile argument must be specified.');
+        throw new Error('No URL source specified.');
+    }
+    if (allUrls.length === 0) {
+        logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
+        return;
+    }
+    logger.info(`Total URLs to process: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
     // Define the core processing task (used by both vanilla and cluster)
     const processPageTask = async (page, url) => {
         const trimmedUrl = url;
@@ -214,11 +402,19 @@ export async function prebidExplorer(options) {
         else {
             logger.info('No results to save.');
         }
-        const remainingUrls = allUrls.filter((url) => !processedUrls.has(url));
-        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
-        logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
+        // Only update inputFile if it was the original source of URLs and no other primary source (CSV/GitHub) was used.
+        if (urlSourceType === 'InputFile' && options.inputFile) {
+            const remainingUrls = allUrls.filter((url) => !processedUrls.has(url));
+            try {
+                fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
+                logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
+            }
+            catch (writeError) {
+                logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);
+            }
+        }
     }
     catch (err) {
-        logger.error('Failed to write results, or update input.txt', { error: err });
+        logger.error('Failed to write results or update input file system', { error: err });
     }
 }

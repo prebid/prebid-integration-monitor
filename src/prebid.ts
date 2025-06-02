@@ -7,6 +7,8 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
 import { Page } from 'puppeteer';
+import { parse } from 'csv-parse/sync';
+import fetch from 'node-fetch'; // Ensure fetch is available, already used by fetchUrlsFromGitHub
 
 // Helper function to configure a new page
 async function configurePage(page: Page): Promise<Page> { // page is passed directly by puppeteer-cluster
@@ -50,6 +52,7 @@ type TaskResult = TaskResultSuccess | TaskResultNoData | TaskResultError;
 
 export interface PrebidExplorerOptions {
     inputFile?: string; // Make optional as it might not be needed if githubRepo is used
+    csvFile?: string;
     githubRepo?: string;
     numUrls?: number;
     puppeteerType: 'vanilla' | 'cluster';
@@ -166,6 +169,58 @@ async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined,
   }
 }
 
+// Helper function to fetch URLs from a CSV file (local or remote)
+async function fetchUrlsFromCsv(csvPathOrUrl: string, logger: WinstonLogger): Promise<string[]> {
+  logger.info(`Fetching URLs from CSV source: ${csvPathOrUrl}`);
+  const extractedUrls: string[] = [];
+  let content: string;
+
+  try {
+    if (csvPathOrUrl.startsWith('http://') || csvPathOrUrl.startsWith('https://')) {
+      logger.info(`Detected remote CSV URL: ${csvPathOrUrl}`);
+      let fetchUrl = csvPathOrUrl;
+      // Transform GitHub blob URLs to raw content URLs
+      if (fetchUrl.includes('github.com') && fetchUrl.includes('/blob/')) {
+        fetchUrl = fetchUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+        logger.info(`Transformed GitHub blob URL to raw content URL: ${fetchUrl}`);
+      }
+
+      const response = await fetch(fetchUrl);
+      if (!response.ok) {
+        logger.error(`Failed to download CSV content from ${fetchUrl}: ${response.status} ${response.statusText}`);
+        const errorBody = await response.text();
+        logger.error(`Error body: ${errorBody}`);
+        return [];
+      }
+      content = await response.text();
+    } else {
+      logger.info(`Reading local CSV file: ${csvPathOrUrl}`);
+      content = fs.readFileSync(csvPathOrUrl, 'utf8');
+    }
+
+    const records = parse(content, {
+      columns: false,
+      skip_empty_lines: true,
+    });
+
+    for (const record of records) {
+      if (record && record.length > 0 && typeof record[0] === 'string') {
+        const url = record[0].trim();
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          extractedUrls.push(url);
+        } else if (url) {
+          logger.warn(`Skipping invalid or non-HTTP/S URL from CSV: "${url}"`);
+        }
+      }
+    }
+    logger.info(`Extracted ${extractedUrls.length} URLs from CSV: ${csvPathOrUrl}`);
+  } catch (error: any) {
+    logger.error(`Error processing CSV from ${csvPathOrUrl}: ${error.message}`, { stack: error.stack });
+    return [];
+  }
+  return extractedUrls;
+}
+
 
 export async function prebidExplorer(options: PrebidExplorerOptions): Promise<void> {
     logger = initializeLogger(options.logDir);
@@ -197,34 +252,41 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
     const taskResults: TaskResult[] = [];
     let allUrls: string[] = [];
     const processedUrls: Set<string> = new Set();
+    let urlSourceType = ''; // To track the source for logging and file updates
 
-    if (options.githubRepo) {
+    if (options.csvFile) {
+        urlSourceType = 'CSV';
+        allUrls = await fetchUrlsFromCsv(options.csvFile, logger);
+        if (allUrls.length > 0) {
+            logger.info(`Successfully loaded ${allUrls.length} URLs from CSV file: ${options.csvFile}`);
+        } else {
+            logger.warn(`No URLs found or fetched from CSV file: ${options.csvFile}.`);
+        }
+    } else if (options.githubRepo) {
+        urlSourceType = 'GitHub';
         allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
         if (allUrls.length > 0) {
             logger.info(`Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`);
         } else {
-            // Changed from logger.error to logger.warn to be consistent with overall "no URLs" handling
             logger.warn(`No URLs found or fetched from GitHub repository: ${options.githubRepo}.`);
-            // The generic check for allUrls.length === 0 below will handle exiting.
         }
     } else if (options.inputFile) {
+        urlSourceType = 'InputFile';
         try {
             allUrls = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
             logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length });
         } catch (fileError: any) {
             logger.error(`Failed to read input file ${options.inputFile}: ${fileError.message}`);
-            // this.error(`Failed to read input file: ${options.inputFile}`, { exit: 1}); // Using 'this.error' might not be available here.
-            throw new Error(`Failed to read input file: ${options.inputFile}`); // Prefer throwing for unrecoverable errors.
-            // return; // Exit if file cannot be read // Not needed due to throw
+            throw new Error(`Failed to read input file: ${options.inputFile}`);
         }
     } else {
-        logger.error('No URL source provided. Either --inputFile or --githubRepo must be specified.');
-        throw new Error('No URL source specified. Either --inputFile or --githubRepo must be specified.'); // Critical configuration error
-        // return; // Exit if no source // Not needed due to throw
+        // This case should ideally be prevented by CLI validation in scan.ts
+        logger.error('No URL source provided. Either --csvFile, --githubRepo, or inputFile argument must be specified.');
+        throw new Error('No URL source specified.');
     }
 
     if (allUrls.length === 0) {
-        logger.warn('No URLs to process. Exiting.');
+        logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
         return;
     }
     logger.info(`Total URLs to process: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
@@ -401,8 +463,8 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
             logger.info('No results to save.');
         }
 
-        // Only update inputFile if it was the source of URLs
-        if (options.inputFile && !options.githubRepo) {
+        // Only update inputFile if it was the original source of URLs and no other primary source (CSV/GitHub) was used.
+        if (urlSourceType === 'InputFile' && options.inputFile) {
             const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
             try {
                 fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
@@ -413,6 +475,6 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         }
 
     } catch (err: any) {
-        logger.error('Failed to write results or update input file', { error: err });
+        logger.error('Failed to write results or update input file system', { error: err });
     }
 }
