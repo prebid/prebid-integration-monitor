@@ -15,7 +15,6 @@ export default class Default extends Command {
       description: 'Directory to save log files',
       default: 'logs',
     }),
-    // help: Flags.help({char: 'h'}), // Example, if needed
   };
 
   // If the original script accepted command-line arguments that should be flags or args:
@@ -36,7 +35,7 @@ export default class Default extends Command {
 
     try {
       // Initialize the tracer as the first step
-      initTracer(); // This might still have issues if tracer.js is not found
+      initTracer();
       logger.info("Default oclif command starting...");
 
       const tracer = trace.getTracer('prebid-integration-monitor-tracer');

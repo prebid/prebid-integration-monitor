@@ -37,7 +37,6 @@ export default class Scan extends Command {
       description: 'Directory to save log files',
       default: 'logs',
     }),
-    // TODO: Consider adding a flag for additional Puppeteer arguments, e.g., --puppeteerArgs="--disable-gpu,--ignore-certificate-errors"
   }
 
   public async run(): Promise<void> {

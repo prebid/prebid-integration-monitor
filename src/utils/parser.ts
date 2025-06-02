@@ -4,20 +4,18 @@ import * as readline from 'readline';
 async function parsePreloadUrls(): Promise<void> {
     let loadList: string[] = [];
 
-    const urlsRl = readline.createInterface({ // Renamed to avoid conflict
-        input: fs.createReadStream('src/input.txt'), // Adjusted path
-        crlfDelay: Infinity // Ensure correct line splitting
+    const urlsRl = readline.createInterface({
+        input: fs.createReadStream('src/input.txt'),
+        crlfDelay: Infinity
     });
 
     for await (const url of urlsRl) {
         const trimmedUrl: string = url.trim();
-        if (trimmedUrl) { // Ensure not to push empty strings if file has blank lines
+        if (trimmedUrl) {
             loadList.push(trimmedUrl);
         }
     }
     console.log(loadList);
-    // TODO: Decide what to do with loadList. Currently, it's just logged.
-    // For example, write it to a file or return it.
 }
 
 parsePreloadUrls().catch(console.error);

@@ -1,16 +1,14 @@
-import { promises as fsPromises } from 'fs'; // Renamed to fsPromises for clarity
+import { promises as fsPromises } from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url'; // For robust __dirname
+import { fileURLToPath } from 'url';
 
-// Replicate __dirname functionality for ES modules
 const __filename: string = fileURLToPath(import.meta.url);
 const __dirname: string = path.dirname(__filename);
 
 const outputDir: string = path.join(__dirname, '..', 'store');
-const finalApiFilePath: string = path.join(__dirname, '..', '..', 'api', 'api.json'); // Changed from summaryFilePath
-const MIN_COUNT_THRESHOLD: number = 5; // Added from clean_stats.ts
+const finalApiFilePath: string = path.join(__dirname, '..', '..', 'api', 'api.json');
+const MIN_COUNT_THRESHOLD: number = 5;
 
-// Interfaces from update_stats.ts (SiteData, PrebidInstanceData remain the same)
 interface SiteData {
     url?: string;
     prebidInstances?: PrebidInstanceData[];
@@ -21,25 +19,22 @@ interface PrebidInstanceData {
     modules?: string[];
 }
 
-// Interfaces that were in clean_stats.ts or are combined
-interface VersionDistribution { // From clean_stats.ts - used for categorized versions
+interface VersionDistribution {
     [version: string]: number;
 }
 
-interface ModuleDistribution { // From clean_stats.ts - used for categorized modules
+interface ModuleDistribution {
     [moduleName: string]: number;
 }
 
-// This is the structure of the data after initial summarization
-interface SummarizationData { // Was SummaryData in update_stats.ts and SummarizationData in clean_stats.ts
-    visitedSites: number; // Added from clean_stats.ts, was monitoredSites
-    monitoredSites: number; // Kept from update_stats.ts
+interface SummarizationData {
+    visitedSites: number;
+    monitoredSites: number;
     prebidSites: number;
-    versionDistribution: VersionDistribution; // This will be the raw versions before categorization
-    moduleDistribution: ModuleDistribution; // This will be the raw modules before filtering/categorization
+    versionDistribution: VersionDistribution;
+    moduleDistribution: ModuleDistribution;
 }
 
-// This is the final output structure, similar to OutputData in clean_stats.ts
 interface FinalApiData {
     visitedSites: number;
     monitoredSites: number;
@@ -54,7 +49,6 @@ interface FinalApiData {
     otherModuleInst: ModuleDistribution;
 }
 
-// Version parsing and comparison functions from update_stats.ts (kept as they are more detailed)
 interface VersionComponents {
     major: number;
     minor: number;
@@ -106,9 +100,8 @@ interface UpdateStatsOptions {
  * Main function to summarize and then clean statistics.
  */
 async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> {
-    // Part 1: Summarization (adapted from original summarizeStats in update_stats.ts)
-    const rawVersionCounts: VersionDistribution = {}; // Was versionCounts
-    const rawModuleCounts: ModuleDistribution = {}; // Was moduleCounts
+    const rawVersionCounts: VersionDistribution = {};
+    const rawModuleCounts: ModuleDistribution = {};
     const uniqueUrls: Set<string> = new Set();
     const urlsWithPrebid: Set<string> = new Set();
     const monthAbbrRegex: RegExp = /^[A-Z][a-z]{2}$/;
@@ -127,11 +120,8 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
                         const filePath: string = path.join(monthDirPath, file);
                         try {
                             const fileContent: string = await fsPromises.readFile(filePath, 'utf8');
-                            // console.log(`TEMPORARY DEBUG: Content of ${filePath}: ###${fileContent}###`); // Restore
 
-                            // Removed temporary diagnostic block for invalid.json
-
-                            const siteEntries: SiteData[] = JSON.parse(fileContent); // Renamed for clarity
+                            const siteEntries: SiteData[] = JSON.parse(fileContent);
 
                             if (Array.isArray(siteEntries)) {
                                 siteEntries.forEach((siteData: SiteData) => {
@@ -177,8 +167,7 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
                             if (options?.logError) {
                                 options.logError(errorMessage, parseError.name, parseError.message);
                             } else {
-                                // console.log('TEMPORARY DEBUG: Entered catch block for parseError in update_stats.ts. Error message:', parseError.message); // Restore
-                                console.error(errorMessage, parseError); // Restore original error logging
+                                console.error(errorMessage, parseError);
                             }
                         }
                     }
@@ -199,14 +188,13 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
         }
 
         const summarizationData: SummarizationData = {
-            visitedSites: uniqueUrls.size, // This now correctly represents all sites found in logs
-            monitoredSites: uniqueUrls.size, // Keeping monitoredSites as per original update_stats, perhaps it means the same
+            visitedSites: uniqueUrls.size,
+            monitoredSites: uniqueUrls.size,
             prebidSites: urlsWithPrebid.size,
             versionDistribution: sortedRawVersionCounts,
             moduleDistribution: sortedRawModuleCounts,
         };
 
-        // Part 2: Cleaning (adapted from cleanStats in clean_stats.ts)
         const finalApiData: FinalApiData = {
             visitedSites: summarizationData.visitedSites,
             monitoredSites: summarizationData.monitoredSites,
@@ -229,12 +217,12 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
 
             if (version.endsWith('-pre')) {
                 finalApiData.buildVersions[cleanedVersion] = count;
-            } else if (version.includes('-')) { // Covers cases like '1.2.3-custom' or 'v1.2.3-custom'
+            } else if (version.includes('-')) {
                 finalApiData.customVersions[cleanedVersion] = count;
             } else {
-                if (cleanedVersion.includes('.')) { // Standard X.Y.Z or X.Y
+                if (cleanedVersion.includes('.')) {
                     finalApiData.releaseVersions[cleanedVersion] = count;
-                } else { // Single numbers or other non-standard, treat as custom
+                } else {
                     finalApiData.customVersions[cleanedVersion] = count;
                 }
             }
@@ -262,7 +250,6 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             }
         }
 
-        // Ensure the target directory exists before writing
         const targetApiDir = path.dirname(finalApiFilePath);
         try {
             await fsPromises.access(targetApiDir);
@@ -270,7 +257,6 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             await fsPromises.mkdir(targetApiDir, { recursive: true });
         }
 
-        // Write the final cleaned data to api.json
         await fsPromises.writeFile(finalApiFilePath, JSON.stringify(finalApiData, null, 2));
         console.log(`Successfully created ${finalApiFilePath}`);
 
@@ -279,13 +265,9 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
         if (options?.logError) {
             options.logError(errorMessage, err.name, err.message);
         } else {
-            console.error(errorMessage, err); // Changed error message for broader scope
+            console.error(errorMessage, err);
         }
     }
 }
 
-// Run the function
-// updateAndCleanStats(); // Commented out: This should not run on import for testing
-
-// If you need to export the function:
 export { updateAndCleanStats };
