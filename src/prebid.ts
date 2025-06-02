@@ -1,18 +1,17 @@
-import * as fs from 'fs'; // Keep fs for readFileSync, existsSync, mkdirSync, writeFileSync
-// Import initializeLogger and winston Logger type
+import * as fs from 'fs';
 import { initializeLogger } from './utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
 import { addExtra } from 'puppeteer-extra';
-import puppeteerVanilla, { Browser, PuppeteerLaunchOptions } from 'puppeteer'; // Reverted to simple default import, added Browser and PuppeteerLaunchOptions
+import puppeteerVanilla, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources'; // Renamed for clarity
+import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
-import { Page } from 'puppeteer'; // Import Page type
+import { Page } from 'puppeteer';
 
 // Helper function to configure a new page
 async function configurePage(page: Page): Promise<Page> { // page is passed directly by puppeteer-cluster
     page.setDefaultTimeout(55000);
-    // Set to Googlebot user agent
+    // Set to a common Chrome user agent
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
     return page;
 }
@@ -49,37 +48,29 @@ interface TaskResultError {
 
 type TaskResult = TaskResultSuccess | TaskResultNoData | TaskResultError;
 
-// Step 1: Define PrebidExplorerOptions interface
 export interface PrebidExplorerOptions {
     inputFile: string;
     puppeteerType: 'vanilla' | 'cluster';
     concurrency: number;
-    headless: boolean; // This will be used for puppeteerOptions
-    monitor: boolean; // This will be used for cluster options
+    headless: boolean;
+    monitor: boolean;
     outputDir: string;
-    logDir: string; // This will be used to initialize the logger
-    // Allow passing any puppeteer launch options
+    logDir: string;
     puppeteerLaunchOptions?: PuppeteerLaunchOptions;
 }
 
-// Declare logger at module level, to be initialized by prebidExplorer
 let logger: WinstonLogger;
 
-const puppeteer = addExtra(puppeteerVanilla as any); // Initialize puppeteer-extra, cast to any
+const puppeteer = addExtra(puppeteerVanilla as any);
 
-// Step 2: Modify prebidExplorer to accept an object of type PrebidExplorerOptions
-// Step 8: Export the prebidExplorer function
 export async function prebidExplorer(options: PrebidExplorerOptions): Promise<void> {
-    // Step 3: Update prebid.ts to call this new logger initialization function.
     logger = initializeLogger(options.logDir);
 
     // Apply puppeteer-extra plugins
     puppeteer.use(StealthPlugin());
 
-    // Call the factory (casting to any to bypass potential type def issue) and configure instance
     const blockResources = (blockResourcesPluginFactory as any)();
     if (blockResources && blockResources.blockedTypes && typeof blockResources.blockedTypes.add === 'function') {
-      // blockResources.blockedTypes is a Set-like object, use its add method
       const typesToBlock: Set<any> = new Set<any>([
           'image', 'font', 'websocket', 'media',
           'texttrack', 'eventsource', 'manifest', 'other'
@@ -90,17 +81,12 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
       logger.warn('Could not configure blockResourcesPlugin: blockedTypes property or .add method not available on instance.', { plugin: blockResources });
     }
 
-    // Step 4: Update to use options.inputFile for reading URLs
-    // Step 5: Update to use options.outputDir for saving results
-    // Step 6: Implement logic to switch between 'vanilla' Puppeteer and 'cluster'
-    // Step 7: Ensure puppeteer.launch options are configurable
-
     const basePuppeteerOptions: PuppeteerLaunchOptions = {
         protocolTimeout: 1000000,
         defaultViewport: null,
-        headless: options.headless, // Use headless from options
-        args: options.puppeteerLaunchOptions?.args || [], // Pass through args
-        ...options.puppeteerLaunchOptions // Spread other potential options
+        headless: options.headless,
+        args: options.puppeteerLaunchOptions?.args || [],
+        ...options.puppeteerLaunchOptions
     };
 
     let results: PageData[] = [];
@@ -184,17 +170,15 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         // The task function now returns TaskResult
         await cluster.task(async ({ page, data: url }: { page: Page, data: string }): Promise<TaskResult> => {
             const result = await processPageTask(page, url);
-            // taskResults.push(result); // Results can be collected from cluster.execute or by processing queue returns
             return result;
         });
 
         try {
             const promises = allUrls.filter(url => url).map(url => {
-                processedUrls.add(url); // Mark as processed when queuing starts
+                processedUrls.add(url);
                 return cluster.queue(url)
                     .then(resultFromQueue => {
-                        // Ensure successful results are correctly typed for pushing or further processing
-                        return resultFromQueue; // This is already TaskResult
+                        return resultFromQueue;
                     })
                     .catch(error => {
                         logger.error(`Error from cluster.queue for ${url}:`, { error });
@@ -208,23 +192,13 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
 
             settledResults.forEach(settledResult => {
                 if (settledResult.status === 'fulfilled') {
-                    // Value should be TaskResult. Explicitly cast for diagnostics.
                     taskResults.push(settledResult.value as TaskResult);
                 } else {
-                    // This case should ideally not be reached if .catch handles errors and returns a TaskResult.
-                    // However, if cluster.queue() itself throws an error that isn't caught by the .catch
-                    // (e.g., an issue before the task even runs, not covered by the task's try/catch),
-                    // it might end up here. We need a URL for error reporting.
-                    // This part is tricky as the original URL isn't directly available in settledResult.reason if it's a generic error.
-                    // For now, we'll log a generic error. This implies a URL might not be processed.
-                    // A more robust solution would involve mapping original URLs to promises if this becomes an issue.
                     logger.error('A promise from cluster.queue settled as rejected, which was not expected as errors should be converted to TaskResult.', { reason: settledResult.reason });
-                    // To maintain data integrity, we might need to know which URL failed here.
-                    // This might require associating URLs with promises more explicitly if direct cluster.queue rejections are possible.
                 }
             });
 
-            await cluster.idle(); // Should be quick if all tasks are done via Promise.allSettled
+            await cluster.idle();
             await cluster.close();
         } catch (error: any) {
             logger.error("An unexpected error occurred during cluster processing orchestration", { error });
@@ -278,7 +252,7 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
             const month: string = now.toLocaleString('default', { month: 'short' });
             const year: number = now.getFullYear();
             const day: string = String(now.getDate()).padStart(2, '0');
-            const monthDir: string = `${options.outputDir}/${month}`; // Use options.outputDir
+            const monthDir: string = `${options.outputDir}/${month}`;
             const dateFilename: string = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
 
             if (!fs.existsSync(monthDir)) {
@@ -293,13 +267,10 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         }
 
         const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
-        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8'); // Use options.inputFile
+        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
         logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
 
     } catch (err: any) {
         logger.error('Failed to write results, or update input.txt', { error: err });
     }
 }
-
-// Step 7: Remove the direct call to prebidExplorer()
-// prebidExplorer();

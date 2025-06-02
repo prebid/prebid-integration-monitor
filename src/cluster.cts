@@ -1,7 +1,6 @@
 import { addExtra } from 'puppeteer-extra';
 import puppeteerVanilla from 'puppeteer'; // Renaming to puppeteerVanilla for clarity
 const StealthPlugin = require('puppeteer-extra-plugin-stealth'); // Changed to require
-// const puppeteer = require('puppeteer'); // This line is replaced by puppeteer-extra initialization
 import { Cluster } from 'puppeteer-cluster';
 import * as fs from 'fs'; // Keep fs for readFileSync for now
 import * as path from 'path';
@@ -24,7 +23,7 @@ const logError = (url: string, message: string, error: Error | any | null) => { 
   }
   // The first argument to logger.error is the primary message string.
   // The second argument is an object for additional metadata.
-  logger.error(message, logDetails); // This logger is now the instance
+  logger.error(message, logDetails);
 };
 
 // Function to wait for pbjs.version
@@ -50,7 +49,7 @@ const clusterSearch = async (): Promise<void> => {
     const cluster: Cluster<string, any> = await Cluster.launch({ // Added types for Cluster
         puppeteer,
         concurrency: Cluster.CONCURRENCY_CONTEXT,
-        maxConcurrency: 1, // Keeping concurrency low for demonstration and resource management
+        maxConcurrency: 1,
         puppeteerOptions: {
             headless: true, // Consider making this configurable
             args: [
@@ -71,18 +70,15 @@ const clusterSearch = async (): Promise<void> => {
 
     await cluster.task(async ({ page, data: url }: { page: Page, data: string }) => { // Added types for task callback
         try {
-            // await page.setIgnoreHTTPSErrors(true); // 1. This line is removed. Global option should suffice.
 
             // 2. Dialog Handler
             page.on('dialog', async (dialog: Dialog) => { // Added Dialog type
                 try {
                     const message: string = dialog.message();
                     await dialog.dismiss();
-                    logger.info(`Dismissed dialog for ${url}: ${message}`, { url }); // This logger is now the instance
-                    // logError(url, `Dialog dismissed: ${message}`, null); // Replaced by logger.info or logger.warn if needed
+                    logger.info(`Dismissed dialog for ${url}: ${message}`, { url });
                 } catch (e: any) {
-                    logger.error(`Error dismissing dialog for ${url}`, { url, error: e }); // This logger is now the instance
-                    // logError(url, `Error dismissing dialog: ${e.message}`, e); // Replaced by logger.error
+                    logger.error(`Error dismissing dialog for ${url}`, { url, error: e });
                 }
             });
 
@@ -96,10 +92,9 @@ const clusterSearch = async (): Promise<void> => {
             }
 
             if (version) {
-                logger.info(`PBJS Version: ${version}`, { url }); // This logger is now the instance
+                logger.info(`PBJS Version: ${version}`, { url });
             } else {
-                logger.info(`PBJS Version: Not found on main page after waiting. Checking frames...`, { url }); // This logger is now the instance
-                // logError(url, "pbjs.version not found on main page after waiting or initial evaluate failed", null); // Captured by getPbjsVersionWithWait's error log
+                logger.info(`PBJS Version: Not found on main page after waiting. Checking frames...`, { url });
                 const frames: Frame[] = page.frames(); // Added Frame[] type
                 let versionFoundInFrame: boolean = false;
                 if (frames.length > 1) {
@@ -108,8 +103,7 @@ const clusterSearch = async (): Promise<void> => {
 
                         if (frame.isDetached()) {
                             const detachedFrameUrl: string = frame.url(); // Get URL before it's completely inaccessible
-                            logger.warn(`Skipping detached frame: ${detachedFrameUrl}`, { url, frameUrl: detachedFrameUrl }); // This logger is now the instance
-                            // console.log(`URL: ${url}, Skipping detached frame: ${detachedFrameUrl}`); // Replaced
+                            logger.warn(`Skipping detached frame: ${detachedFrameUrl}`, { url, frameUrl: detachedFrameUrl });
                             continue;
                         }
 
@@ -117,7 +111,7 @@ const clusterSearch = async (): Promise<void> => {
                             const frameUrl: string = frame.url(); // Get URL for logging before potential errors
                             const frameVersion: string | null = await getPbjsVersionWithWait(frame);
                             if (frameVersion) {
-                                logger.info(`PBJS Version (found in frame ${frameUrl}): ${frameVersion}`, { url, frameUrl }); // This logger is now the instance
+                                logger.info(`PBJS Version (found in frame ${frameUrl}): ${frameVersion}`, { url, frameUrl });
                                 versionFoundInFrame = true;
                                 break;
                             }
@@ -134,36 +128,26 @@ const clusterSearch = async (): Promise<void> => {
                     }
                 }
                 if (!versionFoundInFrame) {
-                    logger.warn(`PBJS Version: Not found in any (accessible/non-timed-out) frame after waiting.`, { url }); // This logger is now the instance
-                    // logError(url, "pbjs.version not found in any (accessible/non-timed-out) frame after waiting", null); // Replaced
+                    logger.warn(`PBJS Version: Not found in any (accessible/non-timed-out) frame after waiting.`, { url });
                 }
             }
         } catch (e: any) {
             // This catch is for page.goto() errors or other unexpected issues in the task
-            logError(url, "Navigation or task processing error", e); // logError now uses logger.error
-            // console.error(`Error processing ${url}: ${e.message}`); // Covered by logError
+            logError(url, "Navigation or task processing error", e);
         }
     });
-
-    // Example URLs to test (replace with actual list if needed)
-    // cluster.queue('https://example.com');
-    // cluster.queue('https://prebid.org/examples/adops/integration-testing.html');
 
     const inputFile: string = path.join(__dirname, 'input.txt'); // __dirname is fine in .cts
     try {
         const urls: string[] = fs.readFileSync(inputFile, 'utf8').split('\n').filter(line => line.trim() !== '');
         if (urls.length === 0) {
-            logger.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile }); // This logger is now the instance
-            // logError("N/A", "input.txt is empty or contains no valid URLs", null); // Replaced
+            logger.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile });
         } else {
-            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile }); // This logger is now the instance
+            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile });
             urls.forEach((url: string) => cluster.queue(url));
         }
     } catch (error: any) {
-        logger.error(`Failed to read or process input.txt: ${error.message}`, { file: inputFile, error }); // This logger is now the instance
-        // logError("N/A", "Failed to read or process input.txt", error); // Replaced
-        // If input.txt cannot be read, we might not want to proceed further,
-        // or proceed with some default/no URLs. For now, it will just log and proceed to idle.
+        logger.error(`Failed to read or process input.txt: ${error.message}`, { file: inputFile, error });
     }
 
     await cluster.idle();
@@ -171,14 +155,10 @@ const clusterSearch = async (): Promise<void> => {
 }
 
 clusterSearch().catch((error: Error) => { // Added Error type for catch
-    // console.error("Unhandled error in clusterSearch:", error); // Replaced by logger
-    // The old fs.appendFileSync is removed. Winston's error transport will handle this.
-    // The logError function itself uses logger.error.
-    // If error is not an Error instance, or for more context:
     const message = "Unhandled error in clusterSearch";
     if (error instanceof Error) {
         logError("N/A", message, error); // logError uses the instance
     } else {
-        logger.error(message, { errorDetails: String(error) }); // This logger is now the instance
+        logger.error(message, { errorDetails: String(error) });
     }
 });
