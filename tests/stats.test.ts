@@ -4,6 +4,7 @@ import mockFs from 'mock-fs'; // Restore mock-fs
 import fs from 'fs';
 import path from 'path';
 
+import { FinalApiData } from '../src/utils/update_stats.js'; // Importing for clarity
 const MIN_COUNT_THRESHOLD = 5; // Not used in the first uncommented test, but keep for later
 
 const readMockJson = (filePath: string) => {
@@ -34,7 +35,8 @@ describe('updateAndCleanStats', () => {
             {
               url: 'http://site1.com',
               prebidInstances: [
-                { version: 'v8.2.0', modules: ['rubiconBidAdapter', 'criteoIdSystem', 'sharedIdSystem', 'adagioAnalyticsAdapter', 'coreModuleOnly'] }
+                { version: 'v8.2.0', modules: ['rubiconBidAdapter', 'criteoIdSystem', 'sharedIdSystem', 'adagioAnalyticsAdapter', 'coreModuleOnly'] },
+                { version: 'v8.1.0', modules: ['criteoIdSystem', 'anotherModule'] } // Added to test website count for criteoIdSystem
               ]
             },
             {
@@ -129,6 +131,27 @@ describe('updateAndCleanStats', () => {
     expect(outputData.analyticsAdapterInst['adagioAnalyticsAdapter']).toBeUndefined();
     expect(outputData.bidAdapterInst['nonExistentAdapter']).toBeUndefined();
     expect(outputData.otherModuleInst['belowThresholdModule']).toBeUndefined();
+
+    // Website Counts (New Assertions)
+    // MIN_COUNT_THRESHOLD = 5 also applies to website counts
+    // Cast to FinalApiData for type safety, though assertions would work without it.
+    const typedOutputData = outputData as FinalApiData;
+
+    expect(typedOutputData.bidAdapterWebsites['rubiconBidAdapter']).toBe(8);
+    expect(typedOutputData.bidAdapterWebsites['appnexusBidAdapter']).toBe(5);
+
+    // criteoIdSystem is on 4 unique sites (site1, site8, site9, site10), below threshold of 5
+    expect(typedOutputData.idModuleWebsites['criteoIdSystem']).toBeUndefined();
+    // sharedIdSystem is on 3 unique sites (site1, site10, site11), below threshold
+    expect(typedOutputData.idModuleWebsites['sharedIdSystem']).toBeUndefined();
+    // coreModuleOnly is on 3 unique sites (site1, site2, site6), below threshold
+    expect(typedOutputData.otherModuleWebsites['coreModuleOnly']).toBeUndefined();
+    // anotherModule is on 1 unique site (site1), below threshold
+    expect(typedOutputData.otherModuleWebsites['anotherModule']).toBeUndefined();
+    
+    // Check categories that should be empty based on current data
+    expect(Object.keys(typedOutputData.rtdModuleWebsites || {}).length).toBe(0);
+    expect(Object.keys(typedOutputData.analyticsAdapterWebsites || {}).length).toBe(0);
   });
 
   it('should handle empty store directory', async () => {
