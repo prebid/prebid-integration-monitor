@@ -192,9 +192,24 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
 
             settledResults.forEach(settledResult => {
                 if (settledResult.status === 'fulfilled') {
-                    taskResults.push(settledResult.value as TaskResult);
-                } else {
-                    logger.error('A promise from cluster.queue settled as rejected, which was not expected as errors should be converted to TaskResult.', { reason: settledResult.reason });
+                    // Ensure that what we receive is indeed a TaskResult, otherwise log and push an error.
+                    // This handles cases where cluster.queue might resolve with something unexpected.
+                    if (settledResult.value && typeof settledResult.value.type === 'string') {
+                        taskResults.push(settledResult.value as TaskResult);
+                    } else {
+                        logger.error('Unexpected fulfillment value from cluster.queue promise, not a TaskResult.', { value: settledResult.value });
+                        // Attempt to find the URL associated with this problematic result if possible.
+                        // This is hard here as we don't have the original URL in this direct context.
+                        // For now, pushing a generic error. A more robust solution might involve mapping promises to URLs.
+                        taskResults.push({ type: 'error', url: 'unknown_url_unexpected_fulfillment', error: 'UNEXPECTED_FULFILLMENT_VALUE' });
+                    }
+                } else { // status === 'rejected'
+                    logger.error('A promise from cluster.queue settled as rejected.', { reason: settledResult.reason });
+                    // The URL is not directly available here from settledResult.reason.
+                    // This indicates an error deeper than the task execution itself (e.g., cluster internal error).
+                    // We need to associate the original URL with the promise to log it here.
+                    // For now, pushing a generic error. This path implies the .catch in the .map() failed.
+                    taskResults.push({ type: 'error', url: 'unknown_url_promise_rejection', error: 'PROMISE_REJECTED_UNEXPECTEDLY' });
                 }
             });
 
@@ -226,8 +241,8 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
 
     // Common result processing and file writing logic
     for (const taskResult of taskResults) {
-        if (!taskResult) {
-            logger.warn(`A task returned no result. This should not happen.`);
+        if (!taskResult) { // This check should ideally be unnecessary if the above logic is sound
+            logger.warn(`A task returned a nullish result, which should have been prevented.`);
             continue;
         }
         if (taskResult.type === 'success') {

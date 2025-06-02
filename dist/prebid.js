@@ -1,32 +1,25 @@
-import * as fs from 'fs'; // Keep fs for readFileSync, existsSync, mkdirSync, writeFileSync
-// Import initializeLogger and winston Logger type
+import * as fs from 'fs';
 import { initializeLogger } from './utils/logger.js';
 import { addExtra } from 'puppeteer-extra';
-import puppeteerVanilla from 'puppeteer'; // Reverted to simple default import, added Browser and PuppeteerLaunchOptions
+import puppeteerVanilla from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources'; // Renamed for clarity
+import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
 // Helper function to configure a new page
 async function configurePage(page) {
     page.setDefaultTimeout(55000);
-    // Set to Googlebot user agent
+    // Set to a common Chrome user agent
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
     return page;
 }
-// Declare logger at module level, to be initialized by prebidExplorer
 let logger;
-const puppeteer = addExtra(puppeteerVanilla); // Initialize puppeteer-extra, cast to any
-// Step 2: Modify prebidExplorer to accept an object of type PrebidExplorerOptions
-// Step 8: Export the prebidExplorer function
+const puppeteer = addExtra(puppeteerVanilla);
 export async function prebidExplorer(options) {
-    // Step 3: Update prebid.ts to call this new logger initialization function.
     logger = initializeLogger(options.logDir);
     // Apply puppeteer-extra plugins
     puppeteer.use(StealthPlugin());
-    // Call the factory (casting to any to bypass potential type def issue) and configure instance
     const blockResources = blockResourcesPluginFactory();
     if (blockResources && blockResources.blockedTypes && typeof blockResources.blockedTypes.add === 'function') {
-        // blockResources.blockedTypes is a Set-like object, use its add method
         const typesToBlock = new Set([
             'image', 'font', 'websocket', 'media',
             'texttrack', 'eventsource', 'manifest', 'other'
@@ -37,16 +30,12 @@ export async function prebidExplorer(options) {
     else {
         logger.warn('Could not configure blockResourcesPlugin: blockedTypes property or .add method not available on instance.', { plugin: blockResources });
     }
-    // Step 4: Update to use options.inputFile for reading URLs
-    // Step 5: Update to use options.outputDir for saving results
-    // Step 6: Implement logic to switch between 'vanilla' Puppeteer and 'cluster'
-    // Step 7: Ensure puppeteer.launch options are configurable
     const basePuppeteerOptions = {
         protocolTimeout: 1000000,
         defaultViewport: null,
-        headless: options.headless, // Use headless from options
-        args: options.puppeteerLaunchOptions?.args || [], // Pass through args
-        ...options.puppeteerLaunchOptions // Spread other potential options
+        headless: options.headless,
+        args: options.puppeteerLaunchOptions?.args || [],
+        ...options.puppeteerLaunchOptions
     };
     let results = [];
     const taskResults = [];
@@ -130,16 +119,14 @@ export async function prebidExplorer(options) {
         // The task function now returns TaskResult
         await cluster.task(async ({ page, data: url }) => {
             const result = await processPageTask(page, url);
-            // taskResults.push(result); // Results can be collected from cluster.execute or by processing queue returns
             return result;
         });
         try {
             const promises = allUrls.filter(url => url).map(url => {
-                processedUrls.add(url); // Mark as processed when queuing starts
+                processedUrls.add(url);
                 return cluster.queue(url)
                     .then(resultFromQueue => {
-                    // Ensure successful results are correctly typed for pushing or further processing
-                    return resultFromQueue; // This is already TaskResult
+                    return resultFromQueue;
                 })
                     .catch(error => {
                     logger.error(`Error from cluster.queue for ${url}:`, { error });
@@ -151,23 +138,29 @@ export async function prebidExplorer(options) {
             const settledResults = await Promise.allSettled(promises);
             settledResults.forEach(settledResult => {
                 if (settledResult.status === 'fulfilled') {
-                    // Value should be TaskResult. Explicitly cast for diagnostics.
-                    taskResults.push(settledResult.value);
+                    // Ensure that what we receive is indeed a TaskResult, otherwise log and push an error.
+                    // This handles cases where cluster.queue might resolve with something unexpected.
+                    if (settledResult.value && typeof settledResult.value.type === 'string') {
+                        taskResults.push(settledResult.value);
+                    }
+                    else {
+                        logger.error('Unexpected fulfillment value from cluster.queue promise, not a TaskResult.', { value: settledResult.value });
+                        // Attempt to find the URL associated with this problematic result if possible.
+                        // This is hard here as we don't have the original URL in this direct context.
+                        // For now, pushing a generic error. A more robust solution might involve mapping promises to URLs.
+                        taskResults.push({ type: 'error', url: 'unknown_url_unexpected_fulfillment', error: 'UNEXPECTED_FULFILLMENT_VALUE' });
+                    }
                 }
-                else {
-                    // This case should ideally not be reached if .catch handles errors and returns a TaskResult.
-                    // However, if cluster.queue() itself throws an error that isn't caught by the .catch
-                    // (e.g., an issue before the task even runs, not covered by the task's try/catch),
-                    // it might end up here. We need a URL for error reporting.
-                    // This part is tricky as the original URL isn't directly available in settledResult.reason if it's a generic error.
-                    // For now, we'll log a generic error. This implies a URL might not be processed.
-                    // A more robust solution would involve mapping original URLs to promises if this becomes an issue.
-                    logger.error('A promise from cluster.queue settled as rejected, which was not expected as errors should be converted to TaskResult.', { reason: settledResult.reason });
-                    // To maintain data integrity, we might need to know which URL failed here.
-                    // This might require associating URLs with promises more explicitly if direct cluster.queue rejections are possible.
+                else { // status === 'rejected'
+                    logger.error('A promise from cluster.queue settled as rejected.', { reason: settledResult.reason });
+                    // The URL is not directly available here from settledResult.reason.
+                    // This indicates an error deeper than the task execution itself (e.g., cluster internal error).
+                    // We need to associate the original URL with the promise to log it here.
+                    // For now, pushing a generic error. This path implies the .catch in the .map() failed.
+                    taskResults.push({ type: 'error', url: 'unknown_url_promise_rejection', error: 'PROMISE_REJECTED_UNEXPECTEDLY' });
                 }
             });
-            await cluster.idle(); // Should be quick if all tasks are done via Promise.allSettled
+            await cluster.idle();
             await cluster.close();
         }
         catch (error) {
@@ -200,8 +193,8 @@ export async function prebidExplorer(options) {
     }
     // Common result processing and file writing logic
     for (const taskResult of taskResults) {
-        if (!taskResult) {
-            logger.warn(`A task returned no result. This should not happen.`);
+        if (!taskResult) { // This check should ideally be unnecessary if the above logic is sound
+            logger.warn(`A task returned a nullish result, which should have been prevented.`);
             continue;
         }
         if (taskResult.type === 'success') {
@@ -225,7 +218,7 @@ export async function prebidExplorer(options) {
             const month = now.toLocaleString('default', { month: 'short' });
             const year = now.getFullYear();
             const day = String(now.getDate()).padStart(2, '0');
-            const monthDir = `${options.outputDir}/${month}`; // Use options.outputDir
+            const monthDir = `${options.outputDir}/${month}`;
             const dateFilename = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
             if (!fs.existsSync(monthDir)) {
                 fs.mkdirSync(monthDir, { recursive: true });
@@ -238,12 +231,10 @@ export async function prebidExplorer(options) {
             logger.info('No results to save.');
         }
         const remainingUrls = allUrls.filter((url) => !processedUrls.has(url));
-        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8'); // Use options.inputFile
+        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
         logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
     }
     catch (err) {
         logger.error('Failed to write results, or update input.txt', { error: err });
     }
 }
-// Step 7: Remove the direct call to prebidExplorer()
-// prebidExplorer();

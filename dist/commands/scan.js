@@ -68,12 +68,11 @@ Scan.flags = {
     }),
     outputDir: Flags.string({
         description: 'Directory to save output files',
-        default: 'output',
+        default: 'store',
     }),
     logDir: Flags.string({
         description: 'Directory to save log files',
         default: 'logs',
     }),
-    // TODO: Consider adding a flag for additional Puppeteer arguments, e.g., --puppeteerArgs="--disable-gpu,--ignore-certificate-errors"
 };
 export default Scan;
