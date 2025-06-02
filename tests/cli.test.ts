@@ -60,6 +60,7 @@ describe('CLI Tests for Scan Command', () => {
     const testOutputDirPath = path.join(projectRoot, 'test_output_cli');
     const customInputPath = path.join(projectRoot, 'tests', 'custom_scan_input.txt');
     const dummyGithubInputFile = path.join(projectRoot, 'dummy_github_input.txt');
+    const testCsvFilePath = path.join(projectRoot, 'test_input.csv'); // Added for CSV tests
 
     // Cleanup before and after all tests in this suite
     beforeAll(() => {
@@ -68,6 +69,7 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(testOutputDirPath);
         cleanup(customInputPath);
         cleanup(dummyGithubInputFile);
+        cleanup(testCsvFilePath); // Added for CSV tests
     });
 
     afterAll(() => {
@@ -76,6 +78,7 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(testOutputDirPath);
         cleanup(customInputPath);
         cleanup(dummyGithubInputFile);
+        cleanup(testCsvFilePath); // Added for CSV tests
     });
 
     // Cleanup before each test
@@ -85,6 +88,7 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(testOutputDirPath);
         cleanup(customInputPath);
         cleanup(dummyGithubInputFile);
+        cleanup(testCsvFilePath); // Added for CSV tests
     });
 
     // Test Case 1
@@ -451,6 +455,204 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     }, testTimeout);
 });
 
+describe('CLI Tests for CSV File Input', () => {
+    const testTimeout = 10000; // Standard timeout for these tests
+    let fetchMock: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+        fetchMock = vi.spyOn(global, 'fetch');
+        // Cleanup testCsvFilePath before each test in this suite as well
+        cleanup(testCsvFilePath);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        // Cleanup testCsvFilePath after each test in this suite
+        cleanup(testCsvFilePath);
+    });
+
+    // Test Case 2: Mocked Remote CSV (Successful Fetch)
+    it('should fetch and parse URLs from a mocked remote CSV file', async () => {
+        const mockCsvContent = "url\nhttp://mockurl1.com\nhttps://mockurl2.com/path\nhttp://mockurl3.com";
+        fetchMock.mockResolvedValueOnce({
+            ok: true,
+            text: async () => mockCsvContent,
+        } as Response);
+
+        const command = `${cliCommand} --csvFile https://example.com/remote.csv`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(fetchMock).toHaveBeenCalledWith('https://example.com/remote.csv');
+        expect(result.stdout).toContain(`Successfully loaded 3 URLs from CSV file: https://example.com/remote.csv`);
+        expect(result.stdout).toContain(`Total URLs to process: 3`);
+    }, testTimeout);
+
+    // Test Case 3: Mocked Remote CSV (GitHub URL Transformation)
+    it('should correctly transform GitHub blob URL and parse from mocked remote CSV', async () => {
+        const mockCsvContent = "url\nhttp://ghmock1.com\nhttps://ghmock2.com";
+        fetchMock.mockResolvedValueOnce({
+            ok: true,
+            text: async () => mockCsvContent,
+        } as Response);
+        
+        const githubBlobUrl = 'https://github.com/testowner/testrepo/blob/main/data.csv';
+        const expectedRawUrl = 'https://raw.githubusercontent.com/testowner/testrepo/main/data.csv';
+        const command = `${cliCommand} --csvFile ${githubBlobUrl}`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(fetchMock).toHaveBeenCalledWith(expectedRawUrl);
+        expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`);
+        expect(result.stdout).toContain(`Successfully loaded 2 URLs from CSV file: ${githubBlobUrl}`);
+        expect(result.stdout).toContain(`Total URLs to process: 2`);
+    }, testTimeout);
+
+    // Test Case 4: Mocked Remote CSV (Fetch Error)
+    it('should handle fetch error for remote CSV gracefully', async () => {
+        fetchMock.mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+            statusText: 'Not Found',
+            text: async () => 'File not found content',
+        } as Response);
+
+        const remoteCsvUrl = 'https://example.com/nonexistent.csv';
+        const command = `${cliCommand} --csvFile ${remoteCsvUrl}`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command should still exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Failed to download CSV content from ${remoteCsvUrl}: 404 Not Found`);
+        expect(result.stdout).toContain(`Error body: File not found content`);
+        expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${remoteCsvUrl}`);
+        expect(result.stdout).toContain('No URLs to process. Exiting.');
+    }, testTimeout);
+
+    // Test Case 5: Local CSV (Successful Read)
+    it('should read and parse URLs from a local CSV file', async () => {
+        const localCsvContent = "header_url\nhttp://local1.com\nhttps://local2.com";
+        fs.writeFileSync(testCsvFilePath, localCsvContent);
+
+        const command = `${cliCommand} --csvFile ${testCsvFilePath}`;
+        const result = await executeCommand(command, projectRoot);
+        
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Reading local CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Successfully loaded 2 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Total URLs to process: 2`);
+    }, testTimeout);
+
+    // Test Case 6: Local CSV (File Not Found)
+    it('should handle file not found error for local CSV gracefully', async () => {
+        const nonExistentFilePath = '/path/to/nonexistent/local.csv';
+        const command = `${cliCommand} --csvFile ${nonExistentFilePath}`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command should still exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        // Error message from fs.readFileSync will be like "Error processing CSV from /path/to/nonexistent/local.csv: ENOENT: no such file or directory..."
+        expect(result.stdout).toContain(`Error processing CSV from ${nonExistentFilePath}: ENOENT: no such file or directory`);
+        expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${nonExistentFilePath}`);
+        expect(result.stdout).toContain('No URLs to process. Exiting.');
+    }, testTimeout);
+    
+    // Test Case 7: Local CSV (Malformed CSV content)
+    it('should handle malformed local CSV content', async () => {
+        const malformedCsvContent = "url,name\nnot_a_url,name1\nhttp://validurl.com,name2\nschemaless.com,name3\n\nhttps://anothervalid.com";
+        fs.writeFileSync(testCsvFilePath, malformedCsvContent);
+
+        const command = `${cliCommand} --csvFile ${testCsvFilePath}`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Skipping invalid or non-HTTP/S URL from CSV: "not_a_url"`);
+        expect(result.stdout).toContain(`Skipping invalid or non-HTTP/S URL from CSV: "schemaless.com"`);
+        expect(result.stdout).toContain(`Successfully loaded 2 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Total URLs to process: 2`); // http://validurl.com, https://anothervalid.com
+    }, testTimeout);
+
+    // Test Case 8: Flag Precedence (--csv-file vs --inputFile)
+    it('should prioritize --csv-file over --inputFile', async () => {
+        const csvContent = "url\nhttp://csv-url1.com\nhttp://csv-url2.com";
+        fs.writeFileSync(testCsvFilePath, csvContent);
+
+        const testInputFilePathForPrecedence = path.join(projectRoot, 'test_input_precedence.txt');
+        createInputFile(testInputFilePathForPrecedence, ['http://textfile-url1.com', 'http://textfile-url2.com', 'http://textfile-url3.com']);
+
+        const command = `${cliCommand} --csvFile ${testCsvFilePath} ${testInputFilePathForPrecedence}`;
+        const result = await executeCommand(command, projectRoot);
+        
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`--csvFile provided, inputFile argument will be ignored.`);
+        expect(result.stdout).toContain(`Successfully loaded 2 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Total URLs to process: 2`);
+
+        const textFileContent = fs.readFileSync(testInputFilePathForPrecedence, 'utf-8');
+        expect(textFileContent.trim()).toBe('http://textfile-url1.com\nhttp://textfile-url2.com\nhttp://textfile-url3.com'); // Should be unchanged
+
+        cleanup(testInputFilePathForPrecedence);
+    }, testTimeout);
+
+    // Test Case 9: Flag Precedence (--csv-file vs --githubRepo)
+    it('should prioritize --csv-file over --githubRepo', async () => {
+        const csvContent = "url\nhttp://csv-for-gh.com";
+        fs.writeFileSync(testCsvFilePath, csvContent); // Using a local CSV for simplicity, could also mock remote
+
+        // Mock fetch for the GitHub repo call that should NOT happen if CSV is prioritized
+        fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
+            if (url.toString().includes('api.github.com')) {
+                return { // Mock a successful GitHub API response
+                    ok: true, json: async () => ([{ name: 'gh_file.txt', type: 'file', download_url: 'https://example.com/gh_file.txt' }]),
+                } as Response;
+            }
+            if (url.toString().includes('example.com/gh_file.txt')) {
+                 return { ok: true, text: async () => 'http://github-url.com' } as Response;
+            }
+            // Fallback for any other unexpected fetch
+            return { ok: false, status: 404, text: async () => 'Unexpected fetch call' } as Response;
+        });
+
+        const command = `${cliCommand} --csvFile ${testCsvFilePath} --githubRepo https://example.com/gh-repo`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`--csvFile provided, --githubRepo will be ignored.`);
+        expect(result.stdout).toContain(`Successfully loaded 1 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Total URLs to process: 1`);
+
+        // Ensure fetch was NOT called for the GitHub repo
+        expect(fetchMock).not.toHaveBeenCalledWith(expect.stringContaining('api.github.com/repos/example/gh-repo'));
+        // If testCsvFilePath was remote and mocked, fetchMock would be called for it. Since it's local, fetchMock isn't called at all.
+        // If we wanted to test a remote CSV here, we'd mock its fetch and expect that call.
+        // For this test, proving githubRepo fetch didn't happen is key.
+        if (testCsvFilePath.startsWith('http')) { // If we were testing a remote CSV
+            expect(fetchMock).toHaveBeenCalledWith(testCsvFilePath);
+        } else { // For local CSV
+            expect(fetchMock).toHaveBeenCalledTimes(0); // No remote calls should be made
+        }
+    }, testTimeout);
+
+    // Test Case 10: Error if no input is provided (re-check existing behavior with csvFile flag)
+    it('should error if no input file, csv-file, or githubRepo is provided', async () => {
+        const defaultInput = path.join(projectRoot, 'src', 'input.txt');
+        if (fs.existsSync(defaultInput)) {
+            // To ensure the test is valid, remove or empty the default input file
+            // For this test, we want to simulate the user providing no input arguments at all.
+            // Oclif's default argument handling for `inputFile` means `src/input.txt` will be assumed
+            // if no other input is given. The command's internal logic then checks if this default
+            // file exists and is non-empty, or if other flags were set.
+            // The error "No input source specified..." comes from scan.ts if all checks fail.
+            fs.unlinkSync(defaultInput); 
+        }
+        
+        const command = `${cliCommand}`; // No args
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(1, `Command should have failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        // Message from scan.ts based on the new logic
+        expect(result.stderr).toContain('No input source specified. Please provide --csvFile, --githubRepo, or an inputFile argument.');
+    }, testTimeout);
+});
+
 describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
     // IMPORTANT:
     // The tests in this suite interact with actual, live GitHub repositories
@@ -462,13 +664,7 @@ describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
 
     const networkTestTimeout = 90000; // Longer timeout for actual network requests
 
-    // Test cases will be added in a subsequent step.
-    // For now, this suite is just a placeholder.
-    // it.todo('should successfully scan a known public repository with processable URLs');
-    // it.todo('should handle a known public repository with no processable URLs');
-    // it.todo('should handle a known invalid or private repository URL gracefully');
-
-    it('should successfully scan a small number of URLs from a live, direct GitHub file URL', async () => {
+    it('should successfully scan a small number of URLs from a live, direct GitHub file URL (for --githubRepo)', async () => {
         const githubFileUrl = 'https://github.com/zer0h/top-1000000-domains/blob/master/top-10000-domains';
         const numUrlsToScan = 7; // Small number to keep the test reasonably fast
         const command = `${cliCommand} --githubRepo ${githubFileUrl} --numUrls ${numUrlsToScan}`;
@@ -496,6 +692,72 @@ describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
         expect(result.stdout).toContain(`Total URLs extracted before limiting: 0`);
         expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${githubFileUrl}.`);
         expect(result.stdout).toContain('No URLs to process. Exiting.');
+
+    }, networkTestTimeout);
+});
+
+// Separate describe block for live CSV tests if preferred, or could be part of the above
+describe('CLI Tests for Live CSV File Input (Network)', () => {
+    const networkTestTimeout = 90000; // Longer timeout for actual network requests
+    let fetchMock: ReturnType<typeof vi.spyOn>; // To ensure no accidental mocking if other tests didn't clean up
+
+    beforeEach(() => {
+        // Ensure fetch is NOT mocked for these live tests
+        // This is a safeguard; fetch should ideally be restored by other suites.
+        // If vi.restoreAllMocks() is consistently used, this might not be strictly necessary
+        // but helps ensure test isolation if restoring was missed.
+        if (vi.isMockFunction(global.fetch)) {
+            vi.restoreAllMocks(); 
+        }
+        // Re-spy if needed by other types of tests, but for live, we want original fetch.
+        // This setup assumes this suite ONLY runs live tests. If mixed, more care is needed.
+    });
+
+    afterEach(() => {
+        // If we spied on fetch for some reason within this suite (e.g. conditional mocking), restore.
+        // Generally, for a purely live suite, this might not do anything if fetch wasn't re-mocked.
+        // vi.restoreAllMocks(); 
+    });
+
+    // Test Case 1: Live Network Test for Remote CSV (GitHub URL)
+    it('should successfully scan a small number of URLs from a live GitHub CSV file URL', async () => {
+        const liveCsvUrl = 'https://github.com/privacy-tech-lab/gpc-web-crawler/blob/main/selenium-optmeowt-crawler/full-crawl-set.csv';
+        // numUrls is not directly used by fetchUrlsFromCsv, but prebidExplorer's main loop might eventually use it
+        // For now, the CSV loader will fetch all URLs. The main processor then takes over.
+        // Let's not use --numUrls for this CSV test to see how many it loads by default from the first few.
+        // The test will primarily check if the fetching and initial processing work.
+        // We'll limit the actual processing in prebidExplorer implicitly by only checking a few URLs in output.
+        const command = `${cliCommand} --csvFile ${liveCsvUrl}`; // Removed --numUrls 3 for now
+        
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Fetching URLs from CSV source: ${liveCsvUrl}`);
+        expect(result.stdout).toContain(`Detected remote CSV URL: ${liveCsvUrl}`);
+        expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: https://raw.githubusercontent.com/privacy-tech-lab/gpc-web-crawler/main/selenium-optmeowt-crawler/full-crawl-set.csv`);
+        
+        // Check that a positive number of URLs were loaded. The exact number can change.
+        // This file has a header, "sites". The first actual URL is on the second line.
+        // Example URLs: http://100widgets.com, http://123open.com
+        const loadedMatch = result.stdout.match(/Successfully loaded (\d+) URLs from CSV file/);
+        expect(loadedMatch).not.toBeNull();
+        const numLoaded = parseInt(loadedMatch![1], 10);
+        expect(numLoaded).toBeGreaterThan(0);
+
+        const processedMatch = result.stdout.match(/Total URLs to process: (\d+)/);
+        expect(processedMatch).not.toBeNull();
+        const numProcessed = parseInt(processedMatch![1], 10);
+        expect(numProcessed).toEqual(numLoaded); // All loaded URLs should be processed initially
+
+        // Check if some known initial URLs (after header) are logged as being processed (if Puppeteer part runs)
+        // This depends on how many URLs are actually processed by Puppeteer in the test.
+        // For now, confirming loading is the primary goal.
+        // Example: if 'http://100widgets.com' is processed, it would appear in logs.
+        // This might be too brittle if the live file changes often at the very top.
+        // Let's focus on the loading messages.
+
+        // Ensure no obvious error messages in stderr
+        expect(result.stderr).toBe('');
 
     }, networkTestTimeout);
 });
