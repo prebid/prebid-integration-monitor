@@ -250,6 +250,27 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             }
         }
 
+        // Process moduleWebsiteCounts to populate website count fields
+        for (const moduleName in moduleWebsiteCounts) { // moduleWebsiteCounts was populated earlier
+            const count: number = moduleWebsiteCounts[moduleName];
+
+            if (count < MIN_COUNT_THRESHOLD) {
+                continue;
+            }
+
+            if (moduleName.includes('BidAdapter')) {
+                finalApiData.bidAdapterWebsites[moduleName] = count;
+            } else if (moduleName.includes('IdSystem') || moduleName === 'userId' || moduleName === 'idImportLibrary' || moduleName === 'pubCommonId' || moduleName === 'utiqSystem' || moduleName === 'trustpidSystem') {
+                finalApiData.idModuleWebsites[moduleName] = count;
+            } else if (moduleName.includes('RtdProvider') || moduleName === 'rtdModule') {
+                finalApiData.rtdModuleWebsites[moduleName] = count;
+            } else if (moduleName.includes('AnalyticsAdapter')) {
+                finalApiData.analyticsAdapterWebsites[moduleName] = count;
+            } else {
+                finalApiData.otherModuleWebsites[moduleName] = count;
+            }
+        }
+
         const targetApiDir = path.dirname(finalApiFilePath);
         try {
             await fsPromises.access(targetApiDir);
