@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
+    "test": "NODE_ENV=production vitest",
+    "pretest": "npx puppeteer browsers install chrome",
     "build:check": "tsc --noEmit",
     "start": "node ./bin/run.js",
     "dev": "node --loader ts-node/esm ./bin/dev.js default",
