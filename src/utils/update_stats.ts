@@ -27,14 +27,6 @@ interface ModuleDistribution {
     [moduleName: string]: number;
 }
 
-interface SummarizationData {
-    visitedSites: number;
-    monitoredSites: number;
-    prebidSites: number;
-    versionDistribution: VersionDistribution;
-    moduleDistribution: ModuleDistribution;
-}
-
 interface FinalApiData {
     visitedSites: number;
     monitoredSites: number;
@@ -187,18 +179,10 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             sortedRawModuleCounts[moduleName] = rawModuleCounts[moduleName];
         }
 
-        const summarizationData: SummarizationData = {
+        const finalApiData: FinalApiData = {
             visitedSites: uniqueUrls.size,
             monitoredSites: uniqueUrls.size,
             prebidSites: urlsWithPrebid.size,
-            versionDistribution: sortedRawVersionCounts,
-            moduleDistribution: sortedRawModuleCounts,
-        };
-
-        const finalApiData: FinalApiData = {
-            visitedSites: summarizationData.visitedSites,
-            monitoredSites: summarizationData.monitoredSites,
-            prebidSites: summarizationData.prebidSites,
             releaseVersions: {},
             buildVersions: {},
             customVersions: {},
@@ -209,8 +193,8 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             otherModuleInst: {}
         };
 
-        // Process versionDistribution from summarizationData
-        const versionDistributionForCleaning: VersionDistribution = summarizationData.versionDistribution;
+        // Process versionDistribution from sortedRawVersionCounts
+        const versionDistributionForCleaning: VersionDistribution = sortedRawVersionCounts;
         for (const version in versionDistributionForCleaning) {
             const count: number = versionDistributionForCleaning[version];
             const cleanedVersion: string = version.startsWith('v') ? version.substring(1) : version;
@@ -228,8 +212,8 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             }
         }
 
-        // Process moduleDistribution from summarizationData
-        const moduleDistributionForCleaning: ModuleDistribution = summarizationData.moduleDistribution;
+        // Process moduleDistribution from sortedRawModuleCounts
+        const moduleDistributionForCleaning: ModuleDistribution = sortedRawModuleCounts;
         for (const moduleName in moduleDistributionForCleaning) {
             const count: number = moduleDistributionForCleaning[moduleName];
 
