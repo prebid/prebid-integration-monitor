@@ -45,21 +45,33 @@ const projectRoot = path.resolve(__dirname, '..');
 const cliCommand = `node ${path.join(projectRoot, 'bin', 'run')} scan`; // Path to CLI
 
 describe('CLI Tests for Scan Command', () => {
-    const defaultInputFilePath = path.join(projectRoot, 'input.txt');
+    const defaultInputFilePath = path.join(projectRoot, 'src', 'input.txt'); // Changed path
     const testInputFilePath = path.join(projectRoot, 'test_input_cli.txt');
     const testOutputDirPath = path.join(projectRoot, 'test_output_cli');
+    const customInputPath = path.join(projectRoot, 'tests', 'custom_scan_input.txt'); // For new test
+
+    // Helper to create a dummy input file, ensuring directory exists
+    function createInputFile(filePath: string, urls: string[]): void {
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(filePath, urls.join('\n'));
+    }
 
     // Cleanup before and after all tests in this suite
     beforeAll(() => {
         cleanup(defaultInputFilePath);
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
+        cleanup(customInputPath); // Added customInputPath
     });
 
     afterAll(() => {
         cleanup(defaultInputFilePath);
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
+        cleanup(customInputPath); // Added customInputPath
     });
 
     // Cleanup before each test
@@ -67,33 +79,39 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(defaultInputFilePath); // Ensure clean state for default input file
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
+        cleanup(customInputPath); // Added customInputPath
     });
 
     // Test Case 1
-    it('Command runs with default options', async () => {
-        createInputFile(defaultInputFilePath, ['https://example.com']);
+    it('Command runs with default options (now src/input.txt)', async () => {
+        createInputFile(defaultInputFilePath, ['https://example.com']); // Will create src/input.txt
         const result = await executeCommand(`${cliCommand}`, projectRoot);
 
+        if (result.code !== 0) {
+            console.error("Test Error Output:", result.stderr); // Log stderr if test fails
+        }
         expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr}`);
-        expect(result.stdout).toContain(`Initial URLs read from input.txt`);
-        const inputFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8');
+        // Actual log message uses the relative path 'src/input.txt' as passed in options
+        expect(result.stdout).toContain(`Initial URLs read from src/input.txt count:`);
+        const inputFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8'); // Reads src/input.txt
         expect(inputFileContent.trim()).toBe('', 'Input file should be empty after processing');
     }, 60000); // 60s timeout
 
     // Test Case 2
-    it('Command runs with puppeteerType=vanilla', async () => {
-        createInputFile(defaultInputFilePath, ['https://example.com']);
+    it('Command runs with puppeteerType=vanilla (using src/input.txt)', async () => {
+        createInputFile(defaultInputFilePath, ['https://example.com']); // Will create src/input.txt
         const result = await executeCommand(`${cliCommand} --puppeteerType=vanilla`, projectRoot);
 
         expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr}`);
         expect(result.stdout).toContain('"puppeteerType": "vanilla"');
-        expect(result.stdout).toContain(`Initial URLs read from input.txt`);
+        // Actual log message uses the relative path 'src/input.txt'
+        expect(result.stdout).toContain(`Initial URLs read from src/input.txt count:`);
     }, 60000); // 60s timeout
 
     // Test Case 3
-    it('Input and output files', async () => {
+    it('Input and output files (custom input, custom output)', async () => {
         const testUrls = ['https://example.com', 'https://www.google.com'];
-        createInputFile(testInputFilePath, testUrls);
+        createInputFile(testInputFilePath, testUrls); // testInputFilePath is in root
 
         const result = await executeCommand(`${cliCommand} ${testInputFilePath} --outputDir=${testOutputDirPath}`, projectRoot);
         expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
@@ -108,11 +126,50 @@ describe('CLI Tests for Scan Command', () => {
 
         expect(fs.existsSync(expectedOutputFile), `Expected output file ${expectedOutputFile} was not created`).toBe(true);
 
-        const inputFileContent = fs.readFileSync(testInputFilePath, 'utf-8');
+        const inputFileContent = fs.readFileSync(testInputFilePath, 'utf-8'); // Reads test_input_cli.txt
         expect(inputFileContent.trim()).toBe('', 'Input file should be empty after processing successful URLs');
     }, 60000); // 60s timeout
 
-    // Test Case 4
+    // New Test Case: Scan with default input file (src/input.txt)
+    it('Scan with default input file (src/input.txt)', async () => {
+        createInputFile(defaultInputFilePath, ['https://default-test.example.com']); // Creates src/input.txt
+        // Ensure no other input.txt in root to avoid confusion
+        if (fs.existsSync(path.join(projectRoot, 'input.txt'))) {
+            cleanup(path.join(projectRoot, 'input.txt'));
+        }
+
+        const result = await executeCommand(`${cliCommand}`, projectRoot); // No input file argument
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        // Actual log message uses the relative path 'src/input.txt'
+        expect(result.stdout).toContain(`Initial URLs read from src/input.txt count:`);
+
+        const inputFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8'); // Checks src/input.txt
+        expect(inputFileContent.trim()).toBe('', 'Default input file (src/input.txt) should be empty after processing');
+    }, 60000);
+
+    // New Test Case: Scan with custom input file overrides default
+    it('Scan with custom input file overrides default', async () => {
+        createInputFile(customInputPath, ['https://custom-test.example.com']); // Creates tests/custom_scan_input.txt
+        // Optionally, create src/input.txt with different content to ensure custom is used
+        createInputFile(defaultInputFilePath, ['https://should-not-be-used.example.com']);
+
+        const result = await executeCommand(`${cliCommand} ${customInputPath}`, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        // Actual log message includes the resolved path and count
+        expect(result.stdout).toContain(`Initial URLs read from ${customInputPath} count:`);
+
+        const customFileContent = fs.readFileSync(customInputPath, 'utf-8');
+        expect(customFileContent.trim()).toBe('', 'Custom input file should be empty after processing');
+
+        // Ensure default file (src/input.txt) was not touched
+        const defaultFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8');
+        expect(defaultFileContent.trim()).toBe('https://should-not-be-used.example.com');
+
+    }, 60000);
+
+    // Test Case 4 (renumbered to 5)
     it('Help command', async () => {
         const result = await executeCommand(`${cliCommand} --help`, projectRoot);
         expect(result.code).toBe(0, `Help command failed with code ${result.code}. Stderr: ${result.stderr}`);

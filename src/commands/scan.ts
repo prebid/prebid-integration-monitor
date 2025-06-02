@@ -4,7 +4,7 @@ import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js'; // Assumin
 
 export default class Scan extends Command {
   static override args = {
-    inputFile: Args.string({description: 'Input file path', default: 'input.txt'}),
+    inputFile: Args.string({description: 'Input file path', default: 'src/input.txt'}),
   }
   static override description = 'Scans websites for Prebid.js integrations.'
   static override examples = [

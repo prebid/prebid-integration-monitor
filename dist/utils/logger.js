@@ -1,23 +1,19 @@
-import winston from 'winston'; // Import Logger type
+import winston from 'winston';
 import fs from 'fs';
 import path from 'path';
 import { trace } from '@opentelemetry/api';
-let logger; // Declare logger variable
+let logger;
 export function initializeLogger(logDir) {
-    // Create logs directory if it doesn't exist
     if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir, { recursive: true });
     }
     logger = winston.createLogger({
         levels: winston.config.npm.levels,
-        format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.errors({ stack: true }), // Log the full stack trace for errors
-        winston.format.splat() // Essential for formatting messages like printf: logger.info('Hello %s', 'world')
-        ),
+        format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.errors({ stack: true }), winston.format.splat()),
         transports: [
             new winston.transports.Console({
-                level: process.env.LOG_LEVEL_CONSOLE || 'info', // Default to 'info', configurable via env variable
-                format: winston.format.combine(winston.format.colorize(), // Colorize log levels
-                winston.format.printf(info => {
+                level: process.env.LOG_LEVEL_CONSOLE || 'info',
+                format: winston.format.combine(winston.format.colorize(), winston.format.printf(info => {
                     let message = `${info.timestamp} ${info.level}: ${info.message}`;
                     if (info.stack) {
                         message += `\n${info.stack}`;
@@ -29,14 +25,10 @@ export function initializeLogger(logDir) {
                             message += ` (trace_id: ${spanContext.traceId}, span_id: ${spanContext.spanId})`;
                         }
                     }
-                    // Special handling for "Initial URLs read"
-                    // The actual log call is: logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length, urls: allUrls });
-                    // The properties 'count' and 'urls' will be directly on the 'info' object.
                     if (typeof info.message === 'string' && info.message.startsWith('Initial URLs read from') && typeof info.count === 'number') {
                         message += ` count: ${info.count}`;
                     }
                     else {
-                        // Original metadata handling for other messages
                         const splat = info[Symbol.for('splat')];
                         if (splat) {
                             if (Array.isArray(splat)) {
@@ -47,7 +39,6 @@ export function initializeLogger(logDir) {
                             }
                             else if (typeof splat === 'object' && splat !== null) {
                                 const metadataString = JSON.stringify(splat);
-                                // Avoid printing empty object or already handled metadata for the specific message
                                 if (metadataString && metadataString !== '{}') {
                                     if (!(typeof info.message === 'string' && info.message.startsWith('Initial URLs read from') && info.urls && typeof info.count === 'number')) {
                                         message += ` ${metadataString}`;
@@ -63,7 +54,7 @@ export function initializeLogger(logDir) {
                 }))
             }),
             new winston.transports.File({
-                filename: path.join(logDir, 'app.log'), // Use dynamic logDir
+                filename: path.join(logDir, 'app.log'),
                 level: process.env.LOG_LEVEL_APP || 'info',
                 format: winston.format.combine(winston.format(info => {
                     const activeSpan = trace.getActiveSpan();
@@ -75,11 +66,10 @@ export function initializeLogger(logDir) {
                         }
                     }
                     return info;
-                })(), winston.format.json() // JSON format for file logs
-                )
+                })(), winston.format.json())
             }),
             new winston.transports.File({
-                filename: path.join(logDir, 'error.log'), // Use dynamic logDir
+                filename: path.join(logDir, 'error.log'),
                 level: 'error',
                 format: winston.format.combine(winston.format(info => {
                     const activeSpan = trace.getActiveSpan();
@@ -91,31 +81,17 @@ export function initializeLogger(logDir) {
                         }
                     }
                     return info;
-                })(), winston.format.json() // JSON format for file logs
-                )
+                })(), winston.format.json())
             })
         ],
         exitOnError: false
     });
-    // A simple test to ensure logger is working
     logger.info(`Logger initialized successfully. Log directory: ${logDir}`);
-    // logger.error('This is a test error message.'); // Optional: remove test messages after setup
-    // logger.warn('This is a test warning message.');
-    // logger.debug('This is a test debug message (won\'t show in console by default).');
     return logger;
 }
-// Export the logger instance directly for convenience,
-// but ensure initializeLogger is called first from the application entry point.
-// This default export might be problematic if not initialized.
-// Consider exporting only initializeLogger and managing the instance in the calling code.
 export default {
-    // Getter to ensure logger is initialized before use
     get instance() {
         if (!logger) {
-            // Initialize with a default directory if not already done, or throw error
-            // For now, let's assume it will be initialized by the app.
-            // Consider throwing an error or initializing with a default path if used before explicit initialization.
-            // initializeLogger('logs'); // Default initialization
             throw new Error("Logger has not been initialized. Call initializeLogger(logDir) first.");
         }
         return logger;

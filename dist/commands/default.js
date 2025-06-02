@@ -16,9 +16,10 @@ class Default extends Command {
         const { flags } = await this.parse(Default);
         // Initialize logger with the logDir from flags
         logger = initializeLogger(flags.logDir);
+        console.log('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
         try {
             // Initialize the tracer as the first step
-            initTracer(); // This might still have issues if tracer.js is not found
+            initTracer();
             logger.info("Default oclif command starting...");
             const tracer = trace.getTracer('prebid-integration-monitor-tracer');
             await tracer.startActiveSpan('application-main-span', async (parentSpan) => {
@@ -55,6 +56,5 @@ Default.flags = {
         description: 'Directory to save log files',
         default: 'logs',
     }),
-    // help: Flags.help({char: 'h'}), // Example, if needed
 };
 export default Default;
