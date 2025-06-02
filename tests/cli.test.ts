@@ -696,6 +696,223 @@ describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
     }, networkTestTimeout);
 });
 
+describe('CLI Tests for Range and Chunk Functionality', () => {
+    const testTimeout = 20000; // Adjusted timeout for these tests, can be tuned
+    const testInputFilePath = path.join(projectRoot, 'test_range_chunk_input.txt');
+    const testCsvFilePath = path.join(projectRoot, 'test_range_chunk.csv'); // For CSV specific range/chunk tests
+
+    beforeEach(() => {
+        cleanup(testInputFilePath);
+        cleanup(testCsvFilePath);
+    });
+
+    afterEach(() => {
+        cleanup(testInputFilePath);
+        cleanup(testCsvFilePath);
+    });
+
+    // --- Tests for --range ---
+    it('should process a valid specific range (e.g., 2-4) from an input file', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com', 'https://url4.com', 'https://url5.com'];
+        createInputFile(testInputFilePath, urls);
+        // Range 2-4 (1-based) means indices 1, 2, 3 (0-based), so url2, url3, url4
+        const command = `${cliCommand} ${testInputFilePath} --range 2-4`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 5`);
+        expect(result.stdout).toContain(`Applying range: 2-4`);
+        expect(result.stdout).toContain(`Applied range: Processing URLs from 2 to 4 (0-based index 1 to 3). Total URLs after range: 3 (out of 5)`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        // Check options passed to prebidExplorer
+        expect(result.stdout).toMatch(/"range": "2-4"/);
+        // Check if the correct URLs are mentioned in the "Processing" logs (if Puppeteer part runs long enough)
+        // This might be brittle, focusing on counts is safer.
+        // expect(result.stdout).toContain('Processing: https://url2.com');
+        // expect(result.stdout).toContain('Processing: https://url3.com');
+        // expect(result.stdout).toContain('Processing: https://url4.com');
+        // expect(result.stdout).not.toContain('Processing: https://url1.com');
+        // expect(result.stdout).not.toContain('Processing: https://url5.com');
+    }, testTimeout);
+
+    it('should process an open-ended range (start only, e.g., 3-) from an input file', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com', 'https://url4.com', 'https://url5.com'];
+        createInputFile(testInputFilePath, urls);
+        // Range 3- (1-based) means indices 2, 3, 4 (0-based), so url3, url4, url5
+        const command = `${cliCommand} ${testInputFilePath} --range 3-`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 5`);
+        expect(result.stdout).toContain(`Applying range: 3-`);
+        expect(result.stdout).toContain(`Applied range: Processing URLs from 3 to 5 (0-based index 2 to 4). Total URLs after range: 3 (out of 5)`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        expect(result.stdout).toMatch(/"range": "3-"/);
+    }, testTimeout);
+
+    it('should process an open-ended range (end only, e.g., -2) from an input file', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com', 'https://url4.com', 'https://url5.com'];
+        createInputFile(testInputFilePath, urls);
+        // Range -2 (1-based) means indices 0, 1 (0-based), so url1, url2
+        const command = `${cliCommand} ${testInputFilePath} --range -2`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 5`);
+        expect(result.stdout).toContain(`Applying range: -2`);
+        expect(result.stdout).toContain(`Applied range: Processing URLs from 1 to 2 (0-based index 0 to 1). Total URLs after range: 2 (out of 5)`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 2`);
+        expect(result.stdout).toMatch(/"range": "-2"/);
+    }, testTimeout);
+
+    it('should handle out-of-bounds range (too high, e.g., 100-110 for a 5 URL file)', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com', 'https://url4.com', 'https://url5.com'];
+        createInputFile(testInputFilePath, urls);
+        const command = `${cliCommand} ${testInputFilePath} --range 100-110`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 5`);
+        expect(result.stdout).toContain(`Applying range: 100-110`);
+        expect(result.stdout).toContain(`Start of range (100) is beyond the total number of URLs (5). No URLs to process.`);
+        expect(result.stdout).toContain(`Total URLs after range: 0 (out of 5)`);
+        expect(result.stdout).toContain(`No URLs to process after applying range or due to empty initial list. Exiting.`);
+        // Ensure it doesn't try to process anything
+        expect(result.stdout).not.toContain(`Total URLs to process after range check:`);
+    }, testTimeout);
+
+    it('should handle invalid range format (e.g., "abc") by processing all URLs and logging a warning', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com'];
+        createInputFile(testInputFilePath, urls);
+        const command = `${cliCommand} ${testInputFilePath} --range abc`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 3`);
+        expect(result.stdout).toContain(`Applying range: abc`);
+        expect(result.stdout).toContain(`Invalid range format: "abc". Proceeding with all URLs.`);
+        // It should then proceed with all 3 URLs
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        expect(result.stdout).toMatch(/"range": "abc"/); // The invalid flag is still passed in options
+    }, testTimeout);
+
+    it('should handle invalid range format (e.g., "1-2-3") by processing all URLs and logging a warning', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com'];
+        createInputFile(testInputFilePath, urls);
+        const command = `${cliCommand} ${testInputFilePath} --range 1-2-3`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 3`);
+        expect(result.stdout).toContain(`Applying range: 1-2-3`);
+        expect(result.stdout).toContain(`Invalid range format: "1-2-3". Proceeding with all URLs.`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        expect(result.stdout).toMatch(/"range": "1-2-3"/);
+    }, testTimeout);
+
+
+    it('should apply a valid range to a CSV input file', async () => {
+        const csvContent = "url\nhttps://csv1.com\nhttps://csv2.com\nhttps://csv3.com\nhttps://csv4.com\nhttps://csv5.com";
+        fs.writeFileSync(testCsvFilePath, csvContent);
+        // Range 2-4 (1-based) means csv2, csv3, csv4
+        const command = `${cliCommand} --csvFile ${testCsvFilePath} --range 2-4`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Successfully loaded 5 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 5`);
+        expect(result.stdout).toContain(`Applying range: 2-4`);
+        expect(result.stdout).toContain(`Applied range: Processing URLs from 2 to 4 (0-based index 1 to 3). Total URLs after range: 3 (out of 5)`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        expect(result.stdout).toMatch(/"range": "2-4"/);
+    }, testTimeout);
+
+    // --- Tests for --chunkSize ---
+    it('should process in chunks if chunkSize is smaller than total URLs', async () => {
+        const urls = Array.from({ length: 10 }, (_, i) => `https://url${i + 1}.com`);
+        createInputFile(testInputFilePath, urls);
+        const command = `${cliCommand} ${testInputFilePath} --chunkSize 3`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 10`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 10`);
+        expect(result.stdout).toMatch(/"chunkSize": 3/);
+        expect(result.stdout).toContain(`Chunked processing enabled. Chunk size: 3`);
+        expect(result.stdout).toContain(`Total chunks to process: 4`); // 10 / 3 = 3.33 -> 4 chunks
+        expect(result.stdout).toContain(`Processing chunk 1 of 4: URLs 1-3`);
+        expect(result.stdout).toContain(`Finished processing chunk 1 of 4`);
+        expect(result.stdout).toContain(`Processing chunk 2 of 4: URLs 4-6`);
+        expect(result.stdout).toContain(`Finished processing chunk 2 of 4`);
+        expect(result.stdout).toContain(`Processing chunk 3 of 4: URLs 7-9`);
+        expect(result.stdout).toContain(`Finished processing chunk 3 of 4`);
+        expect(result.stdout).toContain(`Processing chunk 4 of 4: URLs 10-10`);
+        expect(result.stdout).toContain(`Finished processing chunk 4 of 4`);
+        // Potentially check that all 10 URLs were mentioned in "Processing:" logs if reliable
+    }, testTimeout);
+
+    it('should process all URLs in one chunk if chunkSize is larger than total URLs', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com'];
+        createInputFile(testInputFilePath, urls);
+        const command = `${cliCommand} ${testInputFilePath} --chunkSize 10`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 3`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        expect(result.stdout).toMatch(/"chunkSize": 10/);
+        expect(result.stdout).toContain(`Chunked processing enabled. Chunk size: 10`);
+        expect(result.stdout).toContain(`Total chunks to process: 1`);
+        expect(result.stdout).toContain(`Processing chunk 1 of 1: URLs 1-3`);
+        expect(result.stdout).toContain(`Finished processing chunk 1 of 1`);
+    }, testTimeout);
+
+    it('should process all URLs without chunking if chunkSize is not provided', async () => {
+        const urls = ['https://url1.com', 'https://url2.com', 'https://url3.com'];
+        createInputFile(testInputFilePath, urls);
+        const command = `${cliCommand} ${testInputFilePath}`; // No chunkSize
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 3`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
+        expect(result.stdout).not.toContain(`Chunked processing enabled`);
+        expect(result.stdout).not.toContain(`Processing chunk`);
+        expect(result.stdout).toContain(`Processing all 3 URLs without chunking.`);
+    }, testTimeout);
+
+
+    // --- Tests for --range and --chunkSize combined ---
+    it('should process a ranged set of URLs in chunks', async () => {
+        const urls = Array.from({ length: 20 }, (_, i) => `https://url${i + 1}.com`);
+        createInputFile(testInputFilePath, urls);
+        // Range 5-15 (1-based) means indices 4-14 (0-based), so url5 to url15. Total 11 URLs.
+        // ChunkSize 4. Chunks: (url5,6,7,8), (url9,10,11,12), (url13,14,15) -> 3 chunks
+        const command = `${cliCommand} ${testInputFilePath} --range 5-15 --chunkSize 4`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Initial total URLs found: 20`);
+        expect(result.stdout).toContain(`Applying range: 5-15`);
+        expect(result.stdout).toContain(`Applied range: Processing URLs from 5 to 15 (0-based index 4 to 14). Total URLs after range: 11 (out of 20)`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 11`);
+        expect(result.stdout).toMatch(/"range": "5-15"/);
+        expect(result.stdout).toMatch(/"chunkSize": 4/);
+
+        expect(result.stdout).toContain(`Chunked processing enabled. Chunk size: 4`);
+        expect(result.stdout).toContain(`Total chunks to process: 3`); // 11 / 4 = 2.75 -> 3 chunks
+
+        // Check logs for each chunk. The URLs logged are based on the position in the *original* list if not careful.
+        // The prebid.ts log is "Processing chunk X of Y: URLs A-B" where A and B are 1-based indices *within the current urlsToProcess list*.
+        expect(result.stdout).toContain(`Processing chunk 1 of 3: URLs 1-4`); // Processes first 4 of the 11 ranged URLs
+        expect(result.stdout).toContain(`Finished processing chunk 1 of 3`);
+        expect(result.stdout).toContain(`Processing chunk 2 of 3: URLs 5-8`); // Processes next 4 of the 11 ranged URLs
+        expect(result.stdout).toContain(`Finished processing chunk 2 of 3`);
+        expect(result.stdout).toContain(`Processing chunk 3 of 3: URLs 9-11`);// Processes last 3 of the 11 ranged URLs
+        expect(result.stdout).toContain(`Finished processing chunk 3 of 3`);
+    }, testTimeout);
+});
+
 // Separate describe block for live CSV tests if preferred, or could be part of the above
 describe('CLI Tests for Live CSV File Input (Network)', () => {
     const networkTestTimeout = 90000; // Longer timeout for actual network requests

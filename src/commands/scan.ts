@@ -51,6 +51,8 @@ export default class Scan extends Command {
       description: 'CSV file path or GitHub URL to fetch URLs from. Assumes URLs are in the first column.',
       required: false,
     }),
+    range: Flags.string({ description: "Specify a line range (e.g., '10-20' or '5-') to process from the input source. 1-based indexing.", required: false }),
+    chunkSize: Flags.integer({ description: "Process URLs in chunks of this size. Processes all URLs in the specified range or input, but one chunk at a time.", required: false }),
   }
 
   public async run(): Promise<void> {
@@ -143,6 +145,8 @@ export default class Scan extends Command {
       githubRepo: githubRepo, // Use the potentially modified variable
       csvFile: csvFile, // Add csvFile to options
       numUrls: flags.numUrls,
+      range: flags.range,
+      chunkSize: flags.chunkSize,
       puppeteerLaunchOptions: {
         headless: flags.headless, // Also set within puppeteerLaunchOptions for clarity/consistency
         args: [
