@@ -41,7 +41,7 @@ class Scan extends Command {
     }
 }
 Scan.args = {
-    inputFile: Args.string({ description: 'Input file path', default: 'input.txt' }),
+    inputFile: Args.string({ description: 'Input file path', default: 'src/input.txt' }),
 };
 Scan.description = 'Scans websites for Prebid.js integrations.';
 Scan.examples = [
@@ -68,12 +68,11 @@ Scan.flags = {
     }),
     outputDir: Flags.string({
         description: 'Directory to save output files',
-        default: 'output',
+        default: 'store',
     }),
     logDir: Flags.string({
         description: 'Directory to save log files',
         default: 'logs',
     }),
-    // TODO: Consider adding a flag for additional Puppeteer arguments, e.g., --puppeteerArgs="--disable-gpu,--ignore-certificate-errors"
 };
 export default Scan;

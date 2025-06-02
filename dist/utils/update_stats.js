@@ -1,28 +1,19 @@
-import * as fs from 'fs'; // Changed to import * as fs
+import { promises as fsPromises } from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-// Replicate __dirname functionality in ES Modules
-const __filename = fileURLToPath(import.meta.url); // No changes needed here
-const __dirname = dirname(__filename);
-const outputDir = path.join(__dirname, '..', 'output');
-const summaryFilePath = path.join(outputDir, 'summarization.json'); // No changes needed here
-/**
- * Parses a version string (e.g., "v9.30.0", "v9.31.0-pre") into components.
- * @param {string} versionString
- * @returns {VersionComponents}
- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const outputDir = path.join(__dirname, '..', 'store');
+const finalApiFilePath = path.join(__dirname, '..', '..', 'api', 'api.json');
+const MIN_COUNT_THRESHOLD = 5;
 function parseVersion(versionString) {
-    // Added robustness: handle potential null/undefined input
     if (!versionString) {
         console.warn(`Attempted to parse null or undefined version string.`);
         return { major: 0, minor: 0, patch: 0, preRelease: 'invalid' };
     }
     const match = versionString.match(/^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/);
     if (!match) {
-        // Handle non-standard versions or return a default low value
         console.warn(`Could not parse version: ${versionString}`);
-        // Return a structure that allows comparison but marks it as non-standard
         return { major: 0, minor: 0, patch: 0, preRelease: versionString };
     }
     return {
@@ -32,12 +23,6 @@ function parseVersion(versionString) {
         preRelease: match[4] || null,
     };
 }
-/**
- * Compares two version strings based on semantic versioning rules (descending order).
- * @param {string} a Version string a
- * @param {string} b Version string b
- * @returns {number} -1 if a > b, 1 if a < b, 0 if a === b
- */
 function compareVersions(a, b) {
     const vA = parseVersion(a);
     const vB = parseVersion(b);
@@ -47,82 +32,70 @@ function compareVersions(a, b) {
         return vB.minor - vA.minor;
     if (vA.patch !== vB.patch)
         return vB.patch - vA.patch;
-    // Versions without pre-release tags are considered newer
     if (vA.preRelease === null && vB.preRelease !== null)
         return -1;
     if (vA.preRelease !== null && vB.preRelease === null)
         return 1;
-    // If both have pre-release tags, compare them lexicographically (ascending)
     if (vA.preRelease && vB.preRelease) {
         if (vA.preRelease < vB.preRelease)
-            return -1; // a comes before b
+            return -1;
         if (vA.preRelease > vB.preRelease)
-            return 1; // a comes after b
+            return 1;
     }
-    return 0; // Versions are identical or only differ in ways not covered (e.g., build metadata)
+    return 0;
 }
 /**
- * Extracts data from monthly JSON files and summarizes Prebid version distribution,
- * module distribution, total monitored sites, and sites with Prebid detected.
- * Assumes version information is located at `entry.prebidInstances[].version`.
- * Assumes module information is located at `entry.prebidInstances[].modules`.
- * Assumes URL information is located at `entry.url`.
+ * Main function to summarize and then clean statistics.
  */
-async function summarizeStats() {
-    const versionCounts = {};
-    const moduleCounts = {}; // Added to count modules
-    const uniqueUrls = new Set(); // Use a Set to store all unique URLs found
-    const urlsWithPrebid = new Set(); // Use a Set to store unique URLs with Prebid
-    const monthAbbrRegex = /^[A-Z][a-z]{2}$/; // Matches month abbreviations like Apr, Feb, Mar
+async function updateAndCleanStats(options) {
+    const rawVersionCounts = {};
+    const rawModuleCounts = {};
+    const uniqueUrls = new Set();
+    const urlsWithPrebid = new Set();
+    const monthAbbrRegex = /^[A-Z][a-z]{2}$/;
     try {
-        const outputEntries = await fs.promises.readdir(outputDir, { withFileTypes: true }); // Changed fsPromises to fs.promises
+        const outputEntries = await fsPromises.readdir(outputDir, { withFileTypes: true });
         for (const entry of outputEntries) {
-            // Process only directories matching the month abbreviation pattern
             if (entry.isDirectory() && monthAbbrRegex.test(entry.name)) {
                 const monthDirPath = path.join(outputDir, entry.name);
-                const files = await fs.promises.readdir(monthDirPath); // Changed fsPromises to fs.promises
+                const files = await fsPromises.readdir(monthDirPath);
                 for (const file of files) {
+                    // console.log(`TEMPORARY DEBUG: Processing file: ${path.join(monthDirPath, file)}`); // Restore
                     if (path.extname(file).toLowerCase() === '.json') {
                         const filePath = path.join(monthDirPath, file);
                         try {
-                            const fileContent = await fs.promises.readFile(filePath, 'utf8'); // Changed fsPromises to fs.promises
-                            const data = JSON.parse(fileContent);
-                            if (Array.isArray(data)) {
-                                data.forEach((siteData) => {
+                            const fileContent = await fsPromises.readFile(filePath, 'utf8');
+                            const siteEntries = JSON.parse(fileContent);
+                            if (Array.isArray(siteEntries)) {
+                                siteEntries.forEach((siteData) => {
                                     const currentUrl = siteData?.url?.trim();
-                                    let hasPrebidInstance = false; // No changes needed here
-                                    // Count unique URLs
+                                    let hasPrebidInstance = false;
                                     if (currentUrl) {
                                         uniqueUrls.add(currentUrl);
                                     }
-                                    // Process Prebid instances
                                     if (Array.isArray(siteData.prebidInstances)) {
                                         siteData.prebidInstances.forEach((instance) => {
                                             if (instance) {
-                                                hasPrebidInstance = true; // Mark site as having Prebid if any instance exists
-                                                // Count versions
+                                                hasPrebidInstance = true;
                                                 if (typeof instance.version === 'string') {
                                                     const version = instance.version.trim();
                                                     if (version) {
-                                                        versionCounts[version] = (versionCounts[version] || 0) + 1;
+                                                        rawVersionCounts[version] = (rawVersionCounts[version] || 0) + 1;
                                                     }
                                                 }
-                                                // --- Assumption: Modules are in instance.modules array ---
                                                 if (Array.isArray(instance.modules)) {
                                                     instance.modules.forEach((moduleName) => {
                                                         if (typeof moduleName === 'string') {
                                                             const trimmedModule = moduleName.trim();
                                                             if (trimmedModule) {
-                                                                moduleCounts[trimmedModule] = (moduleCounts[trimmedModule] || 0) + 1;
+                                                                rawModuleCounts[trimmedModule] = (rawModuleCounts[trimmedModule] || 0) + 1;
                                                             }
                                                         }
                                                     });
                                                 }
-                                                // --- End Module Assumption ---
                                             }
                                         });
                                     }
-                                    // If the site had a URL and at least one Prebid instance, add URL to the set
                                     if (currentUrl && hasPrebidInstance) {
                                         urlsWithPrebid.add(currentUrl);
                                     }
@@ -130,40 +103,109 @@ async function summarizeStats() {
                             }
                         }
                         catch (parseError) {
-                            console.error(`Error parsing JSON file ${filePath}:`, parseError);
+                            const errorMessage = `Error parsing JSON file ${filePath}:`;
+                            if (options?.logError) {
+                                options.logError(errorMessage, parseError.name, parseError.message);
+                            }
+                            else {
+                                console.error(errorMessage, parseError);
+                            }
                         }
                     }
                 }
             }
         }
-        // Sort the versions (descending semantic version)
-        const sortedVersions = Object.keys(versionCounts).sort(compareVersions);
-        const sortedVersionCounts = {};
-        for (const version of sortedVersions) {
-            sortedVersionCounts[version] = versionCounts[version];
+        const sortedRawVersions = Object.keys(rawVersionCounts).sort(compareVersions);
+        const sortedRawVersionCounts = {};
+        for (const version of sortedRawVersions) {
+            sortedRawVersionCounts[version] = rawVersionCounts[version];
         }
-        // Sort the modules (descending count)
-        const sortedModules = Object.keys(moduleCounts).sort((a, b) => moduleCounts[b] - moduleCounts[a]);
-        const sortedModuleCounts = {};
-        for (const moduleName of sortedModules) {
-            sortedModuleCounts[moduleName] = moduleCounts[moduleName];
+        const sortedRawModules = Object.keys(rawModuleCounts).sort((a, b) => rawModuleCounts[b] - rawModuleCounts[a]);
+        const sortedRawModuleCounts = {};
+        for (const moduleName of sortedRawModules) {
+            sortedRawModuleCounts[moduleName] = rawModuleCounts[moduleName];
         }
-        // Prepare the summary object
-        const summaryData = {
+        const summarizationData = {
+            visitedSites: uniqueUrls.size,
             monitoredSites: uniqueUrls.size,
             prebidSites: urlsWithPrebid.size,
-            versionDistribution: sortedVersionCounts,
-            moduleDistribution: sortedModuleCounts, // Add sorted module counts
+            versionDistribution: sortedRawVersionCounts,
+            moduleDistribution: sortedRawModuleCounts,
         };
-        // Write the summary to summarization.json
-        await fs.promises.writeFile(summaryFilePath, JSON.stringify(summaryData, null, 2)); // Changed fsPromises to fs.promises
-        console.log(`Summary successfully written to ${summaryFilePath}`);
+        const finalApiData = {
+            visitedSites: summarizationData.visitedSites,
+            monitoredSites: summarizationData.monitoredSites,
+            prebidSites: summarizationData.prebidSites,
+            releaseVersions: {},
+            buildVersions: {},
+            customVersions: {},
+            bidAdapterInst: {},
+            idModuleInst: {},
+            rtdModuleInst: {},
+            analyticsAdapterInst: {},
+            otherModuleInst: {}
+        };
+        // Process versionDistribution from summarizationData
+        const versionDistributionForCleaning = summarizationData.versionDistribution;
+        for (const version in versionDistributionForCleaning) {
+            const count = versionDistributionForCleaning[version];
+            const cleanedVersion = version.startsWith('v') ? version.substring(1) : version;
+            if (version.endsWith('-pre')) {
+                finalApiData.buildVersions[cleanedVersion] = count;
+            }
+            else if (version.includes('-')) {
+                finalApiData.customVersions[cleanedVersion] = count;
+            }
+            else {
+                if (cleanedVersion.includes('.')) {
+                    finalApiData.releaseVersions[cleanedVersion] = count;
+                }
+                else {
+                    finalApiData.customVersions[cleanedVersion] = count;
+                }
+            }
+        }
+        // Process moduleDistribution from summarizationData
+        const moduleDistributionForCleaning = summarizationData.moduleDistribution;
+        for (const moduleName in moduleDistributionForCleaning) {
+            const count = moduleDistributionForCleaning[moduleName];
+            if (count < MIN_COUNT_THRESHOLD) {
+                continue;
+            }
+            if (moduleName.includes('BidAdapter')) {
+                finalApiData.bidAdapterInst[moduleName] = count;
+            }
+            else if (moduleName.includes('IdSystem') || moduleName === 'userId' || moduleName === 'idImportLibrary' || moduleName === 'pubCommonId' || moduleName === 'utiqSystem' || moduleName === 'trustpidSystem') {
+                finalApiData.idModuleInst[moduleName] = count;
+            }
+            else if (moduleName.includes('RtdProvider') || moduleName === 'rtdModule') {
+                finalApiData.rtdModuleInst[moduleName] = count;
+            }
+            else if (moduleName.includes('AnalyticsAdapter')) {
+                finalApiData.analyticsAdapterInst[moduleName] = count;
+            }
+            else {
+                finalApiData.otherModuleInst[moduleName] = count;
+            }
+        }
+        const targetApiDir = path.dirname(finalApiFilePath);
+        try {
+            await fsPromises.access(targetApiDir);
+        }
+        catch (error) {
+            await fsPromises.mkdir(targetApiDir, { recursive: true });
+        }
+        await fsPromises.writeFile(finalApiFilePath, JSON.stringify(finalApiData, null, 2));
+        console.log(`Successfully created ${finalApiFilePath}`);
     }
     catch (err) {
-        console.error('Error processing output directories:', err);
+        const errorMessage = 'Error processing stats:';
+        if (options?.logError) {
+            options.logError(errorMessage, err.name, err.message);
+        }
+        else {
+            console.error(errorMessage, err);
+        }
     }
 }
-// Example usage: Call the function
-summarizeStats();
-// If you need to export the function:
-// export { summarizeStats };
+export { updateAndCleanStats };
