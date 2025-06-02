@@ -112,11 +112,22 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 
 **Argument:**
 
--   `INPUTFILE`: (Optional) Path to the input file containing a list of URLs to scan (one URL per line).
-    -   Defaults to `input.txt` in the project root if not specified.
+-   `INPUTFILE`: (Optional) Path to an input file containing a list of URLs to scan (one URL per line).
+    -   This argument is required if `--githubRepo` is not used.
+    -   If `--githubRepo` is provided, `INPUTFILE` is ignored.
+    -   If neither `INPUTFILE` nor `--githubRepo` is specified, the command will show an error.
+    -   Previously defaulted to `src/input.txt`; now, an input source must be explicitly defined if not using a default that might be configured elsewhere or if `src/input.txt` is not present. (Note: The CLI was updated to require either inputFile or githubRepo explicitly in `scan.ts`)
 
 **Flags:**
 
+-   `--githubRepo <URL>`: Specifies a public GitHub URL from which to fetch URLs.
+    -   This can be a base repository URL (e.g., `https://github.com/owner/repo`) to scan for URLs within processable files (like `.txt`, `.md`) in the repository root.
+    -   Alternatively, it can be a direct link to a specific processable file within a repository (e.g., `https://github.com/owner/repo/blob/main/some/path/file.txt`). In this case, only the specified file will be fetched and processed.
+    -   Example (repository): `--githubRepo https://github.com/owner/repo`
+    -   Example (direct file): `--githubRepo https://github.com/owner/repo/blob/main/urls.txt`
+-   `--numUrls <number>`: When used with `--githubRepo`, this flag limits the number of URLs to be extracted and processed from the repository.
+    -   Default: `100`
+    -   Example: `--numUrls 50`
 -   `--puppeteerType <option>`: Specifies the Puppeteer operational mode.
     -   Options: `vanilla`, `cluster` (default)
     -   `vanilla`: Processes URLs sequentially using a single Puppeteer browser instance.
@@ -160,6 +171,22 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
     ```bash
     ./bin/run scan --concurrency=10 --monitor
     ```
+
+6.  **Scan URLs from a GitHub repository:**
+    ```bash
+    ./bin/run scan --githubRepo https://github.com/owner/repo
+    ```
+
+7.  **Scan a limited number of URLs from a GitHub repository:**
+    ```bash
+    ./bin/run scan --githubRepo https://github.com/owner/repo --numUrls 50
+    ```
+
+#### Notes on URL Extraction
+
+-   The scanner specifically looks for URLs that begin with `http://` or `https://`.
+-   Entries in input sources (files or GitHub content) that are malformed (e.g., `htp://missing-t.com`), schemeless (e.g., `example.com` without a leading `http://` or `https://`), or plain text will be skipped and not processed as URLs.
+-   The tool is designed to robustly process valid URLs even when they are mixed with such non-URL or malformed entries in the source content.
 
 ### `stats:generate` Command
 

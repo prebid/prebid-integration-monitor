@@ -4,13 +4,23 @@ import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js'; // Assumin
 
 export default class Scan extends Command {
   static override args = {
-    inputFile: Args.string({description: 'Input file path', default: 'src/input.txt'}),
+    inputFile: Args.string({description: 'Input file path', required: false}),
   }
   static override description = 'Scans websites for Prebid.js integrations.'
   static override examples = [
     '<%= config.bin %> <%= command.id %> websites.txt --puppeteerType=cluster --concurrency=10',
+    '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/user/repo --numUrls 50',
   ]
   static override flags = {
+    githubRepo: Flags.string({
+      description: 'GitHub repository URL to fetch URLs from',
+      required: false,
+    }),
+    numUrls: Flags.integer({
+      description: 'Number of URLs to load from the GitHub repository (used only with --githubRepo)',
+      default: 100,
+      required: false,
+    }),
     puppeteerType: Flags.string({
       description: 'Type of Puppeteer to use',
       options: ['vanilla', 'cluster'],
@@ -42,9 +52,16 @@ export default class Scan extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Scan)
 
+    // Input validation
+    if (flags.githubRepo && args.inputFile && args.inputFile !== 'src/input.txt') {
+      this.warn('Both --githubRepo and --inputFile (non-default) were provided. --inputFile will be ignored.');
+    } else if (!flags.githubRepo && !args.inputFile) {
+      this.error('Either --githubRepo or --inputFile must be provided.', { exit: 1 });
+    }
+
     // Step 3: Construct PrebidExplorerOptions object
     const options: PrebidExplorerOptions = {
-      inputFile: args.inputFile!, // inputFile is required by args definition, so ! is safe
+      // inputFile: args.inputFile!, // inputFile is required by args definition, so ! is safe
       // Ensure puppeteerType is one of the allowed literal types
       puppeteerType: flags.puppeteerType as 'vanilla' | 'cluster',
       concurrency: flags.concurrency,
@@ -52,6 +69,8 @@ export default class Scan extends Command {
       monitor: flags.monitor,
       outputDir: flags.outputDir,
       logDir: flags.logDir,
+      githubRepo: flags.githubRepo,
+      numUrls: flags.numUrls,
       puppeteerLaunchOptions: {
         headless: flags.headless, // Also set within puppeteerLaunchOptions for clarity/consistency
         args: [
@@ -62,6 +81,15 @@ export default class Scan extends Command {
         // Potentially merge with user-provided args if a flag for that is added
       },
     };
+
+    if (flags.githubRepo) {
+      this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
+      options.inputFile = undefined; // Explicitly set inputFile to undefined
+    } else if (args.inputFile) {
+      options.inputFile = args.inputFile;
+      this.log(`Using input file: ${args.inputFile}`);
+    }
+
 
     this.log(`Starting Prebid scan with options:`);
     this.log(JSON.stringify(options, null, 2));

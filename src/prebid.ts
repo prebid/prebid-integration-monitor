@@ -49,7 +49,9 @@ interface TaskResultError {
 type TaskResult = TaskResultSuccess | TaskResultNoData | TaskResultError;
 
 export interface PrebidExplorerOptions {
-    inputFile: string;
+    inputFile?: string; // Make optional as it might not be needed if githubRepo is used
+    githubRepo?: string;
+    numUrls?: number;
     puppeteerType: 'vanilla' | 'cluster';
     concurrency: number;
     headless: boolean;
@@ -62,6 +64,108 @@ export interface PrebidExplorerOptions {
 let logger: WinstonLogger;
 
 const puppeteer = addExtra(puppeteerVanilla as any);
+
+// Helper function to fetch URLs from GitHub
+async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined, logger: WinstonLogger): Promise<string[]> {
+  logger.info(`Fetching URLs from GitHub repository source: ${repoUrl}`);
+  const extractedUrls: string[] = [];
+  const urlRegex = /(https?:\/\/[^\s"]+)/gi;
+
+  try {
+    // Check if the URL is a direct link to a file view (contains /blob/)
+    if (repoUrl.includes('/blob/')) {
+      logger.info(`Detected direct file link: ${repoUrl}. Attempting to fetch raw content.`);
+      // Transform GitHub file view URL to raw content URL
+      // Example: https://github.com/owner/repo/blob/branch/path/to/file.txt
+      // Becomes: https://raw.githubusercontent.com/owner/repo/branch/path/to/file.txt
+      const rawUrl = repoUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+      
+      logger.info(`Fetching content directly from raw URL: ${rawUrl}`);
+      const fileResponse = await fetch(rawUrl);
+      if (fileResponse.ok) {
+        const content = await fileResponse.text();
+        const matches = content.match(urlRegex);
+        if (matches) {
+          matches.forEach(url => extractedUrls.push(url.trim()));
+          logger.info(`Extracted ${matches.length} URLs from ${rawUrl}`);
+        } else {
+          logger.info(`No URLs found in content from ${rawUrl}`);
+        }
+      } else {
+        logger.error(`Failed to download direct file content: ${rawUrl} - ${fileResponse.status} ${fileResponse.statusText}`);
+        const errorBody = await fileResponse.text();
+        logger.error(`Error body: ${errorBody}`);
+        return []; // Return empty if direct file fetch fails
+      }
+    } else {
+      // Existing logic for repository directory listing
+      logger.info(`Processing as repository URL: ${repoUrl}`);
+      const repoPathMatch = repoUrl.match(/github\.com\/([^/]+\/[^/]+)/);
+      if (!repoPathMatch || !repoPathMatch[1]) {
+        logger.error(`Invalid GitHub repository URL format: ${repoUrl}. Expected format like https://github.com/owner/repo`);
+        return [];
+      }
+      const repoPath = repoPathMatch[1].replace(/\.git$/, '');
+
+      const contentsUrl = `https://api.github.com/repos/${repoPath}/contents`;
+      logger.info(`Fetching repository contents from: ${contentsUrl}`);
+
+      const response = await fetch(contentsUrl, {
+        headers: { Accept: 'application/vnd.github.v3+json' },
+      });
+
+      if (!response.ok) {
+        logger.error(`Failed to fetch repository contents: ${response.status} ${response.statusText}`, { url: contentsUrl });
+        const errorBody = await response.text();
+        logger.error(`Error body: ${errorBody}`);
+        return [];
+      }
+
+      const files = await response.json();
+      if (!Array.isArray(files)) {
+        logger.error('Expected an array of files from GitHub API, but received something else.', { response: files });
+        return [];
+      }
+
+      const targetExtensions = ['.txt', '.md'];
+      logger.info(`Found ${files.length} items in the repository. Filtering for ${targetExtensions.join(', ')} files.`);
+
+      for (const file of files) {
+        if (file.type === 'file' && targetExtensions.some(ext => file.name.endsWith(ext))) {
+          logger.info(`Fetching content for file: ${file.path} from ${file.download_url}`);
+          try {
+            const fileResponse = await fetch(file.download_url);
+            if (fileResponse.ok) {
+              const content = await fileResponse.text();
+              const matches = content.match(urlRegex);
+              if (matches) {
+                matches.forEach(url => extractedUrls.push(url.trim()));
+                logger.info(`Extracted ${matches.length} URLs from ${file.path}`);
+              }
+            } else {
+              logger.warn(`Failed to download file content: ${file.path} - ${fileResponse.status}`);
+            }
+          } catch (fileError: any) {
+            logger.error(`Error fetching or processing file ${file.path}: ${fileError.message}`, { fileUrl: file.download_url });
+          }
+
+          if (numUrls && extractedUrls.length >= numUrls) {
+            logger.info(`Reached URL limit of ${numUrls}. Stopping further file processing.`);
+            break;
+          }
+        }
+      }
+    }
+
+    logger.info(`Total URLs extracted before limiting: ${extractedUrls.length}`);
+    return numUrls ? extractedUrls.slice(0, numUrls) : extractedUrls;
+
+  } catch (error: any) {
+    logger.error(`Error processing GitHub URL ${repoUrl}: ${error.message}`, { stack: error.stack });
+    return [];
+  }
+}
+
 
 export async function prebidExplorer(options: PrebidExplorerOptions): Promise<void> {
     logger = initializeLogger(options.logDir);
@@ -91,9 +195,40 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
 
     let results: PageData[] = [];
     const taskResults: TaskResult[] = [];
-    const allUrls: string[] = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
-    logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length, urls: allUrls });
+    let allUrls: string[] = [];
     const processedUrls: Set<string> = new Set();
+
+    if (options.githubRepo) {
+        allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
+        if (allUrls.length > 0) {
+            logger.info(`Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`);
+        } else {
+            // Changed from logger.error to logger.warn to be consistent with overall "no URLs" handling
+            logger.warn(`No URLs found or fetched from GitHub repository: ${options.githubRepo}.`);
+            // The generic check for allUrls.length === 0 below will handle exiting.
+        }
+    } else if (options.inputFile) {
+        try {
+            allUrls = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
+            logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length });
+        } catch (fileError: any) {
+            logger.error(`Failed to read input file ${options.inputFile}: ${fileError.message}`);
+            // this.error(`Failed to read input file: ${options.inputFile}`, { exit: 1}); // Using 'this.error' might not be available here.
+            throw new Error(`Failed to read input file: ${options.inputFile}`); // Prefer throwing for unrecoverable errors.
+            // return; // Exit if file cannot be read // Not needed due to throw
+        }
+    } else {
+        logger.error('No URL source provided. Either --inputFile or --githubRepo must be specified.');
+        throw new Error('No URL source specified. Either --inputFile or --githubRepo must be specified.'); // Critical configuration error
+        // return; // Exit if no source // Not needed due to throw
+    }
+
+    if (allUrls.length === 0) {
+        logger.warn('No URLs to process. Exiting.');
+        return;
+    }
+    logger.info(`Total URLs to process: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
+
 
     // Define the core processing task (used by both vanilla and cluster)
     const processPageTask = async (page: Page, url: string): Promise<TaskResult> => {
@@ -266,11 +401,18 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
             logger.info('No results to save.');
         }
 
-        const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
-        fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
-        logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
+        // Only update inputFile if it was the source of URLs
+        if (options.inputFile && !options.githubRepo) {
+            const remainingUrls: string[] = allUrls.filter((url: string) => !processedUrls.has(url));
+            try {
+                fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
+                logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
+            } catch (writeError: any) {
+                logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);
+            }
+        }
 
     } catch (err: any) {
-        logger.error('Failed to write results, or update input.txt', { error: err });
+        logger.error('Failed to write results or update input file', { error: err });
     }
 }
