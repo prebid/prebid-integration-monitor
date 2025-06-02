@@ -1,0 +1,36 @@
+name: Sync Fork with Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Fork
+        uses: actions/checkout@v3
+        with:
+          # Fetch all history so we can merge successfully
+          fetch-depth: 0 
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Add Upstream Remote
+        run: git remote add upstream https://github.com/prebid/prebid-integration-monitor.git
+
+      - name: Fetch Upstream
+        run: git fetch upstream
+
+      - name: Merge Upstream Main
+        run: |
+          git checkout main # Or your fork's default branch
+          git merge upstream/main --no-edit # Or the upstream's default branch
+        # Add --allow-unrelated-histories if your fork was not created from the upstream
+
+      - name: Push Changes
+        run: git push origin main # Or your fork's default branch
