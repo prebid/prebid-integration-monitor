@@ -146,6 +146,10 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
     -   Results are typically saved in a subdirectory structure like `output/Month/YYYY-MM-DD.json`.
 -   `--logDir <value>`: Specifies the directory where log files (`app.log`, `error.log`) will be saved.
     -   Default: `logs` (in the project root)
+-   `--range <string>`: Specify a line range (e.g., '10-20', '5-', '-15') to process from the input source (file, CSV, or GitHub-extracted URLs). Uses 1-based indexing. If the source is a GitHub repo, the range applies to the aggregated list of URLs extracted from all targeted files in the repo.
+    -   Example: `--range 10-50` or `--range 1-`
+-   `--chunkSize <number>`: Process URLs in chunks of this size. This processes all URLs (whether from the full input or a specified range) but does so by loading and analyzing only `chunkSize` URLs at a time. Useful for very large lists of URLs to manage resources or process incrementally.
+    -   Example: `--chunkSize 50`
 
 **Usage Examples:**
 
@@ -193,6 +197,11 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 9.  **Scan URLs from a remote CSV file (raw GitHub link):**
     ```bash
     ./bin/run scan --csvFile https://raw.githubusercontent.com/prebid/prebid-integration-monitor/main/tests/fixtures/sample_urls.csv
+    ```
+
+10. **Scan a specific range of URLs from a large input file, in chunks:**
+    ```bash
+    ./bin/run scan very_large_list_of_sites.txt --range 1001-2000 --chunkSize 100
     ```
 
 #### Notes on URL Extraction
