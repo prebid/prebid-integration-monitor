@@ -47,6 +47,7 @@
     "winston": "^3.13.0"
   },
   "devDependencies": {
+    "@oclif/core": "^4.3.1",
     "@types/node": "^20.14.13",
     "mock-fs": "^5.5.0",
     "oclif": "^4.17.46",
