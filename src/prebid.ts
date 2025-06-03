@@ -70,31 +70,90 @@ let logger: WinstonLogger;
 
 const puppeteer = addExtra(puppeteerVanilla as any);
 
+// Helper function to process file content for URL extraction
+async function processFileContent(fileName: string, content: string, logger: WinstonLogger): Promise<string[]> {
+    const extractedUrls = new Set<string>(); // Use Set for automatic deduplication
+    const urlRegex = /(https?:\/\/[^\s"]+)/gi;
+    const schemelessDomainRegex = /(^|\s|"|')([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}(\s|\\"|"|'|$)/g; // Adjusted to handle quotes and escaped quotes
+
+    // Always try to find fully qualified URLs first
+    const fqdnMatches = content.match(urlRegex);
+    if (fqdnMatches) {
+        fqdnMatches.forEach(url => extractedUrls.add(url.trim()));
+    }
+
+    if (fileName.endsWith('.txt')) {
+        logger.info(`Processing .txt file: ${fileName} for schemeless domains.`);
+        // Find schemeless domains
+        const schemelessMatches = content.match(schemelessDomainRegex);
+        if (schemelessMatches) {
+            schemelessMatches.forEach(domain => {
+                const cleanedDomain = domain.trim().replace(/^["']|["']$/g, ''); // Remove surrounding quotes
+                if (cleanedDomain && !cleanedDomain.includes('://')) { // Ensure it's actually schemeless
+                    const fullUrl = `https://${cleanedDomain}`;
+                    if (!extractedUrls.has(fullUrl)) { // Avoid adding if already found as FQDN
+                        extractedUrls.add(fullUrl);
+                        logger.info(`Found and added schemeless domain as ${fullUrl} from ${fileName}`);
+                    }
+                }
+            });
+        }
+    } else if (fileName.endsWith('.json')) {
+        logger.info(`Processing .json file: ${fileName}`);
+        try {
+            const jsonData = JSON.parse(content);
+            const urlsFromJson = new Set<string>();
+
+            function extractUrlsFromJsonRecursive(data: any) {
+                if (typeof data === 'string') {
+                    const jsonStringMatches = data.match(urlRegex);
+                    if (jsonStringMatches) {
+                        jsonStringMatches.forEach(url => urlsFromJson.add(url.trim()));
+                    }
+                } else if (Array.isArray(data)) {
+                    data.forEach(item => extractUrlsFromJsonRecursive(item));
+                } else if (typeof data === 'object' && data !== null) {
+                    Object.values(data).forEach(value => extractUrlsFromJsonRecursive(value));
+                }
+            }
+
+            extractUrlsFromJsonRecursive(jsonData);
+            if (urlsFromJson.size > 0) {
+                logger.info(`Extracted ${urlsFromJson.size} URLs from parsed JSON structure in ${fileName}`);
+                urlsFromJson.forEach(url => extractedUrls.add(url));
+            }
+        } catch (e: any) {
+            logger.warn(`Failed to parse JSON from ${fileName}. Falling back to regex scan of raw content. Error: ${e.message}`);
+            // Fallback is covered by the initial fqdnMatches scan at the beginning of the function
+        }
+    }
+    // For other file types (e.g., .md), the initial fqdnMatches scan is sufficient.
+
+    return Array.from(extractedUrls);
+}
+
 // Helper function to fetch URLs from GitHub
 async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined, logger: WinstonLogger): Promise<string[]> {
   logger.info(`Fetching URLs from GitHub repository source: ${repoUrl}`);
-  const extractedUrls: string[] = [];
-  const urlRegex = /(https?:\/\/[^\s"]+)/gi;
+  const allExtractedUrls: string[] = []; // Changed to allExtractedUrls to avoid confusion with Set in processFileContent
 
   try {
     // Check if the URL is a direct link to a file view (contains /blob/)
     if (repoUrl.includes('/blob/')) {
       logger.info(`Detected direct file link: ${repoUrl}. Attempting to fetch raw content.`);
-      // Transform GitHub file view URL to raw content URL
-      // Example: https://github.com/owner/repo/blob/branch/path/to/file.txt
-      // Becomes: https://raw.githubusercontent.com/owner/repo/branch/path/to/file.txt
       const rawUrl = repoUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-      
+      const fileName = repoUrl.substring(repoUrl.lastIndexOf('/') + 1); // Extract filename
+
       logger.info(`Fetching content directly from raw URL: ${rawUrl}`);
       const fileResponse = await fetch(rawUrl);
       if (fileResponse.ok) {
         const content = await fileResponse.text();
-        const matches = content.match(urlRegex);
-        if (matches) {
-          matches.forEach(url => extractedUrls.push(url.trim()));
-          logger.info(`Extracted ${matches.length} URLs from ${rawUrl}`);
+        const urlsFromFile = await processFileContent(fileName, content, logger);
+        if (urlsFromFile.length > 0) {
+          urlsFromFile.forEach(url => allExtractedUrls.push(url));
+          logger.info(`Extracted ${urlsFromFile.length} URLs from ${rawUrl} (direct file)`);
         } else {
-          logger.info(`No URLs found in content from ${rawUrl}`);
+          logger.info(`No URLs found in content from ${rawUrl} (direct file)`);
         }
       } else {
         logger.error(`Failed to download direct file content: ${rawUrl} - ${fileResponse.status} ${fileResponse.statusText}`);
@@ -132,20 +191,22 @@ async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined,
         return [];
       }
 
-      const targetExtensions = ['.txt', '.md'];
+      // Updated to include .json for targeted processing, .txt and .md for general URL extraction.
+      const targetExtensions = ['.txt', '.md', '.json'];
       logger.info(`Found ${files.length} items in the repository. Filtering for ${targetExtensions.join(', ')} files.`);
 
       for (const file of files) {
-        if (file.type === 'file' && targetExtensions.some(ext => file.name.endsWith(ext))) {
+        // Ensure file.name is defined before calling endsWith
+        if (file.type === 'file' && file.name && targetExtensions.some(ext => file.name.endsWith(ext))) {
           logger.info(`Fetching content for file: ${file.path} from ${file.download_url}`);
           try {
             const fileResponse = await fetch(file.download_url);
             if (fileResponse.ok) {
               const content = await fileResponse.text();
-              const matches = content.match(urlRegex);
-              if (matches) {
-                matches.forEach(url => extractedUrls.push(url.trim()));
-                logger.info(`Extracted ${matches.length} URLs from ${file.path}`);
+              const urlsFromFile = await processFileContent(file.name, content, logger);
+              if (urlsFromFile.length > 0) {
+                urlsFromFile.forEach(url => allExtractedUrls.push(url));
+                logger.info(`Extracted ${urlsFromFile.length} URLs from ${file.path}`);
               }
             } else {
               logger.warn(`Failed to download file content: ${file.path} - ${fileResponse.status}`);
@@ -154,16 +215,17 @@ async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined,
             logger.error(`Error fetching or processing file ${file.path}: ${fileError.message}`, { fileUrl: file.download_url });
           }
 
-          if (numUrls && extractedUrls.length >= numUrls) {
+          if (numUrls && allExtractedUrls.length >= numUrls) {
             logger.info(`Reached URL limit of ${numUrls}. Stopping further file processing.`);
             break;
           }
         }
       }
     }
-
-    logger.info(`Total URLs extracted before limiting: ${extractedUrls.length}`);
-    return numUrls ? extractedUrls.slice(0, numUrls) : extractedUrls;
+    // Deduplicate URLs at the end before slicing
+    const uniqueUrls = Array.from(new Set(allExtractedUrls));
+    logger.info(`Total unique URLs extracted before limiting: ${uniqueUrls.length}`);
+    return numUrls ? uniqueUrls.slice(0, numUrls) : uniqueUrls;
 
   } catch (error: any) {
     logger.error(`Error processing GitHub URL ${repoUrl}: ${error.message}`, { stack: error.stack });
