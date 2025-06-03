@@ -39,7 +39,6 @@ interface FinalApiData {
     rtdModuleInst: ModuleDistribution;
     analyticsAdapterInst: ModuleDistribution;
     otherModuleInst: ModuleDistribution;
-    // Add website count fields to the interface
     bidAdapterWebsites?: ModuleDistribution;
     idModuleWebsites?: ModuleDistribution;
     rtdModuleWebsites?: ModuleDistribution;
