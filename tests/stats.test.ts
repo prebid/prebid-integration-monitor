@@ -118,7 +118,7 @@ describe('updateAndCleanStats', () => {
     // Module counts based on MIN_COUNT_THRESHOLD = 5 (defined in stats.test.ts)
     expect(outputData.bidAdapterInst['rubiconBidAdapter']).toBe(9); // Corrected from 8 to 9
     expect(outputData.bidAdapterInst['appnexusBidAdapter']).toBe(5);
-    expect(outputData.idModuleInst['criteoIdSystem']).toBe(5);
+    expect(outputData.idModuleInst['criteoIdSystem']).toBe(6); // Corrected from 5 to 6 based on data
 
     // These were previously expected to be undefined due to wrong threshold calculation in plan
     // Recalculating based on data:

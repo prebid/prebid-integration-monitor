@@ -229,7 +229,41 @@ export async function prebidExplorer(options) {
         logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
         return;
     }
-    logger.info(`Total URLs to process: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
+    logger.info(`Initial total URLs found: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
+    // 1. URL Range Logic
+    if (options.range) {
+        logger.info(`Applying range: ${options.range}`);
+        const originalUrlCount = allUrls.length;
+        let [startStr, endStr] = options.range.split('-');
+        let start = startStr ? parseInt(startStr, 10) : 1;
+        let end = endStr ? parseInt(endStr, 10) : allUrls.length;
+        if (isNaN(start) || isNaN(end) || start < 0 || end < 0) { // Allow start = 0 for internal 0-based, but user input is 1-based
+            logger.warn(`Invalid range format: "${options.range}". Proceeding with all URLs. Start and end must be numbers. User input is 1-based.`);
+        }
+        else {
+            // Convert 1-based to 0-based indices
+            start = start > 0 ? start - 1 : 0; // If user enters 0 or negative, treat as start from beginning
+            end = end > 0 ? end : allUrls.length; // If user enters 0 or negative for end, or leaves it empty, treat as end of list
+            if (start >= allUrls.length) {
+                logger.warn(`Start of range (${start + 1}) is beyond the total number of URLs (${allUrls.length}). No URLs to process.`);
+                allUrls = [];
+            }
+            else if (start > end - 1) {
+                logger.warn(`Start of range (${start + 1}) is greater than end of range (${end}). Proceeding with URLs from start to end of list.`);
+                allUrls = allUrls.slice(start);
+            }
+            else {
+                allUrls = allUrls.slice(start, end); // end is exclusive for slice, matches 0-based end index
+                logger.info(`Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`);
+            }
+        }
+    }
+    if (allUrls.length === 0) {
+        logger.warn(`No URLs to process after applying range or due to empty initial list. Exiting.`);
+        return;
+    }
+    logger.info(`Total URLs to process after range check: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
+    const urlsToProcess = allUrls; // This now contains potentially ranged URLs
     // Define the core processing task (used by both vanilla and cluster)
     const processPageTask = async (page, url) => {
         const trimmedUrl = url;
@@ -239,7 +273,7 @@ export async function prebidExplorer(options) {
             await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
             await page.evaluate(async () => {
                 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
-                await sleep((1000 * 60) * .10); // 6 seconds delay
+                await sleep(6000);
             });
             const pageData = await page.evaluate(() => {
                 const data = {};
@@ -296,71 +330,153 @@ export async function prebidExplorer(options) {
             return { type: 'error', url: trimmedUrl, error: errorCode };
         }
     };
-    if (options.puppeteerType === 'cluster') {
-        const cluster = await Cluster.launch({
-            concurrency: Cluster.CONCURRENCY_CONTEXT,
-            maxConcurrency: options.concurrency,
-            monitor: options.monitor,
-            puppeteer,
-            puppeteerOptions: basePuppeteerOptions,
-        });
-        // The task function now returns TaskResult
-        await cluster.task(async ({ page, data: url }) => {
-            const result = await processPageTask(page, url);
-            return result;
-        });
-        try {
-            const promises = allUrls.filter(url => url).map(url => {
-                processedUrls.add(url);
-                return cluster.queue(url)
-                    .then(resultFromQueue => {
-                    return resultFromQueue;
-                })
-                    .catch(error => {
-                    logger.error(`Error from cluster.queue for ${url}:`, { error });
-                    // Create and return a TaskResult for errors during queueing/task execution
-                    const errorResult = { type: 'error', url: url, error: 'QUEUE_ERROR_OR_TASK_FAILED' };
-                    return errorResult;
+    // 2. Chunk Processing Logic
+    const chunkSize = options.chunkSize && options.chunkSize > 0 ? options.chunkSize : 0;
+    if (chunkSize > 0) {
+        logger.info(`Chunked processing enabled. Chunk size: ${chunkSize}`);
+        const totalChunks = Math.ceil(urlsToProcess.length / chunkSize);
+        logger.info(`Total chunks to process: ${totalChunks}`);
+        for (let i = 0; i < urlsToProcess.length; i += chunkSize) {
+            const currentChunkUrls = urlsToProcess.slice(i, i + chunkSize);
+            const chunkNumber = Math.floor(i / chunkSize) + 1;
+            logger.info(`Processing chunk ${chunkNumber} of ${totalChunks}: URLs ${i + 1}-${Math.min(i + chunkSize, urlsToProcess.length)}`);
+            if (options.puppeteerType === 'cluster') {
+                const cluster = await Cluster.launch({
+                    concurrency: Cluster.CONCURRENCY_CONTEXT,
+                    maxConcurrency: options.concurrency,
+                    monitor: options.monitor,
+                    puppeteer,
+                    puppeteerOptions: basePuppeteerOptions,
                 });
-            });
-            const settledResults = await Promise.allSettled(promises);
-            settledResults.forEach(settledResult => {
-                if (settledResult.status === 'fulfilled') {
-                    taskResults.push(settledResult.value);
+                await cluster.task(async ({ page, data: url }) => {
+                    return processPageTask(page, url);
+                });
+                try {
+                    const chunkPromises = currentChunkUrls.filter(url => url).map(url => {
+                        processedUrls.add(url); // Add to global processedUrls as it's queued
+                        return cluster.queue(url)
+                            .then(resultFromQueue => resultFromQueue)
+                            .catch(error => {
+                            logger.error(`Error from cluster.queue for ${url} in chunk ${chunkNumber}:`, { error });
+                            return { type: 'error', url: url, error: 'QUEUE_ERROR_OR_TASK_FAILED' };
+                        });
+                    });
+                    const settledChunkResults = await Promise.allSettled(chunkPromises);
+                    settledChunkResults.forEach(settledResult => {
+                        if (settledResult.status === 'fulfilled') {
+                            if (settledResult.value !== undefined && settledResult.value !== null) {
+                                taskResults.push(settledResult.value);
+                            }
+                            else {
+                                logger.warn('A task from cluster.queue (chunked) settled with undefined/null value.', { settledResult });
+                            }
+                        }
+                        else {
+                            logger.error(`A promise from cluster.queue (chunk ${chunkNumber}) settled as rejected.`, { reason: settledResult.reason });
+                        }
+                    });
+                    await cluster.idle();
+                    await cluster.close();
                 }
-                else {
-                    logger.error('A promise from cluster.queue settled as rejected, which was not expected as errors should be converted to TaskResult.', { reason: settledResult.reason });
-                }
-            });
-            await cluster.idle();
-            await cluster.close();
-        }
-        catch (error) {
-            logger.error("An unexpected error occurred during cluster processing orchestration", { error });
-            if (cluster)
-                await cluster.close();
-        }
-    }
-    else { // 'vanilla' Puppeteer
-        let browser = null;
-        try {
-            browser = await puppeteer.launch(basePuppeteerOptions);
-            for (const url of allUrls) {
-                if (url) {
-                    const page = await browser.newPage();
-                    const result = await processPageTask(page, url);
-                    taskResults.push(result);
-                    await page.close();
-                    processedUrls.add(url);
+                catch (error) {
+                    logger.error(`An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`, { error });
+                    if (cluster)
+                        await cluster.close(); // Ensure cluster is closed on error
                 }
             }
+            else { // 'vanilla' Puppeteer for the current chunk
+                let browser = null;
+                try {
+                    browser = await puppeteer.launch(basePuppeteerOptions);
+                    for (const url of currentChunkUrls) {
+                        if (url) {
+                            const page = await browser.newPage();
+                            const result = await processPageTask(page, url);
+                            taskResults.push(result);
+                            await page.close();
+                            processedUrls.add(url); // Add to global processedUrls
+                        }
+                    }
+                }
+                catch (error) {
+                    logger.error(`An error occurred during processing chunk ${chunkNumber} with vanilla Puppeteer.`, { error });
+                }
+                finally {
+                    if (browser)
+                        await browser.close();
+                }
+            }
+            logger.info(`Finished processing chunk ${chunkNumber} of ${totalChunks}.`);
         }
-        catch (error) {
-            logger.error("An unexpected error occurred during vanilla Puppeteer processing", { error });
+    }
+    else {
+        // Process all URLs at once (no chunking)
+        logger.info(`Processing all ${urlsToProcess.length} URLs without chunking.`);
+        if (options.puppeteerType === 'cluster') {
+            const cluster = await Cluster.launch({
+                concurrency: Cluster.CONCURRENCY_CONTEXT,
+                maxConcurrency: options.concurrency,
+                monitor: options.monitor,
+                puppeteer,
+                puppeteerOptions: basePuppeteerOptions,
+            });
+            await cluster.task(async ({ page, data: url }) => {
+                return processPageTask(page, url);
+            });
+            try {
+                const promises = urlsToProcess.filter(url => url).map(url => {
+                    processedUrls.add(url);
+                    return cluster.queue(url)
+                        .then(resultFromQueue => resultFromQueue)
+                        .catch(error => {
+                        logger.error(`Error from cluster.queue for ${url}:`, { error });
+                        return { type: 'error', url: url, error: 'QUEUE_ERROR_OR_TASK_FAILED' };
+                    });
+                });
+                const settledResults = await Promise.allSettled(promises);
+                settledResults.forEach(settledResult => {
+                    if (settledResult.status === 'fulfilled') {
+                        if (settledResult.value !== undefined && settledResult.value !== null) {
+                            taskResults.push(settledResult.value);
+                        }
+                        else {
+                            logger.warn('A task from cluster.queue (non-chunked) settled with undefined/null value.', { settledResult });
+                        }
+                    }
+                    else {
+                        logger.error('A promise from cluster.queue settled as rejected.', { reason: settledResult.reason });
+                    }
+                });
+                await cluster.idle();
+                await cluster.close();
+            }
+            catch (error) {
+                logger.error("An unexpected error occurred during cluster processing orchestration", { error });
+                if (cluster)
+                    await cluster.close();
+            }
         }
-        finally {
-            if (browser)
-                await browser.close();
+        else { // 'vanilla' Puppeteer
+            let browser = null;
+            try {
+                browser = await puppeteer.launch(basePuppeteerOptions);
+                for (const url of urlsToProcess) {
+                    if (url) {
+                        const page = await browser.newPage();
+                        const result = await processPageTask(page, url);
+                        taskResults.push(result);
+                        await page.close();
+                        processedUrls.add(url);
+                    }
+                }
+            }
+            catch (error) {
+                logger.error("An unexpected error occurred during vanilla Puppeteer processing", { error });
+            }
+            finally {
+                if (browser)
+                    await browser.close();
+            }
         }
     }
     // Common result processing and file writing logic
@@ -402,12 +518,16 @@ export async function prebidExplorer(options) {
         else {
             logger.info('No results to save.');
         }
-        // Only update inputFile if it was the original source of URLs and no other primary source (CSV/GitHub) was used.
+        // Update inputFile logic:
+        // The inputFile is overwritten with URLs that were within the processing scope (i.e., after applying any --range)
+        // but were not successfully processed. `urlsToProcess` holds the list of URLs that were candidates for processing
+        // (post-range), and `processedUrls` tracks all URLs that were actually sent to a processing task (across all chunks).
         if (urlSourceType === 'InputFile' && options.inputFile) {
-            const remainingUrls = allUrls.filter((url) => !processedUrls.has(url));
+            const remainingUrlsInAttemptedScope = urlsToProcess.filter((url) => !processedUrls.has(url));
             try {
-                fs.writeFileSync(options.inputFile, remainingUrls.join('\n'), 'utf8');
-                logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed, ${remainingUrls.length} URLs remain.`);
+                // This correctly updates the input file based on the (potentially ranged) scope of URLs that were attempted.
+                fs.writeFileSync(options.inputFile, remainingUrlsInAttemptedScope.join('\n'), 'utf8');
+                logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed from the current scope, ${remainingUrlsInAttemptedScope.length} URLs remain in current scope.`);
             }
             catch (writeError) {
                 logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);

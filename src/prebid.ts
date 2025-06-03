@@ -431,7 +431,11 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
                     const settledChunkResults = await Promise.allSettled(chunkPromises);
                     settledChunkResults.forEach(settledResult => {
                         if (settledResult.status === 'fulfilled') {
-                            taskResults.push(settledResult.value);
+                            if (settledResult.value !== undefined && settledResult.value !== null) {
+                                taskResults.push(settledResult.value);
+                            } else {
+                                logger.warn('A task from cluster.queue (chunked) settled with undefined/null value.', { settledResult });
+                            }
                         } else {
                             logger.error(`A promise from cluster.queue (chunk ${chunkNumber}) settled as rejected.`, { reason: settledResult.reason });
                         }
@@ -492,7 +496,11 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
                 const settledResults = await Promise.allSettled(promises);
                 settledResults.forEach(settledResult => {
                     if (settledResult.status === 'fulfilled') {
-                        taskResults.push(settledResult.value);
+                        if (settledResult.value !== undefined && settledResult.value !== null) {
+                            taskResults.push(settledResult.value);
+                        } else {
+                            logger.warn('A task from cluster.queue (non-chunked) settled with undefined/null value.', { settledResult });
+                        }
                     } else {
                         logger.error('A promise from cluster.queue settled as rejected.', { reason: settledResult.reason });
                     }
