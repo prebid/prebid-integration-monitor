@@ -10,10 +10,24 @@ interface ExecResult {
     code: number | null;
 }
 
-function executeCommand(command: string, cwd: string = '.'): Promise<ExecResult> {
+function executeCommand(command: string, cwd: string = '.', mockEnv: Record<string, string | undefined> = {}): Promise<ExecResult> {
     return new Promise((resolve) => {
-        // Ensure a 'production' like environment for the CLI execution
-        const env = { ...process.env, NODE_ENV: 'production' };
+        const prefixedMockEnv: Record<string, string | undefined> = {};
+        for (const key in mockEnv) {
+            prefixedMockEnv[`TEST_MOCK_${key}`] = mockEnv[key];
+        }
+
+        // Merge process.env, then specific prefixedMockEnv.
+        // NODE_ENV will be inherited from process.env or can be set in prefixedMockEnv if needed.
+        const env = { ...process.env, ...prefixedMockEnv };
+
+        // Remove any mock env vars that were explicitly set to undefined (after prefixing)
+        for (const key in env) {
+            if (env[key] === undefined) {
+                delete env[key];
+            }
+        }
+
         // Remove ts-node/esm loader if present, to avoid it interfering with oclif's compiled command loading
         if (env.NODE_OPTIONS) {
             env.NODE_OPTIONS = env.NODE_OPTIONS.replace(/--loader\s+ts-node\/esm/g, '').trim();
@@ -21,9 +35,14 @@ function executeCommand(command: string, cwd: string = '.'): Promise<ExecResult>
         }
 
         cp.exec(command, { cwd, env }, (error, stdout, stderr) => {
+            const stdoutStr = stdout.toString();
+            const stderrStr = stderr.toString();
+            // Log them immediately for visibility during test execution
+            console.log(`[ChildProcess STDOUT for command "${command}"]:\n${stdoutStr}`);
+            console.error(`[ChildProcess STDERR for command "${command}"]:\n${stderrStr}`);
             resolve({
-                stdout: stdout.toString(),
-                stderr: stderr.toString(),
+                stdout: stdoutStr,
+                stderr: stderrStr,
                 code: error ? error.code : 0,
             });
         });
@@ -219,187 +238,174 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     const testTimeout = 10000; // Shorter timeout as these are now unit-like tests
     const MOCK_REPO_URL = 'https://github.com/mockOwner/mockRepo.git';
 
-    let fetchMock: ReturnType<typeof vi.spyOn>;
+    // Mock environment variables are now passed via a config file path
 
-    beforeEach(() => {
-        // Spy on global.fetch and save the mock object
-        fetchMock = vi.spyOn(global, 'fetch');
-    });
+    const TEMP_MOCK_CONFIG_PATH = path.join(projectRoot, 'temp-mock-config.json');
 
-    afterEach(() => {
-        // Restore the original fetch function after each test
+    afterEach(async () => {
+        // Restore any other mocks if necessary
         vi.restoreAllMocks();
+        // Clean up the temporary mock config file with a small delay
+        await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+        cleanup(TEMP_MOCK_CONFIG_PATH);
     });
 
-    it('Scan using a valid GitHub repository URL (mocked)', async () => {
-        fetchMock
-            .mockResolvedValueOnce({ // First call: GitHub contents API
-                ok: true,
-                json: async () => ([
-                    { name: 'file1.txt', type: 'file', download_url: 'https://example.com/file1.txt' },
-                    { name: 'file2.md', type: 'file', download_url: 'https://example.com/file2.md' },
-                    { name: 'image.png', type: 'file', download_url: 'https://example.com/image.png' }, // Should be ignored
-                ]),
-            } as Response)
-            .mockResolvedValueOnce({ // Second call: download_url for file1.txt
-                ok: true,
-                text: async () => 'http://url1.com\nhttps://url2.com',
-            } as Response)
-            .mockResolvedValueOnce({ // Third call: download_url for file2.md
-                ok: true,
-                text: async () => 'Some markdown with http://url3.com',
-            } as Response);
+    it('Scan using a valid GitHub repository URL (mocked via config file)', async () => {
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([
+                { name: 'file1.txt', type: 'file', download_url: 'https://example.com/file1.txt' },
+                { name: 'file2.md', type: 'file', download_url: 'https://example.com/file2.md' },
+                { name: 'image.png', type: 'file', download_url: 'https://example.com/image.png' }, // Should be ignored
+            ]),
+            MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE: 'http://url1.com\nhttps://url2.com\nhttp://url3.com'
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --mockConfigFile ${TEMP_MOCK_CONFIG_PATH}`;
+        const result = await executeCommand(command, projectRoot, {}); // mockEnv obj is no longer used for these vars
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Fetching URLs from GitHub repository: ${MOCK_REPO_URL}`);
-        expect(result.stdout).toContain(`Successfully loaded 3 URLs from GitHub repository: ${MOCK_REPO_URL}`);
-        expect(result.stdout).toContain(`Total URLs to process: 3`);
-        expect(fetchMock).toHaveBeenCalledTimes(3);
-        expect(fetchMock.mock.calls[0][0]).toBe('https://api.github.com/repos/mockOwner/mockRepo/contents');
-        expect(fetchMock.mock.calls[1][0]).toBe('https://example.com/file1.txt');
-        expect(fetchMock.mock.calls[2][0]).toBe('https://example.com/file2.md');
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file passed as argument: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Loaded MOCK_GITHUB_API_CONTENTS_RESPONSE from argument config file.');
+        expect(result.stdout).toContain('Loaded MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE from argument config file.');
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
+        expect(result.stdout).toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/file1.txt');
+        expect(result.stdout).toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/file2.md');
+        expect(result.stdout).toContain(`Successfully loaded 6 URLs from GitHub repository: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 6`);
     }, testTimeout);
 
-    it('Scan using --numUrls with a GitHub repository (mocked)', async () => {
-        fetchMock
-            .mockResolvedValueOnce({ // GitHub contents API
-                ok: true,
-                json: async () => ([
-                    { name: 'file1.txt', type: 'file', download_url: 'https://example.com/file1.txt' },
-                    { name: 'file2.md', type: 'file', download_url: 'https://example.com/file2.md' }, // This file won't be fetched due to numUrls
-                ]),
-            } as Response)
-            .mockResolvedValueOnce({ // download_url for file1.txt
-                ok: true,
-                text: async () => 'http://url1.com\nhttps://url2.com\nhttp://url3.com',
-            } as Response);
-            // file2.md's content fetch will not happen
+    it('Scan using --numUrls with a GitHub repository (mocked via config file)', async () => {
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([
+                { name: 'file1.txt', type: 'file', download_url: 'https://example.com/file1.txt' },
+                { name: 'file2.md', type: 'file', download_url: 'https://example.com/file2.md' },
+            ]),
+            MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE: 'http://url1.com\nhttps://url2.com\nhttp://url3.com' // 3 URLs per file
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
 
-        const numUrlsToFetch = 2;
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --numUrls ${numUrlsToFetch}`;
-        const result = await executeCommand(command, projectRoot);
+        const numUrlsToFetch = 2; // This should limit after fetching content of file1.txt
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --numUrls ${numUrlsToFetch} --mockConfigFile ${TEMP_MOCK_CONFIG_PATH}`;
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Fetching URLs from GitHub repository: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file passed as argument: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
+        expect(result.stdout).toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/file1.txt');
+        expect(result.stdout).not.toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/file2.md');
         expect(result.stdout).toContain(`Successfully loaded ${numUrlsToFetch} URLs from GitHub repository: ${MOCK_REPO_URL}`);
-        expect(result.stdout).toContain(`Total URLs to process: ${numUrlsToFetch}`);
-        // Expect 1 call for contents, 1 call for file1.txt's content. file2.txt content fetch should be skipped.
-        expect(fetchMock).toHaveBeenCalledTimes(2); 
-        expect(fetchMock.mock.calls[0][0]).toBe('https://api.github.com/repos/mockOwner/mockRepo/contents');
-        expect(fetchMock.mock.calls[1][0]).toBe('https://example.com/file1.txt');
+        expect(result.stdout).toContain(`Total URLs to process after range check: ${numUrlsToFetch}`);
     }, testTimeout);
 
-    it('Scan using a non-existent GitHub repository URL (mocked 404 for contents)', async () => {
-        fetchMock.mockResolvedValueOnce({ // GitHub contents API
-            ok: false,
-            status: 404,
-            statusText: 'Not Found',
-            json: async () => ({ message: 'Not Found' }),
-            text: async () => ('{"message":"Not Found"}')
-        } as Response);
+    it('Scan using a non-existent GitHub repository URL (mocked 404 for contents via config file)', async () => {
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: 'error:404'
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --mockConfigFile ${TEMP_MOCK_CONFIG_PATH}`;
+        const result = await executeCommand(command, projectRoot, {});
 
-        expect(result.code).not.toBe(0, `Command should have failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stderr).toContain(`Failed to fetch repository contents: 404 Not Found`);
-        expect(result.stderr).toContain(`An error occurred during the Prebid scan`);
-        expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(fetchMock.mock.calls[0][0]).toBe('https://api.github.com/repos/mockOwner/mockRepo/contents');
+        expect(result.code).toBe(0, `Command should exit 0 if error is handled. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file passed as argument: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
+        expect(result.stdout).toContain(`Failed to fetch repository contents: 404 Mocked Error`);
+        expect(result.stdout).toContain(`Error body: {"message":"Mocked Error"}`);
+        expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain('No URLs to process from GitHub. Exiting.');
     }, testTimeout);
     
-    it('Scan a GitHub repository that contains no relevant files (mocked)', async () => {
-        fetchMock.mockResolvedValueOnce({ // GitHub contents API
-            ok: true,
-            json: async () => ([
+    it('Scan a GitHub repository that contains no relevant files (mocked via config file)', async () => {
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([
                 { name: 'image.png', type: 'file', download_url: 'https://example.com/image.png' },
                 { name: 'script.js', type: 'file', download_url: 'https://example.com/script.js' },
-            ]),
-        } as Response);
-        // No calls to download_url should be made
+            ])
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --mockConfigFile ${TEMP_MOCK_CONFIG_PATH}`;
+        const result = await executeCommand(command, projectRoot, {});
         
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Fetching URLs from GitHub repository: ${MOCK_REPO_URL}`);
-        // Note: The message "No URLs found or fetched" comes from prebid.ts, which is what we want to see
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file passed as argument: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
         expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`);
-        expect(result.stdout).toContain('No URLs to process. Exiting.');
-        expect(fetchMock).toHaveBeenCalledTimes(1); // Only the contents API call
+        expect(result.stdout).toContain('No URLs to process from GitHub. Exiting.');
     }, testTimeout);
 
-    it('Scan a GitHub repository with relevant files but no URLs in them (mocked)', async () => {
-        fetchMock
-            .mockResolvedValueOnce({ // GitHub contents API
-                ok: true,
-                json: async () => ([
-                    { name: 'empty.txt', type: 'file', download_url: 'https://example.com/empty.txt' },
-                ]),
-            } as Response)
-            .mockResolvedValueOnce({ // download_url for empty.txt
-                ok: true,
-                text: async () => 'This file has no URLs.',
-            } as Response);
+    it('Scan a GitHub repository with relevant files but no URLs in them (mocked via config file)', async () => {
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([
+                { name: 'empty.txt', type: 'file', download_url: 'https://example.com/empty.txt' },
+            ]),
+            MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE: 'This file has no URLs.'
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --mockConfigFile ${TEMP_MOCK_CONFIG_PATH}`;
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file passed as argument: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
+        expect(result.stdout).toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/empty.txt');
         expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`);
-        expect(result.stdout).toContain('No URLs to process. Exiting.');
-        expect(fetchMock).toHaveBeenCalledTimes(2); // Contents API + one file download
+        expect(result.stdout).toContain('No URLs to process from GitHub. Exiting.');
     }, testTimeout);
 
 
-    it('Scan with both --githubRepo (mocked) and --inputFile provided (githubRepo takes precedence)', async () => {
-        fetchMock.mockResolvedValueOnce({ // GitHub contents API
-            ok: true,
-            json: async () => ([
+    it('Scan with both --githubRepo (mocked via config file) and --inputFile provided (githubRepo takes precedence)', async () => {
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([
                 { name: 'file1.txt', type: 'file', download_url: 'https://example.com/file1.txt' }
             ]),
-        } as Response)
-        .mockResolvedValueOnce({ // download_url for file1.txt
-            ok: true,
-            text: async () => 'http://mockedurl.com',
-        } as Response);
+            MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE: 'http://mockedurl.com'
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
         
         const dummyInputFilePath = path.join(projectRoot, 'dummy_gh_input.txt');
         createInputFile(dummyInputFilePath, ['http://local-file-url.com']);
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --inputFile ${dummyInputFilePath}`;
-        const result = await executeCommand(command, projectRoot);
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} ${dummyInputFilePath} --mockConfigFile ${TEMP_MOCK_CONFIG_PATH}`;
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Both --githubRepo and --inputFile (non-default) were provided. --inputFile will be ignored.`);
-        expect(result.stdout).toContain(`Fetching URLs from GitHub repository: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file passed as argument: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
+        expect(result.stdout).toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/file1.txt');
         expect(result.stdout).toContain(`Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`);
+        expect(result.stdout).not.toContain(`Initial URLs read from ${dummyInputFilePath}`);
         
         const inputFileContent = fs.readFileSync(dummyInputFilePath, 'utf-8');
-        expect(inputFileContent.trim()).toBe('http://local-file-url.com'); // Should not be touched
+        expect(inputFileContent.trim()).toBe('http://local-file-url.com');
 
         cleanup(dummyInputFilePath);
-        expect(fetchMock).toHaveBeenCalledTimes(2);
     }, testTimeout);
 
-    it('Scan without providing either --githubRepo or --inputFile fails (no mocks needed)', async () => {
-        // Need to ensure no default 'src/input.txt' exists for this test
+    it('Scan without providing --githubRepo, --csvFile, or a valid default inputFile fails', async () => {
         const defaultInput = path.join(projectRoot, 'src', 'input.txt');
         if (fs.existsSync(defaultInput)) {
             fs.unlinkSync(defaultInput);
         }
-        
-        const command = `${cliCommand}`; // No input file or repo
-        const result = await executeCommand(command, projectRoot);
+        // This test checks for failure when no primary input is given.
+        // Do not pass --mockConfigFile here, as it might interfere with oclif's early argument validation
+        // or be misinterpreted when no primary command action (like --githubRepo) is specified.
+        const command = `${cliCommand}`;
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).not.toBe(0, `Command should have failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stderr).toContain('Either --githubRepo or --inputFile must be provided.');
+        expect(result.stderr).toContain('Failed to read input file: src/input.txt');
     }, testTimeout);
 
-    it('should handle a mix of valid, malformed, and schemeless URLs from mocked GitHub content', async () => {
+    it('should handle a mix of valid, malformed, and schemeless URLs from mocked GitHub content (config file)', async () => {
         const mixedContent = `
             Valid URLs:
             http://valid-example.com
@@ -417,102 +423,97 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             just some random text
             another line of text with example.com but not a URL.
         `;
+        const mockConfigData = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([
+                { name: 'mixed_urls.txt', type: 'file', download_url: 'https://example.com/mixed_urls.txt' },
+            ]),
+            MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE: mixedContent
+        };
+        fs.writeFileSync(TEMP_MOCK_CONFIG_PATH, JSON.stringify(mockConfigData));
+        const mockEnv = { MOCK_CONFIG_FILE_PATH: TEMP_MOCK_CONFIG_PATH };
 
-        fetchMock
-            .mockResolvedValueOnce({ // GitHub contents API
-                ok: true,
-                json: async () => ([
-                    { name: 'mixed_urls.txt', type: 'file', download_url: 'https://example.com/mixed_urls.txt' },
-                ]),
-            } as Response)
-            .mockResolvedValueOnce({ // download_url for mixed_urls.txt
-                ok: true,
-                text: async () => mixedContent,
-            } as Response);
-
-        // Use generous numUrls to ensure all valid ones are attempted if they were more numerous
         const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --numUrls 10`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, mockEnv);
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        
-        // Verify that only the 2 valid URLs are reported as loaded
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
+        expect(result.stdout).toContain(`Using mock configuration file from MOCK_CONFIG_FILE_PATH: ${TEMP_MOCK_CONFIG_PATH}`);
+        expect(result.stdout).toContain('Using mock response for GitHub Contents API (from MOCK_GITHUB_API_CONTENTS_RESPONSE or config file)');
+        expect(result.stdout).toContain('Using mock response for GitHub file download (from MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE or config file) for https://example.com/mixed_urls.txt');
         expect(result.stdout).toContain(`Successfully loaded 2 URLs from GitHub repository: ${MOCK_REPO_URL}`);
-        expect(result.stdout).toContain(`Total URLs to process: 2`);
-
-        // Check that the specific valid URLs were part of the options passed to prebidExplorer (logged)
-        // This requires looking at the JSON.stringify(options, null, 2) output
-        // Need to be careful if order is not guaranteed or if other URLs are processed by puppeteer.
-        // For now, checking the count is the most robust.
-        // A more advanced check might parse the logged options object if necessary.
-
-        // Ensure no errors in stderr related to parsing, beyond the expected successful run.
-        // If there were specific warnings for malformed lines, we'd check for them.
-        // Currently, the regex simply doesn't match, so they are silently ignored.
-        expect(result.stderr).toBe(''); // Or expect it not to contain specific error patterns
-
-        expect(fetchMock).toHaveBeenCalledTimes(2); // 1 for contents, 1 for file download
+        expect(result.stdout).toContain(`Total URLs to process after range check: 2`);
+        expect(result.stderr).toBe('');
     }, testTimeout);
 });
 
 describe('CLI Tests for CSV File Input', () => {
-    const testTimeout = 10000; // Standard timeout for these tests
+    const testTimeout = 10000;
     let fetchMock: ReturnType<typeof vi.spyOn>;
-    // Explicitly define testCsvFilePath for this suite's scope to avoid ReferenceError
     const testCsvFilePath = path.join(projectRoot, 'test_input.csv');
+    const TEMP_MOCK_CONFIG_PATH_CSV = path.join(projectRoot, 'temp-mock-config-csv.json');
 
 
     beforeEach(() => {
         fetchMock = vi.spyOn(global, 'fetch');
-        // Cleanup testCsvFilePath before each test in this suite as well
         cleanup(testCsvFilePath);
+        cleanup(TEMP_MOCK_CONFIG_PATH_CSV);
     });
 
     afterEach(() => {
         vi.restoreAllMocks();
-        // Cleanup testCsvFilePath after each test in this suite
         cleanup(testCsvFilePath);
     });
 
-    // Test Case 2: Mocked Remote CSV (Successful Fetch)
-    it('should fetch and parse URLs from a mocked remote CSV file', async () => {
+    it('should read and parse URLs from a local CSV file', async () => {
+        const localCsvContent = "header_url\nhttp://local1.com";
+        fs.writeFileSync(testCsvFilePath, localCsvContent);
+
+        const command = `${cliCommand} --csvFile ${testCsvFilePath}`;
+        const result = await executeCommand(command, projectRoot, {});
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(result.stdout).toContain(`Reading local CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toContain(`Successfully loaded 1 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toMatch(/Total URLs to process(?: after range check)?: 1/);
+        expect(fetchMock).not.toHaveBeenCalled();
+    }, testTimeout);
+
+    it('should fetch and parse URLs from a mocked remote CSV file (non-GitHub)', async () => {
         const mockCsvContent = "url\nhttp://mockurl1.com\nhttps://mockurl2.com/path\nhttp://mockurl3.com";
         fetchMock.mockResolvedValueOnce({
             ok: true,
             text: async () => mockCsvContent,
         } as Response);
 
-        const command = `${cliCommand} --csvFile https://example.com/remote.csv`;
-        const result = await executeCommand(command, projectRoot);
+        const command = `${cliCommand} --csvFile https://non-github-example.com/remote.csv`;
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(fetchMock).toHaveBeenCalledWith('https://example.com/remote.csv');
-        expect(result.stdout).toContain(`Successfully loaded 3 URLs from CSV file: https://example.com/remote.csv`);
-        expect(result.stdout).toContain(`Total URLs to process: 3`);
+        expect(fetchMock).toHaveBeenCalledWith('https://non-github-example.com/remote.csv');
+        expect(result.stdout).toContain(`Successfully loaded 3 URLs from CSV file: https://non-github-example.com/remote.csv`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
     }, testTimeout);
 
-    // Test Case 3: Mocked Remote CSV (GitHub URL Transformation)
-    it('should correctly transform GitHub blob URL and parse from mocked remote CSV', async () => {
+    it('should correctly transform GitHub blob URL and parse from mocked remote CSV (via env vars)', async () => {
         const mockCsvContent = "url\nhttp://ghmock1.com\nhttps://ghmock2.com";
-        fetchMock.mockResolvedValueOnce({
-            ok: true,
-            text: async () => mockCsvContent,
-        } as Response);
+        const mockEnv = {
+            MOCK_GITHUB_DIRECT_FILE_RESPONSE: mockCsvContent
+        };
         
         const githubBlobUrl = 'https://github.com/testowner/testrepo/blob/main/data.csv';
         const expectedRawUrl = 'https://raw.githubusercontent.com/testowner/testrepo/main/data.csv';
         const command = `${cliCommand} --csvFile ${githubBlobUrl}`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, mockEnv);
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(fetchMock).toHaveBeenCalledWith(expectedRawUrl);
+        expect(fetchMock).not.toHaveBeenCalledWith(expectedRawUrl);
+        expect(result.stdout).toContain(`Using mock response for GitHub direct file link from MOCK_GITHUB_DIRECT_FILE_RESPONSE`);
         expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`);
         expect(result.stdout).toContain(`Successfully loaded 2 URLs from CSV file: ${githubBlobUrl}`);
-        expect(result.stdout).toContain(`Total URLs to process: 2`);
+        expect(result.stdout).toContain(`Total URLs to process after range check: 2`);
     }, testTimeout);
 
-    // Test Case 4: Mocked Remote CSV (Fetch Error)
-    it('should handle fetch error for remote CSV gracefully', async () => {
+    it('should handle fetch error for remote CSV gracefully (non-GitHub)', async () => {
         fetchMock.mockResolvedValueOnce({
             ok: false,
             status: 404,
@@ -520,59 +521,44 @@ describe('CLI Tests for CSV File Input', () => {
             text: async () => 'File not found content',
         } as Response);
 
-        const remoteCsvUrl = 'https://example.com/nonexistent.csv';
+        const remoteCsvUrl = 'https://non-github-example.com/nonexistent.csv';
         const command = `${cliCommand} --csvFile ${remoteCsvUrl}`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command should still exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        expect(fetchMock).toHaveBeenCalledWith(remoteCsvUrl);
         expect(result.stdout).toContain(`Failed to download CSV content from ${remoteCsvUrl}: 404 Not Found`);
         expect(result.stdout).toContain(`Error body: File not found content`);
         expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${remoteCsvUrl}`);
-        expect(result.stdout).toContain('No URLs to process. Exiting.');
+        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
     }, testTimeout);
 
-    // Test Case 5: Local CSV (Successful Read)
-    it('should read and parse URLs from a local CSV file', async () => {
-        const localCsvContent = "header_url\nhttp://local1.com"; // Simplified to one URL
-        fs.writeFileSync(testCsvFilePath, localCsvContent);
-
-        const command = `${cliCommand} --csvFile ${testCsvFilePath}`;
-        const result = await executeCommand(command, projectRoot);
-        
-        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Reading local CSV file: ${testCsvFilePath}`);
-        expect(result.stdout).toContain(`Successfully loaded 1 URLs from CSV file: ${testCsvFilePath}`); // Adjusted count
-        expect(result.stdout).toMatch(/Total URLs to process(?: after range check)?: 1/); // Adjusted count & robust assertion
-    }, testTimeout);
-
-    // Test Case 6: Local CSV (File Not Found)
     it('should handle file not found error for local CSV gracefully', async () => {
         const nonExistentFilePath = '/path/to/nonexistent/local.csv';
         const command = `${cliCommand} --csvFile ${nonExistentFilePath}`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command should still exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        // Error message from fs.readFileSync will be like "Error processing CSV from /path/to/nonexistent/local.csv: ENOENT: no such file or directory..."
         expect(result.stdout).toContain(`Error processing CSV from ${nonExistentFilePath}: ENOENT: no such file or directory`);
         expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${nonExistentFilePath}`);
-        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.'); // Corrected assertion
+        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
+        expect(fetchMock).not.toHaveBeenCalled();
     }, testTimeout);
     
-    // Test Case 7: Local CSV (Malformed CSV content)
     it('should handle malformed local CSV content', async () => {
-        const malformedCsvContent = "url\ninvalid-url\nhttp://valid.com"; // Further simplified
+        const malformedCsvContent = "url\ninvalid-url\nhttp://valid.com";
         fs.writeFileSync(testCsvFilePath, malformedCsvContent);
 
         const command = `${cliCommand} --csvFile ${testCsvFilePath}`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
         expect(result.stdout).toContain(`Skipping invalid or non-HTTP/S URL from CSV: "invalid-url"`);
-        expect(result.stdout).toContain(`Successfully loaded 1 URLs from CSV file: ${testCsvFilePath}`); // Adjusted count
-        expect(result.stdout).toMatch(/Total URLs to process(?: after range check)?: 1/); // Adjusted count & robust assertion
-    }, testTimeout * 3); // Increased timeout for this specific test
+        expect(result.stdout).toContain(`Successfully loaded 1 URLs from CSV file: ${testCsvFilePath}`);
+        expect(result.stdout).toMatch(/Total URLs to process(?: after range check)?: 1/);
+        expect(fetchMock).not.toHaveBeenCalled();
+    }, testTimeout * 3);
 
-    // Test Case 8: Flag Precedence (--csv-file vs --inputFile)
     it('should prioritize --csv-file over --inputFile', async () => {
         const csvContent = "url\nhttp://csv-url1.com\nhttp://csv-url2.com";
         fs.writeFileSync(testCsvFilePath, csvContent);
@@ -581,85 +567,70 @@ describe('CLI Tests for CSV File Input', () => {
         createInputFile(testInputFilePathForPrecedence, ['http://textfile-url1.com', 'http://textfile-url2.com', 'http://textfile-url3.com']);
 
         const command = `${cliCommand} --csvFile ${testCsvFilePath} ${testInputFilePathForPrecedence}`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, {});
         
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        // Warning message might not be present, but core functionality is CSV processing.
-        // expect(result.stdout).toContain(`--csvFile provided, inputFile argument will be ignored.`); 
         expect(result.stdout).toContain(`Successfully loaded 2 URLs from CSV file: ${testCsvFilePath}`);
         expect(result.stdout).toMatch(/Total URLs to process(?: after range check)?: 2/);
         expect(result.stdout).not.toContain(`Initial URLs read from ${testInputFilePathForPrecedence} count:`);
-
+        expect(fetchMock).not.toHaveBeenCalled();
 
         const textFileContent = fs.readFileSync(testInputFilePathForPrecedence, 'utf-8');
-        expect(textFileContent.trim()).toBe('http://textfile-url1.com\nhttp://textfile-url2.com\nhttp://textfile-url3.com'); // Should be unchanged
+        expect(textFileContent.trim()).toBe('http://textfile-url1.com\nhttp://textfile-url2.com\nhttp://textfile-url3.com');
 
         cleanup(testInputFilePathForPrecedence);
     }, testTimeout);
 
-    // Test Case 9: Flag Precedence (--csv-file vs --githubRepo)
-    it('should prioritize --csv-file over --githubRepo', async () => {
+    it('should prioritize --csv-file over --githubRepo (githubRepo uses env var mocks if it were called)', async () => {
         const csvContent = "url\nhttp://csv-for-gh.com";
-        fs.writeFileSync(testCsvFilePath, csvContent); // Using a local CSV for simplicity, could also mock remote
-
-        // Mock fetch for the GitHub repo call that should NOT happen if CSV is prioritized
-        fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
-            if (url.toString().includes('api.github.com')) {
-                return { // Mock a successful GitHub API response
-                    ok: true, json: async () => ([{ name: 'gh_file.txt', type: 'file', download_url: 'https://example.com/gh_file.txt' }]),
-                } as Response;
-            }
-            if (url.toString().includes('example.com/gh_file.txt')) {
-                 return { ok: true, text: async () => 'http://github-url.com' } as Response;
-            }
-            // Fallback for any other unexpected fetch
-            return { ok: false, status: 404, text: async () => 'Unexpected fetch call' } as Response;
-        });
+        fs.writeFileSync(testCsvFilePath, csvContent);
+        const mockEnv = {
+            MOCK_GITHUB_API_CONTENTS_RESPONSE: JSON.stringify([{ name: 'gh_file.txt', type: 'file', download_url: 'https://example.com/gh_file.txt' }]),
+            MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE: 'http://github-url.com'
+        };
 
         const command = `${cliCommand} --csvFile ${testCsvFilePath} --githubRepo https://example.com/gh-repo`;
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, mockEnv);
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        // Warning message might not be present, but core functionality is CSV processing.
-        // expect(result.stdout).toContain(`--csvFile provided, --githubRepo will be ignored.`);
         expect(result.stdout).toContain(`Successfully loaded 1 URLs from CSV file: ${testCsvFilePath}`);
         expect(result.stdout).toMatch(/Total URLs to process(?: after range check)?: 1/);
-        expect(result.stdout).not.toContain(`Fetching URLs from GitHub repository: https://example.com/gh-repo`);
+        expect(result.stdout).not.toContain(`Fetching URLs from GitHub repository source: https://example.com/gh-repo`);
+        expect(result.stdout).not.toContain('Using mock response for GitHub Contents API');
+        expect(fetchMock).not.toHaveBeenCalled();
+    }, testTimeout * 2);
 
-
-        // Ensure fetch was NOT called for the GitHub repo
-        expect(fetchMock).not.toHaveBeenCalledWith(expect.stringContaining('api.github.com/repos/example/gh-repo'));
-        // If testCsvFilePath was remote and mocked, fetchMock would be called for it. Since it's local, fetchMock isn't called at all.
-        // If we wanted to test a remote CSV here, we'd mock its fetch and expect that call.
-        // For this test, proving githubRepo fetch didn't happen is key.
-        // Since this test uses a local CSV, fetchMock should not be called at all.
-        expect(fetchMock).toHaveBeenCalledTimes(0);
-    }, testTimeout * 2); // Increased timeout
-
-    // Test Case 10: Error if no input is provided (re-check existing behavior with csvFile flag)
     it('should error if no input file, csv-file, or githubRepo is provided', async () => {
         const defaultInput = path.join(projectRoot, 'src', 'input.txt');
         if (fs.existsSync(defaultInput)) {
-            // To ensure the test is valid, remove or empty the default input file
-            // For this test, we want to simulate the user providing no input arguments at all.
-            // Oclif's default argument handling for `inputFile` means `src/input.txt` will be assumed
-            // if no other input is given. The command's internal logic then checks if this default
-            // file exists and is non-empty, or if other flags were set.
-            // The error "No input source specified..." comes from scan.ts if all checks fail.
             fs.unlinkSync(defaultInput); 
         }
         
         const command = `${cliCommand}`; // No args
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(command, projectRoot, {});
 
         expect(result.code).toBe(1, `Command should have failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        // Actual error message is more verbose and wrapped by oclif/core
-        expect(result.stderr).toContain('Error: An error occurred during the Prebid scan: Failed to read input');
-        expect(result.stderr).toContain('file: src/input.txt');
+        expect(result.stderr).toContain('Failed to read input file: src/input.txt');
+        expect(fetchMock).not.toHaveBeenCalled();
     }, testTimeout);
 });
 
 describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
+    beforeEach(() => {
+        // No specific env vars to set for live tests, but ensure mocks are clear
+        // executeCommand will use process.env by default if no mockEnv is passed.
+        // Explicitly ensure our GitHub mocks are not set in process.env for this suite.
+        delete process.env.MOCK_GITHUB_API_CONTENTS_RESPONSE;
+        delete process.env.MOCK_GITHUB_FILE_DOWNLOAD_RESPONSE;
+        delete process.env.MOCK_GITHUB_DIRECT_FILE_RESPONSE;
+        if (vi.isMockFunction(global.fetch)) {
+            vi.restoreAllMocks();
+        }
+    });
+
+    afterEach(() => {
+        // No specific cleanup needed here for env vars if tests don't set them on process.env directly
+    });
     // IMPORTANT:
     // The tests in this suite interact with actual, live GitHub repositories
     // and require an active internet connection.

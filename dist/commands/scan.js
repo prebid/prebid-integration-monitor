@@ -103,6 +103,7 @@ class Scan extends Command {
                 ],
                 // Potentially merge with user-provided args if a flag for that is added
             },
+            mockConfigFile: flags.mockConfigFile, // Add the new flag to options
         };
         // Set inputFile in options based on the prioritized logic
         if (csvFile) {
@@ -194,5 +195,6 @@ Scan.flags = {
     }),
     range: Flags.string({ description: "Specify a line range (e.g., '10-20' or '5-') to process from the input source. 1-based indexing.", required: false }),
     chunkSize: Flags.integer({ description: "Process URLs in chunks of this size. Processes all URLs in the specified range or input, but one chunk at a time.", required: false }),
+    mockConfigFile: Flags.string({ hidden: true, description: 'Path to a mock configuration JSON file for testing.' }),
 };
 export default Scan;
