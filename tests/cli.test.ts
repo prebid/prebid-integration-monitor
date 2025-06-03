@@ -553,7 +553,8 @@ describe('CLI Tests for CSV File Input', () => {
         // The MSW handler for raw.githubusercontent.com will return a JSON error:
         // HttpResponse.json({ message: 'File not found in mockFileStore for raw content' }, { status: 404 });
         // The CLI's error logging should capture this JSON string in the "Error body:".
-        expect(result.stdout).toContain(`Error body: {"message":"File not found in mockFileStore for raw content"}`);
+        // Updated to reflect the specific message set in the mock via setMockFileContent.
+        expect(result.stdout).toContain(`Error body: {"message":"Not Found via MSW"}`);
 
         expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${remoteCsvUrl}`);
         expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
