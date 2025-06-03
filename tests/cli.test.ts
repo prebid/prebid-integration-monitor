@@ -480,6 +480,208 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(fetchMock).toHaveBeenCalledTimes(2); // 1 for contents, 1 for file download
     }, testTimeout);
+
+    it('should attempt to fetch a .txt file with domains from a direct GitHub file URL (IAB list format)', async () => {
+        const targetUrl = 'https://github.com/InteractiveAdvertisingBureau/adstxtcrawler/blob/master/adstxt_domains_2018-02-13.txt';
+        // This is the API endpoint for the file content
+        const githubApiUrl = 'https://api.github.com/repos/InteractiveAdvertisingBureau/adstxtcrawler/contents/adstxt_domains_2018-02-13.txt';
+        // This is the raw download URL that GitHub API will point to
+        const downloadUrl = 'https://raw.githubusercontent.com/InteractiveAdvertisingBureau/adstxtcrawler/master/adstxt_domains_2018-02-13.txt';
+        const sampleContent = "domain1.com\ndomain2.com\ngoogle.com"; // Plain domains, not full URLs
+
+        fetchMock
+            .mockResolvedValueOnce({ // Mock for the GitHub contents API call
+                ok: true,
+                json: async () => ({
+                    name: 'adstxt_domains_2018-02-13.txt',
+                    type: 'file',
+                    download_url: downloadUrl,
+                }),
+            } as Response)
+            .mockResolvedValueOnce({ // Mock for the actual file download
+                ok: true,
+                text: async () => sampleContent,
+            } as Response);
+
+        const command = `${cliCommand} --githubRepo ${targetUrl} --numUrls 10`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+
+        // Assertions
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${targetUrl}`);
+        // The tool should identify it as a direct file link and transform it for the API call, then use the download_url
+        expect(result.stdout).toContain(`Detected direct file link: ${targetUrl}. Attempting to fetch raw content.`);
+        expect(result.stdout).toContain(`Fetching content directly from raw URL: ${downloadUrl}`);
+
+
+        // Check fetch mock calls
+        // First call should be to the GitHub API to get file metadata (which includes download_url)
+        // Second call should be to the download_url itself
+        // Note: The current implementation for direct file links might directly go to raw.githubusercontent.com
+        // If so, the first API call to api.github.com/repos/.../contents/... might be skipped for direct links.
+        // Let's check the logs to confirm the behavior.
+        // Based on the live test 'should successfully scan a small number of URLs from a live, direct GitHub file URL (for --githubRepo)'
+        // it seems it does NOT call the /contents/ API endpoint for direct file links, but constructs the raw URL.
+        // However, the mocking setup here assumes it *might* if the logic were different or for non-direct repo links.
+        // Let's adjust the expectation: if it's a direct file, it might skip the contents API call and go for raw.
+        // The current logic in `getUrlsFromGitHub` for a direct file link:
+        // 1. It logs "Detected direct file link".
+        // 2. It constructs the raw URL.
+        // 3. It fetches from the raw URL.
+        // It does NOT call the `api.github.com/repos/.../contents/` endpoint for direct file links.
+        // So, only one fetch call is expected.
+
+        // If the logic changes to first hit the contents API even for direct files, then 2 calls.
+        // For now, based on existing live test output for direct files:
+        // It seems the `fetchFileContentFromUrl` is called, which internally would use the `downloadUrl`.
+        // The initial fetch in `getUrlsFromGitHub` for a direct file is to the `rawContentUrl`.
+
+        // Let's verify the calls based on the mocked behavior which *should* align with the code's logic for direct files.
+        // The code path for direct github file URLs is:
+        // 1. `isDirectGitHubFileLink` returns true.
+        // 2. `getRawGitHubUrl` is called.
+        // 3. `fetchFileContentFromUrl` is called with the raw URL.
+        // This means only ONE fetch call to the `downloadUrl` (raw URL) is made.
+        // The mock for `githubApiUrl` will not be hit if the logic correctly identifies it as a direct file link.
+        // Let's adjust the mock setup if needed or the assertions.
+
+        // Re-evaluating: The `githubRepo` flag can take a repo URL or a direct file URL.
+        // If it's a direct file URL, `getUrlsFromGitHub` -> `processDirectFileLink` is called.
+        // `processDirectFileLink` calls `getRawGitHubUrl` and then `fetchFileContentFromUrl`.
+        // This means ONE fetch to the raw URL. The content API mock is not strictly needed for *this specific direct file URL case*
+        // but is good to have for repository folder URLs.
+        // For this test, we are testing a *direct file URL*.
+
+        // If `fetchMock` was set up for two calls, and only one happens, the test would fail due_to_unmatched_mocks.
+        // The first mock for `githubApiUrl` should NOT be called for a direct file link.
+        // The second mock for `downloadUrl` (the raw one) SHOULD be called.
+
+        // Let's refine the mock setup for clarity for this specific test:
+        // We only need to mock the fetch to the `downloadUrl` because it's a direct file link.
+        // However, the global `fetchMock` is used. We need to ensure the calls are as expected.
+
+        // Correcting the mock setup and expectations for a DIRECT FILE LINK:
+        // The code path for a direct file link does not use the /repos/{owner}/{repo}/contents/{path} API.
+        // It directly constructs the raw.githubusercontent.com URL.
+        // So, we only expect one fetch call to `downloadUrl`.
+        // The first mock for `api.github.com/repos/...` will not be used.
+
+        // Let's remove the first mock and expect one call.
+        // No, keep both mocks, but expect only the second one to be *called* for this *specific test logic*.
+        // The fetchMock will have two configured mocks; only the one matching `downloadUrl` should be hit.
+
+        // fetchMock.mockClear(); // Clear previous calls if any from other tests (handled by beforeEach)
+        // Mock for the actual file download (raw URL)
+        // global.fetch = vi.fn() // Reset fetch mock specific for this test if needed
+        // .mockResolvedValueOnce({ // Mock for the actual file download
+        //     ok: true,
+        //     text: async () => sampleContent,
+        // } as Response);
+        // This is tricky with shared mock. The current setup adds mocks sequentially.
+
+        // The current mock setup:
+        // 1. Mocks api.github.com/.../contents (for repo directory listing)
+        // 2. Mocks raw.github.com/... (for file download)
+        // For a direct file URL, the CLI should skip step 1 and go to step 2.
+        // So, `fetchMock.mock.calls[0][0]` should be `downloadUrl`.
+
+        expect(fetchMock).toHaveBeenCalledTimes(1); // Only one actual fetch for the raw content
+        expect(fetchMock.mock.calls[0][0]).toBe(downloadUrl);
+
+
+        // Because the content is "domain1.com\ndomain2.com\ngoogle.com", and the current regex
+        // `/(https?:\/\/[^\s"]+)/gi` looks for "http://" or "https://", it will not find any URLs.
+        expect(result.stdout).toContain(`No URLs found in content from ${downloadUrl}`);
+        expect(result.stdout).toContain(`Total URLs extracted before limiting: 0`);
+        expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${targetUrl}`);
+        expect(result.stdout).toContain("No URLs to process from GitHub. Exiting.");
+    }, testTimeout);
+
+    it('should attempt to fetch a .json file from a direct GitHub file URL (DuckDuckGo format)', async () => {
+        const targetUrl = 'https://github.com/duckduckgo/tracker-radar/blob/main/build-data/generated/domain_map.json';
+        const rawDownloadUrl = 'https://raw.githubusercontent.com/duckduckgo/tracker-radar/main/build-data/generated/domain_map.json';
+        // Sample JSON content. The actual file is very large.
+        // The current URL extraction regex will not find URLs in this structure unless they are full URLs in string values.
+        // For this sample, no URLs should be extracted.
+        const sampleJsonContent = JSON.stringify({
+            "domain1.com": {
+                "owner": {
+                    "name": "Company A",
+                    "displayName": "Company A",
+                    "privacyPolicy": "https://example.com/privacy", // This IS a URL
+                    "url": "https://example.com" // This IS a URL
+                },
+                "source": ["example.com"],
+                "prevalence": 0.1,
+                "sites": 100,
+                "subdomains": ["sub.domain1.com"],
+                "cnames": [],
+                "fingerprinting": 0,
+                "resources": [
+                    { "rule": "domain1\\.com\\/script\\.js", "severity": "critical", "type": "script" }
+                ],
+                "categories": ["Advertising"]
+            },
+            "domain2.net": {
+                "owner": {
+                    "name": "Company B",
+                    "displayName": "Company B"
+                    // No privacyPolicy or URL here
+                },
+                "source": [],
+                "prevalence": 0.05,
+                "sites": 50,
+                "subdomains": [],
+                "cnames": [],
+                "fingerprinting": 0,
+                "resources": [],
+                "categories": ["Analytics"]
+            }
+        });
+
+        // For direct file links, the CLI directly constructs the raw URL and fetches it.
+        // So, only one fetch call is expected to the rawDownloadUrl.
+        // The fetchMock is configured sequentially. The first mock in the list (if any others were configured by mistake for this test)
+        // would be for the GH API contents endpoint, which is NOT used for direct file links.
+        // The second mock (or first if this is the only one) should be for the rawDownloadUrl.
+        fetchMock.mockResolvedValueOnce({ // This mock should match the call to rawDownloadUrl
+            ok: true,
+            text: async () => sampleJsonContent,
+        } as Response);
+
+        const command = `${cliCommand} --githubRepo ${targetUrl} --numUrls 10`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+
+        // Assertions
+        expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${targetUrl}`);
+        expect(result.stdout).toContain(`Detected direct file link: ${targetUrl}. Attempting to fetch raw content.`);
+        expect(result.stdout).toContain(`Fetching content directly from raw URL: ${rawDownloadUrl}`);
+
+        // Verify fetch call
+        // Since it's a direct file link, only one call to the raw content URL is expected.
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(fetchMock.mock.calls[0][0]).toBe(rawDownloadUrl);
+
+        // The system treats the JSON file as plain text for URL extraction.
+        // The generic regex /(https?:\/\/[^\s"]+)/gi will find full URLs within string values.
+        // In the sampleJsonContent:
+        // - "https://example.com/privacy" is a URL
+        // - "https://example.com" is a URL
+        // So, 2 URLs should be extracted.
+        expect(result.stdout).toContain(`Successfully loaded 2 URLs from GitHub repository: ${targetUrl}`);
+        expect(result.stdout).toContain(`Total URLs to process: 2`);
+
+
+        // If the JSON structure did not contain any fully qualified URLs as string values,
+        // then the following assertions for 0 URLs would be correct.
+        // expect(result.stdout).toContain(`No URLs found in content from ${rawDownloadUrl}`);
+        // expect(result.stdout).toContain(`Total URLs extracted before limiting: 0`);
+        // expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${targetUrl}`);
+        // expect(result.stdout).toContain("No URLs to process from GitHub. Exiting.");
+    }, testTimeout);
 });
 
 describe('CLI Tests for CSV File Input', () => {
@@ -584,7 +786,7 @@ describe('CLI Tests for CSV File Input', () => {
         // Error message from fs.readFileSync will be like "Error processing CSV from /path/to/nonexistent/local.csv: ENOENT: no such file or directory..."
         expect(result.stdout).toContain(`Error processing CSV from ${nonExistentFilePath}: ENOENT: no such file or directory`);
         expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${nonExistentFilePath}`);
-        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.'); // Corrected assertion
+        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
     }, testTimeout);
     
     // Test Case 7: Local CSV (Malformed CSV content)

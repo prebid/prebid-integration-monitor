@@ -74,6 +74,13 @@ const puppeteer = addExtra(puppeteerVanilla as any);
 async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined, logger: WinstonLogger): Promise<string[]> {
   logger.info(`Fetching URLs from GitHub repository source: ${repoUrl}`);
   const extractedUrls: string[] = [];
+  // TODO: Enhance URL extraction for specific file types. Currently, a general regex is used.
+  // This approach will identify fully qualified URLs in any text-based file.
+  // It does not specifically parse structured files like JSON (beyond finding embedded URLs)
+  // or automatically prepend schemes to schemeless domains (e.g., from simple domain lists in .txt files).
+  // For example:
+  //  - For domain lists in .txt files (e.g., IAB adstxt), domains without http(s):// prefixes won't be captured.
+  //  - For structured .json files (e.g., DuckDuckGo tracker radar), only fully qualified URLs present as strings are extracted, not data from specific JSON paths.
   const urlRegex = /(https?:\/\/[^\s"]+)/gi;
 
   try {
