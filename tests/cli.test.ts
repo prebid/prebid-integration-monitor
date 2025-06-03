@@ -59,8 +59,14 @@ describe('CLI Tests for Scan Command', () => {
     const testInputFilePath = path.join(projectRoot, 'test_input_cli.txt');
     const testOutputDirPath = path.join(projectRoot, 'test_output_cli');
     const customInputPath = path.join(projectRoot, 'tests', 'custom_scan_input.txt');
-    const dummyGithubInputFile = path.join(projectRoot, 'dummy_github_input.txt');
+    const dummyGithubInputFile = path.join(projectRoot, 'dummy_github_input.txt'); // This is the one for the main describe block's afterEach
     const testCsvFilePath = path.join(projectRoot, 'test_input.csv'); // Added for CSV tests
+
+    // Define paths for global afterAll cleanup consistently
+    const dummyGhInputPathConst = path.join(projectRoot, 'dummy_gh_input.txt'); // Used in GitHub mocked suite
+    const rangeChunkInputPathConst = path.join(projectRoot, 'test_range_chunk_input.txt');
+    const rangeChunkCsvPathConst = path.join(projectRoot, 'test_range_chunk.csv');
+
 
     // Cleanup before and after all tests in this suite
     beforeAll(() => {
@@ -68,8 +74,16 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
         cleanup(customInputPath);
-        cleanup(dummyGithubInputFile);
-        cleanup(testCsvFilePath); // Added for CSV tests
+        // dummyGithubInputFile is cleaned in afterEach of this suite,
+        // but dummyGhInputPathConst (potentially same name, different context) is for the GitHub mocked suite.
+        // We ensure all uniquely named temp files created across suites are considered.
+        cleanup(dummyGithubInputFile); // General dummy file for top-level suite
+        cleanup(testCsvFilePath); // General CSV test file for top-level suite
+
+        // Explicitly clean up files that might be created by other suites if not handled by their own specific afterEach/All
+        cleanup(dummyGhInputPathConst);
+        cleanup(rangeChunkInputPathConst);
+        cleanup(rangeChunkCsvPathConst);
     });
 
     afterAll(() => {
@@ -77,8 +91,13 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
         cleanup(customInputPath);
-        cleanup(dummyGithubInputFile);
-        cleanup(testCsvFilePath); // Added for CSV tests
+        cleanup(dummyGithubInputFile); // General dummy file
+        cleanup(testCsvFilePath);      // General CSV test file
+
+        // Add these lines for extra safety:
+        cleanup(dummyGhInputPathConst); // Specifically for the one used in GitHub mocked suite
+        cleanup(rangeChunkInputPathConst);
+        cleanup(rangeChunkCsvPathConst);
     });
 
     // Cleanup before each test
@@ -222,17 +241,21 @@ const INVALID_GITHUB_REPO_URL_FORMAT = 'https://github.com/nonexistent-owner-abc
 describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     const testTimeout = 10000; // Shorter timeout as these are now unit-like tests
     const MOCK_REPO_URL = 'https://github.com/mockOwner/mockRepo.git';
+    const dummyGhInputPath = path.join(projectRoot, 'dummy_gh_input.txt'); // Consistent path for this suite
 
     let fetchMock: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
         // Spy on global.fetch and save the mock object
         fetchMock = vi.spyOn(global, 'fetch');
+        // Clean up before each test in this suite if needed, though afterEach is primary for created files
+        cleanup(dummyGhInputPath);
     });
 
     afterEach(() => {
         // Restore the original fetch function after each test
         vi.restoreAllMocks();
+        cleanup(dummyGhInputPath); // Cleanup the specific dummy file for this suite
     });
 
     it('Scan using a valid GitHub repository URL (mocked)', async () => {
@@ -371,10 +394,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             text: async () => 'http://mockedurl.com',
         } as Response);
         
-        const dummyInputFilePath = path.join(projectRoot, 'dummy_gh_input.txt');
-        createInputFile(dummyInputFilePath, ['http://local-file-url.com']);
+        // Use the suite-defined dummyGhInputPath
+        createInputFile(dummyGhInputPath, ['http://local-file-url.com']);
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --inputFile ${dummyInputFilePath}`;
+        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --inputFile ${dummyGhInputPath}`;
         const result = await executeCommand(command, projectRoot);
 
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
@@ -382,10 +405,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         expect(result.stdout).toContain(`Fetching URLs from GitHub repository: ${MOCK_REPO_URL}`);
         expect(result.stdout).toContain(`Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`);
         
-        const inputFileContent = fs.readFileSync(dummyInputFilePath, 'utf-8');
+        const inputFileContent = fs.readFileSync(dummyGhInputPath, 'utf-8');
         expect(inputFileContent.trim()).toBe('http://local-file-url.com'); // Should not be touched
 
-        cleanup(dummyInputFilePath);
+        // No inline cleanup here, it's handled by afterEach
         expect(fetchMock).toHaveBeenCalledTimes(2);
     }, testTimeout);
 
@@ -515,24 +538,26 @@ describe('CLI Tests for CSV File Input', () => {
         expect(result.stdout).toContain(`Total URLs to process: 2`);
     }, testTimeout);
 
-    // Test Case 4: Mocked Remote CSV (Fetch Error)
+    // Test Case 4: Live Remote CSV (Fetch Error for a known 404 URL)
     it('should handle fetch error for remote CSV gracefully', async () => {
-        fetchMock.mockResolvedValueOnce({
-            ok: false,
-            status: 404,
-            statusText: 'Not Found',
-            text: async () => 'File not found content',
-        } as Response);
+        // This test now uses a live URL that is known to 404.
+        // The fetchMock in beforeEach will spy on fetch but not alter its behavior for this test
+        // as we are not calling mockResolvedValueOnce here.
 
-        const remoteCsvUrl = 'https://example.com/nonexistent.csv';
+        const remoteCsvUrl = 'https://github.com/privacy-tech-lab/gpc-web-crawler/blob/main/selenium-optmeowt-crawler/full-crawl-set.csv';
+        const expectedRawUrl = 'https://raw.githubusercontent.com/privacy-tech-lab/gpc-web-crawler/main/selenium-optmeowt-crawler/full-crawl-set.csv';
         const command = `${cliCommand} --csvFile ${remoteCsvUrl}`;
         const result = await executeCommand(command, projectRoot);
 
         expect(result.code).toBe(0, `Command should still exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Failed to download CSV content from ${remoteCsvUrl}: 404 Not Found`);
-        expect(result.stdout).toContain(`Error body: File not found content`);
+        expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`);
+        expect(result.stdout).toContain(`Failed to download CSV content from ${expectedRawUrl}: 404 Not Found`);
+        // The actual error body for GitHub 404s is typically "404: Not Found" or just "Not Found".
+        // Making this assertion flexible or checking for a substring.
+        expect(result.stdout).toContain(`Error body:`); // Check that an error body is mentioned
+        expect(result.stdout).toMatch(/Error body: (404: )?Not Found/); // More flexible check for error body
         expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${remoteCsvUrl}`);
-        expect(result.stdout).toContain('No URLs to process. Exiting.');
+        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
     }, testTimeout);
 
     // Test Case 5: Local CSV (Successful Read)
@@ -935,59 +960,73 @@ describe('CLI Tests for Range and Chunk Functionality', () => {
 // Separate describe block for live CSV tests if preferred, or could be part of the above
 describe('CLI Tests for Live CSV File Input (Network)', () => {
     const networkTestTimeout = 90000; // Longer timeout for actual network requests
-    let fetchMock: ReturnType<typeof vi.spyOn>; // To ensure no accidental mocking if other tests didn't clean up
+    // let fetchMock: ReturnType<typeof vi.spyOn>; // fetchMock is not consistently working for child processes
 
     beforeEach(() => {
         // Ensure fetch is NOT mocked for these live tests
-        // This is a safeguard; fetch should ideally be restored by other suites.
-        // If vi.restoreAllMocks() is consistently used, this might not be strictly necessary
-        // but helps ensure test isolation if restoring was missed.
         if (vi.isMockFunction(global.fetch)) {
             vi.restoreAllMocks(); 
         }
-        // Re-spy if needed by other types of tests, but for live, we want original fetch.
-        // This setup assumes this suite ONLY runs live tests. If mixed, more care is needed.
+        // Cleanup the new local CSV if it exists from a previous run
+        const testDomainsOnlyCsvPath = path.join(projectRoot, 'test_domains_only.csv');
+        cleanup(testDomainsOnlyCsvPath);
     });
 
     afterEach(() => {
-        // If we spied on fetch for some reason within this suite (e.g. conditional mocking), restore.
-        // Generally, for a purely live suite, this might not do anything if fetch wasn't re-mocked.
         // vi.restoreAllMocks(); 
+        // Cleanup the new local CSV after each test
+        const testDomainsOnlyCsvPath = path.join(projectRoot, 'test_domains_only.csv');
+        cleanup(testDomainsOnlyCsvPath);
     });
 
-    // Test Case 1: Live Network Test for Remote CSV (GitHub URL)
-    it('should successfully scan a small number of URLs from a live GitHub CSV file URL', async () => {
-        const liveCsvUrl = 'https://github.com/privacy-tech-lab/gpc-web-crawler/blob/main/selenium-optmeowt-crawler/full-crawl-set.csv';
-        // numUrls is not directly used by fetchUrlsFromCsv, but prebidExplorer's main loop might eventually use it
-        // For now, the CSV loader will fetch all URLs. The main processor then takes over.
-        // Let's not use --numUrls for this CSV test to see how many it loads by default from the first few.
-        // The test will primarily check if the fetching and initial processing work.
-        // We'll limit the actual processing in prebidExplorer implicitly by only checking a few URLs in output.
-        const command = `${cliCommand} --csvFile ${liveCsvUrl}`; // Removed --numUrls 3 for now
+    // Modified Test Case: From live Jirehlov CSV to local small CSV with domains only
+    it('should correctly identify 0 URLs from a local CSV file containing only domains', async () => {
+        const testDomainsOnlyCsvPath = path.join(projectRoot, 'test_domains_only.csv');
+        const csvContent = "domain\ngoogle.com\nexample.com\nyoutube.com";
+        fs.writeFileSync(testDomainsOnlyCsvPath, csvContent);
+
+        const command = `${cliCommand} --csvFile ${testDomainsOnlyCsvPath}`;
         
         const result = await executeCommand(command, projectRoot);
 
         expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Fetching URLs from CSV source: ${liveCsvUrl}`);
-        expect(result.stdout).toContain(`Detected remote CSV URL: ${liveCsvUrl}`);
-        expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: https://raw.githubusercontent.com/privacy-tech-lab/gpc-web-crawler/main/selenium-optmeowt-crawler/full-crawl-set.csv`);
-        
-        // Check that a positive number of URLs were loaded. The exact number can change.
-        // This file has a header, "sites". The first actual URL is on the second line.
-        // Example URLs: http://100widgets.com, http://123open.com
-        // The file actually contains domains, not full URLs, so 0 valid URLs will be extracted.
-        // Current behavior: The raw URL for this specific CSV is returning a 404.
-        console.log("Stdout for Live CSV Test:", result.stdout); // Log stdout for debugging
-
-        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        expect(result.stdout).toContain(`Fetching URLs from CSV source: ${liveCsvUrl}`);
-        expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: https://raw.githubusercontent.com/privacy-tech-lab/gpc-web-crawler/main/selenium-optmeowt-crawler/full-crawl-set.csv`);
-        expect(result.stdout).toContain(`Failed to download CSV content from https://raw.githubusercontent.com/privacy-tech-lab/gpc-web-crawler/main/selenium-optmeowt-crawler/full-crawl-set.csv: 404 Not Found`);
-        expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${liveCsvUrl}.`);
+        // Check for local file processing messages
+        expect(result.stdout).toContain(`Reading local CSV file: ${testDomainsOnlyCsvPath}`);
+        // This is the key assertion: 0 URLs should be loaded because domains don't match the URL regex
+        expect(result.stdout).toContain(`Extracted 0 URLs from CSV: ${testDomainsOnlyCsvPath}`);
+        // Check for appropriate exit message
         expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
         
         // Ensure no actual errors in stderr, warnings in stdout are expected
         expect(result.stderr).toBe('');
 
-    }, networkTestTimeout);
+    }, networkTestTimeout); // networkTestTimeout might be overkill now but safe
+
+    it('should handle a non-existent GitHub CSV file URL gracefully', async () => {
+        const nonExistentGithubCsvUrl = 'https://github.com/completely/nonexistent/repo/blob/main/somefilethatdoesnotexist.csv';
+        const command = `${cliCommand} --csvFile ${nonExistentGithubCsvUrl}`;
+
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command should still exit 0 for graceful handling. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+        
+        // Check for stdout messages
+        expect(result.stdout).toContain(`Fetching URLs from CSV source: ${nonExistentGithubCsvUrl}`);
+        expect(result.stdout).toContain(`Detected remote CSV URL: ${nonExistentGithubCsvUrl}`);
+        // Expect transformation attempt
+        const expectedRawUrl = 'https://raw.githubusercontent.com/completely/nonexistent/repo/main/somefilethatdoesnotexist.csv';
+        expect(result.stdout).toContain(`Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`);
+
+        // Expect failure to download
+        expect(result.stdout).toContain(`Failed to download CSV content from ${expectedRawUrl}: 404 Not Found`);
+        // Allow for slight variations in the "Error body" message, e.g., "404: Not Found" or just "Not Found"
+        expect(result.stdout).toMatch(/Error body: (404: )?Not Found/);
+
+        expect(result.stdout).toContain(`No URLs found or fetched from CSV file: ${nonExistentGithubCsvUrl}.`);
+        expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
+
+        // Ensure no actual errors in stderr (warnings in stdout are expected)
+        expect(result.stderr).toBe('');
+
+    }, networkTestTimeout); // Use the existing networkTestTimeout
 });
