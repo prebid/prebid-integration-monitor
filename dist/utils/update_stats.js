@@ -50,6 +50,7 @@ function compareVersions(a, b) {
 async function updateAndCleanStats(options) {
     const rawVersionCounts = {};
     const rawModuleCounts = {};
+    const moduleWebsiteData = {}; // To store unique URLs for each module
     const uniqueUrls = new Set();
     const urlsWithPrebid = new Set();
     const monthAbbrRegex = /^[A-Z][a-z]{2}$/;
@@ -89,6 +90,13 @@ async function updateAndCleanStats(options) {
                                                             const trimmedModule = moduleName.trim();
                                                             if (trimmedModule) {
                                                                 rawModuleCounts[trimmedModule] = (rawModuleCounts[trimmedModule] || 0) + 1;
+                                                                // Populate moduleWebsiteData
+                                                                if (currentUrl) {
+                                                                    if (!moduleWebsiteData[trimmedModule]) {
+                                                                        moduleWebsiteData[trimmedModule] = new Set();
+                                                                    }
+                                                                    moduleWebsiteData[trimmedModule].add(currentUrl);
+                                                                }
                                                             }
                                                         }
                                                     });
@@ -136,7 +144,13 @@ async function updateAndCleanStats(options) {
             idModuleInst: {},
             rtdModuleInst: {},
             analyticsAdapterInst: {},
-            otherModuleInst: {}
+            otherModuleInst: {},
+            // Initialize website count fields
+            bidAdapterWebsites: {},
+            idModuleWebsites: {},
+            rtdModuleWebsites: {},
+            analyticsAdapterWebsites: {},
+            otherModuleWebsites: {}
         };
         // Process versionDistribution from sortedRawVersionCounts
         const versionDistributionForCleaning = sortedRawVersionCounts;
@@ -181,9 +195,14 @@ async function updateAndCleanStats(options) {
                 finalApiData.otherModuleInst[moduleName] = count;
             }
         }
-        // Process moduleWebsiteCounts to populate website count fields
-        for (const moduleName in moduleWebsiteCounts) { // moduleWebsiteCounts was populated earlier
-            const count = moduleWebsiteCounts[moduleName];
+        // Convert moduleWebsiteData (Set<string>) to moduleWebsiteCountsNumeric (number)
+        const moduleWebsiteCountsNumeric = {};
+        for (const moduleName in moduleWebsiteData) {
+            moduleWebsiteCountsNumeric[moduleName] = moduleWebsiteData[moduleName].size;
+        }
+        // Process moduleWebsiteCountsNumeric to populate website count fields
+        for (const moduleName in moduleWebsiteCountsNumeric) {
+            const count = moduleWebsiteCountsNumeric[moduleName];
             if (count < MIN_COUNT_THRESHOLD) {
                 continue;
             }

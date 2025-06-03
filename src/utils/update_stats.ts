@@ -39,6 +39,12 @@ interface FinalApiData {
     rtdModuleInst: ModuleDistribution;
     analyticsAdapterInst: ModuleDistribution;
     otherModuleInst: ModuleDistribution;
+    // Add website count fields to the interface
+    bidAdapterWebsites?: ModuleDistribution;
+    idModuleWebsites?: ModuleDistribution;
+    rtdModuleWebsites?: ModuleDistribution;
+    analyticsAdapterWebsites?: ModuleDistribution;
+    otherModuleWebsites?: ModuleDistribution;
 }
 
 interface VersionComponents {
@@ -94,6 +100,7 @@ interface UpdateStatsOptions {
 async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> {
     const rawVersionCounts: VersionDistribution = {};
     const rawModuleCounts: ModuleDistribution = {};
+    const moduleWebsiteData: { [moduleName: string]: Set<string> } = {}; // To store unique URLs for each module
     const uniqueUrls: Set<string> = new Set();
     const urlsWithPrebid: Set<string> = new Set();
     const monthAbbrRegex: RegExp = /^[A-Z][a-z]{2}$/;
@@ -142,6 +149,13 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
                                                             const trimmedModule: string = moduleName.trim();
                                                             if (trimmedModule) {
                                                                 rawModuleCounts[trimmedModule] = (rawModuleCounts[trimmedModule] || 0) + 1;
+                                                                // Populate moduleWebsiteData
+                                                                if (currentUrl) {
+                                                                    if (!moduleWebsiteData[trimmedModule]) {
+                                                                        moduleWebsiteData[trimmedModule] = new Set();
+                                                                    }
+                                                                    moduleWebsiteData[trimmedModule].add(currentUrl);
+                                                                }
                                                             }
                                                         }
                                                     });
@@ -190,7 +204,13 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             idModuleInst: {},
             rtdModuleInst: {},
             analyticsAdapterInst: {},
-            otherModuleInst: {}
+            otherModuleInst: {},
+            // Initialize website count fields
+            bidAdapterWebsites: {},
+            idModuleWebsites: {},
+            rtdModuleWebsites: {},
+            analyticsAdapterWebsites: {},
+            otherModuleWebsites: {}
         };
 
         // Process versionDistribution from sortedRawVersionCounts
@@ -234,24 +254,30 @@ async function updateAndCleanStats(options?: UpdateStatsOptions): Promise<void> 
             }
         }
 
-        // Process moduleWebsiteCounts to populate website count fields
-        for (const moduleName in moduleWebsiteCounts) { // moduleWebsiteCounts was populated earlier
-            const count: number = moduleWebsiteCounts[moduleName];
+        // Convert moduleWebsiteData (Set<string>) to moduleWebsiteCountsNumeric (number)
+        const moduleWebsiteCountsNumeric: ModuleDistribution = {};
+        for (const moduleName in moduleWebsiteData) {
+            moduleWebsiteCountsNumeric[moduleName] = moduleWebsiteData[moduleName].size;
+        }
+
+        // Process moduleWebsiteCountsNumeric to populate website count fields
+        for (const moduleName in moduleWebsiteCountsNumeric) {
+            const count: number = moduleWebsiteCountsNumeric[moduleName];
 
             if (count < MIN_COUNT_THRESHOLD) {
                 continue;
             }
 
             if (moduleName.includes('BidAdapter')) {
-                finalApiData.bidAdapterWebsites[moduleName] = count;
+                finalApiData.bidAdapterWebsites![moduleName] = count;
             } else if (moduleName.includes('IdSystem') || moduleName === 'userId' || moduleName === 'idImportLibrary' || moduleName === 'pubCommonId' || moduleName === 'utiqSystem' || moduleName === 'trustpidSystem') {
-                finalApiData.idModuleWebsites[moduleName] = count;
+                finalApiData.idModuleWebsites![moduleName] = count;
             } else if (moduleName.includes('RtdProvider') || moduleName === 'rtdModule') {
-                finalApiData.rtdModuleWebsites[moduleName] = count;
+                finalApiData.rtdModuleWebsites![moduleName] = count;
             } else if (moduleName.includes('AnalyticsAdapter')) {
-                finalApiData.analyticsAdapterWebsites[moduleName] = count;
+                finalApiData.analyticsAdapterWebsites![moduleName] = count;
             } else {
-                finalApiData.otherModuleWebsites[moduleName] = count;
+                finalApiData.otherModuleWebsites![moduleName] = count;
             }
         }
 
