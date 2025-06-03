@@ -135,7 +135,9 @@ async function processFileContent(fileName: string, content: string, logger: Win
 // Helper function to fetch URLs from GitHub
 async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined, logger: WinstonLogger): Promise<string[]> {
   logger.info(`Fetching URLs from GitHub repository source: ${repoUrl}`);
+
   const allExtractedUrls: string[] = []; // Changed to allExtractedUrls to avoid confusion with Set in processFileContent
+
 
   try {
     // Check if the URL is a direct link to a file view (contains /blob/)
