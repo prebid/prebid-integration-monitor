@@ -91,6 +91,10 @@ describe('CLI Tests for Scan Command', () => {
         cleanup(testCsvFilePath); // Added for CSV tests
     });
 
+    afterEach(() => {
+        cleanup(dummyGithubInputFile);
+    });
+
     // Test Case 1
     it('Command runs with default options (now src/input.txt)', async () => {
         createInputFile(defaultInputFilePath, ['https://example.com']); // Will create src/input.txt
