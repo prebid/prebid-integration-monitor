@@ -112,23 +112,21 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 
 **Argument:**
 
--   `INPUTFILE`: (Optional) Path to an input file containing a list of URLs to scan (one URL per line).
+-   `INPUTFILE`: (Optional) Path to a local input file containing URLs.
+    -   Accepts `.txt` (one URL per line), `.csv` (URLs in the first column), or `.json` (extracts all string values that are URLs) files.
     -   This argument is required if `--githubRepo` is not used.
     -   If `--githubRepo` is provided, `INPUTFILE` is ignored.
-    -   If neither `INPUTFILE` nor `--githubRepo` is specified, the command will show an error.
-    -   Previously defaulted to `src/input.txt`; now, an input source must be explicitly defined if not using a default that might be configured elsewhere or if `src/input.txt` is not present. (Note: The CLI was updated to require either inputFile or githubRepo explicitly in `scan.ts`)
+    -   If neither `INPUTFILE` nor `--githubRepo` is specified, the command will show an error (unless the default `src/input.txt` exists and is readable).
+    -   Defaults to `src/input.txt` if no other source is specified.
 
 **Flags:**
 
 -   `--githubRepo <URL>`: Specifies a public GitHub URL from which to fetch URLs.
-    -   This can be a base repository URL (e.g., `https://github.com/owner/repo`) to scan for URLs within processable files (like `.txt`, `.md`) in the repository root.
+    -   This can be a base repository URL (e.g., `https://github.com/owner/repo`) to scan for URLs within processable files (like `.txt`, `.json`, `.md`) in the repository root.
     -   Alternatively, it can be a direct link to a specific processable file within a repository (e.g., `https://github.com/owner/repo/blob/main/some/path/file.txt`). In this case, only the specified file will be fetched and processed.
     -   Example (repository): `--githubRepo https://github.com/owner/repo`
     -   Example (direct file): `--githubRepo https://github.com/owner/repo/blob/main/urls.txt`
--   `--csvFile <path_or_url>`: Path to a local CSV file or a URL (e.g., a raw GitHub CSV link) from which to load URLs for scanning. The scanner expects URLs to be in the first column of the CSV. This flag takes precedence over `--githubRepo` and the `INPUTFILE` argument.
-    -   Example (local): `--csvFile ./path/to/your/urls.csv`
-    -   Example (remote): `--csvFile https://raw.githubusercontent.com/user/repo/main/path/to/your/urls.csv`
--   `--numUrls <number>`: When used with `--githubRepo`, this flag limits the number of URLs to be extracted and processed from the repository. (Note: This flag does not currently apply to URLs loaded via `--csvFile`.)
+-   `--numUrls <number>`: When used with `--githubRepo`, this flag limits the number of URLs to be extracted and processed from the repository.
     -   Default: `100`
     -   Example: `--numUrls 50`
 -   `--puppeteerType <option>`: Specifies the Puppeteer operational mode.
@@ -189,14 +187,14 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
     ./bin/run scan --githubRepo https://github.com/owner/repo --numUrls 50
     ```
 
-8.  **Scan URLs from a local CSV file:**
+8.  **Scan URLs from a local CSV file (using INPUTFILE argument):**
     ```bash
-    ./bin/run scan --csvFile ./data/urls_to_scan.csv
+    ./bin/run scan ./data/urls_to_scan.csv
     ```
 
-9.  **Scan URLs from a remote CSV file (raw GitHub link):**
+9.  **Scan URLs from a local JSON file (using INPUTFILE argument):**
     ```bash
-    ./bin/run scan --csvFile https://raw.githubusercontent.com/prebid/prebid-integration-monitor/main/tests/fixtures/sample_urls.csv
+    ./bin/run scan ./data/urls_to_scan.json
     ```
 
 10. **Scan a specific range of URLs from a large input file, in chunks:**
@@ -206,9 +204,10 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 
 #### Notes on URL Extraction
 
--   The scanner specifically looks for URLs that begin with `http://` or `https://`.
--   Entries in input sources (files or GitHub content) that are malformed (e.g., `htp://missing-t.com`), schemeless (e.g., `example.com` without a leading `http://` or `https://`), or plain text will be skipped and not processed as URLs.
--   The tool is designed to robustly process valid URLs even when they are mixed with such non-URL or malformed entries in the source content.
+-   When processing `.txt` files (or GitHub files treated as text), the scanner looks for fully qualified URLs (e.g., `http://example.com`) and also attempts to identify and prepend `https://` to schemeless domains (e.g., `example.com` becomes `https://example.com`).
+-   For `.csv` files, URLs are expected to be in the first column and should be fully qualified (e.g., `http://example.com`). Schemeless domains from CSVs are currently skipped.
+-   For `.json` files, all string values are recursively scanned. Fully qualified URLs are extracted. If a malformed JSON file is encountered, a fallback regex scan of the raw content is performed.
+-   Entries in input sources that are malformed (e.g., `htp://missing-t.com`) or use unsupported schemes (e.g., `ftp://`) are generally skipped.
 
 ### `stats:generate` Command
 
