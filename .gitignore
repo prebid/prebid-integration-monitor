@@ -1,2 +1,37 @@
-node_modules/
-logs/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# production
+/dist
+
+# misc
+.DS_Store
+.tern-project
+.vscode/launch.json
+*.tsbuildinfo
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# local env files
+.env
+.env*.local
+
+# oclif specific
+/tmp
+/oclif.manifest.json
+
+# test
+coverage
+
+# documentation
+docs/api

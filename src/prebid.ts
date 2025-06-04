@@ -126,9 +126,7 @@ async function processFileContent(fileName: string, content: string, logger: Win
             logger.warn(`Failed to parse JSON from ${fileName}. Falling back to regex scan of raw content. Error: ${e.message}`);
             // Fallback is covered by the initial fqdnMatches scan at the beginning of the function
         }
-    }
-    // For other file types (e.g., .md), the initial fqdnMatches scan is sufficient.
-    } else if (fileName.endsWith('.csv')) {
+    } else if (fileName.endsWith('.csv')) { // Correctly chain the .csv block
         logger.info(`Processing .csv file: ${fileName}`);
         try {
             const records = parse(content, {
@@ -151,7 +149,7 @@ async function processFileContent(fileName: string, content: string, logger: Win
             // Regex scan at the beginning of the function acts as a fallback
         }
     }
-
+    // Ensure a value is always returned
     return Array.from(extractedUrls);
 }
 
