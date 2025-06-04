@@ -627,14 +627,26 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         // Update inputFile logic:
         // The inputFile is overwritten with URLs that were within the processing scope (i.e., after applying any --range)
         // but were not successfully processed. `urlsToProcess` holds the list of URLs that were candidates for processing
-        // (post-range), and `processedUrls` tracks all URLs that were actually sent to a processing task (across all chunks).
+        // (post-range), and `taskResults` holds the outcome of each processing attempt.
         if (urlSourceType === 'InputFile' && options.inputFile) {
             if (options.inputFile.endsWith('.txt')) {
-                const remainingUrlsInAttemptedScope: string[] = urlsToProcess.filter((url: string) => !processedUrls.has(url));
+                const successfullyProcessedUrls: Set<string> = new Set();
+                for (const taskResult of taskResults) {
+                    if (taskResult && taskResult.type === 'success' && taskResult.data.url) {
+                        successfullyProcessedUrls.add(taskResult.data.url);
+                    }
+                }
+
+                const remainingUrlsInAttemptedScope: string[] = urlsToProcess.filter((url: string) => {
+                    // Keep the URL if it was never sent for processing (shouldn't happen if in urlsToProcess)
+                    // OR if it was sent for processing but did NOT succeed.
+                    return !successfullyProcessedUrls.has(url);
+                });
                 try {
-                    // This correctly updates the input file based on the (potentially ranged) scope of URLs that were attempted.
+                    // This updates the input file: only successfully processed URLs are removed.
+                    // URLs that failed or were not processed (e.g. if processing stopped early) remain.
                     fs.writeFileSync(options.inputFile, remainingUrlsInAttemptedScope.join('\n'), 'utf8');
-                    logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed from the current scope, ${remainingUrlsInAttemptedScope.length} URLs remain in current scope.`);
+                    logger.info(`${options.inputFile} updated. ${successfullyProcessedUrls.size} URLs successfully processed and removed. ${remainingUrlsInAttemptedScope.length} URLs remain in current scope (includes unprocessed or failed).`);
                 } catch (writeError: any) {
                     logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);
                 }

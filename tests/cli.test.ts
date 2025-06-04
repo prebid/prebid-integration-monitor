@@ -71,10 +71,12 @@ describe('CLI Tests for Scan Command', () => {
     const dummyGhInputPathConst = path.join(projectRoot, 'dummy_gh_input.txt');
     const rangeChunkInputPathConst = path.join(projectRoot, 'test_range_chunk_input.txt');
     const rangeChunkCsvPathConst = path.join(projectRoot, 'test_range_chunk.csv'); // Retained for range tests using CSV as inputFile
+    const testFailedUrlsInputPathConst = path.join(projectRoot, 'test_failed_urls_input.txt'); // For AllSuite cleanup
 
 
     // Cleanup before and after all tests in this suite
     beforeAll(() => {
+        cleanup(testFailedUrlsInputPathConst); // Add to AllSuite cleanup
         cleanup(defaultInputFilePath);
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
@@ -90,6 +92,7 @@ describe('CLI Tests for Scan Command', () => {
     });
 
     afterAll(() => {
+        cleanup(testFailedUrlsInputPathConst); // Add to AllSuite cleanup
         cleanup(defaultInputFilePath);
         cleanup(testInputFilePath);
         cleanup(testOutputDirPath);
@@ -1111,9 +1114,11 @@ describe('CLI Tests for Local File Inputs (inputFile argument)', () => {
     const testInputActualTxt = path.join(projectRoot, 'test_input_actual.txt');
     const testInputActualCsv = path.join(projectRoot, 'test_input_actual.csv');
     const testInputActualJson = path.join(projectRoot, 'test_input_actual.json');
+    const testFailedUrlsInputPath = path.join(projectRoot, 'test_failed_urls_input.txt');
     // testOutputDirPath is already defined globally
 
     beforeEach(() => {
+        cleanup(testFailedUrlsInputPath); // Add to suite-specific cleanup
         cleanup(testInputActualTxt);
         cleanup(testInputActualCsv);
         cleanup(testInputActualJson);
@@ -1121,11 +1126,53 @@ describe('CLI Tests for Local File Inputs (inputFile argument)', () => {
     });
 
     afterEach(() => {
+        cleanup(testFailedUrlsInputPath); // Add to suite-specific cleanup
         cleanup(testInputActualTxt);
         cleanup(testInputActualCsv);
         cleanup(testInputActualJson);
         cleanup(testOutputDirPath);
     });
+
+    it('should only remove successfully processed URLs from .txt file, leaving failed ones', async () => {
+        const urlsToTest = [
+            'https://example.com', // Expected to succeed
+            'http://nonexistentdomain.faketld', // Expected to fail (e.g., ENOTFOUND or similar network error)
+            'https://www.google.com', // Expected to succeed
+            'http://anothernonexistent.faketld' // Expected to fail
+        ];
+        createInputFile(testFailedUrlsInputPath, urlsToTest);
+
+        // Using --concurrency=1 to make success/failure order more predictable if needed,
+        // though for distinct domains like example.com vs nonexistent, it should be fine.
+        // Using a slightly higher timeout multiplier due to potential network timeouts for failing URLs.
+        const command = `${cliCommand} ${testFailedUrlsInputPath} --concurrency=1`;
+        const result = await executeCommand(command, projectRoot);
+
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
+
+        const remainingContent = fs.readFileSync(testFailedUrlsInputPath, 'utf-8').trim();
+        const remainingUrls = remainingContent.split('\n').filter(line => line.trim() !== '');
+
+        expect(remainingUrls).toContain('http://nonexistentdomain.faketld');
+        expect(remainingUrls).toContain('http://anothernonexistent.faketld');
+        expect(remainingUrls).not.toContain('https://example.com');
+        expect(remainingUrls).not.toContain('https://www.google.com');
+
+        expect(remainingUrls.length).toBe(2); // Exactly two URLs should remain
+
+        // Verify the log message (adjust regex as needed for precision)
+        // Example: "INFO: test_failed_urls_input.txt updated. 2 URLs successfully processed and removed. 2 URLs remain in current scope (includes unprocessed or failed)."
+        const logRegex = /([\d]+) URLs successfully processed and removed. ([\d]+) URLs remain in current scope \(includes unprocessed or failed\)/;
+        const match = result.stdout.match(logRegex);
+        expect(match).not.toBeNull(`Log message not found or did not match. Stdout: ${result.stdout}`);
+        if (match) {
+            expect(match[1]).toBe('2'); // Successfully processed
+            expect(match[2]).toBe('2'); // Remaining (failed)
+        }
+        // Check for the specific file update log
+        expect(result.stdout).toContain(`${testFailedUrlsInputPath} updated.`);
+
+    }, generalScanTestTimeout * 2); // Allow more time due to multiple URLs and potential timeouts
 
     it('should load URLs from a local .txt file specified by inputFile argument', async () => {
         const urls = ['http://txt-example1.com', 'https://txt-example2.com/path'];
