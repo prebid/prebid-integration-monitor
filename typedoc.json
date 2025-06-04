@@ -1,0 +1,8 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "docs",
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryPointStrategy": "resolve",
+  "excludeExternals": true,
+  "name": "Prebid Integration Monitor API Documentation"
+}

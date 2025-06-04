@@ -12,7 +12,8 @@
     "start": "node ./bin/run.js",
     "dev": "node --loader ts-node/esm ./bin/dev.js default",
     "scan": "npm run build && node ./bin/run.js scan",
-    "prebid:scan": "node ./bin/run.js scan"
+    "prebid:scan": "node ./bin/run.js scan",
+    "docs": "typedoc --skipErrorChecking"
   },
   "repository": {
     "type": "git",
@@ -51,6 +52,8 @@
     "@types/node": "^20.14.13",
     "mock-fs": "^5.5.0",
     "oclif": "^4.17.46",
+    "typedoc": "^0.28.5",
+    "typedoc-plugin-markdown": "^4.6.4",
     "vitest": "^3.2.0"
   },
   "bin": {
