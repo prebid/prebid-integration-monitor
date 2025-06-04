@@ -54,8 +54,6 @@ export default class Scan extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Scan)
 
-    const {args, flags} = await this.parse(Scan)
-
     const options: PrebidExplorerOptions = {
       puppeteerType: flags.puppeteerType as 'vanilla' | 'cluster',
       concurrency: flags.concurrency,
