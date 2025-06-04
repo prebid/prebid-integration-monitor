@@ -128,6 +128,29 @@ async function processFileContent(fileName: string, content: string, logger: Win
         }
     }
     // For other file types (e.g., .md), the initial fqdnMatches scan is sufficient.
+    } else if (fileName.endsWith('.csv')) {
+        logger.info(`Processing .csv file: ${fileName}`);
+        try {
+            const records = parse(content, {
+                columns: false,
+                skip_empty_lines: true,
+            });
+            for (const record of records) {
+                if (record && record.length > 0 && typeof record[0] === 'string') {
+                    const url = record[0].trim();
+                    if (url.startsWith('http://') || url.startsWith('https://')) {
+                        extractedUrls.add(url);
+                    } else if (url) {
+                        logger.warn(`Skipping invalid or non-HTTP/S URL from CSV content in ${fileName}: "${url}"`);
+                    }
+                }
+            }
+            logger.info(`Extracted ${extractedUrls.size} URLs from CSV content in ${fileName} (after initial regex scan)`);
+        } catch (e: any) {
+            logger.warn(`Failed to parse CSV content from ${fileName}. Error: ${e.message}`);
+            // Regex scan at the beginning of the function acts as a fallback
+        }
+    }
 
     return Array.from(extractedUrls);
 }
@@ -235,58 +258,18 @@ async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined,
   }
 }
 
-// Helper function to fetch URLs from a CSV file (local or remote)
-async function fetchUrlsFromCsv(csvPathOrUrl: string, logger: WinstonLogger): Promise<string[]> {
-  logger.info(`Fetching URLs from CSV source: ${csvPathOrUrl}`);
-  const extractedUrls: string[] = [];
-  let content: string;
-
-  try {
-    if (csvPathOrUrl.startsWith('http://') || csvPathOrUrl.startsWith('https://')) {
-      logger.info(`Detected remote CSV URL: ${csvPathOrUrl}`);
-      let fetchUrl = csvPathOrUrl;
-      // Transform GitHub blob URLs to raw content URLs
-      if (fetchUrl.includes('github.com') && fetchUrl.includes('/blob/')) {
-        fetchUrl = fetchUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-        logger.info(`Transformed GitHub blob URL to raw content URL: ${fetchUrl}`);
-      }
-
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        logger.error(`Failed to download CSV content from ${fetchUrl}: ${response.status} ${response.statusText}`);
-        const errorBody = await response.text();
-        logger.error(`Error body: ${errorBody}`);
-        return [];
-      }
-      content = await response.text();
-    } else {
-      logger.info(`Reading local CSV file: ${csvPathOrUrl}`);
-      content = fs.readFileSync(csvPathOrUrl, 'utf8');
+// Function to load file contents
+function loadFileContents(filePath: string, logger: WinstonLogger): string | null {
+    logger.info(`Attempting to read file: ${filePath}`);
+    try {
+        const content: string = fs.readFileSync(filePath, 'utf8');
+        logger.info(`Successfully read file: ${filePath}`);
+        return content;
+    } catch (error: any) {
+        logger.error(`Failed to read file ${filePath}: ${error.message}`, { stack: error.stack });
+        return null; // Return null or throw error as per desired error handling strategy
     }
-
-    const records = parse(content, {
-      columns: false,
-      skip_empty_lines: true,
-    });
-
-    for (const record of records) {
-      if (record && record.length > 0 && typeof record[0] === 'string') {
-        const url = record[0].trim();
-        if (url.startsWith('http://') || url.startsWith('https://')) {
-          extractedUrls.push(url);
-        } else if (url) {
-          logger.warn(`Skipping invalid or non-HTTP/S URL from CSV: "${url}"`);
-        }
-      }
-    }
-    logger.info(`Extracted ${extractedUrls.length} URLs from CSV: ${csvPathOrUrl}`);
-  } catch (error: any) {
-    logger.error(`Error processing CSV from ${csvPathOrUrl}: ${error.message}`, { stack: error.stack });
-    return [];
-  }
-  return extractedUrls;
 }
-
 
 export async function prebidExplorer(options: PrebidExplorerOptions): Promise<void> {
     logger = initializeLogger(options.logDir);
@@ -320,15 +303,7 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
     const processedUrls: Set<string> = new Set();
     let urlSourceType = ''; // To track the source for logging and file updates
 
-    if (options.csvFile) {
-        urlSourceType = 'CSV';
-        allUrls = await fetchUrlsFromCsv(options.csvFile, logger);
-        if (allUrls.length > 0) {
-            logger.info(`Successfully loaded ${allUrls.length} URLs from CSV file: ${options.csvFile}`);
-        } else {
-            logger.warn(`No URLs found or fetched from CSV file: ${options.csvFile}.`);
-        }
-    } else if (options.githubRepo) {
+    if (options.githubRepo) {
         urlSourceType = 'GitHub';
         allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
         if (allUrls.length > 0) {
@@ -338,16 +313,27 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         }
     } else if (options.inputFile) {
         urlSourceType = 'InputFile';
-        try {
-            allUrls = fs.readFileSync(options.inputFile, 'utf8').split('\n').map((url: string) => url.trim()).filter((url: string) => url.length > 0);
-            logger.info(`Initial URLs read from ${options.inputFile}`, { count: allUrls.length });
-        } catch (fileError: any) {
-            logger.error(`Failed to read input file ${options.inputFile}: ${fileError.message}`);
-            throw new Error(`Failed to read input file: ${options.inputFile}`);
+        const fileContent = loadFileContents(options.inputFile, logger);
+        if (fileContent) {
+            // Determine file type for logging, actual type handling is in processFileContent
+            const fileType = options.inputFile.substring(options.inputFile.lastIndexOf('.') + 1) || 'unknown';
+            logger.info(`Processing local file: ${options.inputFile} (detected type: ${fileType})`);
+            allUrls = await processFileContent(options.inputFile, fileContent, logger);
+            if (allUrls.length > 0) {
+                logger.info(`Successfully loaded ${allUrls.length} URLs from local ${fileType.toUpperCase()} file: ${options.inputFile}`);
+            } else {
+                logger.warn(`No URLs extracted from local ${fileType.toUpperCase()} file: ${options.inputFile}. Check file content and type handling.`);
+            }
+        } else {
+            // loadFileContents already logs the error, but we should ensure allUrls is empty and potentially throw
+            allUrls = []; // Ensure allUrls is empty if file read failed
+            logger.error(`Failed to load content from input file ${options.inputFile}. Cannot proceed with this source.`);
+            // Depending on desired behavior, you might want to throw an error here
+            // For now, it will proceed to the "No URLs to process" check.
         }
     } else {
         // This case should ideally be prevented by CLI validation in scan.ts
-        logger.error('No URL source provided. Either --csvFile, --githubRepo, or inputFile argument must be specified.');
+        logger.error('No URL source provided. Either --githubRepo or inputFile argument must be specified.');
         throw new Error('No URL source specified.');
     }
 
@@ -643,13 +629,17 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         // but were not successfully processed. `urlsToProcess` holds the list of URLs that were candidates for processing
         // (post-range), and `processedUrls` tracks all URLs that were actually sent to a processing task (across all chunks).
         if (urlSourceType === 'InputFile' && options.inputFile) {
-            const remainingUrlsInAttemptedScope: string[] = urlsToProcess.filter((url: string) => !processedUrls.has(url));
-            try {
-                // This correctly updates the input file based on the (potentially ranged) scope of URLs that were attempted.
-                fs.writeFileSync(options.inputFile, remainingUrlsInAttemptedScope.join('\n'), 'utf8');
-                logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed from the current scope, ${remainingUrlsInAttemptedScope.length} URLs remain in current scope.`);
-            } catch (writeError: any) {
-                logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);
+            if (options.inputFile.endsWith('.txt')) {
+                const remainingUrlsInAttemptedScope: string[] = urlsToProcess.filter((url: string) => !processedUrls.has(url));
+                try {
+                    // This correctly updates the input file based on the (potentially ranged) scope of URLs that were attempted.
+                    fs.writeFileSync(options.inputFile, remainingUrlsInAttemptedScope.join('\n'), 'utf8');
+                    logger.info(`${options.inputFile} updated. ${processedUrls.size} URLs processed from the current scope, ${remainingUrlsInAttemptedScope.length} URLs remain in current scope.`);
+                } catch (writeError: any) {
+                    logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);
+                }
+            } else {
+                logger.info(`Skipping modification of original ${options.inputFile.endsWith('.csv') ? 'CSV' : 'JSON'} input file: ${options.inputFile}`);
             }
         }
 
