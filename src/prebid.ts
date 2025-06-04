@@ -1,306 +1,176 @@
+/**
+ * @fileoverview This is the main orchestrator script for the Prebid Explorer tool.
+ * It leverages Puppeteer to launch a browser, load URLs from various sources
+ * (local files or GitHub), process each page to extract Prebid.js and other
+ * advertising technology information, and then saves these findings.
+ *
+ * The script is designed to be configurable through command-line options,
+ * allowing users to specify URL sources, Puppeteer behavior (vanilla vs. cluster),
+ * concurrency, output directories, and more.
+ *
+ * It coordinates helper modules for URL loading (`url-loader.ts`),
+ * Puppeteer task execution (`puppeteer-task.ts`), and results handling
+ * (`results-handler.ts`).
+ */
 import * as fs from 'fs';
 import { initializeLogger } from './utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
 import { addExtra } from 'puppeteer-extra';
-import puppeteerVanilla, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
+import puppeteerVanilla, { Browser, PuppeteerLaunchOptions, Page } from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources';
+import blockResourcesPluginFactory, { BlockResourcesPlugin } from 'puppeteer-extra-plugin-block-resources'; // Import type for plugin
 import { Cluster } from 'puppeteer-cluster';
-import { Page } from 'puppeteer';
-import { parse } from 'csv-parse/sync';
-import fetch from 'node-fetch'; // Ensure fetch is available, already used by fetchUrlsFromGitHub
 
-// Helper function to configure a new page
-async function configurePage(page: Page): Promise<Page> { // page is passed directly by puppeteer-cluster
-    page.setDefaultTimeout(55000);
-    // Set to a common Chrome user agent
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-    return page;
-}
+// Import functions from new modules
+import {
+    processFileContent,
+    fetchUrlsFromGitHub,
+    loadFileContents
+} from './utils/url-loader.js';
 
-// Define interfaces for page data
-interface PrebidInstance {
-    globalVarName: string;
-    version: string;
-    modules: string[];
-}
+import {
+    processPageTask, // The core function for processing a single page
+    // TaskResult and PageData are now imported from common/types
+} from './utils/puppeteer-task.js';
 
-interface PageData {
-    libraries: string[];
-    date: string;
-    prebidInstances?: PrebidInstance[];
-    url?: string; // Added url to PageData
-}
+// Import shared types from the new common location
+import type { TaskResult, PageData } from '../common/types.js';
 
-interface TaskResultSuccess {
-    type: 'success';
-    data: PageData;
-}
+import {
+    processAndLogTaskResults,
+    writeResultsToFile,
+    updateInputFile
+} from './utils/results-handler.js';
 
-interface TaskResultNoData {
-    type: 'no_data';
-    url: string;
-}
-
-interface TaskResultError {
-    type: 'error';
-    url: string;
-    error: string;
-}
-
-type TaskResult = TaskResultSuccess | TaskResultNoData | TaskResultError;
-
+/**
+ * Defines the configuration options for the `prebidExplorer` function.
+ * These options control various aspects of the Prebid.js scanning process,
+ * including URL sources, Puppeteer settings, concurrency, and output.
+ */
 export interface PrebidExplorerOptions {
+    /** Optional path to an input file containing URLs to scan (e.g., .txt, .json, .csv). */
     inputFile?: string; // Make optional as it might not be needed if githubRepo is used
+    /** Optional path to a CSV file (currently unused, consider for future use or removal). */
     csvFile?: string;
+    /** Optional URL of a GitHub repository or direct file link to fetch URLs from. */
     githubRepo?: string;
+    /** Optional maximum number of URLs to process from the source. */
     numUrls?: number;
+    /** The type of Puppeteer execution: 'vanilla' (single browser instance) or 'cluster' (multiple instances). */
     puppeteerType: 'vanilla' | 'cluster';
+    /** The maximum number of concurrent Puppeteer instances/pages when using 'cluster' mode. */
     concurrency: number;
+    /** Whether to run Puppeteer in headless mode. */
     headless: boolean;
+    /** Whether to enable Puppeteer cluster monitoring (if 'cluster' mode is used). */
     monitor: boolean;
+    /** The directory where output JSON files will be saved. */
+    /** The directory where output JSON files containing scan results will be saved. */
     outputDir: string;
+    /** The directory where log files (e.g., activity logs, error logs) will be saved. */
     logDir: string;
+    /**
+     * Optional Puppeteer launch options to customize browser instantiation.
+     * @see https://pptr.dev/api/puppeteer.puppeteerlaunchoptions
+     * @example { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+     */
     puppeteerLaunchOptions?: PuppeteerLaunchOptions;
+    /**
+     * Optional string specifying a range of URLs to process from the input list (1-based index).
+     * Useful for splitting large lists or resuming partial scans.
+     * @example "1-100", "50-", "-200"
+     */
     range?: string;
+    /**
+     * Optional number of URLs to process in each batch or chunk.
+     * If set to 0 or undefined, all URLs are processed in a single batch (or per cluster limits).
+     * Useful for managing resources or if processing needs to be intermittent.
+     */
     chunkSize?: number;
 }
 
-let logger: WinstonLogger;
+let logger: WinstonLogger; // Global logger instance, initialized within prebidExplorer.
 
-const puppeteer = addExtra(puppeteerVanilla as any);
-
-// Helper function to process file content for URL extraction
-async function processFileContent(fileName: string, content: string, logger: WinstonLogger): Promise<string[]> {
-    const extractedUrls = new Set<string>(); // Use Set for automatic deduplication
-    const urlRegex = /(https?:\/\/[^\s"]+)/gi;
-    const schemelessDomainRegex = /(^|\s|"|')([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}(\s|\\"|"|'|$)/g; // Adjusted to handle quotes and escaped quotes
-
-    // Always try to find fully qualified URLs first
-    const fqdnMatches = content.match(urlRegex);
-    if (fqdnMatches) {
-        fqdnMatches.forEach(url => extractedUrls.add(url.trim()));
-    }
-
-    if (fileName.endsWith('.txt')) {
-        logger.info(`Processing .txt file: ${fileName} for schemeless domains.`);
-        // Find schemeless domains
-        const schemelessMatches = content.match(schemelessDomainRegex);
-        if (schemelessMatches) {
-            schemelessMatches.forEach(domain => {
-                const cleanedDomain = domain.trim().replace(/^["']|["']$/g, ''); // Remove surrounding quotes
-                if (cleanedDomain && !cleanedDomain.includes('://')) { // Ensure it's actually schemeless
-                    const fullUrl = `https://${cleanedDomain}`;
-                    if (!extractedUrls.has(fullUrl)) { // Avoid adding if already found as FQDN
-                        extractedUrls.add(fullUrl);
-                        logger.info(`Found and added schemeless domain as ${fullUrl} from ${fileName}`);
-                    }
-                }
-            });
-        }
-    } else if (fileName.endsWith('.json')) {
-        logger.info(`Processing .json file: ${fileName}`);
-        try {
-            const jsonData = JSON.parse(content);
-            const urlsFromJson = new Set<string>();
-
-            function extractUrlsFromJsonRecursive(data: any) {
-                if (typeof data === 'string') {
-                    const jsonStringMatches = data.match(urlRegex);
-                    if (jsonStringMatches) {
-                        jsonStringMatches.forEach(url => urlsFromJson.add(url.trim()));
-                    }
-                } else if (Array.isArray(data)) {
-                    data.forEach(item => extractUrlsFromJsonRecursive(item));
-                } else if (typeof data === 'object' && data !== null) {
-                    Object.values(data).forEach(value => extractUrlsFromJsonRecursive(value));
-                }
-            }
-
-            extractUrlsFromJsonRecursive(jsonData);
-            if (urlsFromJson.size > 0) {
-                logger.info(`Extracted ${urlsFromJson.size} URLs from parsed JSON structure in ${fileName}`);
-                urlsFromJson.forEach(url => extractedUrls.add(url));
-            }
-        } catch (e: any) {
-            logger.warn(`Failed to parse JSON from ${fileName}. Falling back to regex scan of raw content. Error: ${e.message}`);
-            // Fallback is covered by the initial fqdnMatches scan at the beginning of the function
-        }
-    } else if (fileName.endsWith('.csv')) { // Correctly chain the .csv block
-        logger.info(`Processing .csv file: ${fileName}`);
-        try {
-            const records = parse(content, {
-                columns: false,
-                skip_empty_lines: true,
-            });
-            for (const record of records) {
-                if (record && record.length > 0 && typeof record[0] === 'string') {
-                    const url = record[0].trim();
-                    if (url.startsWith('http://') || url.startsWith('https://')) {
-                        extractedUrls.add(url);
-                    } else if (url) {
-                        logger.warn(`Skipping invalid or non-HTTP/S URL from CSV content in ${fileName}: "${url}"`);
-                    }
-                }
-            }
-            logger.info(`Extracted ${extractedUrls.size} URLs from CSV content in ${fileName} (after initial regex scan)`);
-        } catch (e: any) {
-            logger.warn(`Failed to parse CSV content from ${fileName}. Error: ${e.message}`);
-            // Regex scan at the beginning of the function acts as a fallback
-        }
-    }
-    // Ensure a value is always returned
-    return Array.from(extractedUrls);
-}
-
-// Helper function to fetch URLs from GitHub
-async function fetchUrlsFromGitHub(repoUrl: string, numUrls: number | undefined, logger: WinstonLogger): Promise<string[]> {
-  logger.info(`Fetching URLs from GitHub repository source: ${repoUrl}`);
-
-  const allExtractedUrls: string[] = []; // Changed to allExtractedUrls to avoid confusion with Set in processFileContent
+// Apply puppeteer-extra plugins.
+// The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
+// to handle the dynamic nature of puppeteer-extra plugins while retaining type safety
+// for the core puppeteerVanilla methods.
+const puppeteer = addExtra(puppeteerVanilla as any) as unknown as typeof puppeteerVanilla;
 
 
-  try {
-    // Check if the URL is a direct link to a file view (contains /blob/)
-    if (repoUrl.includes('/blob/')) {
-      logger.info(`Detected direct file link: ${repoUrl}. Attempting to fetch raw content.`);
-      const rawUrl = repoUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-      const fileName = repoUrl.substring(repoUrl.lastIndexOf('/') + 1); // Extract filename
-
-      logger.info(`Fetching content directly from raw URL: ${rawUrl}`);
-      const fileResponse = await fetch(rawUrl);
-      if (fileResponse.ok) {
-        const content = await fileResponse.text();
-        const urlsFromFile = await processFileContent(fileName, content, logger);
-        if (urlsFromFile.length > 0) {
-          urlsFromFile.forEach(url => allExtractedUrls.push(url));
-          logger.info(`Extracted ${urlsFromFile.length} URLs from ${rawUrl} (direct file)`);
-        } else {
-          logger.info(`No URLs found in content from ${rawUrl} (direct file)`);
-        }
-      } else {
-        logger.error(`Failed to download direct file content: ${rawUrl} - ${fileResponse.status} ${fileResponse.statusText}`);
-        const errorBody = await fileResponse.text();
-        logger.error(`Error body: ${errorBody}`);
-        return []; // Return empty if direct file fetch fails
-      }
-    } else {
-      // Existing logic for repository directory listing
-      logger.info(`Processing as repository URL: ${repoUrl}`);
-      const repoPathMatch = repoUrl.match(/github\.com\/([^/]+\/[^/]+)/);
-      if (!repoPathMatch || !repoPathMatch[1]) {
-        logger.error(`Invalid GitHub repository URL format: ${repoUrl}. Expected format like https://github.com/owner/repo`);
-        return [];
-      }
-      const repoPath = repoPathMatch[1].replace(/\.git$/, '');
-
-      const contentsUrl = `https://api.github.com/repos/${repoPath}/contents`;
-      logger.info(`Fetching repository contents from: ${contentsUrl}`);
-
-      const response = await fetch(contentsUrl, {
-        headers: { Accept: 'application/vnd.github.v3+json' },
-      });
-
-      if (!response.ok) {
-        logger.error(`Failed to fetch repository contents: ${response.status} ${response.statusText}`, { url: contentsUrl });
-        const errorBody = await response.text();
-        logger.error(`Error body: ${errorBody}`);
-        return [];
-      }
-
-      const files = await response.json();
-      if (!Array.isArray(files)) {
-        logger.error('Expected an array of files from GitHub API, but received something else.', { response: files });
-        return [];
-      }
-
-      // Updated to include .json for targeted processing, .txt and .md for general URL extraction.
-      const targetExtensions = ['.txt', '.md', '.json'];
-      logger.info(`Found ${files.length} items in the repository. Filtering for ${targetExtensions.join(', ')} files.`);
-
-      for (const file of files) {
-        // Ensure file.name is defined before calling endsWith
-        if (file.type === 'file' && file.name && targetExtensions.some(ext => file.name.endsWith(ext))) {
-          logger.info(`Fetching content for file: ${file.path} from ${file.download_url}`);
-          try {
-            const fileResponse = await fetch(file.download_url);
-            if (fileResponse.ok) {
-              const content = await fileResponse.text();
-              const urlsFromFile = await processFileContent(file.name, content, logger);
-              if (urlsFromFile.length > 0) {
-                urlsFromFile.forEach(url => allExtractedUrls.push(url));
-                logger.info(`Extracted ${urlsFromFile.length} URLs from ${file.path}`);
-              }
-            } else {
-              logger.warn(`Failed to download file content: ${file.path} - ${fileResponse.status}`);
-            }
-          } catch (fileError: any) {
-            logger.error(`Error fetching or processing file ${file.path}: ${fileError.message}`, { fileUrl: file.download_url });
-          }
-
-          if (numUrls && allExtractedUrls.length >= numUrls) {
-            logger.info(`Reached URL limit of ${numUrls}. Stopping further file processing.`);
-            break;
-          }
-        }
-      }
-    }
-    // Deduplicate URLs at the end before slicing
-    const uniqueUrls = Array.from(new Set(allExtractedUrls));
-    logger.info(`Total unique URLs extracted before limiting: ${uniqueUrls.length}`);
-    return numUrls ? uniqueUrls.slice(0, numUrls) : uniqueUrls;
-
-  } catch (error: any) {
-    logger.error(`Error processing GitHub URL ${repoUrl}: ${error.message}`, { stack: error.stack });
-    return [];
-  }
-}
-
-// Function to load file contents
-function loadFileContents(filePath: string, logger: WinstonLogger): string | null {
-    logger.info(`Attempting to read file: ${filePath}`);
-    try {
-        const content: string = fs.readFileSync(filePath, 'utf8');
-        logger.info(`Successfully read file: ${filePath}`);
-        return content;
-    } catch (error: any) {
-        logger.error(`Failed to read file ${filePath}: ${error.message}`, { stack: error.stack });
-        return null; // Return null or throw error as per desired error handling strategy
-    }
-}
-
+/**
+ * The main entry point for the Prebid Explorer tool.
+ * This asynchronous function orchestrates the entire process of:
+ * 1. Initializing logging.
+ * 2. Applying Puppeteer plugins (Stealth, Block Resources).
+ * 3. Determining the source of URLs (GitHub or local file) and loading them.
+ * 4. Filtering URLs based on the specified range, if any.
+ * 5. Launching Puppeteer (either a single instance or a cluster for concurrency).
+ * 6. Processing each URL in chunks (if specified) using the `processPageTask`.
+ * 7. Collecting and logging results from each task.
+ * 8. Writing aggregated successful results to JSON files.
+ * 9. Updating the input file if applicable (e.g., removing successfully processed URLs).
+ *
+ * @param {PrebidExplorerOptions} options - An object containing all configuration settings
+ *                                          for the current run of the Prebid Explorer.
+ * @returns {Promise<void>} A promise that resolves when all URLs have been processed and
+ *                          results have been handled, or rejects if a critical error occurs
+ *                          during setup or orchestration.
+ * @example
+ * const options = {
+ *   inputFile: "urls.txt",
+ *   outputDir: "output_results",
+ *   logDir: "logs",
+ *   puppeteerType: 'cluster',
+ *   concurrency: 5,
+ *   headless: true,
+ *   monitor: false,
+ *   chunkSize: 100,
+ *   range: "1-500"
+ * };
+ * prebidExplorer(options)
+ *   .then(() => console.log("Prebid Explorer finished."))
+ *   .catch(error => console.error("Prebid Explorer failed:", error));
+ */
 export async function prebidExplorer(options: PrebidExplorerOptions): Promise<void> {
-    logger = initializeLogger(options.logDir);
+    logger = initializeLogger(options.logDir); // Initialize the global logger
 
-    // Apply puppeteer-extra plugins
+    logger.info('Starting Prebid Explorer with options:', options);
+
+    // Apply puppeteer-extra stealth plugin to help avoid bot detection
     puppeteer.use(StealthPlugin());
 
-    const blockResources = (blockResourcesPluginFactory as any)();
-    if (blockResources && blockResources.blockedTypes && typeof blockResources.blockedTypes.add === 'function') {
-      const typesToBlock: Set<any> = new Set<any>([
-          'image', 'font', 'websocket', 'media',
-          'texttrack', 'eventsource', 'manifest', 'other'
-      ]);
-      typesToBlock.forEach(type => blockResources.blockedTypes.add(type));
-      puppeteer.use(blockResources); // Use the configured instance
-    } else {
-      logger.warn('Could not configure blockResourcesPlugin: blockedTypes property or .add method not available on instance.', { plugin: blockResources });
-    }
+    // Define specific type for blocked resource types for clarity
+    type ResourceType = 'image' | 'font' | 'websocket' | 'media' | 'texttrack' | 'eventsource' | 'manifest' | 'other' | 'stylesheet' | 'script' | 'xhr';
+
+    const resourcesToBlock: Set<ResourceType> = new Set<ResourceType>([
+        'image', 'font', 'media', // Common non-essential resources for ad tech scanning
+        'texttrack', 'eventsource', 'manifest', 'other'
+        // 'stylesheet', 'script', 'xhr', 'websocket' are usually essential and not blocked.
+    ]);
+    const blockResourcesPlugin = blockResourcesPluginFactory({ blockedTypes: resourcesToBlock });
+    puppeteer.use(blockResourcesPlugin);
+    logger.info(`Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`);
 
     const basePuppeteerOptions: PuppeteerLaunchOptions = {
-        protocolTimeout: 1000000,
+        protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
+        /** @type {(null|Object)} Sets the viewport to null, effectively using the default viewport of the browser window. */
         defaultViewport: null,
         headless: options.headless,
         args: options.puppeteerLaunchOptions?.args || [],
         ...options.puppeteerLaunchOptions
     };
 
-    let results: PageData[] = [];
-    const taskResults: TaskResult[] = [];
+    // results array is correctly typed with PageData from puppeteer-task.ts
+    const taskResults: TaskResult[] = []; // Correctly typed with TaskResult from puppeteer-task.ts
+    /** @type {string[]} Array to store all URLs fetched from the specified source. */
     let allUrls: string[] = [];
+    /** @type {Set<string>} Set to keep track of URLs that have been processed or are queued for processing. */
     const processedUrls: Set<string> = new Set();
+    /** @type {string} String to identify the source of URLs (e.g., 'GitHub', 'InputFile'). */
     let urlSourceType = ''; // To track the source for logging and file updates
 
+    // Determine the source of URLs (GitHub or local file) and fetch them.
     if (options.githubRepo) {
         urlSourceType = 'GitHub';
         allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
@@ -335,6 +205,7 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         throw new Error('No URL source specified.');
     }
 
+    // Exit if no URLs were found from the specified source.
     if (allUrls.length === 0) {
         logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
         return;
@@ -342,6 +213,7 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
     logger.info(`Initial total URLs found: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
 
     // 1. URL Range Logic
+    // Apply URL range filtering if specified in options.
     if (options.range) {
         logger.info(`Applying range: ${options.range}`);
         const originalUrlCount = allUrls.length;
@@ -376,73 +248,18 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
     }
     logger.info(`Total URLs to process after range check: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
 
+    /** @type {string[]} URLs to be processed after applying range and other filters. */
     const urlsToProcess = allUrls; // This now contains potentially ranged URLs
 
     // Define the core processing task (used by both vanilla and cluster)
-    const processPageTask = async (page: Page, url: string): Promise<TaskResult> => {
-        const trimmedUrl: string = url;
-        logger.info(`Processing: ${trimmedUrl}`, { url: trimmedUrl });
-        try {
-            await configurePage(page);
-            await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
-
-            await page.evaluate(async () => {
-                const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
-                await sleep(6000);
-            });
-
-            const pageData: PageData = await page.evaluate((): PageData => {
-                const data: Partial<PageData> = {};
-                data.libraries = [];
-                data.date = new Date().toISOString().slice(0, 10);
-                if ((window as any).apstag) data.libraries.push('apstag');
-                if ((window as any).googletag) data.libraries.push('googletag');
-                if ((window as any).ats) data.libraries.push('ats');
-                if ((window as any)._pbjsGlobals && Array.isArray((window as any)._pbjsGlobals)) {
-                    data.prebidInstances = [];
-                    (window as any)._pbjsGlobals.forEach(function(globalVarName: string) {
-                        const pbjsInstance = (window as any)[globalVarName];
-                        if (pbjsInstance && pbjsInstance.version && pbjsInstance.installedModules) {
-                            data.prebidInstances!.push({
-                                globalVarName: globalVarName,
-                                version: pbjsInstance.version,
-                                modules: pbjsInstance.installedModules
-                            });
-                        }
-                    });
-                }
-                return data as PageData;
-            });
-            pageData.url = trimmedUrl;
-            if (pageData.libraries.length > 0 || (pageData.prebidInstances && pageData.prebidInstances.length > 0)) {
-                return { type: 'success', data: pageData };
-            } else {
-                logger.warn(`No relevant Prebid or ad library data found for ${trimmedUrl}`, { url: trimmedUrl });
-                return { type: 'no_data', url: trimmedUrl };
-            }
-        } catch (pageError: any) {
-            logger.error(`Error processing ${trimmedUrl}`, { url: trimmedUrl, error: pageError });
-            const errorMessage: string = pageError.message || '';
-            const netErrorMatch: RegExpMatchArray | null = errorMessage.match(/net::([A-Z_]+)/);
-            let errorCode: string;
-            if (netErrorMatch) {
-                errorCode = netErrorMatch[1];
-            } else {
-                const prefix: string = `Error processing ${trimmedUrl}: `;
-                if (errorMessage.startsWith(prefix)) {
-                    errorCode = errorMessage.substring(prefix.length).trim();
-                } else {
-                    errorCode = errorMessage.trim() || 'UNKNOWN_ERROR';
-                }
-                errorCode = errorCode.replace(/\s+/g, '_').toUpperCase();
-            }
-            return { type: 'error', url: trimmedUrl, error: errorCode };
-        }
-    };
+    // Note: The actual definition of processPageTask is now imported.
+    // We pass it to the cluster or call it directly, along with the logger.
 
     // 2. Chunk Processing Logic
+    /** @type {number} Size of chunks for processing URLs. 0 means no chunking. */
     const chunkSize = options.chunkSize && options.chunkSize > 0 ? options.chunkSize : 0;
 
+    // Process URLs in chunks if chunkSize is specified.
     if (chunkSize > 0) {
         logger.info(`Chunked processing enabled. Chunk size: ${chunkSize}`);
         const totalChunks = Math.ceil(urlsToProcess.length / chunkSize);
@@ -453,8 +270,9 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
             const chunkNumber = Math.floor(i / chunkSize) + 1;
             logger.info(`Processing chunk ${chunkNumber} of ${totalChunks}: URLs ${i + 1}-${Math.min(i + chunkSize, urlsToProcess.length)}`);
 
+            // Process the current chunk using either 'cluster' or 'vanilla' Puppeteer mode.
             if (options.puppeteerType === 'cluster') {
-                const cluster: Cluster<string, TaskResult> = await Cluster.launch({
+                const cluster: Cluster<{url: string, logger: WinstonLogger}, TaskResult> = await Cluster.launch({
                     concurrency: Cluster.CONCURRENCY_CONTEXT,
                     maxConcurrency: options.concurrency,
                     monitor: options.monitor,
@@ -462,37 +280,47 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
                     puppeteerOptions: basePuppeteerOptions,
                 });
 
-                await cluster.task(async ({ page, data: url }: { page: Page, data: string }): Promise<TaskResult> => {
-                    return processPageTask(page, url);
-                });
+                // Register the imported processPageTask with the cluster
+                await cluster.task(processPageTask);
 
                 try {
                     const chunkPromises = currentChunkUrls.filter(url => url).map(url => {
                         processedUrls.add(url); // Add to global processedUrls as it's queued
-                        return cluster.queue(url)
-                            .then(resultFromQueue => resultFromQueue)
-                            .catch(error => {
-                                logger.error(`Error from cluster.queue for ${url} in chunk ${chunkNumber}:`, { error });
-                                return { type: 'error', url: url, error: 'QUEUE_ERROR_OR_TASK_FAILED' } as TaskResult;
-                            });
+                        return cluster.queue({ url, logger }) // Pass url and logger
+                            // No specific .then or .catch here, as results are collected from settledChunkResults
+                            // Error handling for queueing itself might be needed if cluster.queue can throw directly
+                            // However, task errors are handled by processPageTask and returned as TaskResultError.
                     });
+                    // Wait for all promises in the chunk to settle
                     const settledChunkResults = await Promise.allSettled(chunkPromises);
+
                     settledChunkResults.forEach(settledResult => {
                         if (settledResult.status === 'fulfilled') {
-                            if (settledResult.value !== undefined && settledResult.value !== null) {
+                            // Ensure that settledResult.value is not null or undefined before pushing
+                            if (settledResult.value) {
                                 taskResults.push(settledResult.value);
                             } else {
-                                logger.warn('A task from cluster.queue (chunked) settled with undefined/null value.', { settledResult });
+                                // This case might occur if a task somehow resolves with no value,
+                                // though processPageTask is expected to always return a TaskResult.
+                                logger.warn('A task from cluster.queue (chunked) fulfilled but with undefined/null value.', { settledResult });
                             }
-                        } else {
-                            logger.error(`A promise from cluster.queue (chunk ${chunkNumber}) settled as rejected.`, { reason: settledResult.reason });
+                        } else if (settledResult.status === 'rejected') {
+                            // This typically means an error occurred before processPageTask could even run or return a TaskResultError
+                            // (e.g., an issue with Puppeteer itself or the cluster queue mechanism for that specific task).
+                            // It's important to log this, as it might not be captured by processPageTask's own error handling.
+                            logger.error(`A promise from cluster.queue (chunk ${chunkNumber}) was rejected. This is unexpected if processPageTask is robust.`, { reason: settledResult.reason });
+                            // Optionally, create a TaskResultError here if the URL can be reliably determined.
+                            // const urlFromRejectedPromise = ... (this might be tricky to get reliably from the settledResult.reason)
+                            // if (urlFromRejectedPromise) {
+                            //     taskResults.push({ type: 'error', url: urlFromRejectedPromise, error: 'PROMISE_REJECTED_IN_QUEUE' });
+                            // }
                         }
                     });
                     await cluster.idle();
                     await cluster.close();
                 } catch (error: any) {
                     logger.error(`An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`, { error });
-                    if (cluster) await cluster.close(); // Ensure cluster is closed on error
+                    if (cluster && !cluster.isClosed()) await cluster.close(); // Ensure cluster is closed on error
                 }
             } else { // 'vanilla' Puppeteer for the current chunk
                 let browser: Browser | null = null;
@@ -501,7 +329,8 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
                     for (const url of currentChunkUrls) {
                         if (url) {
                             const page = await browser.newPage();
-                            const result = await processPageTask(page, url);
+                            // Call the imported processPageTask directly
+                            const result = await processPageTask({ page, data: { url, logger } });
                             taskResults.push(result);
                             await page.close();
                             processedUrls.add(url); // Add to global processedUrls
@@ -519,7 +348,7 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         // Process all URLs at once (no chunking)
         logger.info(`Processing all ${urlsToProcess.length} URLs without chunking.`);
         if (options.puppeteerType === 'cluster') {
-            const cluster: Cluster<string, TaskResult> = await Cluster.launch({
+            const cluster: Cluster<{url: string, logger: WinstonLogger}, TaskResult> = await Cluster.launch({
                 concurrency: Cluster.CONCURRENCY_CONTEXT,
                 maxConcurrency: options.concurrency,
                 monitor: options.monitor,
@@ -527,37 +356,35 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
                 puppeteerOptions: basePuppeteerOptions,
             });
 
-            await cluster.task(async ({ page, data: url }: { page: Page, data: string }): Promise<TaskResult> => {
-                return processPageTask(page, url);
-            });
+            await cluster.task(processPageTask);
 
             try {
                 const promises = urlsToProcess.filter(url => url).map(url => {
                     processedUrls.add(url);
-                    return cluster.queue(url)
-                        .then(resultFromQueue => resultFromQueue)
-                        .catch(error => {
-                            logger.error(`Error from cluster.queue for ${url}:`, { error });
-                            return { type: 'error', url: url, error: 'QUEUE_ERROR_OR_TASK_FAILED' } as TaskResult;
-                        });
+                    return cluster.queue({ url, logger });
                 });
                 const settledResults = await Promise.allSettled(promises);
                 settledResults.forEach(settledResult => {
                     if (settledResult.status === 'fulfilled') {
-                        if (settledResult.value !== undefined && settledResult.value !== null) {
+                        if (settledResult.value) {
                             taskResults.push(settledResult.value);
                         } else {
-                            logger.warn('A task from cluster.queue (non-chunked) settled with undefined/null value.', { settledResult });
+                             logger.warn('A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.', { settledResult });
                         }
-                    } else {
-                        logger.error('A promise from cluster.queue settled as rejected.', { reason: settledResult.reason });
+                    } else if (settledResult.status === 'rejected') {
+                        logger.error('A promise from cluster.queue (non-chunked) was rejected. This is unexpected if processPageTask is robust.', { reason: settledResult.reason });
+                        // Optionally, create a TaskResultError here
+                        // const urlFromRejectedPromise = ...
+                        // if (urlFromRejectedPromise) {
+                        //     taskResults.push({ type: 'error', url: urlFromRejectedPromise, error: 'PROMISE_REJECTED_IN_QUEUE' });
+                        // }
                     }
                 });
                 await cluster.idle();
                 await cluster.close();
             } catch (error: any) {
                 logger.error("An unexpected error occurred during cluster processing orchestration", { error });
-                if (cluster) await cluster.close();
+                if (cluster && !cluster.isClosed()) await cluster.close();
             }
         } else { // 'vanilla' Puppeteer
             let browser: Browser | null = null;
@@ -566,7 +393,7 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
                 for (const url of urlsToProcess) {
                     if (url) {
                         const page = await browser.newPage();
-                        const result = await processPageTask(page, url);
+                        const result = await processPageTask({ page, data: { url, logger } });
                         taskResults.push(result);
                         await page.close();
                         processedUrls.add(url);
@@ -580,80 +407,11 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
         }
     }
 
-    // Common result processing and file writing logic
-    for (const taskResult of taskResults) {
-        if (!taskResult) {
-            logger.warn(`A task returned no result. This should not happen.`);
-            continue;
-        }
-        if (taskResult.type === 'success') {
-            logger.info(`Data found for ${taskResult.data.url}`, { url: taskResult.data.url });
-            results.push(taskResult.data);
-        } else if (taskResult.type === 'no_data') {
-            logger.warn('No Prebid data found for URL (summary)', { url: taskResult.url });
-        } else if (taskResult.type === 'error') {
-            logger.error('Error processing URL (summary)', { url: taskResult.url, error: taskResult.error });
-        }
-    }
+    // Use functions from results-handler.ts
+    const successfulResults = processAndLogTaskResults(taskResults, logger);
+    writeResultsToFile(successfulResults, options.outputDir, logger);
 
-    logger.info('Final Results Array Count:', { count: results.length });
-
-    try {
-        if (!fs.existsSync(options.outputDir)) {
-            fs.mkdirSync(options.outputDir, { recursive: true });
-        }
-
-        if (results.length > 0) {
-            const now: Date = new Date();
-            const month: string = now.toLocaleString('default', { month: 'short' });
-            const year: number = now.getFullYear();
-            const day: string = String(now.getDate()).padStart(2, '0');
-            const monthDir: string = `${options.outputDir}/${month}`;
-            const dateFilename: string = `${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${day}.json`;
-
-            if (!fs.existsSync(monthDir)) {
-                fs.mkdirSync(monthDir, { recursive: true });
-            }
-
-            const jsonOutput: string = JSON.stringify(results, null, 2);
-            fs.writeFileSync(`${monthDir}/${dateFilename}`, jsonOutput + '\n', 'utf8');
-            logger.info(`Results have been written to ${monthDir}/${dateFilename}`);
-        } else {
-            logger.info('No results to save.');
-        }
-
-        // Update inputFile logic:
-        // The inputFile is overwritten with URLs that were within the processing scope (i.e., after applying any --range)
-        // but were not successfully processed. `urlsToProcess` holds the list of URLs that were candidates for processing
-        // (post-range), and `taskResults` holds the outcome of each processing attempt.
-        if (urlSourceType === 'InputFile' && options.inputFile) {
-            if (options.inputFile.endsWith('.txt')) {
-                const successfullyProcessedUrls: Set<string> = new Set();
-                for (const taskResult of taskResults) {
-                    if (taskResult && taskResult.type === 'success' && taskResult.data.url) {
-                        successfullyProcessedUrls.add(taskResult.data.url);
-                    }
-                }
-
-                const remainingUrlsInAttemptedScope: string[] = urlsToProcess.filter((url: string) => {
-                    // Keep the URL if it was never sent for processing (shouldn't happen if in urlsToProcess)
-                    // OR if it was sent for processing but did NOT succeed.
-                    return !successfullyProcessedUrls.has(url);
-                });
-                try {
-                    // This updates the input file: only successfully processed URLs are removed.
-                    // URLs that failed or were not processed (e.g. if processing stopped early) remain.
-                    fs.writeFileSync(options.inputFile, remainingUrlsInAttemptedScope.join('\n'), 'utf8');
-                    logger.info(`${options.inputFile} updated. ${successfullyProcessedUrls.size} URLs successfully processed and removed. ${remainingUrlsInAttemptedScope.length} URLs remain in current scope (includes unprocessed or failed).`);
-                } catch (writeError: any) {
-                    logger.error(`Failed to update ${options.inputFile}: ${writeError.message}`);
-                }
-            } else {
-                logger.info(`Skipping modification of original ${options.inputFile.endsWith('.csv') ? 'CSV' : 'JSON'} input file: ${options.inputFile}`);
-            }
-        }
-
-    } catch (err: any) {
-        logger.error('Failed to write results or update input file system', { error: err });
+    if (urlSourceType === 'InputFile' && options.inputFile) {
+        updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);
     }
 }
