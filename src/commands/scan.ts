@@ -1,60 +1,46 @@
-import {Args, Command, Flags} from '@oclif/core';
+import {Command} from '@oclif/core';
 // Step 1: Import prebidExplorer and PrebidExplorerOptions
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js'; // Assuming .js for NodeNext resolution
+import { scanArgs, scanFlags } from './scan-options.js';
 
+/**
+ * Defines the Scan command for the CLI.
+ * This command scans websites for Prebid.js integrations.
+ */
 export default class Scan extends Command {
-  static override args = {
-    inputFile: Args.string({description: 'Input file path (accepts .txt, .csv, .json)', required: false, default: 'src/input.txt'}),
-  }
+  /**
+   * Defines the arguments for the Scan command.
+   */
+  static override args = scanArgs;
+  /**
+   * Provides a description for the Scan command.
+   */
   static override description = 'Scans websites for Prebid.js integrations. InputFile can be .txt, .csv, or .json.'
+  /**
+   * Provides examples of how to use the Scan command.
+   */
   static override examples = [
     '<%= config.bin %> <%= command.id %> websites.txt --puppeteerType=cluster --concurrency=10',
     '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/user/repo --numUrls 50',
   ]
-  static override flags = {
-    githubRepo: Flags.string({
-      description: 'GitHub repository URL to fetch URLs from',
-      required: false,
-    }),
-    numUrls: Flags.integer({
-      description: 'Number of URLs to load from the GitHub repository (used only with --githubRepo)',
-      default: 100,
-      required: false,
-    }),
-    puppeteerType: Flags.string({
-      description: 'Type of Puppeteer to use',
-      options: ['vanilla', 'cluster'],
-      default: 'cluster',
-    }),
-    concurrency: Flags.integer({
-      description: 'Number of concurrent Puppeteer instances',
-      default: 5,
-    }),
-    headless: Flags.boolean({
-      description: 'Run Puppeteer in headless mode',
-      default: true,
-      allowNo: true,
-    }),
-    monitor: Flags.boolean({
-      description: 'Enable puppeteer-cluster monitoring',
-      default: false,
-    }),
-    outputDir: Flags.string({
-      description: 'Directory to save output files',
-      default: 'store',
-    }),
-    logDir: Flags.string({
-      description: 'Directory to save log files',
-      default: 'logs',
-    }),
-    range: Flags.string({ description: "Specify a line range (e.g., '10-20' or '5-') to process from the input source. 1-based indexing.", required: false }),
-    chunkSize: Flags.integer({ description: "Process URLs in chunks of this size. Processes all URLs in the specified range or input, but one chunk at a time.", required: false }),
-  }
+  /**
+   * Defines the flags for the Scan command.
+   */
+  static override flags = scanFlags;
 
-  public async run(): Promise<void> {
-    const {args, flags} = await this.parse(Scan)
-
-    const options: PrebidExplorerOptions = {
+  /**
+   * Executes the Scan command.
+   * This method parses the arguments and flags, then calls the prebidExplorer function.
+   * @returns {Promise<void>} A promise that resolves when the command has finished executing.
+   */
+  /**
+   * Creates the {@link PrebidExplorerOptions} object based on the parsed command-line flags.
+   *
+   * @param flags - The parsed flags object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.flags`.
+   * @returns A {@link PrebidExplorerOptions} object configured with values from the flags.
+   */
+  private _getPrebidExplorerOptions(flags: typeof Scan.flags): PrebidExplorerOptions {
+    return {
       puppeteerType: flags.puppeteerType as 'vanilla' | 'cluster',
       concurrency: flags.concurrency,
       headless: flags.headless,
@@ -68,32 +54,43 @@ export default class Scan extends Command {
         headless: flags.headless,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       },
-      // githubRepo and inputFile are set below based on prioritization
+      // githubRepo and inputFile are set by _getInputSourceOptions
     };
+  }
 
-    // Input source prioritization
+  /**
+   * Determines the input source (file or GitHub repository) and updates the provided PrebidExplorerOptions object.
+   * This method prioritizes GitHub repository if specified, otherwise uses the input file.
+   * It logs information about the chosen source and warns if `inputFile` is ignored due to `githubRepo` being present.
+   *
+   * @param args - The parsed arguments object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.args`.
+   * @param flags - The parsed flags object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.flags`.
+   * @param options - The {@link PrebidExplorerOptions} object to be modified with input source details.
+   */
+  private _getInputSourceOptions(args: typeof Scan.args, flags: typeof Scan.flags, options: PrebidExplorerOptions): void {
     if (flags.githubRepo) {
       this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
       options.githubRepo = flags.githubRepo;
-      // User explicitly provided args.inputFile, warn it's ignored.
       if (args.inputFile && args.inputFile !== 'src/input.txt') {
         this.warn(`--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`);
       }
     } else if (args.inputFile) {
-      // This covers both explicitly provided inputFile and the default 'src/input.txt'.
-      // prebidExplorer will handle a non-existent/empty default file.
       this.log(`Using input file: ${args.inputFile}`);
       options.inputFile = args.inputFile;
     } else {
-      // This state should ideally not be reached if args.inputFile has a default.
-      // As a safeguard if args.inputFile default is removed or logic changes:
       this.error('No input source specified. Please provide --githubRepo or an inputFile argument.', { exit: 1 });
     }
+  }
+
+  public async run(): Promise<void> {
+    const {args, flags} = await this.parse(Scan)
+
+    const options = this._getPrebidExplorerOptions(flags);
+    this._getInputSourceOptions(args, flags, options);
 
     this.log(`Starting Prebid scan with options:`);
     this.log(JSON.stringify(options, null, 2));
 
-    // Step 4 & 5: Call prebidExplorer with error handling
     try {
       await prebidExplorer(options);
       this.log('Prebid scan completed successfully.');
