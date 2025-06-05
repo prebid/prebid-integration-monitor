@@ -7,9 +7,22 @@ import { fileURLToPath } from 'url'; // For __dirname if needed, though likely n
 // const __filename: string = fileURLToPath(import.meta.url);
 // const __dirname: string = path.dirname(__filename);
 
+/**
+ * Command to generate or update API statistics.
+ * This command processes stored website scan data, summarizes it, cleans it,
+ * and applies version and module categorization to generate the `api/api.json` file.
+ */
 export default class StatsGenerate extends Command {
+  /**
+   * Description of the stats:generate command.
+   * This description is displayed when listing commands or showing help for this command.
+   */
   static override description = 'Generates or updates the API statistics file (api/api.json) by processing stored website scan data. This includes summarizing data, cleaning it, and applying version and module categorization.';
 
+  /**
+   * Examples of how to use the stats:generate command.
+   * These examples are displayed in the help output for this command.
+   */
   static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '$ prebid-explorer stats:generate',
@@ -19,6 +32,14 @@ export default class StatsGenerate extends Command {
   // static override args = {};
   // static override flags = {};
 
+  /**
+   * Executes the stats generation process.
+   * This method orchestrates the update and cleaning of statistics by calling `updateAndCleanStats`.
+   * It logs the start and successful completion of the process.
+   * If an error occurs, it logs a detailed error message and exits with a non-zero status code.
+   * @async
+   * @returns {Promise<void>} A promise that resolves when the statistics generation is complete or rejects if an error occurs.
+   */
   public async run(): Promise<void> {
     this.log('Starting statistics generation process...');
 
