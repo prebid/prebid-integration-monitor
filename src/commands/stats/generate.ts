@@ -1,5 +1,5 @@
 import { Command } from '@oclif/core';
-import { updateAndCleanStats } from '../../utils/update_stats.js'; // Ensure .js extension for runtime
+import { updateAndCleanStats } from '../../utils/update-stats.js'; // Ensure .js extension for runtime
 import * as path from 'path'; // For potential future use, good practice
 import { fileURLToPath } from 'url'; // For __dirname if needed, though likely not for this command
 
