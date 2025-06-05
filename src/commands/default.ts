@@ -2,14 +2,25 @@ import {Command, Flags} from '@oclif/core';
 import { initTracer } from '../tracer.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
-import { trace } from '@opentelemetry/api';
+import { executeMonitoringLogic } from '../services/monitoring-service.js';
 
 let logger: WinstonLogger; // Module-level logger variable
 
+/**
+ * Default command for prebid-integration-monitor.
+ * This command runs the main monitoring logic for the application.
+ */
 export default class Default extends Command {
+  /**
+   * A brief description of what the command does.
+   * This is displayed when running `prebid-integration-monitor --help`.
+   */
   static description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.'
 
   // Add a logDir flag similar to the scan command for consistency
+  /**
+   * Defines the flags (command-line options) accepted by this command.
+   */
   static flags = {
     logDir: Flags.string({
       description: 'Directory to save log files',
@@ -27,44 +38,33 @@ export default class Default extends Command {
   //   {name: 'exampleArg', description: 'example argument'},
   // ];
 
+  /**
+   * The main execution method for the command.
+   * This method is called when the command is run.
+   * It initializes the logger and tracer, then calls `executeMonitoringLogic`
+   * from `monitoring-service.ts` to perform the main application tasks.
+   * @returns {Promise<void>} A promise that resolves when the command has finished executing.
+   */
   async run(): Promise<void> {
     const {flags} = await this.parse(Default);
     // Initialize logger with the logDir from flags
     logger = initializeLogger(flags.logDir);
-    console.log('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
+    logger.info('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
 
     try {
       // Initialize the tracer as the first step
       initTracer();
       logger.info("Default oclif command starting...");
 
-      const tracer = trace.getTracer('prebid-integration-monitor-tracer');
+      // Call the refactored monitoring logic
+      // Pass logger and this.log to the service
+      // this.log is passed directly. If context issues arise, this.log.bind(this) can be used.
+      await executeMonitoringLogic(logger, this.log);
 
-      await tracer.startActiveSpan('application-main-span', async (parentSpan) => {
-        logger.info('Inside parent span (oclif command).');
-        this.log('Inside parent span (oclif command).'); // oclif logger
-
-        await tracer.startActiveSpan('child-task-span', async (childSpan) => {
-          logger.info('Inside child span, performing a task (oclif command)...');
-          this.log('Inside child span, performing a task (oclif command)...');
-          childSpan.addEvent('Task processing started');
-
-          // Simulate some work
-          await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-
-          childSpan.addEvent('Task processing finished');
-          logger.info('Child span task complete (oclif command).');
-          this.log('Child span task complete (oclif command).');
-          childSpan.end();
-        });
-
-        logger.info('Parent span continuing after child span (oclif command).');
-        this.log('Parent span continuing after child span (oclif command).');
-        parentSpan.end();
-      });
-
-      logger.info('Main application processing finished (oclif command).');
-      this.log('Main application processing finished (oclif command).');
+      // The following lines were part of the original tracer logic,
+      // and are now handled within executeMonitoringLogic or are implicitly covered.
+      // logger.info('Main application processing finished (oclif command).');
+      // this.log('Main application processing finished (oclif command).');
 
     } catch (error) {
       logger.error('Error in oclif command execution:', error);
