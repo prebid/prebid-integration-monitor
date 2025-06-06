@@ -40,14 +40,11 @@ export function processAndLogTaskResults(taskResults: TaskResult[], logger: Wins
     logger.info(`Processing ${taskResults.length} task results...`);
     for (const taskResult of taskResults) {
         if (!taskResult) {
-            logger.warn(`A task returned no result. This should not happen.`);
+            logger.warn(`A task returned no result or an undefined entry in taskResults. This should ideally not happen.`);
             continue;
         }
-    // Exhaustive check for taskResult.type using a switch statement
-        if (!taskResult) { // Should not happen with well-formed inputs, but good for robustness
-            logger.warn('Encountered an undefined task result.');
-            continue;
-        }
+        // Note: The first check for !taskResult is sufficient.
+        // The second identical check has been removed.
 
         // Use type property to discriminate and log accordingly
         const { type } = taskResult;
@@ -162,8 +159,8 @@ export function updateInputFile(
     taskResults: TaskResult[],
     logger: WinstonLogger
 ): void {
-    if (!inputFile.endsWith('.txt')) {
-        logger.info(`Skipping modification of input file as it is not a .txt file: ${inputFile}`);
+    if (!inputFilepath.endsWith('.txt')) {
+        logger.info(`Skipping modification of input file as it is not a .txt file: ${inputFilepath}`);
         return;
     }
 
@@ -187,8 +184,8 @@ export function updateInputFile(
 
         let finalUrlsToWrite: string[];
 
-        if (fs.existsSync(inputFile)) {
-            const originalContent = fs.readFileSync(inputFile, 'utf8');
+        if (fs.existsSync(inputFilepath)) {
+            const originalContent = fs.readFileSync(inputFilepath, 'utf8');
             const originalUrls = originalContent.split('\n').filter(line => line.trim() !== '');
 
             // Create a set of URLs from the current processing scope for efficient lookup
@@ -205,18 +202,18 @@ export function updateInputFile(
         } else {
             // If the input file doesn't exist (e.g., first run or deleted),
             // then the "remaining" URLs are just those from the current scope that weren't successful.
-            logger.warn(`Input file ${inputFile} not found for updating. Will create it with remaining URLs from current scope.`);
+            logger.warn(`Input file ${inputFilepath} not found for updating. Will create it with remaining URLs from current scope.`);
             finalUrlsToWrite = urlsInCurrentProcessingScope.filter(
                 (url: string) => !successfullyProcessedUrls.has(url)
             );
         }
 
-        fs.writeFileSync(inputFile, finalUrlsToWrite.join('\n') + (finalUrlsToWrite.length > 0 ? '\n' : ''), 'utf8');
+        fs.writeFileSync(inputFilepath, finalUrlsToWrite.join('\n') + (finalUrlsToWrite.length > 0 ? '\n' : ''), 'utf8');
         logger.info(
-            `${inputFile} updated. ${successfullyProcessedUrls.size} URLs from current scope successfully processed. ${finalUrlsToWrite.length} URLs written to file.`
+            `${inputFilepath} updated. ${successfullyProcessedUrls.size} URLs from current scope successfully processed. ${finalUrlsToWrite.length} URLs written to file.`
         );
     } catch (e: unknown) { // Use unknown for better type safety
         const writeError = e as Error;
-        logger.error(`Failed to update ${inputFile}: ${writeError.message}`, { stack: writeError.stack });
+        logger.error(`Failed to update ${inputFilepath}: ${writeError.message}`, { stack: writeError.stack });
     }
 }

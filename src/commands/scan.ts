@@ -1,4 +1,4 @@
-import {Command} from '@oclif/core';
+import {Command, Flags, Args, Interfaces} from '@oclif/core'; // Added Interfaces
 // Step 1: Import prebidExplorer and PrebidExplorerOptions
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js'; // Assuming .js for NodeNext resolution
 import { scanArgs, scanFlags } from './scan-options.js';
@@ -39,7 +39,7 @@ export default class Scan extends Command {
    * @param flags - The parsed flags object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.flags`.
    * @returns A {@link PrebidExplorerOptions} object configured with values from the flags.
    */
-  private _getPrebidExplorerOptions(flags: typeof Scan.flags): PrebidExplorerOptions {
+  private _getPrebidExplorerOptions(flags: Interfaces.InferredFlags<typeof Scan.flags>): PrebidExplorerOptions {
     return {
       puppeteerType: flags.puppeteerType as 'vanilla' | 'cluster',
       concurrency: flags.concurrency,
@@ -67,7 +67,7 @@ export default class Scan extends Command {
    * @param flags - The parsed flags object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.flags`.
    * @param options - The {@link PrebidExplorerOptions} object to be modified with input source details.
    */
-  private _getInputSourceOptions(args: typeof Scan.args, flags: typeof Scan.flags, options: PrebidExplorerOptions): void {
+  private _getInputSourceOptions(args: Interfaces.InferredArgs<typeof Scan.args>, flags: Interfaces.InferredFlags<typeof Scan.flags>, options: PrebidExplorerOptions): void {
     if (flags.githubRepo) {
       this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
       options.githubRepo = flags.githubRepo;
