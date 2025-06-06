@@ -233,6 +233,43 @@ This command currently does not take any specific flags.
     ```
     *(Ensure `./bin/run` has execute permissions or use `node ./bin/run stats:generate`)*
 
+### `inspect` Command
+
+The `inspect` command fetches data from a given URL and stores the HTTP request and response details to a file. This is useful for archiving web content or debugging network interactions. It supports saving data in JSON format and a basic HAR (HTTP Archive) format.
+
+**Syntax:**
+
+```bash
+./bin/run inspect <URL> [FLAGS...]
+# or in development: node ./bin/dev.js inspect <URL> [FLAGS...]
+```
+
+**Argument:**
+
+-   `<URL>`: (Required) The full URL to inspect (e.g., `https://example.com`).
+
+**Flags:**
+
+-   `--output-dir <value>`: Specifies the directory where the inspection data will be saved.
+    -   Default: `store/inspect`
+-   `--format <option>`: The format in which to store the inspection data.
+    -   Options: `json` (default), `har`
+    -   The HAR implementation is currently basic, capturing essential request/response details.
+-   `--filename <value>`: The base filename for the inspection data (without extension).
+    -   If not provided, a filename will be automatically generated based on the URL's hostname and a timestamp (e.g., `example_com-YYYY-MM-DDTHH-mm-ss-SSSZ`).
+
+**Usage Examples:**
+
+1.  **Inspect a URL and save as JSON to the default directory:**
+    ```bash
+    ./bin/run inspect https://example.com
+    ```
+
+2.  **Inspect a URL and save as HAR with a custom filename and directory:**
+    ```bash
+    ./bin/run inspect https://api.example.com/data --format har --output-dir my-inspections --filename api-data-archive
+    ```
+
 ## Running Tests
 
 To run the test suite using Vitest:

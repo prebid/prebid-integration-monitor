@@ -154,11 +154,10 @@ export async function prebidExplorer(options: PrebidExplorerOptions): Promise<vo
 
     const basePuppeteerOptions: PuppeteerLaunchOptions = {
         protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
-        /** @type {(null|Object)} Sets the viewport to null, effectively using the default viewport of the browser window. */
-        defaultViewport: null,
+        defaultViewport: null, // Sets the viewport to null, effectively using the default viewport of the browser window.
         headless: options.headless,
         args: options.puppeteerLaunchOptions?.args || [],
-        ...options.puppeteerLaunchOptions
+        ...(options.puppeteerLaunchOptions || {}) // Ensures options.puppeteerLaunchOptions is an object before spreading
     };
 
     // results array is correctly typed with PageData from puppeteer-task.ts
