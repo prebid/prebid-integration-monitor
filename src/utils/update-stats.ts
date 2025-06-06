@@ -41,7 +41,7 @@ import {
     FINAL_API_FILE_PATH,
     MIN_COUNT_THRESHOLD,
     MONTH_ABBR_REGEX
-} from '../../config/stats-config.js';
+} from '../config/stats-config.js';
 
 // import { fileURLToPath } from 'url'; // No longer needed after __filename/__dirname removal
 // const __filename: string = fileURLToPath(import.meta.url); // No longer needed

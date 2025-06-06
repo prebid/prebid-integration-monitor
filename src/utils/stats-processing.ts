@@ -138,7 +138,7 @@ export interface ProcessedVersionDistribution { // Changed from typedef to inter
 }
 
 
-import { DEFAULT_MODULE_CATEGORIES } from '../../config/stats-config.js';
+import { DEFAULT_MODULE_CATEGORIES } from '../config/stats-config.js';
 
 // ##################################################################################################
 // CONSTANTS - e.g. defaultModuleCategories

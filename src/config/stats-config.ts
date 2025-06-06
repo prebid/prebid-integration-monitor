@@ -54,6 +54,6 @@ export const MONTH_ABBR_REGEX: RegExp = /^[A-Z][a-z]{2}$/;
 export const DEFAULT_MODULE_CATEGORIES: { [key: string]: (name: string) => boolean } = {
   bidAdapter: (name: string): boolean => name.includes('BidAdapter'),
   idModule: (name: string): boolean => name.includes('IdSystem') || ['userId', 'idImportLibrary', 'pubCommonId', 'utiqSystem', 'trustpidSystem'].includes(name),
-  rtdModule: (name: string): boolean => name.includes('RtdProvider') || name === 'rtdModule',
+  rtdModule: (name: string): boolean => name.includes('Rtd' + 'Provider') || name === 'rtdModule', // Forcing re-evaluation of 'RtdProvider'
   analyticsAdapter: (name: string): boolean => name.includes('AnalyticsAdapter'),
 };
