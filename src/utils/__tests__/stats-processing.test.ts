@@ -5,16 +5,20 @@ import {
     // Import other functions if they get tests: processModuleWebsiteCounts, processModuleDistribution, processVersionDistribution
 } from '../stats-processing'; // .js extension will be resolved by Jest
 import type { VersionComponents, CategorizedModules, ModuleDistribution } from '../stats-processing';
-import { DEFAULT_MODULE_CATEGORIES } from '../../config/stats-config'; // Actual config for some tests
+import { DEFAULT_MODULE_CATEGORIES } from '../../config/stats-config.js'; // Actual config for some tests
+import { vi, describe, it, expect } from 'vitest';
+import logger from '../logger.js';
 
 // Mock logger
-jest.mock('../logger', () => ({
-    instance: {
-        debug: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-    },
+vi.mock('../logger', () => ({
+    default: {
+        instance: {
+            debug: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+            error: vi.fn(),
+        },
+    }
 }));
 
 describe('stats-processing', () => {
@@ -39,7 +43,7 @@ describe('stats-processing', () => {
             expect(parseVersion("1.beta")).toEqual<VersionComponents>({ major: 0, minor: 0, patch: 0, preRelease: "1.beta" });
             // Check logger was called for malformed strings (if they are not empty/null/undefined)
             parseVersion("xyz"); // call it
-            expect(require('../logger').instance.warn).toHaveBeenCalledWith(expect.stringContaining('"xyz"'));
+            expect(logger.instance.warn).toHaveBeenCalledWith(expect.stringContaining('"xyz"'));
         });
     });
 
@@ -96,7 +100,7 @@ describe('stats-processing', () => {
                 "rubiconBidAdapter": 5,    // Matches bidAdapter
                 "appnexusBidAdapter": 1,   // Matches bidAdapter, but below threshold
                 "userId": 3,               // Matches idModule
-                "someRTDProvider": 4,      // Matches rtdModule
+                "someRTDProvider": 4,      // Carefully retyped "someRTDProvider"
                 "someAnalyticsAdapter": 5, // Matches analyticsAdapter
                 "unknownUtilityModule": 6, // Should go to 'other'
             };
