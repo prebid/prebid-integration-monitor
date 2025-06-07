@@ -1839,3 +1839,4 @@ describe('CLI Tests for Local File Inputs (inputFile argument)', () => {
         expect(csvFileContent.trim()).toBe(csvContent.trim(), 'CSV file used as inputFile should not be emptied.');
     }, testTimeout);
 });
+});
