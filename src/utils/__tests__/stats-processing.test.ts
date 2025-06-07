@@ -6,7 +6,6 @@ import {
 } from '../stats-processing'; // .js extension will be resolved by Jest
 import type {
   VersionComponents,
-  CategorizedModules,
   ModuleDistribution,
 } from '../stats-processing';
 import { DEFAULT_MODULE_CATEGORIES } from '../../config/stats-config.js'; // Actual config for some tests

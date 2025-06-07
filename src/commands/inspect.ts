@@ -86,7 +86,7 @@ export default class Inspect extends Command {
         body: responseBody, // Caution: Storing large response bodies can consume significant disk space.
       };
 
-      const inspectionData: any = {
+      const inspectionData: unknown = {
         request: requestData,
         response: responseData,
         timestamp: new Date().toISOString(),
@@ -123,11 +123,11 @@ export default class Inspect extends Command {
             },
             entries: [
               {
-                startedDateTime: inspectionData.timestamp,
+                startedDateTime: (inspectionData as { timestamp: string }).timestamp,
                 time: -1, // Placeholder, could calculate actual time if performance monitoring is added
                 request: {
-                  method: inspectionData.request.method,
-                  url: inspectionData.request.url,
+                  method: (inspectionData as { request: { method: string } }).request.method,
+                  url: (inspectionData as { request: { url: string } }).request.url,
                   httpVersion: 'HTTP/1.1', // Placeholder
                   cookies: [], // Placeholder
                   headers: [], // Placeholder, map from inspectionData.request.headers if captured
@@ -136,17 +136,17 @@ export default class Inspect extends Command {
                   bodySize: -1,
                 },
                 response: {
-                  status: inspectionData.response.status,
-                  statusText: inspectionData.response.statusText,
+                  status: (inspectionData as { response: { status: number } }).response.status,
+                  statusText: (inspectionData as { response: { statusText: string } }).response.statusText,
                   httpVersion: 'HTTP/1.1', // Placeholder
                   cookies: [], // Placeholder
-                  headers: Object.entries(inspectionData.response.headers).map(
+                  headers: Object.entries((inspectionData as { response: { headers: Record<string, string> } }).response.headers).map(
                     ([name, value]) => ({ name, value }),
                   ),
                   content: {
                     size: responseBody.length,
                     mimeType:
-                      inspectionData.response.headers['content-type'] ||
+                      (inspectionData as { response: { headers: Record<string, string> } }).response.headers['content-type'] ||
                       'application/octet-stream',
                     text: responseBody, // HAR spec allows for text content
                   },
@@ -166,9 +166,9 @@ export default class Inspect extends Command {
         this.error(`Unsupported format: ${flags.format}`, { exit: 1 });
         return;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.error(
-        `Error during inspection: ${error.message} (URL: ${args.url})`,
+        `Error during inspection: ${(error as Error).message} (URL: ${args.url})`,
         { exit: 1 },
       );
     }

@@ -1,5 +1,4 @@
 import { promises as fsPromises, Dirent } from 'fs';
-import * as path from 'path';
 import logger from './logger.js'; // Assuming logger is accessible here
 
 /**

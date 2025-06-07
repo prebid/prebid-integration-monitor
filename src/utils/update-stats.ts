@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import {
   readDirectory,
@@ -20,8 +19,8 @@ import type {
   VersionDistribution,
   ModuleDistribution,
   ProcessedVersionDistribution, // Return type of imported processVersionDistribution
-  ProcessedModuleDistribution, // Return type of imported processModuleDistribution
-  ProcessedModuleWebsiteCounts, // Return type of imported processModuleWebsiteCounts
+  // ProcessedModuleDistribution, // Return type of imported processModuleDistribution
+  // ProcessedModuleWebsiteCounts, // Return type of imported processModuleWebsiteCounts
 } from './stats-processing.js';
 
 import {
@@ -141,7 +140,7 @@ async function readAndParseFiles(
                   rawModuleCounts,
                   moduleWebsiteData,
                 );
-              } catch (parseError: any) {
+              } catch {
                 // Error logging for readJsonFile is handled within readJsonFile itself.
                 // If readJsonFile throws, this catch block will handle it.
                 logger.instance.warn(
@@ -150,7 +149,7 @@ async function readAndParseFiles(
               }
             }
           }
-        } catch (monthDirError: any) {
+        } catch {
           // Error logging for readDirectory is handled within readDirectory itself.
           // If readDirectory throws, this catch block will handle it.
           logger.instance.warn(
@@ -282,10 +281,7 @@ async function updateAndCleanStats(): Promise<void> {
 }
 
 // Export necessary functions for use elsewhere.
-export {
-  updateAndCleanStats,
-  readAndParseFiles,
-};
+export { updateAndCleanStats, readAndParseFiles };
 export type {
   FinalApiData,
   ParsedScanData,

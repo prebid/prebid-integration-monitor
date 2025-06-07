@@ -1,7 +1,5 @@
 import { Command } from '@oclif/core';
 import { updateAndCleanStats } from '../../utils/update-stats.js'; // Ensure .js extension for runtime
-import * as path from 'path'; // For potential future use, good practice
-import { fileURLToPath } from 'url'; // For __dirname if needed, though likely not for this command
 
 // Optional: Replicate __dirname functionality if complex pathing were needed, but probably not for this simple command
 // const __filename: string = fileURLToPath(import.meta.url);
@@ -49,10 +47,10 @@ export default class StatsGenerate extends Command {
       await updateAndCleanStats();
       this.log('Statistics generation process completed successfully.');
       this.log('The file api/api.json has been updated.');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Log the error in a more structured way if possible
       this.error(
-        `An error occurred during statistics generation: ${error.message}`,
+        `An error occurred during statistics generation: ${(error as Error).message}`,
         {
           exit: 1, // oclif recommends exiting with a non-zero code on error
           suggestions: [

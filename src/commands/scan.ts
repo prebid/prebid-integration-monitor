@@ -1,4 +1,4 @@
-import { Command, Flags, Args, Interfaces } from '@oclif/core'; // Added Interfaces
+import { Command, Interfaces } from '@oclif/core'; // Added Interfaces
 // Step 1: Import prebidExplorer and PrebidExplorerOptions
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js'; // Assuming .js for NodeNext resolution
 import { scanArgs, scanFlags } from './scan-options.js';
@@ -106,9 +106,10 @@ export default class Scan extends Command {
     try {
       await prebidExplorer(options);
       this.log('Prebid scan completed successfully.');
-    } catch (error: any) {
-      this.log(`Full error during Prebid scan: ${error.stack || error}`); // Log full error
-      this.error(`An error occurred during the Prebid scan: ${error.message}`, {
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.log(`Full error during Prebid scan: ${err.stack || err}`); // Log full error
+      this.error(`An error occurred during the Prebid scan: ${err.message}`, {
         exit: 1,
         suggestions: ['Check logs for more details.'], // Suggestions are fine
       });
