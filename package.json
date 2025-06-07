@@ -7,11 +7,11 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest --exclude tests/cli.test.ts",
-    "pretest": "npx puppeteer browsers install chrome",
+    "pretest": "pnpm exec puppeteer browsers install chrome",
     "build:check": "tsc --noEmit",
     "start": "node ./bin/run.js",
     "dev": "node --loader ts-node/esm ./bin/dev.js default",
-    "scan": "npm run build && node ./bin/run.js scan",
+    "scan": "pnpm run build && node ./bin/run.js scan",
     "prebid:scan": "node ./bin/run.js scan",
     "docs:generate": "typedoc --options typedoc.json",
     "lint": "eslint . --ext .ts",

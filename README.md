@@ -5,9 +5,11 @@ This project is designed to monitor Prebid integrations. It is now built using T
 ## Prerequisites
 
 - Node.js (v16 or later recommended)
-- npm (comes with Node.js)
+- pnpm
 
 ## Setup
+
+**Note:** This project uses pnpm for package management.
 
 1.  **Clone the repository:**
 
@@ -18,7 +20,7 @@ This project is designed to monitor Prebid integrations. It is now built using T
 
 2.  **Install dependencies:**
     ```bash
-    npm install
+    pnpm install
     ```
 
 ## Project Structure
@@ -45,7 +47,7 @@ This project is designed to monitor Prebid integrations. It is now built using T
 To run the application in development mode (using the oclif development script, which leverages `ts-node`):
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 This executes `node ./bin/dev.js` which handles TypeScript execution.
@@ -55,23 +57,23 @@ This executes `node ./bin/dev.js` which handles TypeScript execution.
 To compile the TypeScript code to JavaScript (output will be in the `dist/` directory):
 
 ```bash
-npm run build
+pnpm run build
 ```
 
-**Note on `tsc` execution:** In some environments, if `tsc` (the TypeScript compiler) is not found via the npm script, you might need to invoke it using `npx`:
+**Note on `tsc` execution:** In some environments, if `tsc` (the TypeScript compiler) is not found via the npm script, you might need to invoke it using `pnpm dlx`:
 
 ```bash
-npx -p typescript tsc
+pnpm dlx typescript tsc
 ```
 
-This command typically isn't needed if `npm run build` works, as `npm run build` should use the `tsc` from your project's `devDependencies`. The type checking can also be done using `npm run build:check` or `npx -p typescript tsc --noEmit --module nodenext --moduleResolution nodenext src/**/*.ts`.
+This command typically isn't needed if `pnpm run build` works, as `pnpm run build` should use the `tsc` from your project's `devDependencies`. The type checking can also be done using `pnpm run build:check` or `pnpm dlx typescript tsc --noEmit --module nodenext --moduleResolution nodenext src/**/*.ts`.
 
 ## Running in Production
 
-After building the project (`npm run build`), run the compiled application using its oclif entry point:
+After building the project (`pnpm run build`), run the compiled application using its oclif entry point:
 
 ```bash
-npm start
+pnpm start
 ```
 
 This executes `node ./bin/run.js`.
@@ -83,8 +85,8 @@ This application is now structured as an oclif (Open CLI Framework) command-line
 - **Running commands:**
 
   - In development: `node ./bin/dev.js [COMMAND] [FLAGS]`
-  - In production (after `npm run build`): `node ./bin/run.js [COMMAND] [FLAGS]`
-  - If the package is linked globally (`npm link`) or installed globally, you can use the bin name directly: `app [COMMAND] [FLAGS]` (Note: `app` is the default bin name configured in `package.json`).
+  - In production (after `pnpm run build`): `node ./bin/run.js [COMMAND] [FLAGS]`
+  - If the package is linked globally (`pnpm link --global`) or installed globally, you can use the bin name directly: `app [COMMAND] [FLAGS]` (Note: `app` is the default bin name configured in `package.json`).
 
 - **Default Command:**
 
@@ -113,7 +115,7 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 ```bash
 ./bin/run scan [INPUTFILE] [FLAGS...]
 # or in development: node ./bin/dev.js scan [INPUTFILE] [FLAGS...]
-# or using npm script: npm run prebid:scan -- [INPUTFILE] [FLAGS...] (note the -- to pass arguments to the script)
+# or using pnpm script: pnpm run prebid:scan -- [INPUTFILE] [FLAGS...] (note the -- to pass arguments to the script)
 ```
 
 **Argument:**
@@ -234,7 +236,7 @@ The `stats:generate` command processes stored website scan data (typically found
 ```bash
 ./bin/run stats:generate
 # or in development: node ./bin/dev.js stats:generate
-# or using npm script (if configured): npm run prebid:stats:generate
+# or using pnpm script (if configured): pnpm run prebid:stats:generate
 ```
 
 **Flags:**
@@ -292,13 +294,13 @@ The `inspect` command fetches data from a given URL and stores the HTTP request 
 To run the test suite using Vitest:
 
 ```bash
-npm test
+pnpm run test
 ```
 
-**Note on `vitest` execution:** In some environments, if `vitest` is not found via the npm script, you might need to run it using `npx`:
+**Note on `vitest` execution:** In some environments, if `vitest` is not found via the pnpm script, you might need to run it using `pnpm dlx`:
 
 ```bash
-npx -p vitest vitest run
+pnpm dlx vitest run
 ```
 
 This will execute all tests found in the `tests/` directory.
@@ -320,7 +322,7 @@ This project uses ESLint for linting and Prettier for code formatting to ensure 
 - **To format all supported files in the project:**
 
   ```bash
-  npm run format
+  pnpm run format
   ```
 
   This command uses Prettier to rewrite files in place according to the rules in `.prettierrc.cjs`.
@@ -328,14 +330,14 @@ This project uses ESLint for linting and Prettier for code formatting to ensure 
 - **To lint all TypeScript files and automatically fix fixable issues:**
 
   ```bash
-  npm run lint -- --fix
+  pnpm run lint -- --fix
   ```
 
   This command uses ESLint to analyze the code. The `--fix` flag instructs ESLint to automatically correct problems where possible. Any errors that cannot be auto-fixed will be reported in the console.
 
 - **To check for linting errors without fixing:**
   ```bash
-  npm run lint
+  pnpm run lint
   ```
 
 It's recommended to run these scripts before committing code to maintain a clean and consistent codebase.
