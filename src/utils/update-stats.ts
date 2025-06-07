@@ -9,22 +9,10 @@ import {
 } from './file-system-utils.js';
 import type { Dirent } from 'fs';
 import {
-  // Functions moved to stats-processing.ts
-  // parseVersion, (used by compareVersions and processVersionDistribution)
-  // compareVersions, (used by processVersionDistribution)
-  // _categorizeModules, (used by processModuleDistribution and processModuleWebsiteCounts)
   processModuleDistribution,
   processModuleWebsiteCounts,
   processVersionDistribution,
   _processSiteEntries,
-  // Types moved to stats-processing.ts or to be imported from there
-  // VersionComponents, (used by parseVersion, compareVersions)
-  // CategorizedModules, (return type of _categorizeModules)
-  // ProcessedModuleWebsiteCounts, (return type of processModuleWebsiteCounts)
-  // ProcessedModuleDistribution, (return type of processModuleDistribution)
-  // ProcessedVersionDistribution, (return type of processVersionDistribution)
-  // Constants moved
-  // defaultModuleCategories (used by _categorizeModules)
 } from './stats-processing.js';
 
 import type {
@@ -43,10 +31,6 @@ import {
   MONTH_ABBR_REGEX,
 } from '../config/stats-config.js';
 
-// import { fileURLToPath } from 'url'; // No longer needed after __filename/__dirname removal
-// const __filename: string = fileURLToPath(import.meta.url); // No longer needed
-// const __dirname: string = path.dirname(__filename); // No longer needed
-
 /**
  * Represents the final aggregated API data structure that is written to a JSON file.
  * This data summarizes Prebid.js usage statistics across all scanned websites.
@@ -54,19 +38,19 @@ import {
  * @property {number} visitedSites
  * @property {number} monitoredSites
  * @property {number} prebidSites
- * @property {VersionDistribution} releaseVersions - Imported from stats-processing.js
- * @property {VersionDistribution} buildVersions - Imported from stats-processing.js
- * @property {VersionDistribution} customVersions - Imported from stats-processing.js
- * @property {ModuleDistribution} bidAdapterInst - Imported from stats-processing.js
- * @property {ModuleDistribution} idModuleInst - Imported from stats-processing.js
- * @property {ModuleDistribution} rtdModuleInst - Imported from stats-processing.js
- * @property {ModuleDistribution} analyticsAdapterInst - Imported from stats-processing.js
- * @property {ModuleDistribution} otherModuleInst - Imported from stats-processing.js
- * @property {ModuleDistribution} [bidAdapterWebsites] - Imported from stats-processing.js
- * @property {ModuleDistribution} [idModuleWebsites] - Imported from stats-processing.js
- * @property {ModuleDistribution} [rtdModuleWebsites] - Imported from stats-processing.js
- * @property {ModuleDistribution} [analyticsAdapterWebsites] - Imported from stats-processing.js
- * @property {ModuleDistribution} [otherModuleWebsites] - Imported from stats-processing.js
+ * @property {VersionDistribution} releaseVersions
+ * @property {VersionDistribution} buildVersions
+ * @property {VersionDistribution} customVersions
+ * @property {ModuleDistribution} bidAdapterInst
+ * @property {ModuleDistribution} idModuleInst
+ * @property {ModuleDistribution} rtdModuleInst
+ * @property {ModuleDistribution} analyticsAdapterInst
+ * @property {ModuleDistribution} otherModuleInst
+ * @property {ModuleDistribution} [bidAdapterWebsites]
+ * @property {ModuleDistribution} [idModuleWebsites]
+ * @property {ModuleDistribution} [rtdModuleWebsites]
+ * @property {ModuleDistribution} [analyticsAdapterWebsites]
+ * @property {ModuleDistribution} [otherModuleWebsites]
  */
 interface FinalApiData {
   visitedSites: number;
@@ -87,13 +71,6 @@ interface FinalApiData {
   otherModuleWebsites?: ModuleDistribution;
 }
 
-// Functions parseVersion, compareVersions, _categorizeModules,
-// processModuleWebsiteCounts, processModuleDistribution, processVersionDistribution,
-// and _processSiteEntries and their related types (VersionComponents, CategorizedModules, etc.)
-// have been moved to src/utils/stats-processing.ts
-
-// Constants like defaultModuleCategories also moved.
-
 /**
  * Defines the structure of data aggregated by {@link readAndParseFiles} from raw scan data files.
  * This raw aggregated data is then further processed by other functions.
@@ -101,10 +78,17 @@ interface FinalApiData {
  * @typedef {object} ParsedScanData
  * @property {Set<string>} uniqueUrls
  * @property {Set<string>} urlsWithPrebid
- * @property {VersionDistribution} rawVersionCounts - Imported from stats-processing.js
- * @property {ModuleDistribution} rawModuleCounts - Imported from stats-processing.js
+ * @property {VersionDistribution} rawVersionCounts
+ * @property {ModuleDistribution} rawModuleCounts
  * @property {{ [moduleName: string]: Set<string> }} moduleWebsiteData
  */
+interface ParsedScanData {
+  uniqueUrls: Set<string>;
+  urlsWithPrebid: Set<string>;
+  rawVersionCounts: VersionDistribution;
+  rawModuleCounts: ModuleDistribution;
+  moduleWebsiteData: { [moduleName: string]: Set<string> };
+}
 
 /**
  * Reads and parses all JSON scan data files from monthly subdirectories.
@@ -121,8 +105,8 @@ async function readAndParseFiles(
   baseOutputDir: string,
   monthDirRegex: RegExp,
 ): Promise<ParsedScanData> {
-  const rawVersionCounts: VersionDistribution = {}; // Type imported from stats-processing
-  const rawModuleCounts: ModuleDistribution = {}; // Type imported from stats-processing
+  const rawVersionCounts: VersionDistribution = {};
+  const rawModuleCounts: ModuleDistribution = {};
   const moduleWebsiteData: { [moduleName: string]: Set<string> } = {};
   const uniqueUrls: Set<string> = new Set();
   const urlsWithPrebid: Set<string> = new Set();
@@ -234,7 +218,6 @@ async function readAndParseFiles(
 async function updateAndCleanStats(): Promise<void> {
   try {
     // Step 1: Read and parse raw data from scan files
-    // Constants like OUTPUT_DIR and MONTH_ABBR_REGEX are now imported from stats-config.js
     const parsedData: ParsedScanData = await readAndParseFiles(
       OUTPUT_DIR,
       MONTH_ABBR_REGEX,
@@ -245,14 +228,12 @@ async function updateAndCleanStats(): Promise<void> {
       processVersionDistribution(parsedData.rawVersionCounts);
 
     // Step 3: Process and categorize module instance distributions
-    // MIN_COUNT_THRESHOLD is imported from stats-config.js
     const moduleInstanceStats = processModuleDistribution(
       parsedData.rawModuleCounts,
       MIN_COUNT_THRESHOLD,
     );
 
     // Step 4: Process and categorize module website distributions
-    // MIN_COUNT_THRESHOLD is imported from stats-config.js
     const moduleWebsiteStats = processModuleWebsiteCounts(
       parsedData.moduleWebsiteData,
       MIN_COUNT_THRESHOLD,
@@ -279,9 +260,7 @@ async function updateAndCleanStats(): Promise<void> {
     };
 
     // Step 6: Write the final data to api.json
-    // FINAL_API_FILE_PATH is imported from stats-config.js
     const targetApiDir: string = path.dirname(FINAL_API_FILE_PATH);
-    // Use ensureDirectoryExists from file-system-utils.js
     await ensureDirectoryExists(targetApiDir);
 
     // Use writeJsonFile from file-system-utils.js
@@ -302,30 +281,14 @@ async function updateAndCleanStats(): Promise<void> {
   }
 }
 
-// Export necessary functions for use elsewhere (e.g., by commands or tests)
-// No changes needed to exports based on this refactoring, as the public API of this module remains the same.
+// Export necessary functions for use elsewhere.
 export {
   updateAndCleanStats,
-  readAndParseFiles, // Still exported from here, but implementation uses imported _processSiteEntries
-  // parseVersion, compareVersions, _categorizeModules, etc. are no longer defined here
-  // defaultModuleCategories is no longer defined here
-  // MIN_COUNT_THRESHOLD, OUTPUT_DIR, FINAL_API_FILE_PATH are now imported, so no need to export them from here
-  // unless this file is intended to be a barrel export for them, which is not the case.
+  readAndParseFiles,
 };
 export type {
-  // SiteData, PrebidInstanceData, VersionComponents, etc. are imported from stats-processing.js if needed here
-  // For example, ParsedScanData uses VersionDistribution and ModuleDistribution which are now imported types.
-  FinalApiData, // Still defined and used here
-  ParsedScanData, // Still defined and used here
-  // Specific processing result types like ProcessedModuleDistribution are used by updateAndCleanStats
-  // but their definitions are in stats-processing.ts and imported.
-  VersionDistribution, // Imported type
-  ModuleDistribution, // Imported type
-  // CategorizedModules is an internal type for _categorizeModules, not directly used by update-stats
+  FinalApiData,
+  ParsedScanData,
+  VersionDistribution, // Re-exported from stats-processing
+  ModuleDistribution, // Re-exported from stats-processing
 };
-
-// Note: The explicit `export type` for SiteData, PrebidInstanceData, VersionComponents,
-// ProcessedModuleDistribution, ProcessedModuleWebsiteCounts, ProcessedVersionDistribution,
-// CategorizedModules should be removed if these types are now solely defined and exported
-// from stats-processing.ts and imported here as needed.
-// FinalApiData and ParsedScanData remain defined here, but might use types imported from stats-processing.

@@ -14,8 +14,12 @@ import {
 // Resource identifies the entity producing telemetry (e.g., a service).
 // It's recommended to configure it with attributes like service name, version, environment, etc.
 // Example: new Resource({ [SemanticResourceAttributes.SERVICE_NAME]: 'your-service-name', [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0' })
-import { Resource } from '@opentelemetry/resources';
+// Using named import for the TYPE, and require for the VALUE due to persistent TS2693 error.
+import type { Resource as OpenTelemetryResourceType } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const OpenTelemetryResourceValue = require('@opentelemetry/resources').Resource;
 
 /**
  * Creates a Resource instance for the service.
@@ -28,15 +32,15 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
  * - OTEL_SERVICE_VERSION: The version of the service.
  * - OTEL_DEPLOYMENT_ENVIRONMENT: The deployment environment (e.g., 'production', 'staging').
  *
- * @returns {Resource} The configured Resource object.
+ * @returns {OpenTelemetryResourceType} The configured Resource object.
  */
-const _createServiceResource = (): Resource => {
+const _createServiceResource = (): OpenTelemetryResourceType => { // Type annotation uses the imported OpenTelemetryResourceType
   const serviceName = process.env.OTEL_SERVICE_NAME || 'unknown_service';
   const serviceVersion = process.env.OTEL_SERVICE_VERSION || '0.0.0';
   const deploymentEnvironment =
     process.env.OTEL_DEPLOYMENT_ENVIRONMENT || 'unknown';
 
-  return new Resource({
+  return new (OpenTelemetryResourceValue as new (attributes: Record<string, any>) => OpenTelemetryResourceType)({ // Use the required value as constructor
     [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
     [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
     [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: deploymentEnvironment,

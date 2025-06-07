@@ -6,8 +6,10 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { ConsoleSpanExporter, BatchSpanProcessor, } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const OpenTelemetryResourceValue = require('@opentelemetry/resources').Resource;
 /**
  * Creates a Resource instance for the service.
  * This helper function centralizes the logic for defining service-identifying attributes.
@@ -19,13 +21,13 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
  * - OTEL_SERVICE_VERSION: The version of the service.
  * - OTEL_DEPLOYMENT_ENVIRONMENT: The deployment environment (e.g., 'production', 'staging').
  *
- * @returns {Resource} The configured Resource object.
+ * @returns {OpenTelemetryResourceType} The configured Resource object.
  */
 const _createServiceResource = () => {
     const serviceName = process.env.OTEL_SERVICE_NAME || 'unknown_service';
     const serviceVersion = process.env.OTEL_SERVICE_VERSION || '0.0.0';
     const deploymentEnvironment = process.env.OTEL_DEPLOYMENT_ENVIRONMENT || 'unknown';
-    return new Resource({
+    return new OpenTelemetryResourceValue({
         [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
         [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
         [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: deploymentEnvironment,
@@ -87,7 +89,7 @@ export const initTracer = () => {
             // See OpenTelemetry documentation for more details on BatchSpanProcessor configuration.
             spanProcessors: [
                 new BatchSpanProcessor(consoleExporter), // For local debugging
-                new BatchSpanProcessor(otlpExporter) // For production export
+                new BatchSpanProcessor(otlpExporter), // For production export
             ],
             // Enables a suite of automatic instrumentations for common Node.js libraries
             // (e.g., HTTP, Express, gRPC, various DB clients like pg, mysql).
@@ -121,7 +123,8 @@ export const initTracer = () => {
  */
 process.on('SIGTERM', () => {
     if (sdk) {
-        sdk.shutdown()
+        sdk
+            .shutdown()
             .then(() => console.log('Tracing terminated gracefully'))
             .catch((error) => console.error('Error shutting down tracing', error))
             .finally(() => process.exit(0));

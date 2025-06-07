@@ -47,8 +47,8 @@ export default class StatsGenerate extends Command {
                 exit: 1, // oclif recommends exiting with a non-zero code on error
                 suggestions: [
                     'Check the console output for more details from the updateAndCleanStats script.',
-                    'Ensure that the scan data directory (typically \'store\') contains valid JSON files.',
-                    'Verify file permissions for reading scan data and writing to the \'api\' directory.',
+                    "Ensure that the scan data directory (typically 'store') contains valid JSON files.",
+                    "Verify file permissions for reading scan data and writing to the 'api' directory.",
                 ],
             });
             // For more detailed debugging, you might want to log the full stack trace

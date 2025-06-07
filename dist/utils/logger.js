@@ -17,7 +17,7 @@ let logger;
  * @param {Logform.TransformableInfo} info - The log information object implicitly passed by Winston.
  * @returns {Logform.TransformableInfo} The modified log information object.
  */
-const openTelemetryFormat = winston.format(info => {
+const openTelemetryFormat = winston.format((info) => {
     const activeSpan = trace.getActiveSpan();
     if (activeSpan) {
         const spanContext = activeSpan.spanContext();
@@ -40,12 +40,14 @@ const openTelemetryFormat = winston.format(info => {
  */
 function formatSplatMetadata(splat) {
     if (Array.isArray(splat)) {
-        const metadata = splat.map((s) => typeof s === 'object' ? JSON.stringify(s) : s).join(' ');
+        const metadata = splat
+            .map((s) => (typeof s === 'object' ? JSON.stringify(s) : s))
+            .join(' ');
         return metadata || ''; // Return empty string if metadata is empty after join
     }
     else if (typeof splat === 'object' && splat !== null) {
         const metadataString = JSON.stringify(splat);
-        return (metadataString && metadataString !== '{}') ? metadataString : '';
+        return metadataString && metadataString !== '{}' ? metadataString : '';
     }
     else if (splat !== undefined) {
         return String(splat);
@@ -69,7 +71,9 @@ function formatConsoleLogMessage(info) {
             message += ` (trace_id: ${spanContext.traceId}, span_id: ${spanContext.spanId})`;
         }
     }
-    if (typeof info.message === 'string' && info.message.startsWith('Initial URLs read from') && typeof info.count === 'number') {
+    if (typeof info.message === 'string' &&
+        info.message.startsWith('Initial URLs read from') &&
+        typeof info.count === 'number') {
         message += ` count: ${info.count}`;
     }
     else {
@@ -100,20 +104,20 @@ export function initializeLogger(logDir) {
         transports: [
             new winston.transports.Console({
                 level: process.env.LOG_LEVEL_CONSOLE || 'info',
-                format: winston.format.combine(winston.format.colorize(), winston.format.printf(formatConsoleLogMessage))
+                format: winston.format.combine(winston.format.colorize(), winston.format.printf(formatConsoleLogMessage)),
             }),
             new winston.transports.File({
                 filename: path.join(logDir, 'app.log'),
                 level: process.env.LOG_LEVEL_APP || 'info',
-                format: winston.format.combine(openTelemetryFormat(), winston.format.json())
+                format: winston.format.combine(openTelemetryFormat(), winston.format.json()),
             }),
             new winston.transports.File({
                 filename: path.join(logDir, 'error.log'),
                 level: 'error',
-                format: winston.format.combine(openTelemetryFormat(), winston.format.json())
-            })
+                format: winston.format.combine(openTelemetryFormat(), winston.format.json()),
+            }),
         ],
-        exitOnError: false
+        exitOnError: false,
     });
     logger.info(`Logger initialized successfully. Log directory: ${logDir}`);
     return logger;
@@ -127,8 +131,8 @@ export default {
      */
     get instance() {
         if (!logger) {
-            throw new Error("Logger has not been initialized. Call initializeLogger(logDir) first.");
+            throw new Error('Logger has not been initialized. Call initializeLogger(logDir) first.');
         }
         return logger;
-    }
+    },
 };
