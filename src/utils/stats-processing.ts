@@ -74,7 +74,6 @@ export interface VersionComponents {
  * @property {ModuleDistribution} other - Distribution of modules not fitting into other predefined categories.
  */
 export interface CategorizedModules {
-  // Changed from typedef to interface for consistency
   bidAdapter: ModuleDistribution;
   idModule: ModuleDistribution;
   rtdModule: ModuleDistribution;
@@ -95,7 +94,6 @@ export interface CategorizedModules {
  * @property {ModuleDistribution} otherModuleWebsites - Distribution of unique websites using other specific modules not fitting predefined categories.
  */
 export interface ProcessedModuleWebsiteCounts {
-  // Changed from typedef to interface
   bidAdapterWebsites: ModuleDistribution;
   idModuleWebsites: ModuleDistribution;
   rtdModuleWebsites: ModuleDistribution;
@@ -116,7 +114,6 @@ export interface ProcessedModuleWebsiteCounts {
  * @property {ModuleDistribution} otherModuleInst - Distribution of other Prebid.js module instances not fitting predefined categories.
  */
 export interface ProcessedModuleDistribution {
-  // Changed from typedef to interface
   bidAdapterInst: ModuleDistribution;
   idModuleInst: ModuleDistribution;
   rtdModuleInst: ModuleDistribution;
@@ -135,7 +132,6 @@ export interface ProcessedModuleDistribution {
  *           (e.g., "8.42.0-custom", or versions not matching X.Y.Z or X.Y.Z-pre patterns).
  */
 export interface ProcessedVersionDistribution {
-  // Changed from typedef to interface
   releaseVersions: VersionDistribution;
   buildVersions: VersionDistribution;
   customVersions: VersionDistribution;
@@ -263,10 +259,13 @@ export function _categorizeModules<T>( // Made exportable for potential testing,
     if (count < minCountThreshold) continue;
 
     let categorized = false;
-    for (const categoryKey in moduleCategoryPredicates) {
-      const key = categoryKey as keyof typeof defaultModuleCategories;
+    // Iterate over strongly typed keys of moduleCategoryPredicates
+    // Ensuring key is typed as a key of CategorizedModules for result[key] access
+    // and also compatible with moduleCategoryPredicates which shares the same key structure.
+    const categoryKeys = Object.keys(moduleCategoryPredicates) as Array<keyof CategorizedModules>;
+    for (const key of categoryKeys) {
       if (moduleCategoryPredicates[key](moduleName)) {
-        (result[key] as ModuleDistribution)[moduleName] = count;
+        result[key][moduleName] = count; // result[key] is ModuleDistribution
         categorized = true;
         break;
       }
@@ -294,7 +293,7 @@ export function processModuleWebsiteCounts(
     moduleWebsiteData,
     minCountThreshold,
     (dataSet: Set<string>) => dataSet.size,
-    DEFAULT_MODULE_CATEGORIES, // Updated to use imported constant
+    DEFAULT_MODULE_CATEGORIES,
   );
   return {
     bidAdapterWebsites: categorized.bidAdapter,
@@ -329,7 +328,7 @@ export function processModuleDistribution(
     sortedRawModuleCounts,
     minCountThreshold,
     (count: number) => count,
-    DEFAULT_MODULE_CATEGORIES, // Updated to use imported constant
+    DEFAULT_MODULE_CATEGORIES,
   );
   return {
     bidAdapterInst: categorized.bidAdapter,
@@ -455,6 +454,5 @@ export function _processSiteEntries( // Made exportable for potential testing
 }
 
 // logger is imported as _processSiteEntries uses it.
-// _categorizeModules and _processSiteEntries were made exportable for testing, as per original file (update-stats.ts).
-// JSDoc for functions have been kept from the original file.
-// Changed typedefs for Processed/Categorized types (e.g. ProcessedModuleDistribution) to interfaces for consistency.
+// _categorizeModules and _processSiteEntries were made exportable for potential testing, consistent with original structure.
+// JSDoc for functions have been largely kept from the original file.

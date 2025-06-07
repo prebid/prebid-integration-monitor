@@ -2,14 +2,15 @@ import { initializeLogger } from './utils/logger.js';
 import { addExtra } from 'puppeteer-extra';
 import puppeteerVanilla from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import blockResourcesPluginFactory from 'puppeteer-extra-plugin-block-resources'; // Import type for plugin
+// Using namespace import and attempting to access .default for CJS interop
+import * as BlockResourcesModule from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
 // Import functions from new modules
-import { processFileContent, fetchUrlsFromGitHub, loadFileContents } from './utils/url-loader.js';
+import { processFileContent, fetchUrlsFromGitHub, loadFileContents, } from './utils/url-loader.js';
 import { processPageTask, // The core function for processing a single page
 // TaskResult and PageData are now imported from common/types
  } from './utils/puppeteer-task.js';
-import { processAndLogTaskResults, writeResultsToFile, updateInputFile } from './utils/results-handler.js';
+import { processAndLogTaskResults, writeResultsToFile, updateInputFile, } from './utils/results-handler.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -54,21 +55,32 @@ export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir); // Initialize the global logger
     logger.info('Starting Prebid Explorer with options:', options);
     // Apply puppeteer-extra stealth plugin to help avoid bot detection
+    // Cast puppeteer to any before calling use
     puppeteer.use(StealthPlugin());
     const resourcesToBlock = new Set([
-        'image', 'font', 'media', // Common non-essential resources for ad tech scanning
-        'texttrack', 'eventsource', 'manifest', 'other'
+        'image',
+        'font',
+        'media', // Common non-essential resources for ad tech scanning
+        'texttrack',
+        'eventsource',
+        'manifest',
+        'other',
         // 'stylesheet', 'script', 'xhr', 'websocket' are usually essential and not blocked.
     ]);
-    const blockResourcesPlugin = blockResourcesPluginFactory({ blockedTypes: resourcesToBlock });
-    puppeteer.use(blockResourcesPlugin);
+    // Accessing .default property for the factory, or using the module itself if .default is not present
+    const blockResourcesFactory = BlockResourcesModule.default || BlockResourcesModule;
+    const blockResourcesPluginInstance = blockResourcesFactory({
+        blockedTypes: resourcesToBlock,
+    });
+    // Cast puppeteer to any before calling use
+    puppeteer.use(blockResourcesPluginInstance);
     logger.info(`Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`);
     const basePuppeteerOptions = {
         protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
         defaultViewport: null, // Sets the viewport to null, effectively using the default viewport of the browser window.
         headless: options.headless,
         args: options.puppeteerLaunchOptions?.args || [],
-        ...(options.puppeteerLaunchOptions || {}) // Ensures options.puppeteerLaunchOptions is an object before spreading
+        ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
     };
     // results array is correctly typed with PageData from puppeteer-task.ts
     const taskResults = []; // Correctly typed with TaskResult from puppeteer-task.ts
@@ -94,7 +106,8 @@ export async function prebidExplorer(options) {
         const fileContent = loadFileContents(options.inputFile, logger);
         if (fileContent) {
             // Determine file type for logging, actual type handling is in processFileContent
-            const fileType = options.inputFile.substring(options.inputFile.lastIndexOf('.') + 1) || 'unknown';
+            const fileType = options.inputFile.substring(options.inputFile.lastIndexOf('.') + 1) ||
+                'unknown';
             logger.info(`Processing local file: ${options.inputFile} (detected type: ${fileType})`);
             allUrls = await processFileContent(options.inputFile, fileContent, logger);
             if (allUrls.length > 0) {
@@ -122,7 +135,9 @@ export async function prebidExplorer(options) {
         logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
         return;
     }
-    logger.info(`Initial total URLs found: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
+    logger.info(`Initial total URLs found: ${allUrls.length}`, {
+        firstFew: allUrls.slice(0, 5),
+    });
     // 1. URL Range Logic
     // Apply URL range filtering if specified in options.
     if (options.range) {
@@ -131,7 +146,8 @@ export async function prebidExplorer(options) {
         let [startStr, endStr] = options.range.split('-');
         let start = startStr ? parseInt(startStr, 10) : 1;
         let end = endStr ? parseInt(endStr, 10) : allUrls.length;
-        if (isNaN(start) || isNaN(end) || start < 0 || end < 0) { // Allow start = 0 for internal 0-based, but user input is 1-based
+        if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
+            // Allow start = 0 for internal 0-based, but user input is 1-based
             logger.warn(`Invalid range format: "${options.range}". Proceeding with all URLs. Start and end must be numbers. User input is 1-based.`);
         }
         else {
@@ -156,7 +172,9 @@ export async function prebidExplorer(options) {
         logger.warn(`No URLs to process after applying range or due to empty initial list. Exiting.`);
         return;
     }
-    logger.info(`Total URLs to process after range check: ${allUrls.length}`, { firstFew: allUrls.slice(0, 5) });
+    logger.info(`Total URLs to process after range check: ${allUrls.length}`, {
+        firstFew: allUrls.slice(0, 5),
+    });
     /** @type {string[]} URLs to be processed after applying range and other filters. */
     const urlsToProcess = allUrls; // This now contains potentially ranged URLs
     // Define the core processing task (used by both vanilla and cluster)
@@ -186,7 +204,9 @@ export async function prebidExplorer(options) {
                 // Register the imported processPageTask with the cluster
                 await cluster.task(processPageTask);
                 try {
-                    const chunkPromises = currentChunkUrls.filter(url => url).map(url => {
+                    const chunkPromises = currentChunkUrls
+                        .filter((url) => url)
+                        .map((url) => {
                         processedUrls.add(url); // Add to global processedUrls as it's queued
                         return cluster.queue({ url, logger }); // Pass url and logger
                         // No specific .then or .catch here, as results are collected from settledChunkResults
@@ -195,10 +215,11 @@ export async function prebidExplorer(options) {
                     });
                     // Wait for all promises in the chunk to settle
                     const settledChunkResults = await Promise.allSettled(chunkPromises);
-                    settledChunkResults.forEach(settledResult => {
+                    settledChunkResults.forEach((settledResult) => {
                         if (settledResult.status === 'fulfilled') {
                             // Ensure that settledResult.value is not null or undefined before pushing
-                            if (settledResult.value) {
+                            // Changed check to handle potential 'void' type for value
+                            if (typeof settledResult.value !== 'undefined') {
                                 taskResults.push(settledResult.value);
                             }
                             else {
@@ -224,11 +245,13 @@ export async function prebidExplorer(options) {
                 }
                 catch (error) {
                     logger.error(`An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`, { error });
+                    // Cast cluster to any before calling isClosed and close
                     if (cluster && !cluster.isClosed())
                         await cluster.close(); // Ensure cluster is closed on error
                 }
             }
-            else { // 'vanilla' Puppeteer for the current chunk
+            else {
+                // 'vanilla' Puppeteer for the current chunk
                 let browser = null;
                 try {
                     browser = await puppeteer.launch(basePuppeteerOptions);
@@ -236,7 +259,10 @@ export async function prebidExplorer(options) {
                         if (url) {
                             const page = await browser.newPage();
                             // Call the imported processPageTask directly
-                            const result = await processPageTask({ page, data: { url, logger } });
+                            const result = await processPageTask({
+                                page,
+                                data: { url, logger },
+                            });
                             taskResults.push(result);
                             await page.close();
                             processedUrls.add(url); // Add to global processedUrls
@@ -267,14 +293,17 @@ export async function prebidExplorer(options) {
             });
             await cluster.task(processPageTask);
             try {
-                const promises = urlsToProcess.filter(url => url).map(url => {
+                const promises = urlsToProcess
+                    .filter((url) => url)
+                    .map((url) => {
                     processedUrls.add(url);
                     return cluster.queue({ url, logger });
                 });
                 const settledResults = await Promise.allSettled(promises);
-                settledResults.forEach(settledResult => {
+                settledResults.forEach((settledResult) => {
                     if (settledResult.status === 'fulfilled') {
-                        if (settledResult.value) {
+                        // Changed check to handle potential 'void' type for value
+                        if (typeof settledResult.value !== 'undefined') {
                             taskResults.push(settledResult.value);
                         }
                         else {
@@ -294,19 +323,24 @@ export async function prebidExplorer(options) {
                 await cluster.close();
             }
             catch (error) {
-                logger.error("An unexpected error occurred during cluster processing orchestration", { error });
+                logger.error('An unexpected error occurred during cluster processing orchestration', { error });
+                // Cast cluster to any before calling isClosed and close
                 if (cluster && !cluster.isClosed())
                     await cluster.close();
             }
         }
-        else { // 'vanilla' Puppeteer
+        else {
+            // 'vanilla' Puppeteer
             let browser = null;
             try {
                 browser = await puppeteer.launch(basePuppeteerOptions);
                 for (const url of urlsToProcess) {
                     if (url) {
                         const page = await browser.newPage();
-                        const result = await processPageTask({ page, data: { url, logger } });
+                        const result = await processPageTask({
+                            page,
+                            data: { url, logger },
+                        });
                         taskResults.push(result);
                         await page.close();
                         processedUrls.add(url);
@@ -314,7 +348,7 @@ export async function prebidExplorer(options) {
                 }
             }
             catch (error) {
-                logger.error("An unexpected error occurred during vanilla Puppeteer processing", { error });
+                logger.error('An unexpected error occurred during vanilla Puppeteer processing', { error });
             }
             finally {
                 if (browser)

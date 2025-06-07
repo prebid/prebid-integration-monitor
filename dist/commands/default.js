@@ -46,7 +46,7 @@ export default class Default extends Command {
         try {
             // Initialize the tracer as the first step
             initTracer();
-            logger.info("Default oclif command starting...");
+            logger.info('Default oclif command starting...');
             // Call the refactored monitoring logic
             // Pass logger and this.log to the service
             // this.log is passed directly. If context issues arise, this.log.bind(this) can be used.

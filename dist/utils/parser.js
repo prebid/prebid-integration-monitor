@@ -4,7 +4,7 @@ async function parsePreloadUrls() {
     let loadList = [];
     const urlsRl = readline.createInterface({
         input: fs.createReadStream('src/input.txt'),
-        crlfDelay: Infinity
+        crlfDelay: Infinity,
     });
     for await (const url of urlsRl) {
         const trimmedUrl = url.trim();

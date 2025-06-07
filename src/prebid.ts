@@ -22,9 +22,8 @@ import puppeteerVanilla, {
   Page,
 } from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import blockResourcesPluginFactory, {
-  BlockResourcesPlugin,
-} from 'puppeteer-extra-plugin-block-resources'; // Import type for plugin
+// Using namespace import and attempting to access .default for CJS interop
+import * as BlockResourcesModule from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
 
 // Import functions from new modules
@@ -40,7 +39,7 @@ import {
 } from './utils/puppeteer-task.js';
 
 // Import shared types from the new common location
-import type { TaskResult, PageData } from '../common/types.js';
+import type { TaskResult, PageData } from './common/types.ts';
 
 import {
   processAndLogTaskResults,
@@ -147,7 +146,8 @@ export async function prebidExplorer(
   logger.info('Starting Prebid Explorer with options:', options);
 
   // Apply puppeteer-extra stealth plugin to help avoid bot detection
-  puppeteer.use(StealthPlugin());
+  // Cast puppeteer to any before calling use
+  (puppeteer as any).use(StealthPlugin());
 
   // Define specific type for blocked resource types for clarity
   type ResourceType =
@@ -173,10 +173,13 @@ export async function prebidExplorer(
     'other',
     // 'stylesheet', 'script', 'xhr', 'websocket' are usually essential and not blocked.
   ]);
-  const blockResourcesPlugin = blockResourcesPluginFactory({
+  // Accessing .default property for the factory, or using the module itself if .default is not present
+  const blockResourcesFactory = (BlockResourcesModule as any).default || BlockResourcesModule;
+  const blockResourcesPluginInstance = blockResourcesFactory({
     blockedTypes: resourcesToBlock,
   });
-  puppeteer.use(blockResourcesPlugin);
+  // Cast puppeteer to any before calling use
+  (puppeteer as any).use(blockResourcesPluginInstance);
   logger.info(
     `Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`,
   );
@@ -372,8 +375,9 @@ export async function prebidExplorer(
 
           settledChunkResults.forEach((settledResult) => {
             if (settledResult.status === 'fulfilled') {
-              // Ensure that settledResult.value is not null or undefined before pushing
-              if (settledResult.value) {
+              // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
+              // processPageTask is expected to always return a TaskResult.
+              if (typeof settledResult.value !== 'undefined') {
                 taskResults.push(settledResult.value);
               } else {
                 // This case might occur if a task somehow resolves with no value,
@@ -405,7 +409,8 @@ export async function prebidExplorer(
             `An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`,
             { error },
           );
-          if (cluster && !cluster.isClosed()) await cluster.close(); // Ensure cluster is closed on error
+          // Cast cluster to any before calling isClosed and close
+          if (cluster && !(cluster as any).isClosed()) await (cluster as any).close(); // Ensure cluster is closed on error
         }
       } else {
         // 'vanilla' Puppeteer for the current chunk
@@ -467,7 +472,8 @@ export async function prebidExplorer(
         const settledResults = await Promise.allSettled(promises);
         settledResults.forEach((settledResult) => {
           if (settledResult.status === 'fulfilled') {
-            if (settledResult.value) {
+            // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
+            if (typeof settledResult.value !== 'undefined') {
               taskResults.push(settledResult.value);
             } else {
               logger.warn(
@@ -494,7 +500,8 @@ export async function prebidExplorer(
           'An unexpected error occurred during cluster processing orchestration',
           { error },
         );
-        if (cluster && !cluster.isClosed()) await cluster.close();
+        // Cast cluster to any before calling isClosed and close
+        if (cluster && !(cluster as any).isClosed()) await (cluster as any).close();
       }
     } else {
       // 'vanilla' Puppeteer
