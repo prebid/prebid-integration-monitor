@@ -34,7 +34,14 @@ import {
 } from './utils/puppeteer-task.js';
 
 // Import shared types from the new common location
-import type { TaskResult } from './common/types.ts';
+import type { TaskResult, PageData } from './common/types.ts';
+import { AppError, AppErrorDetails } from './common/AppError.js';
+// Import ResourceType directly as it's used for type annotations, not just through DEFAULT_RESOURCES_TO_BLOCK
+import {
+  PUPPETEER_PROTOCOL_TIMEOUT,
+  DEFAULT_RESOURCES_TO_BLOCK,
+  ResourceType, // Use directly
+} from './config/app-config.js';
 
 import {
   processAndLogTaskResults,
@@ -44,159 +51,152 @@ import {
 
 /**
  * Defines the configuration options for the `prebidExplorer` function.
- * These options control various aspects of the Prebid.js scanning process,
- * including URL sources, Puppeteer settings, concurrency, and output.
+ * These options control various aspects of the Prebid.js scanning process.
+ * @interface PrebidExplorerOptions
+ * @property {string} [inputFile] - Optional path to a local file containing URLs to scan (e.g., .txt, .json, .csv).
+ *                                  Used if `githubRepo` is not provided.
+ * @property {string} [csvFile] - Optional path to a CSV file. Currently unused, consider for future use or removal.
+ *                                (Note: `inputFile` can handle CSVs, making this potentially redundant).
+ * @property {string} [githubRepo] - Optional URL of a public GitHub repository or a direct link to a file
+ *                                   within such a repository to fetch URLs from. Takes precedence over `inputFile`.
+ * @property {number} [numUrls] - Optional. Maximum number of URLs to process when fetching from GitHub or other list sources.
+ *                                If undefined, all found URLs are processed (subject to other limits like range).
+ * @property {'vanilla' | 'cluster'} puppeteerType - The mode of Puppeteer execution.
+ *                                                   'vanilla' uses a single browser instance.
+ *                                                   'cluster' uses `puppeteer-cluster` for parallel processing.
+ * @property {number} concurrency - The maximum number of concurrent Puppeteer instances or pages
+ *                                  when `puppeteerType` is 'cluster'. Ignored for 'vanilla'.
+ * @property {boolean} headless - Whether to run Puppeteer in headless mode (no visible browser UI).
+ *                                `true` for headless, `false` for headed.
+ * @property {boolean} monitor - Whether to enable the `puppeteer-cluster` web monitoring interface
+ *                               (typically at `http://localhost:21337`) when `puppeteerType` is 'cluster'.
+ * @property {string} outputDir - The directory path where output JSON files containing scan results will be saved.
+ *                                Dated subdirectories (e.g., `YYYY-MM-Mon`) will be created within this directory.
+ * @property {string} logDir - The directory path where log files (e.g., `app.log`, `error.log`) will be saved.
+ * @property {PuppeteerLaunchOptions} [puppeteerLaunchOptions] - Optional. Advanced launch options for Puppeteer,
+ *                                                                allowing fine-grained control over the browser instance.
+ *                                                                @see https://pptr.dev/api/puppeteer.puppeteerlaunchoptions
+ * @property {string} [range] - Optional string specifying a sub-range of URLs to process from the input list (1-based index).
+ *                              Examples: "1-100" (first 100), "50-" (from 50th to end), "-200" (up to 200th).
+ *                              Useful for splitting large lists or resuming scans.
+ * @property {number} [chunkSize] - Optional. Number of URLs to process in each batch or chunk.
+ *                                 If 0 or undefined, all URLs (after range filtering) are processed in a single batch
+ *                                 (or as per cluster limits). Useful for resource management with very large URL lists.
  */
 export interface PrebidExplorerOptions {
-  /** Optional path to an input file containing URLs to scan (e.g., .txt, .json, .csv). */
-  inputFile?: string; // Make optional as it might not be needed if githubRepo is used
-  /** Optional path to a CSV file (currently unused, consider for future use or removal). */
+  inputFile?: string;
   csvFile?: string;
-  /** Optional URL of a GitHub repository or direct file link to fetch URLs from. */
   githubRepo?: string;
-  /** Optional maximum number of URLs to process from the source. */
   numUrls?: number;
-  /** The type of Puppeteer execution: 'vanilla' (single browser instance) or 'cluster' (multiple instances). */
   puppeteerType: 'vanilla' | 'cluster';
-  /** The maximum number of concurrent Puppeteer instances/pages when using 'cluster' mode. */
   concurrency: number;
-  /** Whether to run Puppeteer in headless mode. */
   headless: boolean;
-  /** Whether to enable Puppeteer cluster monitoring (if 'cluster' mode is used). */
   monitor: boolean;
-  /** The directory where output JSON files will be saved. */
-  /** The directory where output JSON files containing scan results will be saved. */
   outputDir: string;
-  /** The directory where log files (e.g., activity logs, error logs) will be saved. */
   logDir: string;
-  /**
-   * Optional Puppeteer launch options to customize browser instantiation.
-   * @see https://pptr.dev/api/puppeteer.puppeteerlaunchoptions
-   * @example { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
-   */
   puppeteerLaunchOptions?: PuppeteerLaunchOptions;
-  /**
-   * Optional string specifying a range of URLs to process from the input list (1-based index).
-   * Useful for splitting large lists or resuming partial scans.
-   * @example "1-100", "50-", "-200"
-   */
   range?: string;
-  /**
-   * Optional number of URLs to process in each batch or chunk.
-   * If set to 0 or undefined, all URLs are processed in a single batch (or per cluster limits).
-   * Useful for managing resources or if processing needs to be intermittent.
-   */
   chunkSize?: number;
 }
 
 let logger: WinstonLogger; // Global logger instance, initialized within prebidExplorer.
 
 // Apply puppeteer-extra plugins.
-// The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
-// to handle the dynamic nature of puppeteer-extra plugins while retaining type safety
-// for the core puppeteerVanilla methods.
 const puppeteer = addExtra(
-  puppeteerVanilla as any, // Changed from unknown to any
+  puppeteerVanilla as any,
 ) as unknown as typeof puppeteerVanilla;
 
 /**
- * The main entry point for the Prebid Explorer tool.
- * This asynchronous function orchestrates the entire process of:
- * 1. Initializing logging.
- * 2. Applying Puppeteer plugins (Stealth, Block Resources).
- * 3. Determining the source of URLs (GitHub or local file) and loading them.
- * 4. Filtering URLs based on the specified range, if any.
- * 5. Launching Puppeteer (either a single instance or a cluster for concurrency).
- * 6. Processing each URL in chunks (if specified) using the `processPageTask`.
- * 7. Collecting and logging results from each task.
- * 8. Writing aggregated successful results to JSON files.
- * 9. Updating the input file if applicable (e.g., removing successfully processed URLs).
+ * Main orchestrator for the Prebid.js scanning process.
  *
- * @param {PrebidExplorerOptions} options - An object containing all configuration settings
- *                                          for the current run of the Prebid Explorer.
- * @returns {Promise<void>} A promise that resolves when all URLs have been processed and
- *                          results have been handled, or rejects if a critical error occurs
- *                          during setup or orchestration.
+ * This function initializes logging and Puppeteer, loads URLs from the specified source (file or GitHub),
+ * filters them if a range is provided, and then processes these URLs to detect Prebid.js and other
+ * advertising technologies. It can operate Puppeteer in 'vanilla' mode (single browser) or 'cluster'
+ * mode for parallel processing. URLs can be processed in chunks for better resource management.
+ *
+ * **Major Steps:**
+ * 1.  **Initialization**: Sets up the logger and applies Puppeteer plugins like `puppeteer-extra-plugin-stealth`
+ *     and `puppeteer-extra-plugin-block-resources` (using `DEFAULT_RESOURCES_TO_BLOCK`).
+ * 2.  **URL Loading**: Fetches URLs from either a GitHub repository (via `fetchUrlsFromGitHub`) or a local
+ *     input file (via `loadFileContents` and `processFileContent`).
+ * 3.  **URL Filtering**: If a `range` is specified in options, it slices the URL list accordingly.
+ * 4.  **Puppeteer Launch & Processing**:
+ *     *   If `chunkSize` is specified, URLs are processed in batches.
+ *     *   Based on `puppeteerType`:
+ *         *   **'cluster'**: Launches a `puppeteer-cluster` instance. Errors during cluster launch
+ *             (e.g., from `Cluster.launch()`) are caught and re-thrown as `AppError` with
+ *             `errorCode: 'PUPPETEER_CLUSTER_LAUNCH_FAILED'`.
+ *         *   **'vanilla'**: Launches a single Puppeteer browser instance. Errors during browser launch
+ *             (e.g., from `puppeteer.launch()`) are caught and re-thrown as `AppError` with
+ *             `errorCode: 'PUPPETEER_LAUNCH_FAILED'`.
+ *     *   Each URL (or page in a chunk) is processed by `processPageTask`.
+ * 5.  **Results Handling**:
+ *     *   Aggregates results from all processed URLs.
+ *     *   Logs outcomes using `processAndLogTaskResults`.
+ *     *   Writes successful results to a JSON file using `writeResultsToFile`.
+ *     *   If a local input file was used, updates it by removing successfully processed URLs using `updateInputFile`.
+ * 6.  **Error Handling**: A top-level `try...catch...finally` block ensures that critical errors during
+ *     the orchestration (including Puppeteer launch failures or unhandled exceptions from tasks) are caught,
+ *     logged with details, and re-thrown as an `AppError` with `errorCode: 'PREBID_EXPLORER_FAILURE'`.
+ *     The `finally` block attempts to process and save any partial results collected before a critical error.
+ *
+ * @param {PrebidExplorerOptions} options - Configuration options for the scan.
+ * @returns {Promise<void>} Resolves when all processing is complete.
+ * @throws {AppError} If a critical error occurs during setup or execution (e.g., `PUPPETEER_LAUNCH_FAILED`,
+ *                    `PUPPETEER_CLUSTER_LAUNCH_FAILED`, `PREBID_EXPLORER_FAILURE`). The `details` property
+ *                    of the `AppError` will contain `originalError` and a specific `errorCode`.
  * @example
  * const options = {
- *   inputFile: "urls.txt",
- *   outputDir: "output_results",
- *   logDir: "logs",
- *   puppeteerType: 'cluster',
- *   concurrency: 5,
- *   headless: true,
- *   monitor: false,
- *   chunkSize: 100,
- *   range: "1-500"
+ *   inputFile: "urls.txt", outputDir: "results", logDir: "logs",
+ *   puppeteerType: 'cluster', concurrency: 5, headless: true, monitor: false
  * };
- * prebidExplorer(options)
- *   .then(() => console.log("Prebid Explorer finished."))
- *   .catch(error => console.error("Prebid Explorer failed:", error));
+ * prebidExplorer(options).then(() => console.log("Scan complete.")).catch(err => console.error(err));
  */
 export async function prebidExplorer(
   options: PrebidExplorerOptions,
 ): Promise<void> {
-  logger = initializeLogger(options.logDir); // Initialize the global logger
+  // Initialize at a higher scope to be accessible in finally
+  let successfulResults: PageData[] = [];
+  let urlsToProcess: string[] = [];
+  let urlSourceType = ''; // To track the source for logging and file updates
+  // taskResults also needs to be available in the finally block
+  const taskResults: TaskResult[] = [];
 
-  logger.info('Starting Prebid Explorer with options:', options);
+  try {
+    logger = initializeLogger(options.logDir); // Initialize the global logger
+    logger.info('Starting Prebid Explorer with options:', options);
 
   // Apply puppeteer-extra stealth plugin to help avoid bot detection
-  // Cast puppeteer to any before calling use
-  (puppeteer as any).use(StealthPlugin()); // Changed cast
+  (puppeteer as any).use(StealthPlugin());
 
-  // Define specific type for blocked resource types for clarity
-  type ResourceType =
-    | 'image'
-    | 'font'
-    | 'websocket'
-    | 'media'
-    | 'texttrack'
-    | 'eventsource'
-    | 'manifest'
-    | 'other'
-    | 'stylesheet'
-    | 'script'
-    | 'xhr';
+  // The local 'ResourceType' type definition is removed.
+  // We rely on the imported 'ResourceType' via 'DEFAULT_RESOURCES_TO_BLOCK'.
 
-  const resourcesToBlock: Set<ResourceType> = new Set<ResourceType>([
-    'image',
-    'font',
-    'media', // Common non-essential resources for ad tech scanning
-    'texttrack',
-    'eventsource',
-    'manifest',
-    'other',
-    // 'stylesheet', 'script', 'xhr', 'websocket' are usually essential and not blocked.
-  ]);
   // Accessing .default property for the factory, or using the module itself if .default is not present
   const factory = ((BlockResourcesModule as any).default ||
     BlockResourcesModule) as any;
   const blockResourcesPluginInstance = factory({
-    // Changed factory definition and call
-    blockedTypes: resourcesToBlock,
+    blockedTypes: DEFAULT_RESOURCES_TO_BLOCK, // Use imported constant from app-config
   });
-  // Cast puppeteer to any before calling use
-  (puppeteer as any).use(blockResourcesPluginInstance); // Changed cast
+  (puppeteer as any).use(blockResourcesPluginInstance);
   logger.info(
-    `Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`,
+    `Configured to block resource types: ${Array.from(DEFAULT_RESOURCES_TO_BLOCK).join(', ')}`,
   );
 
   const basePuppeteerOptions: PuppeteerLaunchOptions = {
-    protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
-    defaultViewport: null, // Sets the viewport to null, effectively using the default viewport of the browser window.
+    protocolTimeout: PUPPETEER_PROTOCOL_TIMEOUT, // Use imported constant from app-config
+    defaultViewport: null,
     headless: options.headless,
     args: options.puppeteerLaunchOptions?.args || [],
-    ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
+    ...(options.puppeteerLaunchOptions || {}),
   };
 
-  // results array is correctly typed with PageData from puppeteer-task.ts
-  const taskResults: TaskResult[] = []; // Correctly typed with TaskResult from puppeteer-task.ts
+  // taskResults is declared at a higher scope, no need to re-declare here.
   /** @type {string[]} Array to store all URLs fetched from the specified source. */
   let allUrls: string[] = [];
   /** @type {Set<string>} Set to keep track of URLs that have been processed or are queued for processing. */
   const processedUrls: Set<string> = new Set();
-  /** @type {string} String to identify the source of URLs (e.g., 'GitHub', 'InputFile'). */
-  let urlSourceType = ''; // To track the source for logging and file updates
+  // urlSourceType is now declared at a higher scope
 
   // Determine the source of URLs (GitHub or local file) and fetch them.
   if (options.githubRepo) {
@@ -246,7 +246,6 @@ export async function prebidExplorer(
       logger.error(
         `Failed to load content from input file ${options.inputFile}. Cannot proceed with this source.`,
       );
-      // Depending on desired behavior, you might want to throw an error here
       // For now, it will proceed to the "No URLs to process" check.
     }
   } else {
@@ -254,7 +253,7 @@ export async function prebidExplorer(
     logger.error(
       'No URL source provided. Either --githubRepo or inputFile argument must be specified.',
     );
-    throw new Error('No URL source specified.');
+    throw new Error('No URL source specified.'); // This will be caught by the main try-catch
   }
 
   // Exit if no URLs were found from the specified source.
@@ -278,14 +277,12 @@ export async function prebidExplorer(
     let end = endStr ? parseInt(endStr, 10) : allUrls.length;
 
     if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
-      // Allow start = 0 for internal 0-based, but user input is 1-based
       logger.warn(
         `Invalid range format: "${options.range}". Proceeding with all URLs. Start and end must be numbers. User input is 1-based.`,
       );
     } else {
-      // Convert 1-based to 0-based indices
-      start = start > 0 ? start - 1 : 0; // If user enters 0 or negative, treat as start from beginning
-      end = end > 0 ? end : allUrls.length; // If user enters 0 or negative for end, or leaves it empty, treat as end of list
+      start = start > 0 ? start - 1 : 0;
+      end = end > 0 ? end : allUrls.length;
 
       if (start >= allUrls.length) {
         logger.warn(
@@ -298,7 +295,7 @@ export async function prebidExplorer(
         );
         allUrls = allUrls.slice(start);
       } else {
-        allUrls = allUrls.slice(start, end); // end is exclusive for slice, matches 0-based end index
+        allUrls = allUrls.slice(start, end);
         logger.info(
           `Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`,
         );
@@ -316,19 +313,15 @@ export async function prebidExplorer(
     firstFew: allUrls.slice(0, 5),
   });
 
-  /** @type {string[]} URLs to be processed after applying range and other filters. */
-  const urlsToProcess = allUrls; // This now contains potentially ranged URLs
+  // urlsToProcess is now declared at a higher scope
+  urlsToProcess = allUrls; // This now contains potentially ranged URLs
 
   // Define the core processing task (used by both vanilla and cluster)
-  // Note: The actual definition of processPageTask is now imported.
-  // We pass it to the cluster or call it directly, along with the logger.
 
   // 2. Chunk Processing Logic
-  /** @type {number} Size of chunks for processing URLs. 0 means no chunking. */
   const chunkSize =
     options.chunkSize && options.chunkSize > 0 ? options.chunkSize : 0;
 
-  // Process URLs in chunks if chunkSize is specified.
   if (chunkSize > 0) {
     logger.info(`Chunked processing enabled. Chunk size: ${chunkSize}`);
     const totalChunks = Math.ceil(urlsToProcess.length / chunkSize);
@@ -341,62 +334,58 @@ export async function prebidExplorer(
         `Processing chunk ${chunkNumber} of ${totalChunks}: URLs ${i + 1}-${Math.min(i + chunkSize, urlsToProcess.length)}`,
       );
 
-      // Process the current chunk using either 'cluster' or 'vanilla' Puppeteer mode.
       if (options.puppeteerType === 'cluster') {
-        const cluster: Cluster<
+        let cluster: Cluster<
           { url: string; logger: WinstonLogger },
           TaskResult
-        > = await Cluster.launch({
-          concurrency: Cluster.CONCURRENCY_CONTEXT,
-          maxConcurrency: options.concurrency,
+        > | null = null;
+        try {
+          try {
+            cluster = await Cluster.launch({
+              concurrency: Cluster.CONCURRENCY_CONTEXT,
+              maxConcurrency: options.concurrency,
           monitor: options.monitor,
           puppeteer,
           puppeteerOptions: basePuppeteerOptions,
         });
+          } catch (launchError: unknown) {
+            const errorDetails: AppErrorDetails = {
+              errorCode: 'PUPPETEER_CLUSTER_LAUNCH_FAILED',
+              originalError: launchError as Error,
+              puppeteerType: 'cluster',
+              chunkProcessing: true,
+              chunkNumber,
+            };
+            logger.error(`Puppeteer Cluster launch failed (chunk ${chunkNumber}): ${(launchError as Error).message}`, { errorDetails });
+            throw new AppError(`Puppeteer Cluster launch failed for chunk ${chunkNumber}.`, errorDetails);
+          }
 
-        // Register the imported processPageTask with the cluster
         await cluster.task(processPageTask);
 
         try {
           const chunkPromises = currentChunkUrls
             .filter((url) => url)
             .map((url) => {
-              processedUrls.add(url); // Add to global processedUrls as it's queued
-              return cluster.queue({ url, logger }); // Pass url and logger
-              // No specific .then or .catch here, as results are collected from settledChunkResults
-              // Error handling for queueing itself might be needed if cluster.queue can throw directly
-              // However, task errors are handled by processPageTask and returned as TaskResultError.
+              processedUrls.add(url);
+              return cluster!.queue({ url, logger });
             });
-          // Wait for all promises in the chunk to settle
           const settledChunkResults = await Promise.allSettled(chunkPromises);
 
           settledChunkResults.forEach((settledResult) => {
             if (settledResult.status === 'fulfilled') {
-              // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
-              // processPageTask is expected to always return a TaskResult.
               if (typeof settledResult.value !== 'undefined') {
                 taskResults.push(settledResult.value);
               } else {
-                // This case might occur if a task somehow resolves with no value,
-                // though processPageTask is expected to always return a TaskResult.
                 logger.warn(
                   'A task from cluster.queue (chunked) fulfilled but with undefined/null value.',
                   { settledResult },
                 );
               }
             } else if (settledResult.status === 'rejected') {
-              // This typically means an error occurred before processPageTask could even run or return a TaskResultError
-              // (e.g., an issue with Puppeteer itself or the cluster queue mechanism for that specific task).
-              // It's important to log this, as it might not be captured by processPageTask's own error handling.
               logger.error(
                 `A promise from cluster.queue (chunk ${chunkNumber}) was rejected. This is unexpected if processPageTask is robust.`,
                 { reason: settledResult.reason },
               );
-              // Optionally, create a TaskResultError here if the URL can be reliably determined.
-              // const urlFromRejectedPromise = ... (this might be tricky to get reliably from the settledResult.reason)
-              // if (urlFromRejectedPromise) {
-              //     taskResults.push({ type: 'error', url: urlFromRejectedPromise, error: 'PROMISE_REJECTED_IN_QUEUE' });
-              // }
             }
           });
           await cluster.idle();
@@ -404,35 +393,48 @@ export async function prebidExplorer(
         } catch (error: unknown) {
           logger.error(
             `An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`,
-            { error },
+            { error: (error as Error).message, stack: (error as Error).stack },
           );
-          // Cast cluster to any before calling isClosed and close
-          if (cluster && !(cluster as any).isClosed())
-            // Changed cast
-            await (cluster as any).close(); // Ensure cluster is closed on error
+          if (cluster && !(cluster as any).isClosed()) {
+            await (cluster as any).close();
+          }
+          // If Cluster.launch itself failed, the AppError is thrown and will be caught by the outer try-catch.
         }
       } else {
         // 'vanilla' Puppeteer for the current chunk
         let browser: Browser | null = null;
         try {
-          browser = await puppeteer.launch(basePuppeteerOptions);
+          try {
+            browser = await puppeteer.launch(basePuppeteerOptions);
+          } catch (launchError: unknown) {
+            const errorDetails: AppErrorDetails = {
+              errorCode: 'PUPPETEER_LAUNCH_FAILED',
+              originalError: launchError as Error,
+              puppeteerType: 'vanilla',
+              chunkProcessing: true,
+              chunkNumber,
+            };
+            logger.error(`Vanilla Puppeteer launch failed (chunk ${chunkNumber}): ${(launchError as Error).message}`, { errorDetails });
+            throw new AppError(`Vanilla Puppeteer launch failed for chunk ${chunkNumber}.`, errorDetails);
+          }
           for (const url of currentChunkUrls) {
             if (url) {
               const page = await browser.newPage();
-              // Call the imported processPageTask directly
               const result = await processPageTask({
                 page,
                 data: { url, logger },
               });
               taskResults.push(result);
               await page.close();
-              processedUrls.add(url); // Add to global processedUrls
+              processedUrls.add(url);
             }
           }
         } catch (error: unknown) {
+          if (error instanceof AppError) throw error;
+
           logger.error(
             `An error occurred during processing chunk ${chunkNumber} with vanilla Puppeteer.`,
-            { error },
+            { error: (error as Error).message, stack: (error as Error).stack },
           );
         } finally {
           if (browser) await browser.close();
@@ -448,30 +450,40 @@ export async function prebidExplorer(
       `Processing all ${urlsToProcess.length} URLs without chunking.`,
     );
     if (options.puppeteerType === 'cluster') {
-      const cluster: Cluster<
+      let cluster: Cluster<
         { url: string; logger: WinstonLogger },
         TaskResult
-      > = await Cluster.launch({
-        concurrency: Cluster.CONCURRENCY_CONTEXT,
-        maxConcurrency: options.concurrency,
-        monitor: options.monitor,
-        puppeteer,
-        puppeteerOptions: basePuppeteerOptions,
-      });
-
-      await cluster.task(processPageTask);
-
+      > | null = null;
       try {
+        try {
+            cluster = await Cluster.launch({
+                concurrency: Cluster.CONCURRENCY_CONTEXT,
+                maxConcurrency: options.concurrency,
+                monitor: options.monitor,
+                puppeteer,
+                puppeteerOptions: basePuppeteerOptions,
+            });
+        } catch (launchError: unknown) {
+            const errorDetails: AppErrorDetails = {
+                errorCode: 'PUPPETEER_CLUSTER_LAUNCH_FAILED',
+                originalError: launchError as Error,
+                puppeteerType: 'cluster',
+            };
+            logger.error(`Puppeteer Cluster launch failed (non-chunked): ${(launchError as Error).message}`, { errorDetails });
+            throw new AppError('Puppeteer Cluster launch failed.', errorDetails);
+        }
+
+        await cluster.task(processPageTask);
+
         const promises = urlsToProcess
           .filter((url) => url)
           .map((url) => {
             processedUrls.add(url);
-            return cluster.queue({ url, logger });
+            return cluster!.queue({ url, logger }); // cluster is non-null here
           });
         const settledResults = await Promise.allSettled(promises);
         settledResults.forEach((settledResult) => {
           if (settledResult.status === 'fulfilled') {
-            // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
             if (typeof settledResult.value !== 'undefined') {
               taskResults.push(settledResult.value);
             } else {
@@ -485,30 +497,39 @@ export async function prebidExplorer(
               'A promise from cluster.queue (non-chunked) was rejected. This is unexpected if processPageTask is robust.',
               { reason: settledResult.reason },
             );
-            // Optionally, create a TaskResultError here
-            // const urlFromRejectedPromise = ...
-            // if (urlFromRejectedPromise) {
-            //     taskResults.push({ type: 'error', url: urlFromRejectedPromise, error: 'PROMISE_REJECTED_IN_QUEUE' });
-            // }
           }
         });
         await cluster.idle();
         await cluster.close();
       } catch (error: unknown) {
-        logger.error(
-          'An unexpected error occurred during cluster processing orchestration',
-          { error },
-        );
-        // Cast cluster to any before calling isClosed and close
-        if (cluster && !(cluster as any).isClosed())
-          // Changed cast
+        if (error instanceof AppError) throw error;
+
+        if (cluster && !(cluster as any).isClosed()) {
           await (cluster as any).close();
+        }
+        const errorDetails: AppErrorDetails = {
+          errorCode: 'PUPPETEER_CLUSTER_PROCESSING_FAILED',
+          originalError: error as Error,
+          puppeteerType: 'cluster',
+        };
+        logger.error(`Error in puppeteer-cluster (non-chunked): ${(error as Error).message}`, { errorDetails });
+        throw new AppError('Puppeteer cluster processing failed.', errorDetails);
       }
     } else {
       // 'vanilla' Puppeteer
       let browser: Browser | null = null;
       try {
-        browser = await puppeteer.launch(basePuppeteerOptions);
+        try {
+          browser = await puppeteer.launch(basePuppeteerOptions);
+        } catch (launchError: unknown) {
+          const errorDetails: AppErrorDetails = {
+            errorCode: 'PUPPETEER_LAUNCH_FAILED',
+            originalError: launchError as Error,
+            puppeteerType: 'vanilla',
+          };
+          logger.error(`Vanilla Puppeteer launch failed: ${(launchError as Error).message}`, { errorDetails });
+          throw new AppError('Vanilla Puppeteer launch failed.', errorDetails);
+        }
         for (const url of urlsToProcess) {
           if (url) {
             const page = await browser.newPage();
@@ -522,21 +543,94 @@ export async function prebidExplorer(
           }
         }
       } catch (error: unknown) {
+        if (error instanceof AppError) throw error;
+
         logger.error(
           'An unexpected error occurred during vanilla Puppeteer processing',
-          { error },
+          { error: (error as Error).message, stack: (error as Error).stack },
         );
+        const errorDetails: AppErrorDetails = {
+          errorCode: 'PUPPETEER_VANILLA_PROCESSING_FAILED',
+          originalError: error as Error,
+          puppeteerType: 'vanilla',
+        };
+        throw new AppError('Vanilla Puppeteer processing failed.', errorDetails);
       } finally {
         if (browser) await browser.close();
       }
     }
   }
+  // Assign to successfulResults here, after all processing is done and before catch/finally
+  successfulResults = processAndLogTaskResults(taskResults, logger);
 
-  // Use functions from results-handler.ts
-  const successfulResults = processAndLogTaskResults(taskResults, logger);
-  writeResultsToFile(successfulResults, options.outputDir, logger);
+} catch (error: unknown) {
+  // This is a top-level catch for prebidExplorer orchestration errors
+  const err = error as Error;
+  let appErrorDetails: AppErrorDetails;
 
-  if (urlSourceType === 'InputFile' && options.inputFile) {
-    updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);
+  if (err instanceof AppError && err.details) {
+    appErrorDetails = {
+      ...err.details,
+      errorCode: err.details.errorCode || 'PREBID_EXPLORER_FAILURE',
+      originalError: err.details.originalError || err,
+    };
+    // Ensure logger is initialized before using
+    if (logger) {
+      logger.error(
+        `Critical error during Prebid exploration: ${err.message}`,
+        {
+          errorDetails: appErrorDetails,
+          originalStack: err.stack,
+        },
+      );
+    } else {
+      console.error(`Critical error (logger not init): ${err.message}`, appErrorDetails);
+    }
+  } else {
+    appErrorDetails = {
+      errorCode: 'PREBID_EXPLORER_FAILURE',
+      originalError: err,
+    };
+    if (logger) {
+      logger.error(
+        `Critical error during Prebid exploration: ${err.message}`,
+        {
+          errorName: err.name,
+          errorMessage: err.message,
+          errorStack: err.stack,
+        },
+      );
+    } else {
+      console.error(`Critical error (logger not init): ${err.message}`);
+    }
+  }
+  // Re-throw as an AppError to standardize errors propagated from prebidExplorer
+  throw new AppError(
+    `Critical error during Prebid exploration: ${err.message}`,
+    appErrorDetails,
+  );
+} finally {
+  // This block runs regardless of errors in the try block,
+  // to ensure any partial results are processed and files are updated.
+  // Ensure logger is initialized before using it in finally block
+  const currentLogger = logger || initializeLogger(options.logDir, 'prebid-explorer-finally');
+
+  if (taskResults.length > 0 || successfulResults.length > 0) {
+    // successfulResults might not be populated if error occurred before its assignment in try
+    // Re-process taskResults if successfulResults is empty but taskResults has items
+    const finalSuccessfulResults = successfulResults.length > 0 ? successfulResults : processAndLogTaskResults(taskResults, currentLogger);
+    if (finalSuccessfulResults.length > 0) {
+      writeResultsToFile(finalSuccessfulResults, options.outputDir, currentLogger);
+    }
+
+    if (urlSourceType === 'InputFile' && options.inputFile) {
+      // urlsToProcess might be empty if error occurred before its initialization.
+      updateInputFile(options.inputFile, urlsToProcess || [], taskResults, currentLogger);
+    }
+  } else if (currentLogger) {
+    currentLogger.info('No task results generated, skipping result processing and file updates in finally block.');
   }
 }
+}
+
+[end of src/prebid.ts]
