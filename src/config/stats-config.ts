@@ -24,7 +24,11 @@ export const OUTPUT_DIR: string = path.join(PROJECT_ROOT, 'store');
  * @description The full path to the output JSON file (`api.json`) that contains the aggregated statistics.
  * Resolved relative to the project root.
  */
-export const FINAL_API_FILE_PATH: string = path.join(PROJECT_ROOT, 'api', 'api.json');
+export const FINAL_API_FILE_PATH: string = path.join(
+  PROJECT_ROOT,
+  'api',
+  'api.json',
+);
 
 /**
  * @const {number} MIN_COUNT_THRESHOLD
@@ -51,9 +55,21 @@ export const MONTH_ABBR_REGEX: RegExp = /^[A-Z][a-z]{2}$/;
  * @property {function(string): boolean} rtdModule - Identifies Real-Time Data (RTD) modules.
  * @property {function(string): boolean} analyticsAdapter - Identifies analytics adapter modules.
  */
-export const DEFAULT_MODULE_CATEGORIES: { [key: string]: (name: string) => boolean } = {
+export const DEFAULT_MODULE_CATEGORIES: {
+  [key: string]: (name: string) => boolean;
+} = {
   bidAdapter: (name: string): boolean => name.includes('BidAdapter'),
-  idModule: (name: string): boolean => name.includes('IdSystem') || ['userId', 'idImportLibrary', 'pubCommonId', 'utiqSystem', 'trustpidSystem'].includes(name),
-  rtdModule: (name: string): boolean => name.includes('Rtd' + 'Provider') || name === 'rtdModule', // Forcing re-evaluation of 'RtdProvider'
-  analyticsAdapter: (name: string): boolean => name.includes('AnalyticsAdapter'),
+  idModule: (name: string): boolean =>
+    name.includes('IdSystem') ||
+    [
+      'userId',
+      'idImportLibrary',
+      'pubCommonId',
+      'utiqSystem',
+      'trustpidSystem',
+    ].includes(name),
+  rtdModule: (name: string): boolean =>
+    name.includes('Rtd' + 'Provider') || name === 'rtdModule', // Forcing re-evaluation of 'RtdProvider'
+  analyticsAdapter: (name: string): boolean =>
+    name.includes('AnalyticsAdapter'),
 };

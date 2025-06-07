@@ -285,6 +285,39 @@ npx -p vitest vitest run
 
 This will execute all tests found in the `tests/` directory.
 
+## Linting and Formatting
+
+This project uses ESLint for linting and Prettier for code formatting to ensure code quality and consistency.
+
+### Configuration
+
+-   **ESLint**: Configuration is managed in `eslint.config.js`. It uses `@typescript-eslint/parser` for TypeScript support and integrates Prettier rules to avoid conflicts.
+-   **Prettier**: Configuration is managed in `.prettierrc.cjs`.
+-   **Ignore Files**:
+    -   `.eslintignore` (if you choose to create one, though `ignores` in `eslint.config.js` is preferred for ESLint v9+).
+    -   `.prettierignore` is used to specify files that Prettier should not format.
+
+### Scripts
+
+-   **To format all supported files in the project:**
+    ```bash
+    npm run format
+    ```
+    This command uses Prettier to rewrite files in place according to the rules in `.prettierrc.cjs`.
+
+-   **To lint all TypeScript files and automatically fix fixable issues:**
+    ```bash
+    npm run lint -- --fix
+    ```
+    This command uses ESLint to analyze the code. The `--fix` flag instructs ESLint to automatically correct problems where possible. Any errors that cannot be auto-fixed will be reported in the console.
+
+-   **To check for linting errors without fixing:**
+    ```bash
+    npm run lint
+    ```
+
+It's recommended to run these scripts before committing code to maintain a clean and consistent codebase.
+
 ## Logging
 
 This application utilizes the Winston logging library to provide detailed and structured logging.

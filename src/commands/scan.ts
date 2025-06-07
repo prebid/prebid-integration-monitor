@@ -1,4 +1,4 @@
-import {Command, Flags, Args, Interfaces} from '@oclif/core'; // Added Interfaces
+import { Command, Flags, Args, Interfaces } from '@oclif/core'; // Added Interfaces
 // Step 1: Import prebidExplorer and PrebidExplorerOptions
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js'; // Assuming .js for NodeNext resolution
 import { scanArgs, scanFlags } from './scan-options.js';
@@ -15,14 +15,15 @@ export default class Scan extends Command {
   /**
    * Provides a description for the Scan command.
    */
-  static override description = 'Scans websites for Prebid.js integrations. InputFile can be .txt, .csv, or .json.'
+  static override description =
+    'Scans websites for Prebid.js integrations. InputFile can be .txt, .csv, or .json.';
   /**
    * Provides examples of how to use the Scan command.
    */
   static override examples = [
     '<%= config.bin %> <%= command.id %> websites.txt --puppeteerType=cluster --concurrency=10',
     '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/user/repo --numUrls 50',
-  ]
+  ];
   /**
    * Defines the flags for the Scan command.
    */
@@ -39,7 +40,9 @@ export default class Scan extends Command {
    * @param flags - The parsed flags object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.flags`.
    * @returns A {@link PrebidExplorerOptions} object configured with values from the flags.
    */
-  private _getPrebidExplorerOptions(flags: Interfaces.InferredFlags<typeof Scan.flags>): PrebidExplorerOptions {
+  private _getPrebidExplorerOptions(
+    flags: Interfaces.InferredFlags<typeof Scan.flags>,
+  ): PrebidExplorerOptions {
     return {
       puppeteerType: flags.puppeteerType as 'vanilla' | 'cluster',
       concurrency: flags.concurrency,
@@ -67,23 +70,32 @@ export default class Scan extends Command {
    * @param flags - The parsed flags object obtained from `this.parse(Scan)`. Expected to conform to the structure defined in `Scan.flags`.
    * @param options - The {@link PrebidExplorerOptions} object to be modified with input source details.
    */
-  private _getInputSourceOptions(args: Interfaces.InferredArgs<typeof Scan.args>, flags: Interfaces.InferredFlags<typeof Scan.flags>, options: PrebidExplorerOptions): void {
+  private _getInputSourceOptions(
+    args: Interfaces.InferredArgs<typeof Scan.args>,
+    flags: Interfaces.InferredFlags<typeof Scan.flags>,
+    options: PrebidExplorerOptions,
+  ): void {
     if (flags.githubRepo) {
       this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
       options.githubRepo = flags.githubRepo;
       if (args.inputFile && args.inputFile !== 'src/input.txt') {
-        this.warn(`--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`);
+        this.warn(
+          `--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`,
+        );
       }
     } else if (args.inputFile) {
       this.log(`Using input file: ${args.inputFile}`);
       options.inputFile = args.inputFile;
     } else {
-      this.error('No input source specified. Please provide --githubRepo or an inputFile argument.', { exit: 1 });
+      this.error(
+        'No input source specified. Please provide --githubRepo or an inputFile argument.',
+        { exit: 1 },
+      );
     }
   }
 
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(Scan)
+    const { args, flags } = await this.parse(Scan);
 
     const options = this._getPrebidExplorerOptions(flags);
     this._getInputSourceOptions(args, flags, options);

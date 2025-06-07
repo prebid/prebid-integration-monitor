@@ -11,8 +11,8 @@ import logger from './logger.js';
  * @property {PrebidInstanceData[]} [prebidInstances] - An array of Prebid.js instances found on the site. Optional if no instances detected.
  */
 export interface SiteData {
-    url?: string;
-    prebidInstances?: PrebidInstanceData[];
+  url?: string;
+  prebidInstances?: PrebidInstanceData[];
 }
 
 /**
@@ -22,8 +22,8 @@ export interface SiteData {
  * @property {string[]} [modules] - An array of module names (e.g., "rubiconBidAdapter", "userId") associated with the Prebid.js instance. Optional if no modules detected or applicable.
  */
 export interface PrebidInstanceData {
-    version?: string;
-    modules?: string[];
+  version?: string;
+  modules?: string[];
 }
 
 /**
@@ -33,7 +33,7 @@ export interface PrebidInstanceData {
  * @property {number} [version] - Count for a specific version string.
  */
 export interface VersionDistribution {
-    [version: string]: number;
+  [version: string]: number;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface VersionDistribution {
  * @property {number} [moduleName] - Count for a specific module name.
  */
 export interface ModuleDistribution {
-    [moduleName: string]: number;
+  [moduleName: string]: number;
 }
 
 /**
@@ -56,10 +56,10 @@ export interface ModuleDistribution {
  * @see {@link https://semver.org/ Semantic Versioning}
  */
 export interface VersionComponents {
-    major: number;
-    minor: number;
-    patch: number;
-    preRelease: string | null;
+  major: number;
+  minor: number;
+  patch: number;
+  preRelease: string | null;
 }
 
 /**
@@ -73,12 +73,13 @@ export interface VersionComponents {
  * @property {ModuleDistribution} analyticsAdapter - Distribution of analytics adapter modules.
  * @property {ModuleDistribution} other - Distribution of modules not fitting into other predefined categories.
  */
-export interface CategorizedModules { // Changed from typedef to interface for consistency
-    bidAdapter: ModuleDistribution;
-    idModule: ModuleDistribution;
-    rtdModule: ModuleDistribution;
-    analyticsAdapter: ModuleDistribution;
-    other: ModuleDistribution;
+export interface CategorizedModules {
+  // Changed from typedef to interface for consistency
+  bidAdapter: ModuleDistribution;
+  idModule: ModuleDistribution;
+  rtdModule: ModuleDistribution;
+  analyticsAdapter: ModuleDistribution;
+  other: ModuleDistribution;
 }
 
 /**
@@ -93,12 +94,13 @@ export interface CategorizedModules { // Changed from typedef to interface for c
  * @property {ModuleDistribution} analyticsAdapterWebsites - Distribution of unique websites using specific analytics adapter modules.
  * @property {ModuleDistribution} otherModuleWebsites - Distribution of unique websites using other specific modules not fitting predefined categories.
  */
-export interface ProcessedModuleWebsiteCounts { // Changed from typedef to interface
-    bidAdapterWebsites: ModuleDistribution;
-    idModuleWebsites: ModuleDistribution;
-    rtdModuleWebsites: ModuleDistribution;
-    analyticsAdapterWebsites: ModuleDistribution;
-    otherModuleWebsites: ModuleDistribution;
+export interface ProcessedModuleWebsiteCounts {
+  // Changed from typedef to interface
+  bidAdapterWebsites: ModuleDistribution;
+  idModuleWebsites: ModuleDistribution;
+  rtdModuleWebsites: ModuleDistribution;
+  analyticsAdapterWebsites: ModuleDistribution;
+  otherModuleWebsites: ModuleDistribution;
 }
 
 /**
@@ -113,12 +115,13 @@ export interface ProcessedModuleWebsiteCounts { // Changed from typedef to inter
  * @property {ModuleDistribution} analyticsAdapterInst - Distribution of Prebid.js analytics adapter module instances.
  * @property {ModuleDistribution} otherModuleInst - Distribution of other Prebid.js module instances not fitting predefined categories.
  */
-export interface ProcessedModuleDistribution { // Changed from typedef to interface
-    bidAdapterInst: ModuleDistribution;
-    idModuleInst: ModuleDistribution;
-    rtdModuleInst: ModuleDistribution;
-    analyticsAdapterInst: ModuleDistribution;
-    otherModuleInst: ModuleDistribution;
+export interface ProcessedModuleDistribution {
+  // Changed from typedef to interface
+  bidAdapterInst: ModuleDistribution;
+  idModuleInst: ModuleDistribution;
+  rtdModuleInst: ModuleDistribution;
+  analyticsAdapterInst: ModuleDistribution;
+  otherModuleInst: ModuleDistribution;
 }
 
 /**
@@ -131,12 +134,12 @@ export interface ProcessedModuleDistribution { // Changed from typedef to interf
  * @property {VersionDistribution} customVersions - Distribution of custom or non-standard Prebid.js versions
  *           (e.g., "8.42.0-custom", or versions not matching X.Y.Z or X.Y.Z-pre patterns).
  */
-export interface ProcessedVersionDistribution { // Changed from typedef to interface
-    releaseVersions: VersionDistribution;
-    buildVersions: VersionDistribution;
-    customVersions: VersionDistribution;
+export interface ProcessedVersionDistribution {
+  // Changed from typedef to interface
+  releaseVersions: VersionDistribution;
+  buildVersions: VersionDistribution;
+  customVersions: VersionDistribution;
 }
-
 
 import { DEFAULT_MODULE_CATEGORIES } from '../config/stats-config.js';
 
@@ -163,23 +166,29 @@ import { DEFAULT_MODULE_CATEGORIES } from '../config/stats-config.js';
  *          - For unparseable strings (not matching `vX.Y.Z(-prerelease)`),
  *            returns `{ major: 0, minor: 0, patch: 0, preRelease: originalInputString }`.
  */
-export function parseVersion(versionString: string | undefined): VersionComponents {
-    if (!versionString) {
-        // Optionally log if strict parsing is expected and undefined/null is an issue:
-        // logger.instance.debug('parseVersion received null or undefined versionString.');
-        return { major: 0, minor: 0, patch: 0, preRelease: 'invalid' };
-    }
-    const match: RegExpMatchArray | null = versionString.match(/^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/);
-    if (!match) {
-        logger.instance.warn(`Could not parse version string: "${versionString}" into X.Y.Z format. Returning as custom preRelease.`);
-        return { major: 0, minor: 0, patch: 0, preRelease: versionString };
-    }
-    return {
-        major: parseInt(match[1], 10),
-        minor: parseInt(match[2], 10),
-        patch: parseInt(match[3], 10),
-        preRelease: match[4] || null,
-    };
+export function parseVersion(
+  versionString: string | undefined,
+): VersionComponents {
+  if (!versionString) {
+    // Optionally log if strict parsing is expected and undefined/null is an issue:
+    // logger.instance.debug('parseVersion received null or undefined versionString.');
+    return { major: 0, minor: 0, patch: 0, preRelease: 'invalid' };
+  }
+  const match: RegExpMatchArray | null = versionString.match(
+    /^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/,
+  );
+  if (!match) {
+    logger.instance.warn(
+      `Could not parse version string: "${versionString}" into X.Y.Z format. Returning as custom preRelease.`,
+    );
+    return { major: 0, minor: 0, patch: 0, preRelease: versionString };
+  }
+  return {
+    major: parseInt(match[1], 10),
+    minor: parseInt(match[2], 10),
+    patch: parseInt(match[3], 10),
+    preRelease: match[4] || null,
+  };
 }
 
 /**
@@ -202,26 +211,26 @@ export function parseVersion(versionString: string | undefined): VersionComponen
  * compareVersions("8.0.0-beta", "8.0.0-alpha"); // Returns < 0 (8.0.0-beta is newer than 8.0.0-alpha)
  */
 export function compareVersions(a: string, b: string): number {
-    const vA: VersionComponents = parseVersion(a);
-    const vB: VersionComponents = parseVersion(b);
+  const vA: VersionComponents = parseVersion(a);
+  const vB: VersionComponents = parseVersion(b);
 
-    // Compare major, minor, patch versions in descending order
-    if (vA.major !== vB.major) return vB.major - vA.major; // If vB.major > vA.major, positive (b newer), else negative (a newer)
-    if (vA.minor !== vB.minor) return vB.minor - vA.minor;
-    if (vA.patch !== vB.patch) return vB.patch - vA.patch;
+  // Compare major, minor, patch versions in descending order
+  if (vA.major !== vB.major) return vB.major - vA.major; // If vB.major > vA.major, positive (b newer), else negative (a newer)
+  if (vA.minor !== vB.minor) return vB.minor - vA.minor;
+  if (vA.patch !== vB.patch) return vB.patch - vA.patch;
 
-    // Pre-release handling for descending sort (release > pre-release)
-    // A release version (preRelease is null) is considered newer than a pre-release version.
-    if (vA.preRelease === null && vB.preRelease !== null) return -1; // a is release, b is pre-release; a is newer
-    if (vA.preRelease !== null && vB.preRelease === null) return 1;  // a is pre-release, b is release; b is newer
+  // Pre-release handling for descending sort (release > pre-release)
+  // A release version (preRelease is null) is considered newer than a pre-release version.
+  if (vA.preRelease === null && vB.preRelease !== null) return -1; // a is release, b is pre-release; a is newer
+  if (vA.preRelease !== null && vB.preRelease === null) return 1; // a is pre-release, b is release; b is newer
 
-    // If both are pre-releases (or both null), compare preRelease strings lexicographically.
-    // For descending sort of versions, a "larger" pre-release string (e.g. "beta" vs "alpha") is considered newer.
-    if (vA.preRelease && vB.preRelease) {
-        if (vA.preRelease < vB.preRelease) return 1;  // a is "smaller" (e.g. alpha), so b (e.g. beta) is newer
-        if (vA.preRelease > vB.preRelease) return -1; // a is "larger", so a is newer
-    }
-    return 0;
+  // If both are pre-releases (or both null), compare preRelease strings lexicographically.
+  // For descending sort of versions, a "larger" pre-release string (e.g. "beta" vs "alpha") is considered newer.
+  if (vA.preRelease && vB.preRelease) {
+    if (vA.preRelease < vB.preRelease) return 1; // a is "smaller" (e.g. alpha), so b (e.g. beta) is newer
+    if (vA.preRelease > vB.preRelease) return -1; // a is "larger", so a is newer
+  }
+  return 0;
 }
 
 /**
@@ -236,37 +245,37 @@ export function compareVersions(a: string, b: string): number {
  * @returns An object containing modules categorized into distributions.
  */
 export function _categorizeModules<T>( // Made exportable for potential testing, though still "internal" by convention
-    dataSource: { [moduleName: string]: T },
-    minCountThreshold: number,
-    countExtractor: (item: T) => number,
-    moduleCategoryPredicates: Readonly<typeof DEFAULT_MODULE_CATEGORIES> // Updated, Readonly for safety
+  dataSource: { [moduleName: string]: T },
+  minCountThreshold: number,
+  countExtractor: (item: T) => number,
+  moduleCategoryPredicates: Readonly<typeof DEFAULT_MODULE_CATEGORIES>, // Updated, Readonly for safety
 ): CategorizedModules {
-    const result: CategorizedModules = {
-        bidAdapter: {},
-        idModule: {},
-        rtdModule: {},
-        analyticsAdapter: {},
-        other: {},
-    };
+  const result: CategorizedModules = {
+    bidAdapter: {},
+    idModule: {},
+    rtdModule: {},
+    analyticsAdapter: {},
+    other: {},
+  };
 
-    for (const moduleName in dataSource) {
-        const count = countExtractor(dataSource[moduleName]);
-        if (count < minCountThreshold) continue;
+  for (const moduleName in dataSource) {
+    const count = countExtractor(dataSource[moduleName]);
+    if (count < minCountThreshold) continue;
 
-        let categorized = false;
-        for (const categoryKey in moduleCategoryPredicates) {
-            const key = categoryKey as keyof typeof defaultModuleCategories;
-            if (moduleCategoryPredicates[key](moduleName)) {
-                (result[key] as ModuleDistribution)[moduleName] = count;
-                categorized = true;
-                break;
-            }
-        }
-        if (!categorized) {
-            result.other[moduleName] = count;
-        }
+    let categorized = false;
+    for (const categoryKey in moduleCategoryPredicates) {
+      const key = categoryKey as keyof typeof defaultModuleCategories;
+      if (moduleCategoryPredicates[key](moduleName)) {
+        (result[key] as ModuleDistribution)[moduleName] = count;
+        categorized = true;
+        break;
+      }
     }
-    return result;
+    if (!categorized) {
+      result.other[moduleName] = count;
+    }
+  }
+  return result;
 }
 
 /**
@@ -278,22 +287,22 @@ export function _categorizeModules<T>( // Made exportable for potential testing,
  * @returns Categorized module distributions based on website counts.
  */
 export function processModuleWebsiteCounts(
-    moduleWebsiteData: { [moduleName: string]: Set<string> },
-    minCountThreshold: number
+  moduleWebsiteData: { [moduleName: string]: Set<string> },
+  minCountThreshold: number,
 ): ProcessedModuleWebsiteCounts {
-    const categorized = _categorizeModules<Set<string>>(
-        moduleWebsiteData,
-        minCountThreshold,
-        (dataSet: Set<string>) => dataSet.size,
-        DEFAULT_MODULE_CATEGORIES // Updated to use imported constant
-    );
-    return {
-        bidAdapterWebsites: categorized.bidAdapter,
-        idModuleWebsites: categorized.idModule,
-        rtdModuleWebsites: categorized.rtdModule,
-        analyticsAdapterWebsites: categorized.analyticsAdapter,
-        otherModuleWebsites: categorized.other,
-    };
+  const categorized = _categorizeModules<Set<string>>(
+    moduleWebsiteData,
+    minCountThreshold,
+    (dataSet: Set<string>) => dataSet.size,
+    DEFAULT_MODULE_CATEGORIES, // Updated to use imported constant
+  );
+  return {
+    bidAdapterWebsites: categorized.bidAdapter,
+    idModuleWebsites: categorized.idModule,
+    rtdModuleWebsites: categorized.rtdModule,
+    analyticsAdapterWebsites: categorized.analyticsAdapter,
+    otherModuleWebsites: categorized.other,
+  };
 }
 
 /**
@@ -305,28 +314,30 @@ export function processModuleWebsiteCounts(
  * @returns Categorized module distributions based on instance counts.
  */
 export function processModuleDistribution(
-    rawModuleCounts: ModuleDistribution,
-    minCountThreshold: number
+  rawModuleCounts: ModuleDistribution,
+  minCountThreshold: number,
 ): ProcessedModuleDistribution {
-    const sortedRawModules: string[] = Object.keys(rawModuleCounts).sort((a, b) => rawModuleCounts[b] - rawModuleCounts[a]);
-    const sortedRawModuleCounts: ModuleDistribution = {};
-    for (const moduleName of sortedRawModules) {
-        sortedRawModuleCounts[moduleName] = rawModuleCounts[moduleName];
-    }
+  const sortedRawModules: string[] = Object.keys(rawModuleCounts).sort(
+    (a, b) => rawModuleCounts[b] - rawModuleCounts[a],
+  );
+  const sortedRawModuleCounts: ModuleDistribution = {};
+  for (const moduleName of sortedRawModules) {
+    sortedRawModuleCounts[moduleName] = rawModuleCounts[moduleName];
+  }
 
-    const categorized = _categorizeModules<number>(
-        sortedRawModuleCounts,
-        minCountThreshold,
-        (count: number) => count,
-        DEFAULT_MODULE_CATEGORIES // Updated to use imported constant
-    );
-    return {
-        bidAdapterInst: categorized.bidAdapter,
-        idModuleInst: categorized.idModule,
-        rtdModuleInst: categorized.rtdModule,
-        analyticsAdapterInst: categorized.analyticsAdapter,
-        otherModuleInst: categorized.other,
-    };
+  const categorized = _categorizeModules<number>(
+    sortedRawModuleCounts,
+    minCountThreshold,
+    (count: number) => count,
+    DEFAULT_MODULE_CATEGORIES, // Updated to use imported constant
+  );
+  return {
+    bidAdapterInst: categorized.bidAdapter,
+    idModuleInst: categorized.idModule,
+    rtdModuleInst: categorized.rtdModule,
+    analyticsAdapterInst: categorized.analyticsAdapter,
+    otherModuleInst: categorized.other,
+  };
 }
 
 /**
@@ -336,31 +347,39 @@ export function processModuleDistribution(
  * @param rawVersionCounts - Object with version strings as keys and raw counts as values.
  * @returns Categorized version distributions.
  */
-export function processVersionDistribution(rawVersionCounts: VersionDistribution): ProcessedVersionDistribution {
-    const releaseVersions: VersionDistribution = {};
-    const buildVersions: VersionDistribution = {};
-    const customVersions: VersionDistribution = {};
-    const sortedRawVersions: string[] = Object.keys(rawVersionCounts).sort(compareVersions);
+export function processVersionDistribution(
+  rawVersionCounts: VersionDistribution,
+): ProcessedVersionDistribution {
+  const releaseVersions: VersionDistribution = {};
+  const buildVersions: VersionDistribution = {};
+  const customVersions: VersionDistribution = {};
+  const sortedRawVersions: string[] =
+    Object.keys(rawVersionCounts).sort(compareVersions);
 
-    for (const version of sortedRawVersions) {
-        const count: number = rawVersionCounts[version];
-        const cleanedVersion: string = version.startsWith('v') ? version.substring(1) : version;
-        const originalVersionForCategorization: string = version;
+  for (const version of sortedRawVersions) {
+    const count: number = rawVersionCounts[version];
+    const cleanedVersion: string = version.startsWith('v')
+      ? version.substring(1)
+      : version;
+    const originalVersionForCategorization: string = version;
 
-        if (originalVersionForCategorization.endsWith('-pre')) {
-            buildVersions[cleanedVersion] = count;
-        } else if (originalVersionForCategorization.includes('-')) {
-            customVersions[cleanedVersion] = count;
-        } else {
-            const parsedForValidation = parseVersion(cleanedVersion);
-            if (parsedForValidation.preRelease === null && cleanedVersion.match(/^\d+\.\d+\.\d+$/)) {
-                 releaseVersions[cleanedVersion] = count;
-            } else {
-                 customVersions[cleanedVersion] = count;
-            }
-        }
+    if (originalVersionForCategorization.endsWith('-pre')) {
+      buildVersions[cleanedVersion] = count;
+    } else if (originalVersionForCategorization.includes('-')) {
+      customVersions[cleanedVersion] = count;
+    } else {
+      const parsedForValidation = parseVersion(cleanedVersion);
+      if (
+        parsedForValidation.preRelease === null &&
+        cleanedVersion.match(/^\d+\.\d+\.\d+$/)
+      ) {
+        releaseVersions[cleanedVersion] = count;
+      } else {
+        customVersions[cleanedVersion] = count;
+      }
     }
-    return { releaseVersions, buildVersions, customVersions };
+  }
+  return { releaseVersions, buildVersions, customVersions };
 }
 
 /**
@@ -378,57 +397,61 @@ export function processVersionDistribution(rawVersionCounts: VersionDistribution
  * @param moduleWebsiteData - Map to accumulate unique websites per module.
  */
 export function _processSiteEntries( // Made exportable for potential testing
-    siteEntries: SiteData[],
-    currentFileSourceInfo: string,
-    uniqueUrls: Set<string>,
-    urlsWithPrebid: Set<string>,
-    rawVersionCounts: VersionDistribution,
-    rawModuleCounts: ModuleDistribution,
-    moduleWebsiteData: { [moduleName: string]: Set<string> }
+  siteEntries: SiteData[],
+  currentFileSourceInfo: string,
+  uniqueUrls: Set<string>,
+  urlsWithPrebid: Set<string>,
+  rawVersionCounts: VersionDistribution,
+  rawModuleCounts: ModuleDistribution,
+  moduleWebsiteData: { [moduleName: string]: Set<string> },
 ): void {
-    if (!Array.isArray(siteEntries)) {
-        logger.instance.warn(`_processSiteEntries received non-array data for ${currentFileSourceInfo}`);
-        return;
+  if (!Array.isArray(siteEntries)) {
+    logger.instance.warn(
+      `_processSiteEntries received non-array data for ${currentFileSourceInfo}`,
+    );
+    return;
+  }
+
+  siteEntries.forEach((siteData: SiteData) => {
+    const currentUrl: string | undefined = siteData?.url?.trim();
+    let hasPrebidInstanceOnSite: boolean = false;
+
+    if (currentUrl) uniqueUrls.add(currentUrl);
+
+    if (Array.isArray(siteData.prebidInstances)) {
+      siteData.prebidInstances.forEach((instance: PrebidInstanceData) => {
+        if (!instance) return;
+        hasPrebidInstanceOnSite = true;
+
+        if (typeof instance.version === 'string') {
+          const version: string = instance.version.trim();
+          if (version)
+            rawVersionCounts[version] = (rawVersionCounts[version] || 0) + 1;
+        }
+
+        if (Array.isArray(instance.modules)) {
+          instance.modules.forEach((moduleName: string) => {
+            if (typeof moduleName === 'string') {
+              const trimmedModule: string = moduleName.trim();
+              if (trimmedModule) {
+                rawModuleCounts[trimmedModule] =
+                  (rawModuleCounts[trimmedModule] || 0) + 1;
+                if (currentUrl) {
+                  if (!moduleWebsiteData[trimmedModule]) {
+                    moduleWebsiteData[trimmedModule] = new Set();
+                  }
+                  moduleWebsiteData[trimmedModule].add(currentUrl);
+                }
+              }
+            }
+          });
+        }
+      });
     }
-
-    siteEntries.forEach((siteData: SiteData) => {
-        const currentUrl: string | undefined = siteData?.url?.trim();
-        let hasPrebidInstanceOnSite: boolean = false;
-
-        if (currentUrl) uniqueUrls.add(currentUrl);
-
-        if (Array.isArray(siteData.prebidInstances)) {
-            siteData.prebidInstances.forEach((instance: PrebidInstanceData) => {
-                if (!instance) return;
-                hasPrebidInstanceOnSite = true;
-
-                if (typeof instance.version === 'string') {
-                    const version: string = instance.version.trim();
-                    if (version) rawVersionCounts[version] = (rawVersionCounts[version] || 0) + 1;
-                }
-
-                if (Array.isArray(instance.modules)) {
-                    instance.modules.forEach((moduleName: string) => {
-                        if (typeof moduleName === 'string') {
-                            const trimmedModule: string = moduleName.trim();
-                            if (trimmedModule) {
-                                rawModuleCounts[trimmedModule] = (rawModuleCounts[trimmedModule] || 0) + 1;
-                                if (currentUrl) {
-                                    if (!moduleWebsiteData[trimmedModule]) {
-                                        moduleWebsiteData[trimmedModule] = new Set();
-                                    }
-                                    moduleWebsiteData[trimmedModule].add(currentUrl);
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-        }
-        if (currentUrl && hasPrebidInstanceOnSite) {
-            urlsWithPrebid.add(currentUrl);
-        }
-    });
+    if (currentUrl && hasPrebidInstanceOnSite) {
+      urlsWithPrebid.add(currentUrl);
+    }
+  });
 }
 
 // logger is imported as _processSiteEntries uses it.

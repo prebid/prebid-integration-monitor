@@ -10,21 +10,21 @@
  * Contains details about its global variable name, version, and loaded modules.
  */
 export interface PrebidInstance {
-    /**
-     * The global variable name under which the Prebid.js instance is available.
-     * @example "pbjs"
-     */
-    globalVarName: string;
-    /**
-     * The version string of the Prebid.js instance.
-     * @example "7.53.0"
-     */
-    version: string;
-    /**
-     * An array of strings, where each string is the name of an installed Prebid.js module.
-     * @example ["consentManagement", "gptPreAuction", "dfpAdServerVideo"]
-     */
-    modules: string[];
+  /**
+   * The global variable name under which the Prebid.js instance is available.
+   * @example "pbjs"
+   */
+  globalVarName: string;
+  /**
+   * The version string of the Prebid.js instance.
+   * @example "7.53.0"
+   */
+  version: string;
+  /**
+   * An array of strings, where each string is the name of an installed Prebid.js module.
+   * @example ["consentManagement", "gptPreAuction", "dfpAdServerVideo"]
+   */
+  modules: string[];
 }
 
 /**
@@ -42,26 +42,26 @@ export interface PrebidInstance {
  * };
  */
 export interface PageData {
-    /**
-     * An array of strings identifying ad libraries detected on the page.
-     * @example ["googletag", "apstag", "ats"]
-     */
-    libraries: string[];
-    /**
-     * The date the page was scanned, formatted as YYYY-MM-DD.
-     * @example "2023-10-26"
-     */
-    date: string;
-    /**
-     * An optional array of {@link PrebidInstance} objects, representing each
-     * Prebid.js instance found on the page. Undefined if no instances are found.
-     */
-    prebidInstances?: PrebidInstance[];
-    /**
-     * The URL of the page from which the data was extracted.
-     * @example "https://www.example.com/article"
-     */
-    url?: string;
+  /**
+   * An array of strings identifying ad libraries detected on the page.
+   * @example ["googletag", "apstag", "ats"]
+   */
+  libraries: string[];
+  /**
+   * The date the page was scanned, formatted as YYYY-MM-DD.
+   * @example "2023-10-26"
+   */
+  date: string;
+  /**
+   * An optional array of {@link PrebidInstance} objects, representing each
+   * Prebid.js instance found on the page. Undefined if no instances are found.
+   */
+  prebidInstances?: PrebidInstance[];
+  /**
+   * The URL of the page from which the data was extracted.
+   * @example "https://www.example.com/article"
+   */
+  url?: string;
 }
 
 /**
@@ -77,10 +77,10 @@ export type TaskResultType = 'success' | 'no_data' | 'error';
  * Contains the extracted {@link PageData}.
  */
 export interface TaskResultSuccess {
-    /** Identifies the result type as successful. */
-    type: 'success';
-    /** The {@link PageData} extracted from the page. */
-    data: PageData;
+  /** Identifies the result type as successful. */
+  type: 'success';
+  /** The {@link PageData} extracted from the page. */
+  data: PageData;
 }
 
 /**
@@ -88,25 +88,25 @@ export interface TaskResultSuccess {
  * advertising technology data (like Prebid.js) was detected.
  */
 export interface TaskResultNoData {
-    /** Identifies the result type as finding no relevant data. */
-    type: 'no_data';
-    /** The URL of the page that was processed. */
-    url: string;
+  /** Identifies the result type as finding no relevant data. */
+  type: 'no_data';
+  /** The URL of the page that was processed. */
+  url: string;
 }
 
 /**
  * Represents an outcome where an error occurred while attempting to process a page.
  */
 export interface TaskResultError {
-    /** Identifies the result type as an error. */
-    type: 'error';
-    /** The URL of the page that was being processed when the error occurred. */
-    url: string;
-    /**
-     * A string code or message describing the error.
-     * @example "NET_TIMEOUT", "PBJS_NOT_FOUND"
-     */
-    error: string;
+  /** Identifies the result type as an error. */
+  type: 'error';
+  /** The URL of the page that was being processed when the error occurred. */
+  url: string;
+  /**
+   * A string code or message describing the error.
+   * @example "NET_TIMEOUT", "PBJS_NOT_FOUND"
+   */
+  error: string;
 }
 
 /**

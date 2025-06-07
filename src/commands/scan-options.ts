@@ -1,7 +1,11 @@
-import {Args, Flags} from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 
 export const scanArgs = {
-  inputFile: Args.string({description: 'Input file path (accepts .txt, .csv, .json)', required: false, default: 'src/input.txt'}),
+  inputFile: Args.string({
+    description: 'Input file path (accepts .txt, .csv, .json)',
+    required: false,
+    default: 'src/input.txt',
+  }),
 };
 
 export const scanFlags = {
@@ -10,7 +14,8 @@ export const scanFlags = {
     required: false,
   }),
   numUrls: Flags.integer({
-    description: 'Number of URLs to load from the GitHub repository (used only with --githubRepo)',
+    description:
+      'Number of URLs to load from the GitHub repository (used only with --githubRepo)',
     default: 100,
     required: false,
   }),
@@ -40,6 +45,14 @@ export const scanFlags = {
     description: 'Directory to save log files',
     default: 'logs',
   }),
-  range: Flags.string({ description: "Specify a line range (e.g., '10-20' or '5-') to process from the input source. 1-based indexing.", required: false }),
-  chunkSize: Flags.integer({ description: "Process URLs in chunks of this size. Processes all URLs in the specified range or input, but one chunk at a time.", required: false }),
+  range: Flags.string({
+    description:
+      "Specify a line range (e.g., '10-20' or '5-') to process from the input source. 1-based indexing.",
+    required: false,
+  }),
+  chunkSize: Flags.integer({
+    description:
+      'Process URLs in chunks of this size. Processes all URLs in the specified range or input, but one chunk at a time.',
+    required: false,
+  }),
 };

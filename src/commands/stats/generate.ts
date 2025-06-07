@@ -17,7 +17,8 @@ export default class StatsGenerate extends Command {
    * Description of the stats:generate command.
    * This description is displayed when listing commands or showing help for this command.
    */
-  static override description = 'Generates or updates the API statistics file (api/api.json) by processing stored website scan data. This includes summarizing data, cleaning it, and applying version and module categorization.';
+  static override description =
+    'Generates or updates the API statistics file (api/api.json) by processing stored website scan data. This includes summarizing data, cleaning it, and applying version and module categorization.';
 
   /**
    * Examples of how to use the stats:generate command.
@@ -50,14 +51,17 @@ export default class StatsGenerate extends Command {
       this.log('The file api/api.json has been updated.');
     } catch (error: any) {
       // Log the error in a more structured way if possible
-      this.error(`An error occurred during statistics generation: ${error.message}`, {
-        exit: 1, // oclif recommends exiting with a non-zero code on error
-        suggestions: [
-          'Check the console output for more details from the updateAndCleanStats script.',
-          'Ensure that the scan data directory (typically \'store\') contains valid JSON files.',
-          'Verify file permissions for reading scan data and writing to the \'api\' directory.',
-        ],
-      });
+      this.error(
+        `An error occurred during statistics generation: ${error.message}`,
+        {
+          exit: 1, // oclif recommends exiting with a non-zero code on error
+          suggestions: [
+            'Check the console output for more details from the updateAndCleanStats script.',
+            "Ensure that the scan data directory (typically 'store') contains valid JSON files.",
+            "Verify file permissions for reading scan data and writing to the 'api' directory.",
+          ],
+        },
+      );
       // For more detailed debugging, you might want to log the full stack trace
       // console.error('Full error stack:', error.stack);
     }

@@ -89,10 +89,26 @@ describe('updateAndCleanStats', () => {
    * @param {FinalApiData} actualData - The actual data from `api.json`.
    * @param {SiteCounts} expectedCounts - The expected site counts.
    */
-  function assertSiteCounts(actualData: FinalApiData, expectedCounts: { visitedSites: number; monitoredSites: number; prebidSites: number; }) {
-    expect(actualData.visitedSites, `Expected visitedSites to be ${expectedCounts.visitedSites}`).toBe(expectedCounts.visitedSites);
-    expect(actualData.monitoredSites, `Expected monitoredSites to be ${expectedCounts.monitoredSites}`).toBe(expectedCounts.monitoredSites);
-    expect(actualData.prebidSites, `Expected prebidSites to be ${expectedCounts.prebidSites}`).toBe(expectedCounts.prebidSites);
+  function assertSiteCounts(
+    actualData: FinalApiData,
+    expectedCounts: {
+      visitedSites: number;
+      monitoredSites: number;
+      prebidSites: number;
+    },
+  ) {
+    expect(
+      actualData.visitedSites,
+      `Expected visitedSites to be ${expectedCounts.visitedSites}`,
+    ).toBe(expectedCounts.visitedSites);
+    expect(
+      actualData.monitoredSites,
+      `Expected monitoredSites to be ${expectedCounts.monitoredSites}`,
+    ).toBe(expectedCounts.monitoredSites);
+    expect(
+      actualData.prebidSites,
+      `Expected prebidSites to be ${expectedCounts.prebidSites}`,
+    ).toBe(expectedCounts.prebidSites);
   }
 
   /**
@@ -107,10 +123,25 @@ describe('updateAndCleanStats', () => {
    * @param {FinalApiData} actualData - The actual data from `api.json`.
    * @param {VersionCounts} expectedCounts - The expected version counts.
    */
-  function assertVersionCounts(actualData: FinalApiData, expectedCounts: { releaseVersions: {[key: string]: number}, buildVersions: {[key: string]: number}, customVersions: {[key: string]: number}}) {
-    expect(actualData.releaseVersions, 'Expected releaseVersions to match').toEqual(expectedCounts.releaseVersions);
-    expect(actualData.buildVersions, 'Expected buildVersions to match').toEqual(expectedCounts.buildVersions);
-    expect(actualData.customVersions, 'Expected customVersions to match').toEqual(expectedCounts.customVersions);
+  function assertVersionCounts(
+    actualData: FinalApiData,
+    expectedCounts: {
+      releaseVersions: { [key: string]: number };
+      buildVersions: { [key: string]: number };
+      customVersions: { [key: string]: number };
+    },
+  ) {
+    expect(
+      actualData.releaseVersions,
+      'Expected releaseVersions to match',
+    ).toEqual(expectedCounts.releaseVersions);
+    expect(actualData.buildVersions, 'Expected buildVersions to match').toEqual(
+      expectedCounts.buildVersions,
+    );
+    expect(
+      actualData.customVersions,
+      'Expected customVersions to match',
+    ).toEqual(expectedCounts.customVersions);
   }
 
   /**
@@ -128,12 +159,28 @@ describe('updateAndCleanStats', () => {
    * @param {Partial<ModuleInstanceCounts>} expectedCounts - The expected module instance counts.
    *                                                        Use Partial as some categories might be undefined if no modules meet threshold.
    */
-  function assertModuleInstanceCounts(actualData: FinalApiData, expectedCounts: Partial<ModuleInstanceCounts>) {
-    expect(actualData.bidAdapterInst, 'Expected bidAdapterInst to match').toEqual(expectedCounts.bidAdapterInst || {});
-    expect(actualData.idModuleInst, 'Expected idModuleInst to match').toEqual(expectedCounts.idModuleInst || {});
-    expect(actualData.analyticsAdapterInst, 'Expected analyticsAdapterInst to match').toEqual(expectedCounts.analyticsAdapterInst || {});
-    expect(actualData.rtdModuleInst, 'Expected rtdModuleInst to match').toEqual(expectedCounts.rtdModuleInst || {});
-    expect(actualData.otherModuleInst, 'Expected otherModuleInst to match').toEqual(expectedCounts.otherModuleInst || {});
+  function assertModuleInstanceCounts(
+    actualData: FinalApiData,
+    expectedCounts: Partial<ModuleInstanceCounts>,
+  ) {
+    expect(
+      actualData.bidAdapterInst,
+      'Expected bidAdapterInst to match',
+    ).toEqual(expectedCounts.bidAdapterInst || {});
+    expect(actualData.idModuleInst, 'Expected idModuleInst to match').toEqual(
+      expectedCounts.idModuleInst || {},
+    );
+    expect(
+      actualData.analyticsAdapterInst,
+      'Expected analyticsAdapterInst to match',
+    ).toEqual(expectedCounts.analyticsAdapterInst || {});
+    expect(actualData.rtdModuleInst, 'Expected rtdModuleInst to match').toEqual(
+      expectedCounts.rtdModuleInst || {},
+    );
+    expect(
+      actualData.otherModuleInst,
+      'Expected otherModuleInst to match',
+    ).toEqual(expectedCounts.otherModuleInst || {});
   }
 
   /**
@@ -150,12 +197,30 @@ describe('updateAndCleanStats', () => {
    * @param {FinalApiData} actualData - The actual data from `api.json`.
    * @param {Partial<ModuleWebsiteCounts>} expectedCounts - The expected module website counts.
    */
-  function assertModuleWebsiteCounts(actualData: FinalApiData, expectedCounts: Partial<ModuleWebsiteCounts>) {
-    expect(actualData.bidAdapterWebsites, 'Expected bidAdapterWebsites to match').toEqual(expectedCounts.bidAdapterWebsites || {});
-    expect(actualData.idModuleWebsites, 'Expected idModuleWebsites to match').toEqual(expectedCounts.idModuleWebsites || {});
-    expect(actualData.analyticsAdapterWebsites, 'Expected analyticsAdapterWebsites to match').toEqual(expectedCounts.analyticsAdapterWebsites || {});
-    expect(actualData.rtdModuleWebsites, 'Expected rtdModuleWebsites to match').toEqual(expectedCounts.rtdModuleWebsites || {});
-    expect(actualData.otherModuleWebsites, 'Expected otherModuleWebsites to match').toEqual(expectedCounts.otherModuleWebsites || {});
+  function assertModuleWebsiteCounts(
+    actualData: FinalApiData,
+    expectedCounts: Partial<ModuleWebsiteCounts>,
+  ) {
+    expect(
+      actualData.bidAdapterWebsites,
+      'Expected bidAdapterWebsites to match',
+    ).toEqual(expectedCounts.bidAdapterWebsites || {});
+    expect(
+      actualData.idModuleWebsites,
+      'Expected idModuleWebsites to match',
+    ).toEqual(expectedCounts.idModuleWebsites || {});
+    expect(
+      actualData.analyticsAdapterWebsites,
+      'Expected analyticsAdapterWebsites to match',
+    ).toEqual(expectedCounts.analyticsAdapterWebsites || {});
+    expect(
+      actualData.rtdModuleWebsites,
+      'Expected rtdModuleWebsites to match',
+    ).toEqual(expectedCounts.rtdModuleWebsites || {});
+    expect(
+      actualData.otherModuleWebsites,
+      'Expected otherModuleWebsites to match',
+    ).toEqual(expectedCounts.otherModuleWebsites || {});
   }
 
   /**
@@ -164,76 +229,171 @@ describe('updateAndCleanStats', () => {
    */
   const mockComprehensiveData = {
     [storePath]: {
-      'Jan': {
+      Jan: {
         'data1.json': JSON.stringify([
           {
             url: 'http://site1.com',
             prebidInstances: [
-              { version: 'v8.2.0', modules: ['rubiconBidAdapter', 'criteoIdSystem', 'sharedIdSystem', 'adagioAnalyticsAdapter', 'coreModuleOnly'] },
-              { version: 'v8.1.0', modules: ['criteoIdSystem', 'anotherModule'] } // `anotherModule` helps test website count for criteoIdSystem vs other modules on same site
-            ]
+              {
+                version: 'v8.2.0',
+                modules: [
+                  'rubiconBidAdapter',
+                  'criteoIdSystem',
+                  'sharedIdSystem',
+                  'adagioAnalyticsAdapter',
+                  'coreModuleOnly',
+                ],
+              },
+              {
+                version: 'v8.1.0',
+                modules: ['criteoIdSystem', 'anotherModule'],
+              }, // `anotherModule` helps test website count for criteoIdSystem vs other modules on same site
+            ],
           },
           {
             url: 'http://site2.com',
             prebidInstances: [
-              { version: '7.53.0', modules: ['rubiconBidAdapter', 'id5IdSystem', 'connectIdSystem', 'coreModuleOnly', 'belowThresholdModule'] } // `belowThresholdModule` intended to be filtered.
-            ]
+              {
+                version: '7.53.0',
+                modules: [
+                  'rubiconBidAdapter',
+                  'id5IdSystem',
+                  'connectIdSystem',
+                  'coreModuleOnly',
+                  'belowThresholdModule',
+                ],
+              }, // `belowThresholdModule` intended to be filtered.
+            ],
           },
           {
             url: 'http://site3.com',
-            prebidInstances: [{}] // Tests handling of instance with no version/modules.
-          }
+            prebidInstances: [{}], // Tests handling of instance with no version/modules.
+          },
         ]),
         'data2.json': JSON.stringify([
           {
             url: 'http://site4.com',
             prebidInstances: [
-              { version: 'v9.10.0-pre', modules: ['rubiconBidAdapter', 'pubCommonId', 'realTimeData', 'enrichmentRtdProvider'] } // `realTimeData` intended to be below threshold.
-            ]
+              {
+                version: 'v9.10.0-pre',
+                modules: [
+                  'rubiconBidAdapter',
+                  'pubCommonId',
+                  'realTimeData',
+                  'enrichmentRtdProvider',
+                ],
+              }, // `realTimeData` intended to be below threshold.
+            ],
           },
           {
             url: 'http://site5.com',
             prebidInstances: [
-              { version: 'v1.2.3-custom', modules: ['rubiconBidAdapter', 'utiqSystem', 'customAnalyticsAdapter'] }
-            ]
+              {
+                version: 'v1.2.3-custom',
+                modules: [
+                  'rubiconBidAdapter',
+                  'utiqSystem',
+                  'customAnalyticsAdapter',
+                ],
+              },
+            ],
           },
           {
             url: 'http://site6.com',
             prebidInstances: [
-              { version: '9.35', modules: ['rubiconBidAdapter', 'trustpidSystem', 'coreModuleOnly'] }
-            ]
-          }
+              {
+                version: '9.35',
+                modules: [
+                  'rubiconBidAdapter',
+                  'trustpidSystem',
+                  'coreModuleOnly',
+                ],
+              },
+            ],
+          },
         ]),
       },
-      'Feb': {
+      Feb: {
         'data3.json': JSON.stringify([
           {
             url: 'http://site1.com', // Repeat site1
             prebidInstances: [
-              { version: 'v8.2.0', modules: ['rubiconBidAdapter', 'criteoIdSystem', 'appnexusBidAdapter'] }
-            ]
+              {
+                version: 'v8.2.0',
+                modules: [
+                  'rubiconBidAdapter',
+                  'criteoIdSystem',
+                  'appnexusBidAdapter',
+                ],
+              },
+            ],
           },
           {
             url: 'http://site7.com', // No Prebid
-          }
-        ])
+          },
+        ]),
       },
-      'Mar': { // Add more data to ensure some modules pass threshold
+      Mar: {
+        // Add more data to ensure some modules pass threshold
         'data4.json': JSON.stringify([
-          { url: 'http://site8.com', prebidInstances: [{ version: 'v8.2.0', modules: ['rubiconBidAdapter', 'appnexusBidAdapter', 'criteoIdSystem'] }] },
-          { url: 'http://site9.com', prebidInstances: [{ version: 'v8.2.0', modules: ['rubiconBidAdapter', 'appnexusBidAdapter', 'criteoIdSystem'] }] },
-          { url: 'http://site10.com', prebidInstances: [{ version: 'v8.2.0', modules: ['rubiconBidAdapter', 'appnexusBidAdapter', 'criteoIdSystem', 'sharedIdSystem'] }] },
-          { url: 'http://site11.com', prebidInstances: [{ version: 'v8.2.0', modules: ['appnexusBidAdapter', 'sharedIdSystem'] }] },
-        ])
-      }
+          {
+            url: 'http://site8.com',
+            prebidInstances: [
+              {
+                version: 'v8.2.0',
+                modules: [
+                  'rubiconBidAdapter',
+                  'appnexusBidAdapter',
+                  'criteoIdSystem',
+                ],
+              },
+            ],
+          },
+          {
+            url: 'http://site9.com',
+            prebidInstances: [
+              {
+                version: 'v8.2.0',
+                modules: [
+                  'rubiconBidAdapter',
+                  'appnexusBidAdapter',
+                  'criteoIdSystem',
+                ],
+              },
+            ],
+          },
+          {
+            url: 'http://site10.com',
+            prebidInstances: [
+              {
+                version: 'v8.2.0',
+                modules: [
+                  'rubiconBidAdapter',
+                  'appnexusBidAdapter',
+                  'criteoIdSystem',
+                  'sharedIdSystem',
+                ],
+              },
+            ],
+          },
+          {
+            url: 'http://site11.com',
+            prebidInstances: [
+              {
+                version: 'v8.2.0',
+                modules: ['appnexusBidAdapter', 'sharedIdSystem'],
+              },
+            ],
+          },
+        ]),
+      },
     },
-    'api': {} // api directory must exist for writeFile to place api.json
+    api: {}, // api directory must exist for writeFile to place api.json
   };
 
   it('should correctly summarize and clean stats, then write to api/api.json', async () => {
     // Copied mock data structure from the original test plan, adjusted for absolute storePath
     mockFs(mockComprehensiveData);
-
 
     await updateAndCleanStats();
 
@@ -242,20 +402,24 @@ describe('updateAndCleanStats', () => {
     const outputData = readMockJson(outputPath) as FinalApiData; // Cast here for type safety in helpers
 
     // Assertions from the original test plan
-    assertSiteCounts(outputData, { visitedSites: 11, monitoredSites: 11, prebidSites: 10 });
+    assertSiteCounts(outputData, {
+      visitedSites: 11,
+      monitoredSites: 11,
+      prebidSites: 10,
+    });
 
     assertVersionCounts(outputData, {
       releaseVersions: { '8.2.0': 6, '7.53.0': 1, '9.35': 1 },
       buildVersions: { '9.10.0-pre': 1 },
-      customVersions: { '1.2.3-custom': 1 }
+      customVersions: { '1.2.3-custom': 1 },
     });
     // Specific check for a version that should NOT be in customVersions after re-categorization
     expect(outputData.customVersions['9.35']).toBeUndefined();
 
     // Module counts based on MIN_COUNT_THRESHOLD = 5 (threshold from update_stats.js)
     assertModuleInstanceCounts(outputData, {
-      bidAdapterInst: { 'rubiconBidAdapter': 9, 'appnexusBidAdapter': 5 },
-      idModuleInst: { 'criteoIdSystem': 6 },
+      bidAdapterInst: { rubiconBidAdapter: 9, appnexusBidAdapter: 5 },
+      idModuleInst: { criteoIdSystem: 6 },
       // analyticsAdapterInst, rtdModuleInst, otherModuleInst will be checked for absence of certain modules
     });
 
@@ -263,15 +427,16 @@ describe('updateAndCleanStats', () => {
     expect(outputData.idModuleInst['sharedIdSystem']).toBeUndefined();
     expect(outputData.otherModuleInst['coreModuleOnly']).toBeUndefined();
     expect(outputData.rtdModuleInst['realTimeData']).toBeUndefined();
-    expect(outputData.analyticsAdapterInst['adagioAnalyticsAdapter']).toBeUndefined();
+    expect(
+      outputData.analyticsAdapterInst['adagioAnalyticsAdapter'],
+    ).toBeUndefined();
     expect(outputData.bidAdapterInst['nonExistentAdapter']).toBeUndefined();
     expect(outputData.otherModuleInst['belowThresholdModule']).toBeUndefined();
-
 
     // Website Counts (New Assertions)
     // MIN_COUNT_THRESHOLD = 5 also applies to website counts
     assertModuleWebsiteCounts(outputData, {
-      bidAdapterWebsites: { 'rubiconBidAdapter': 8, 'appnexusBidAdapter': 5 },
+      bidAdapterWebsites: { rubiconBidAdapter: 8, appnexusBidAdapter: 5 },
       // idModuleWebsites, analyticsAdapterWebsites, rtdModuleWebsites, otherModuleWebsites will be checked for absence of certain modules
     });
 
@@ -284,10 +449,12 @@ describe('updateAndCleanStats', () => {
     expect(outputData.otherModuleWebsites['coreModuleOnly']).toBeUndefined();
     // anotherModule is on 1 unique site (site1), below threshold
     expect(outputData.otherModuleWebsites['anotherModule']).toBeUndefined();
-    
+
     // Check categories that should be empty based on current data
     expect(Object.keys(outputData.rtdModuleWebsites || {}).length).toBe(0);
-    expect(Object.keys(outputData.analyticsAdapterWebsites || {}).length).toBe(0);
+    expect(Object.keys(outputData.analyticsAdapterWebsites || {}).length).toBe(
+      0,
+    );
   });
 
   /**
@@ -303,9 +470,10 @@ describe('updateAndCleanStats', () => {
     // outputDir in update_stats.ts resolves to path.join(__dirname, '..', 'store')
     // where __dirname is /app/src/utils, so outputDir is /app/src/store
     // const storePath = path.resolve(process.cwd(), 'src', 'store'); // Now defined at the describe level
-    mockFs({ // Define mock structure for this specific test
+    mockFs({
+      // Define mock structure for this specific test
       [storePath]: {}, // Mock the specific absolute path
-      'api': {} // api directory must exist for writeFile to place api.json
+      api: {}, // api directory must exist for writeFile to place api.json
     });
 
     await updateAndCleanStats();
@@ -334,10 +502,10 @@ describe('updateAndCleanStats', () => {
     // const storePath = path.resolve(process.cwd(), 'src', 'store'); // Now defined at the describe level
     mockFs({
       [storePath]: {
-        'Jan': {}, // Empty month directory
-        'Feb': {}  // Another empty month directory
+        Jan: {}, // Empty month directory
+        Feb: {}, // Another empty month directory
       },
-      'api': {}
+      api: {},
     });
 
     // Removed incorrect console.log from here
@@ -361,9 +529,9 @@ describe('updateAndCleanStats', () => {
     // const storePath = path.resolve(process.cwd(), 'src', 'store'); // Now defined at the describe level
     mockFs({
       [storePath]: {
-        'Jan': { 'not-a-json.txt': 'hello' }, // Month directory with a non-JSON file
+        Jan: { 'not-a-json.txt': 'hello' }, // Month directory with a non-JSON file
       },
-      'api': {}
+      api: {},
     });
     await updateAndCleanStats();
     const outputData = readMockJson(path.join('api', 'api.json'));

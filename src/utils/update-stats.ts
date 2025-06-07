@@ -2,45 +2,45 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import {
-    readDirectory,
-    readJsonFile,
-    ensureDirectoryExists,
-    writeJsonFile
+  readDirectory,
+  readJsonFile,
+  ensureDirectoryExists,
+  writeJsonFile,
 } from './file-system-utils.js';
 import type { Dirent } from 'fs';
 import {
-    // Functions moved to stats-processing.ts
-    // parseVersion, (used by compareVersions and processVersionDistribution)
-    // compareVersions, (used by processVersionDistribution)
-    // _categorizeModules, (used by processModuleDistribution and processModuleWebsiteCounts)
-    processModuleDistribution,
-    processModuleWebsiteCounts,
-    processVersionDistribution,
-    _processSiteEntries,
-    // Types moved to stats-processing.ts or to be imported from there
-    // VersionComponents, (used by parseVersion, compareVersions)
-    // CategorizedModules, (return type of _categorizeModules)
-    // ProcessedModuleWebsiteCounts, (return type of processModuleWebsiteCounts)
-    // ProcessedModuleDistribution, (return type of processModuleDistribution)
-    // ProcessedVersionDistribution, (return type of processVersionDistribution)
-    // Constants moved
-    // defaultModuleCategories (used by _categorizeModules)
+  // Functions moved to stats-processing.ts
+  // parseVersion, (used by compareVersions and processVersionDistribution)
+  // compareVersions, (used by processVersionDistribution)
+  // _categorizeModules, (used by processModuleDistribution and processModuleWebsiteCounts)
+  processModuleDistribution,
+  processModuleWebsiteCounts,
+  processVersionDistribution,
+  _processSiteEntries,
+  // Types moved to stats-processing.ts or to be imported from there
+  // VersionComponents, (used by parseVersion, compareVersions)
+  // CategorizedModules, (return type of _categorizeModules)
+  // ProcessedModuleWebsiteCounts, (return type of processModuleWebsiteCounts)
+  // ProcessedModuleDistribution, (return type of processModuleDistribution)
+  // ProcessedVersionDistribution, (return type of processVersionDistribution)
+  // Constants moved
+  // defaultModuleCategories (used by _categorizeModules)
 } from './stats-processing.js';
 
 import type {
-    SiteData, // Used by readJsonFile<SiteData[]> in readAndParseFiles
-    VersionDistribution,
-    ModuleDistribution,
-    ProcessedVersionDistribution, // Return type of imported processVersionDistribution
-    ProcessedModuleDistribution, // Return type of imported processModuleDistribution
-    ProcessedModuleWebsiteCounts // Return type of imported processModuleWebsiteCounts
+  SiteData, // Used by readJsonFile<SiteData[]> in readAndParseFiles
+  VersionDistribution,
+  ModuleDistribution,
+  ProcessedVersionDistribution, // Return type of imported processVersionDistribution
+  ProcessedModuleDistribution, // Return type of imported processModuleDistribution
+  ProcessedModuleWebsiteCounts, // Return type of imported processModuleWebsiteCounts
 } from './stats-processing.js';
 
 import {
-    OUTPUT_DIR,
-    FINAL_API_FILE_PATH,
-    MIN_COUNT_THRESHOLD,
-    MONTH_ABBR_REGEX
+  OUTPUT_DIR,
+  FINAL_API_FILE_PATH,
+  MIN_COUNT_THRESHOLD,
+  MONTH_ABBR_REGEX,
 } from '../config/stats-config.js';
 
 // import { fileURLToPath } from 'url'; // No longer needed after __filename/__dirname removal
@@ -69,22 +69,22 @@ import {
  * @property {ModuleDistribution} [otherModuleWebsites] - Imported from stats-processing.js
  */
 interface FinalApiData {
-    visitedSites: number;
-    monitoredSites: number;
-    prebidSites: number;
-    releaseVersions: VersionDistribution;
-    buildVersions: VersionDistribution;
-    customVersions: VersionDistribution;
-    bidAdapterInst: ModuleDistribution;
-    idModuleInst: ModuleDistribution;
-    rtdModuleInst: ModuleDistribution;
-    analyticsAdapterInst: ModuleDistribution;
-    otherModuleInst: ModuleDistribution;
-    bidAdapterWebsites?: ModuleDistribution;
-    idModuleWebsites?: ModuleDistribution;
-    rtdModuleWebsites?: ModuleDistribution;
-    analyticsAdapterWebsites?: ModuleDistribution;
-    otherModuleWebsites?: ModuleDistribution;
+  visitedSites: number;
+  monitoredSites: number;
+  prebidSites: number;
+  releaseVersions: VersionDistribution;
+  buildVersions: VersionDistribution;
+  customVersions: VersionDistribution;
+  bidAdapterInst: ModuleDistribution;
+  idModuleInst: ModuleDistribution;
+  rtdModuleInst: ModuleDistribution;
+  analyticsAdapterInst: ModuleDistribution;
+  otherModuleInst: ModuleDistribution;
+  bidAdapterWebsites?: ModuleDistribution;
+  idModuleWebsites?: ModuleDistribution;
+  rtdModuleWebsites?: ModuleDistribution;
+  analyticsAdapterWebsites?: ModuleDistribution;
+  otherModuleWebsites?: ModuleDistribution;
 }
 
 // Functions parseVersion, compareVersions, _categorizeModules,
@@ -117,71 +117,84 @@ interface FinalApiData {
  * @param {RegExp} monthDirRegex - Regex to identify month-named subdirectories.
  * @returns {Promise<ParsedScanData>} Aggregated raw data.
  */
-async function readAndParseFiles(baseOutputDir: string, monthDirRegex: RegExp): Promise<ParsedScanData> {
-    const rawVersionCounts: VersionDistribution = {}; // Type imported from stats-processing
-    const rawModuleCounts: ModuleDistribution = {}; // Type imported from stats-processing
-    const moduleWebsiteData: { [moduleName: string]: Set<string> } = {};
-    const uniqueUrls: Set<string> = new Set();
-    const urlsWithPrebid: Set<string> = new Set();
+async function readAndParseFiles(
+  baseOutputDir: string,
+  monthDirRegex: RegExp,
+): Promise<ParsedScanData> {
+  const rawVersionCounts: VersionDistribution = {}; // Type imported from stats-processing
+  const rawModuleCounts: ModuleDistribution = {}; // Type imported from stats-processing
+  const moduleWebsiteData: { [moduleName: string]: Set<string> } = {};
+  const uniqueUrls: Set<string> = new Set();
+  const urlsWithPrebid: Set<string> = new Set();
 
-    try {
-        // Use readDirectory from file-system-utils.js
-        const outputEntries: Dirent[] = await readDirectory(baseOutputDir, { withFileTypes: true });
+  try {
+    // Use readDirectory from file-system-utils.js
+    const outputEntries: Dirent[] = await readDirectory(baseOutputDir, {
+      withFileTypes: true,
+    });
 
-        for (const entry of outputEntries) {
-            if (entry.isDirectory() && monthDirRegex.test(entry.name)) {
-                const monthDirPath: string = path.join(baseOutputDir, entry.name);
-                try {
-                    // Use readDirectory from file-system-utils.js
-                    const files: string[] = await readDirectory(monthDirPath);
+    for (const entry of outputEntries) {
+      if (entry.isDirectory() && monthDirRegex.test(entry.name)) {
+        const monthDirPath: string = path.join(baseOutputDir, entry.name);
+        try {
+          // Use readDirectory from file-system-utils.js
+          const files: string[] = await readDirectory(monthDirPath);
 
-                    for (const file of files) {
-                        if (path.extname(file).toLowerCase() === '.json') {
-                            const filePath: string = path.join(monthDirPath, file);
-                            try {
-                                // Use readJsonFile from file-system-utils.js
-                                const siteEntries: SiteData[] = await readJsonFile<SiteData[]>(filePath);
+          for (const file of files) {
+            if (path.extname(file).toLowerCase() === '.json') {
+              const filePath: string = path.join(monthDirPath, file);
+              try {
+                // Use readJsonFile from file-system-utils.js
+                const siteEntries: SiteData[] =
+                  await readJsonFile<SiteData[]>(filePath);
 
-                                _processSiteEntries(
-                                    siteEntries,
-                                    filePath, // Pass filePath as source info
-                                    uniqueUrls,
-                                    urlsWithPrebid,
-                                    rawVersionCounts,
-                                    rawModuleCounts,
-                                    moduleWebsiteData
-                                );
-                            } catch (parseError: any) {
-                                // Error logging for readJsonFile is handled within readJsonFile itself.
-                                // If readJsonFile throws, this catch block will handle it.
-                                logger.instance.warn(`Skipping file due to parsing error: ${filePath}`);
-                            }
-                        }
-                    }
-                } catch (monthDirError: any) {
-                    // Error logging for readDirectory is handled within readDirectory itself.
-                    // If readDirectory throws, this catch block will handle it.
-                    logger.instance.warn(`Skipping directory due to reading error: ${monthDirPath}`);
-                }
+                _processSiteEntries(
+                  siteEntries,
+                  filePath, // Pass filePath as source info
+                  uniqueUrls,
+                  urlsWithPrebid,
+                  rawVersionCounts,
+                  rawModuleCounts,
+                  moduleWebsiteData,
+                );
+              } catch (parseError: any) {
+                // Error logging for readJsonFile is handled within readJsonFile itself.
+                // If readJsonFile throws, this catch block will handle it.
+                logger.instance.warn(
+                  `Skipping file due to parsing error: ${filePath}`,
+                );
+              }
             }
+          }
+        } catch (monthDirError: any) {
+          // Error logging for readDirectory is handled within readDirectory itself.
+          // If readDirectory throws, this catch block will handle it.
+          logger.instance.warn(
+            `Skipping directory due to reading error: ${monthDirPath}`,
+          );
         }
-    } catch (baseDirError: any) {
-        // Error logging for readDirectory is handled within readDirectory itself.
-        logger.instance.error(`Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted.`, {
-            errorName: baseDirError.name,
-            errorMessage: baseDirError.message,
-        });
-        // Rethrow or handle as critical if base directory processing is essential
-        throw baseDirError;
+      }
     }
+  } catch (baseDirError: any) {
+    // Error logging for readDirectory is handled within readDirectory itself.
+    logger.instance.error(
+      `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted.`,
+      {
+        errorName: baseDirError.name,
+        errorMessage: baseDirError.message,
+      },
+    );
+    // Rethrow or handle as critical if base directory processing is essential
+    throw baseDirError;
+  }
 
-    return {
-        uniqueUrls,
-        urlsWithPrebid,
-        rawVersionCounts,
-        rawModuleCounts,
-        moduleWebsiteData,
-    };
+  return {
+    uniqueUrls,
+    urlsWithPrebid,
+    rawVersionCounts,
+    rawModuleCounts,
+    moduleWebsiteData,
+  };
 }
 
 /**
@@ -219,85 +232,96 @@ async function readAndParseFiles(baseOutputDir: string, monthDirRegex: RegExp): 
  *   to understand Prebid.js adoption trends.
  */
 async function updateAndCleanStats(): Promise<void> {
-    try {
-        // Step 1: Read and parse raw data from scan files
-        // Constants like OUTPUT_DIR and MONTH_ABBR_REGEX are now imported from stats-config.js
-        const parsedData: ParsedScanData = await readAndParseFiles(OUTPUT_DIR, MONTH_ABBR_REGEX);
+  try {
+    // Step 1: Read and parse raw data from scan files
+    // Constants like OUTPUT_DIR and MONTH_ABBR_REGEX are now imported from stats-config.js
+    const parsedData: ParsedScanData = await readAndParseFiles(
+      OUTPUT_DIR,
+      MONTH_ABBR_REGEX,
+    );
 
-        // Step 2: Process and categorize version distributions
-        const versionStats: ProcessedVersionDistribution = processVersionDistribution(parsedData.rawVersionCounts);
+    // Step 2: Process and categorize version distributions
+    const versionStats: ProcessedVersionDistribution =
+      processVersionDistribution(parsedData.rawVersionCounts);
 
-        // Step 3: Process and categorize module instance distributions
-        // MIN_COUNT_THRESHOLD is imported from stats-config.js
-        const moduleInstanceStats = processModuleDistribution(parsedData.rawModuleCounts, MIN_COUNT_THRESHOLD);
+    // Step 3: Process and categorize module instance distributions
+    // MIN_COUNT_THRESHOLD is imported from stats-config.js
+    const moduleInstanceStats = processModuleDistribution(
+      parsedData.rawModuleCounts,
+      MIN_COUNT_THRESHOLD,
+    );
 
-        // Step 4: Process and categorize module website distributions
-        // MIN_COUNT_THRESHOLD is imported from stats-config.js
-        const moduleWebsiteStats = processModuleWebsiteCounts(parsedData.moduleWebsiteData, MIN_COUNT_THRESHOLD);
+    // Step 4: Process and categorize module website distributions
+    // MIN_COUNT_THRESHOLD is imported from stats-config.js
+    const moduleWebsiteStats = processModuleWebsiteCounts(
+      parsedData.moduleWebsiteData,
+      MIN_COUNT_THRESHOLD,
+    );
 
-        // Step 5: Compile all processed data into the final API structure
-        const finalApiData: FinalApiData = {
-            visitedSites: parsedData.uniqueUrls.size,
-            monitoredSites: parsedData.uniqueUrls.size, // Assuming all visited sites are monitored for this context
-            prebidSites: parsedData.urlsWithPrebid.size,
-            releaseVersions: versionStats.releaseVersions,
-            buildVersions: versionStats.buildVersions,
-            customVersions: versionStats.customVersions,
-            bidAdapterInst: moduleInstanceStats.bidAdapterInst,
-            idModuleInst: moduleInstanceStats.idModuleInst,
-            rtdModuleInst: moduleInstanceStats.rtdModuleInst,
-            analyticsAdapterInst: moduleInstanceStats.analyticsAdapterInst,
-            otherModuleInst: moduleInstanceStats.otherModuleInst,
-            bidAdapterWebsites: moduleWebsiteStats.bidAdapterWebsites,
-            idModuleWebsites: moduleWebsiteStats.idModuleWebsites,
-            rtdModuleWebsites: moduleWebsiteStats.rtdModuleWebsites,
-            analyticsAdapterWebsites: moduleWebsiteStats.analyticsAdapterWebsites,
-            otherModuleWebsites: moduleWebsiteStats.otherModuleWebsites
-        };
+    // Step 5: Compile all processed data into the final API structure
+    const finalApiData: FinalApiData = {
+      visitedSites: parsedData.uniqueUrls.size,
+      monitoredSites: parsedData.uniqueUrls.size, // Assuming all visited sites are monitored for this context
+      prebidSites: parsedData.urlsWithPrebid.size,
+      releaseVersions: versionStats.releaseVersions,
+      buildVersions: versionStats.buildVersions,
+      customVersions: versionStats.customVersions,
+      bidAdapterInst: moduleInstanceStats.bidAdapterInst,
+      idModuleInst: moduleInstanceStats.idModuleInst,
+      rtdModuleInst: moduleInstanceStats.rtdModuleInst,
+      analyticsAdapterInst: moduleInstanceStats.analyticsAdapterInst,
+      otherModuleInst: moduleInstanceStats.otherModuleInst,
+      bidAdapterWebsites: moduleWebsiteStats.bidAdapterWebsites,
+      idModuleWebsites: moduleWebsiteStats.idModuleWebsites,
+      rtdModuleWebsites: moduleWebsiteStats.rtdModuleWebsites,
+      analyticsAdapterWebsites: moduleWebsiteStats.analyticsAdapterWebsites,
+      otherModuleWebsites: moduleWebsiteStats.otherModuleWebsites,
+    };
 
-        // Step 6: Write the final data to api.json
-        // FINAL_API_FILE_PATH is imported from stats-config.js
-        const targetApiDir: string = path.dirname(FINAL_API_FILE_PATH);
-        // Use ensureDirectoryExists from file-system-utils.js
-        await ensureDirectoryExists(targetApiDir);
+    // Step 6: Write the final data to api.json
+    // FINAL_API_FILE_PATH is imported from stats-config.js
+    const targetApiDir: string = path.dirname(FINAL_API_FILE_PATH);
+    // Use ensureDirectoryExists from file-system-utils.js
+    await ensureDirectoryExists(targetApiDir);
 
-        // Use writeJsonFile from file-system-utils.js
-        await writeJsonFile(FINAL_API_FILE_PATH, finalApiData);
-        logger.instance.info(`Successfully updated statistics at ${FINAL_API_FILE_PATH}`);
-
-    } catch (err: any) {
-        // Catch errors from readAndParseFiles if rethrown, or from processing steps,
-        // or from ensureDirectoryExists/writeJsonFile if they rethrow.
-        logger.instance.error('A critical error occurred in updateAndCleanStats:', {
-            errorName: err.name,
-            errorMessage: err.message,
-            stack: err.stack,
-        });
-        // Depending on application design, might rethrow or exit process
-        throw err;
-    }
+    // Use writeJsonFile from file-system-utils.js
+    await writeJsonFile(FINAL_API_FILE_PATH, finalApiData);
+    logger.instance.info(
+      `Successfully updated statistics at ${FINAL_API_FILE_PATH}`,
+    );
+  } catch (err: any) {
+    // Catch errors from readAndParseFiles if rethrown, or from processing steps,
+    // or from ensureDirectoryExists/writeJsonFile if they rethrow.
+    logger.instance.error('A critical error occurred in updateAndCleanStats:', {
+      errorName: err.name,
+      errorMessage: err.message,
+      stack: err.stack,
+    });
+    // Depending on application design, might rethrow or exit process
+    throw err;
+  }
 }
 
 // Export necessary functions for use elsewhere (e.g., by commands or tests)
 // No changes needed to exports based on this refactoring, as the public API of this module remains the same.
 export {
-    updateAndCleanStats,
-    readAndParseFiles, // Still exported from here, but implementation uses imported _processSiteEntries
-    // parseVersion, compareVersions, _categorizeModules, etc. are no longer defined here
-    // defaultModuleCategories is no longer defined here
-    // MIN_COUNT_THRESHOLD, OUTPUT_DIR, FINAL_API_FILE_PATH are now imported, so no need to export them from here
-    // unless this file is intended to be a barrel export for them, which is not the case.
+  updateAndCleanStats,
+  readAndParseFiles, // Still exported from here, but implementation uses imported _processSiteEntries
+  // parseVersion, compareVersions, _categorizeModules, etc. are no longer defined here
+  // defaultModuleCategories is no longer defined here
+  // MIN_COUNT_THRESHOLD, OUTPUT_DIR, FINAL_API_FILE_PATH are now imported, so no need to export them from here
+  // unless this file is intended to be a barrel export for them, which is not the case.
 };
 export type {
-    // SiteData, PrebidInstanceData, VersionComponents, etc. are imported from stats-processing.js if needed here
-    // For example, ParsedScanData uses VersionDistribution and ModuleDistribution which are now imported types.
-    FinalApiData, // Still defined and used here
-    ParsedScanData, // Still defined and used here
-    // Specific processing result types like ProcessedModuleDistribution are used by updateAndCleanStats
-    // but their definitions are in stats-processing.ts and imported.
-    VersionDistribution, // Imported type
-    ModuleDistribution // Imported type
-    // CategorizedModules is an internal type for _categorizeModules, not directly used by update-stats
+  // SiteData, PrebidInstanceData, VersionComponents, etc. are imported from stats-processing.js if needed here
+  // For example, ParsedScanData uses VersionDistribution and ModuleDistribution which are now imported types.
+  FinalApiData, // Still defined and used here
+  ParsedScanData, // Still defined and used here
+  // Specific processing result types like ProcessedModuleDistribution are used by updateAndCleanStats
+  // but their definitions are in stats-processing.ts and imported.
+  VersionDistribution, // Imported type
+  ModuleDistribution, // Imported type
+  // CategorizedModules is an internal type for _categorizeModules, not directly used by update-stats
 };
 
 // Note: The explicit `export type` for SiteData, PrebidInstanceData, VersionComponents,

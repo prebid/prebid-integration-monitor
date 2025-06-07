@@ -1,7 +1,7 @@
-import {expect, test, vi, describe, beforeEach, afterEach} from 'vitest'
-import Inspect from '../src/commands/inspect' // Adjust path as needed
-import {mkdir, writeFile, readFile, rm} from 'fs/promises'
-import * as path from 'path'
+import { expect, test, vi, describe, beforeEach, afterEach } from 'vitest';
+import Inspect from '../src/commands/inspect'; // Adjust path as needed
+import { mkdir, writeFile, readFile, rm } from 'fs/promises';
+import * as path from 'path';
 import fetch from 'node-fetch';
 
 // Mock node-fetch
@@ -82,17 +82,32 @@ describe('Inspect Command', () => {
 
   test('should use custom filename when provided', async () => {
     const customFilename = 'my-custom-inspection';
-    const argv = [MOCKED_URL, '--output-dir', MOCKED_OUTPUT_DIR, '--filename', customFilename];
+    const argv = [
+      MOCKED_URL,
+      '--output-dir',
+      MOCKED_OUTPUT_DIR,
+      '--filename',
+      customFilename,
+    ];
     const inspectCommand = new Inspect(argv, mockConfig as any);
     await inspectCommand.run();
 
-    const expectedFilePath = path.join(MOCKED_OUTPUT_DIR, `${customFilename}.json`);
+    const expectedFilePath = path.join(
+      MOCKED_OUTPUT_DIR,
+      `${customFilename}.json`,
+    );
     const content = JSON.parse(await readFile(expectedFilePath, 'utf-8'));
     expect(content.request.url).toBe(MOCKED_URL);
   });
 
   test('should save as basic HAR format when specified', async () => {
-    const argv = [MOCKED_URL, '--output-dir', MOCKED_OUTPUT_DIR, '--format', 'har'];
+    const argv = [
+      MOCKED_URL,
+      '--output-dir',
+      MOCKED_OUTPUT_DIR,
+      '--format',
+      'har',
+    ];
     const inspectCommand = new Inspect(argv, mockConfig as any);
     await inspectCommand.run();
 
@@ -103,11 +118,15 @@ describe('Inspect Command', () => {
     const filePath = path.join(MOCKED_OUTPUT_DIR, files[0]);
     const content = JSON.parse(await readFile(filePath, 'utf-8'));
 
-    expect(content.log.creator.name).toBe('prebid-integration-monitor/inspect-command');
+    expect(content.log.creator.name).toBe(
+      'prebid-integration-monitor/inspect-command',
+    );
     expect(content.log.entries.length).toBe(1);
     expect(content.log.entries[0].request.url).toBe(MOCKED_URL);
     expect(content.log.entries[0].response.status).toBe(200);
-    expect(content.log.entries[0].response.content.text).toBe(MOCKED_RESPONSE_BODY);
+    expect(content.log.entries[0].response.content.text).toBe(
+      MOCKED_RESPONSE_BODY,
+    );
   });
 
   test('should handle fetch error gracefully', async () => {
