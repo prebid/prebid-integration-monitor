@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
 import { initTracer } from '../tracer.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
@@ -15,7 +15,8 @@ export default class Default extends Command {
    * A brief description of what the command does.
    * This is displayed when running `prebid-integration-monitor --help`.
    */
-  static description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.'
+  static description =
+    'Default command for prebid-integration-monitor. Runs the main monitoring logic.';
 
   // Add a logDir flag similar to the scan command for consistency
   /**
@@ -46,15 +47,17 @@ export default class Default extends Command {
    * @returns {Promise<void>} A promise that resolves when the command has finished executing.
    */
   async run(): Promise<void> {
-    const {flags} = await this.parse(Default);
+    const { flags } = await this.parse(Default);
     // Initialize logger with the logDir from flags
     logger = initializeLogger(flags.logDir);
-    logger.info('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
+    logger.info(
+      'TEST_CONSOLE_OUTPUT: This is a test message from default command.',
+    );
 
     try {
       // Initialize the tracer as the first step
       initTracer();
-      logger.info("Default oclif command starting...");
+      logger.info('Default oclif command starting...');
 
       // Call the refactored monitoring logic
       // Pass logger and this.log to the service
@@ -65,10 +68,9 @@ export default class Default extends Command {
       // and are now handled within executeMonitoringLogic or are implicitly covered.
       // logger.info('Main application processing finished (oclif command).');
       // this.log('Main application processing finished (oclif command).');
-
     } catch (error) {
       logger.error('Error in oclif command execution:', error);
-      this.error(error as Error, {exit: 1});
+      this.error(error as Error, { exit: 1 });
     }
   }
 }

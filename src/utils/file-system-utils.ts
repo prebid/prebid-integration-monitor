@@ -14,19 +14,19 @@ import logger from './logger.js'; // Assuming logger is accessible here
  * @throws Will log an error using `logger.instance` if `fsPromises.mkdir` fails for unexpected reasons.
  */
 export async function ensureDirectoryExists(dirPath: string): Promise<void> {
-    try {
-        await fsPromises.mkdir(dirPath, { recursive: true });
-    } catch (error: any) {
-        // Log the error.
-        logger.instance.error(`Error ensuring directory ${dirPath} exists:`, {
-            errorName: error.name,
-            errorMessage: error.message,
-            // stack: error.stack // Optionally log stack for more details
-        });
-        // Rethrow the error so the caller is aware that directory creation failed,
-        // as this is often a critical step.
-        throw error;
-    }
+  try {
+    await fsPromises.mkdir(dirPath, { recursive: true });
+  } catch (error: any) {
+    // Log the error.
+    logger.instance.error(`Error ensuring directory ${dirPath} exists:`, {
+      errorName: error.name,
+      errorMessage: error.message,
+      // stack: error.stack // Optionally log stack for more details
+    });
+    // Rethrow the error so the caller is aware that directory creation failed,
+    // as this is often a critical step.
+    throw error;
+  }
 }
 
 /**
@@ -51,22 +51,31 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
  *   console.log(`${dirents[0].name} is a directory.`);
  * }
  */
-export async function readDirectory(dirPath: string, options: { withFileTypes: true }): Promise<Dirent[]>;
-export async function readDirectory(dirPath: string, options?: { withFileTypes?: false }): Promise<string[]>;
-export async function readDirectory(dirPath: string, options?: { withFileTypes?: boolean }): Promise<string[] | Dirent[]> {
-    try {
-        if (options?.withFileTypes) {
-            return await fsPromises.readdir(dirPath, { withFileTypes: true });
-        } else {
-            return await fsPromises.readdir(dirPath);
-        }
-    } catch (error: any) {
-        logger.instance.error(`Error reading directory ${dirPath}:`, {
-            errorName: error.name,
-            errorMessage: error.message,
-        });
-        throw error; // Rethrow to allow caller to handle critical errors like EACCES or ENOENT
+export async function readDirectory(
+  dirPath: string,
+  options: { withFileTypes: true },
+): Promise<Dirent[]>;
+export async function readDirectory(
+  dirPath: string,
+  options?: { withFileTypes?: false },
+): Promise<string[]>;
+export async function readDirectory(
+  dirPath: string,
+  options?: { withFileTypes?: boolean },
+): Promise<string[] | Dirent[]> {
+  try {
+    if (options?.withFileTypes) {
+      return await fsPromises.readdir(dirPath, { withFileTypes: true });
+    } else {
+      return await fsPromises.readdir(dirPath);
     }
+  } catch (error: any) {
+    logger.instance.error(`Error reading directory ${dirPath}:`, {
+      errorName: error.name,
+      errorMessage: error.message,
+    });
+    throw error; // Rethrow to allow caller to handle critical errors like EACCES or ENOENT
+  }
 }
 
 /**
@@ -89,17 +98,17 @@ export async function readDirectory(dirPath: string, options?: { withFileTypes?:
  * }
  */
 export async function readJsonFile<T>(filePath: string): Promise<T> {
-    try {
-        const fileContent: string = await fsPromises.readFile(filePath, 'utf8');
-        return JSON.parse(fileContent) as T;
-    } catch (error: any) {
-        logger.instance.error(`Error reading or parsing JSON file ${filePath}:`, {
-            errorName: error.name,
-            errorMessage: error.message,
-            // stack: error.stack // Optional: for more detailed debugging
-        });
-        throw error; // Rethrow for the caller to handle
-    }
+  try {
+    const fileContent: string = await fsPromises.readFile(filePath, 'utf8');
+    return JSON.parse(fileContent) as T;
+  } catch (error: any) {
+    logger.instance.error(`Error reading or parsing JSON file ${filePath}:`, {
+      errorName: error.name,
+      errorMessage: error.message,
+      // stack: error.stack // Optional: for more detailed debugging
+    });
+    throw error; // Rethrow for the caller to handle
+  }
 }
 
 /**
@@ -119,15 +128,18 @@ export async function readJsonFile<T>(filePath: string): Promise<T> {
  *   // Handle file writing error
  * }
  */
-export async function writeJsonFile(filePath: string, data: any): Promise<void> {
-    try {
-        const jsonData: string = JSON.stringify(data, null, 2);
-        await fsPromises.writeFile(filePath, jsonData, 'utf8');
-    } catch (error: any) {
-        logger.instance.error(`Error writing JSON file ${filePath}:`, {
-            errorName: error.name,
-            errorMessage: error.message,
-        });
-        throw error; // Rethrow for the caller to handle
-    }
+export async function writeJsonFile(
+  filePath: string,
+  data: any,
+): Promise<void> {
+  try {
+    const jsonData: string = JSON.stringify(data, null, 2);
+    await fsPromises.writeFile(filePath, jsonData, 'utf8');
+  } catch (error: any) {
+    logger.instance.error(`Error writing JSON file ${filePath}:`, {
+      errorName: error.name,
+      errorMessage: error.message,
+    });
+    throw error; // Rethrow for the caller to handle
+  }
 }

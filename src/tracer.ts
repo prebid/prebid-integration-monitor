@@ -7,7 +7,10 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import {
+  ConsoleSpanExporter,
+  BatchSpanProcessor,
+} from '@opentelemetry/sdk-trace-node';
 // Resource identifies the entity producing telemetry (e.g., a service).
 // It's recommended to configure it with attributes like service name, version, environment, etc.
 // Example: new Resource({ [SemanticResourceAttributes.SERVICE_NAME]: 'your-service-name', [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0' })
@@ -30,7 +33,8 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 const _createServiceResource = (): Resource => {
   const serviceName = process.env.OTEL_SERVICE_NAME || 'unknown_service';
   const serviceVersion = process.env.OTEL_SERVICE_VERSION || '0.0.0';
-  const deploymentEnvironment = process.env.OTEL_DEPLOYMENT_ENVIRONMENT || 'unknown';
+  const deploymentEnvironment =
+    process.env.OTEL_DEPLOYMENT_ENVIRONMENT || 'unknown';
 
   return new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
@@ -98,8 +102,8 @@ export const initTracer = () => {
       // Advanced configuration options include scheduledDelayMillis, maxQueueSize, maxExportBatchSize etc.
       // See OpenTelemetry documentation for more details on BatchSpanProcessor configuration.
       spanProcessors: [
-          new BatchSpanProcessor(consoleExporter), // For local debugging
-          new BatchSpanProcessor(otlpExporter)     // For production export
+        new BatchSpanProcessor(consoleExporter), // For local debugging
+        new BatchSpanProcessor(otlpExporter), // For production export
       ],
       // Enables a suite of automatic instrumentations for common Node.js libraries
       // (e.g., HTTP, Express, gRPC, various DB clients like pg, mysql).
@@ -109,10 +113,11 @@ export const initTracer = () => {
       instrumentations: [getNodeAutoInstrumentations()],
     });
 
-    console.log('OpenTelemetry NodeSDK initialized with OTLP and Console exporters. Auto-instrumentations are enabled. Attempting to start SDK...');
+    console.log(
+      'OpenTelemetry NodeSDK initialized with OTLP and Console exporters. Auto-instrumentations are enabled. Attempting to start SDK...',
+    );
     sdk.start();
     console.log('OpenTelemetry NodeSDK started successfully.');
-
   } catch (error) {
     console.error('Failed to initialize or start OpenTelemetry SDK:', error);
     // Depending on the application's criticality of tracing, you might choose to:
@@ -135,7 +140,8 @@ export const initTracer = () => {
  */
 process.on('SIGTERM', () => {
   if (sdk) {
-    sdk.shutdown()
+    sdk
+      .shutdown()
       .then(() => console.log('Tracing terminated gracefully'))
       .catch((error) => console.error('Error shutting down tracing', error))
       .finally(() => process.exit(0));

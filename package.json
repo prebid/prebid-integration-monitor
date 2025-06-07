@@ -13,7 +13,9 @@
     "dev": "node --loader ts-node/esm ./bin/dev.js default",
     "scan": "npm run build && node ./bin/run.js scan",
     "prebid:scan": "node ./bin/run.js scan",
-    "docs:generate": "typedoc --options typedoc.json"
+    "docs:generate": "typedoc --options typedoc.json",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -50,8 +52,14 @@
   "devDependencies": {
     "@oclif/core": "^4.3.1",
     "@types/node": "^20.14.13",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
     "mock-fs": "^5.5.0",
     "oclif": "^4.17.46",
+    "prettier": "^3.5.3",
     "typedoc": "^0.28.5",
     "typedoc-plugin-markdown": "^4.6.4",
     "vitest": "^3.2.0"

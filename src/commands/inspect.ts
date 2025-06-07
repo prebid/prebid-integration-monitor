@@ -1,6 +1,6 @@
-import {Args, Command, Flags} from '@oclif/core'
+import { Args, Command, Flags } from '@oclif/core';
 import fetch from 'node-fetch';
-import {mkdir, writeFile} from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import * as path from 'path';
 import { URL } from 'url';
 
@@ -16,15 +16,16 @@ export default class Inspect extends Command {
       description: 'URL to inspect.',
       required: true,
     }),
-  }
+  };
 
-  static override description = 'Inspects a URL and stores the request/response data. Supports JSON and HAR (basic) formats.'
+  static override description =
+    'Inspects a URL and stores the request/response data. Supports JSON and HAR (basic) formats.';
 
   static override examples = [
     '<%= config.bin %> <%= command.id %> https://example.com',
     '<%= config.bin %> <%= command.id %> https://example.com --output-dir store/custom-inspect --format har --filename my-inspection',
     '<%= config.bin %> <%= command.id %> https://api.example.com/data --filename api-data --format json',
-  ]
+  ];
 
   static override flags = {
     'output-dir': Flags.string({
@@ -32,15 +33,17 @@ export default class Inspect extends Command {
       default: 'store/inspect',
     }),
     format: Flags.string({
-      description: 'Format to store the data (json, har). HAR implementation is currently basic.',
+      description:
+        'Format to store the data (json, har). HAR implementation is currently basic.',
       default: 'json',
       options: ['json', 'har'],
     }),
     filename: Flags.string({
-      description: 'Filename for the inspection data (without extension). If not provided, it will be derived from the URL and timestamp.',
+      description:
+        'Filename for the inspection data (without extension). If not provided, it will be derived from the URL and timestamp.',
       required: false,
     }),
-  }
+  };
 
   /**
    * Runs the inspect command.
@@ -49,13 +52,13 @@ export default class Inspect extends Command {
    * @returns {Promise<void>} A promise that resolves when the command execution is complete.
    */
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(Inspect)
+    const { args, flags } = await this.parse(Inspect);
 
-    this.log(`Inspecting URL: ${args.url}`)
-    this.log(`Output directory: ${flags['output-dir']}`)
-    this.log(`Format: ${flags.format}`)
+    this.log(`Inspecting URL: ${args.url}`);
+    this.log(`Output directory: ${flags['output-dir']}`);
+    this.log(`Format: ${flags.format}`);
     if (flags.filename) {
-      this.log(`Custom filename specified: ${flags.filename}.${flags.format}`)
+      this.log(`Custom filename specified: ${flags.filename}.${flags.format}`);
     }
 
     try {
@@ -94,7 +97,9 @@ export default class Inspect extends Command {
       if (!outputFilenameBase) {
         const urlObject = new URL(args.url);
         // Sanitize hostname to be used in filename
-        const hostname = urlObject.hostname.replace(/[^a-z0-9_.-]/gi, '_').toLowerCase();
+        const hostname = urlObject.hostname
+          .replace(/[^a-z0-9_.-]/gi, '_')
+          .toLowerCase();
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         outputFilenameBase = `${hostname}-${timestamp}`;
         this.log(`Generated filename base: ${outputFilenameBase}`);
@@ -135,10 +140,14 @@ export default class Inspect extends Command {
                   statusText: inspectionData.response.statusText,
                   httpVersion: 'HTTP/1.1', // Placeholder
                   cookies: [], // Placeholder
-                  headers: Object.entries(inspectionData.response.headers).map(([name, value]) => ({name, value})),
+                  headers: Object.entries(inspectionData.response.headers).map(
+                    ([name, value]) => ({ name, value }),
+                  ),
                   content: {
                     size: responseBody.length,
-                    mimeType: inspectionData.response.headers['content-type'] || 'application/octet-stream',
+                    mimeType:
+                      inspectionData.response.headers['content-type'] ||
+                      'application/octet-stream',
                     text: responseBody, // HAR spec allows for text content
                   },
                   redirectURL: response.headers.get('location') || '',
@@ -154,12 +163,14 @@ export default class Inspect extends Command {
         await writeFile(outputPath, JSON.stringify(harOutput, null, 2));
         this.log(`Inspection data (basic HAR) saved to: ${outputPath}`);
       } else {
-        this.error(`Unsupported format: ${flags.format}`, {exit: 1});
+        this.error(`Unsupported format: ${flags.format}`, { exit: 1 });
         return;
       }
-
     } catch (error: any) {
-      this.error(`Error during inspection: ${error.message} (URL: ${args.url})`, {exit: 1});
+      this.error(
+        `Error during inspection: ${error.message} (URL: ${args.url})`,
+        { exit: 1 },
+      );
     }
   }
 }
