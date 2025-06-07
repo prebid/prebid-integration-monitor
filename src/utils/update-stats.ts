@@ -27,27 +27,30 @@ import {
   MIN_COUNT_THRESHOLD,
   MONTH_ABBR_REGEX,
 } from '../config/stats-config.js';
+import { AppError, AppErrorDetails } from './../common/AppError.js';
 
 /**
  * Represents the final aggregated API data structure that is written to a JSON file.
- * This data summarizes Prebid.js usage statistics across all scanned websites.
+ * This data summarizes Prebid.js usage statistics across all scanned websites,
+ * including counts of sites, version distributions, and module usage.
+ *
  * @interface FinalApiData
- * @property {number} visitedSites
- * @property {number} monitoredSites
- * @property {number} prebidSites
- * @property {VersionDistribution} releaseVersions
- * @property {VersionDistribution} buildVersions
- * @property {VersionDistribution} customVersions
- * @property {ModuleDistribution} bidAdapterInst
- * @property {ModuleDistribution} idModuleInst
- * @property {ModuleDistribution} rtdModuleInst
- * @property {ModuleDistribution} analyticsAdapterInst
- * @property {ModuleDistribution} otherModuleInst
- * @property {ModuleDistribution} [bidAdapterWebsites]
- * @property {ModuleDistribution} [idModuleWebsites]
- * @property {ModuleDistribution} [rtdModuleWebsites]
- * @property {ModuleDistribution} [analyticsAdapterWebsites]
- * @property {ModuleDistribution} [otherModuleWebsites]
+ * @property {number} visitedSites - Total number of unique URLs visited during scans.
+ * @property {number} monitoredSites - Total number of unique URLs considered for monitoring (currently same as visitedSites).
+ * @property {number} prebidSites - Total number of unique URLs where Prebid.js was detected.
+ * @property {VersionDistribution} releaseVersions - Distribution of official release Prebid.js versions.
+ * @property {VersionDistribution} buildVersions - Distribution of Prebid.js build versions (e.g., "-pre" suffix).
+ * @property {VersionDistribution} customVersions - Distribution of custom or non-standard Prebid.js versions.
+ * @property {ModuleDistribution} bidAdapterInst - Distribution of bid adapter modules by instance count.
+ * @property {ModuleDistribution} idModuleInst - Distribution of ID system modules by instance count.
+ * @property {ModuleDistribution} rtdModuleInst - Distribution of Real-Time Data (RTD) modules by instance count.
+ * @property {ModuleDistribution} analyticsAdapterInst - Distribution of analytics adapter modules by instance count.
+ * @property {ModuleDistribution} otherModuleInst - Distribution of other modules by instance count.
+ * @property {ModuleDistribution} [bidAdapterWebsites] - Optional. Distribution of bid adapter modules by unique website count.
+ * @property {ModuleDistribution} [idModuleWebsites] - Optional. Distribution of ID system modules by unique website count.
+ * @property {ModuleDistribution} [rtdModuleWebsites] - Optional. Distribution of RTD modules by unique website count.
+ * @property {ModuleDistribution} [analyticsAdapterWebsites] - Optional. Distribution of analytics adapter modules by unique website count.
+ * @property {ModuleDistribution} [otherModuleWebsites] - Optional. Distribution of other modules by unique website count.
  */
 interface FinalApiData {
   visitedSites: number;
@@ -70,14 +73,14 @@ interface FinalApiData {
 
 /**
  * Defines the structure of data aggregated by {@link readAndParseFiles} from raw scan data files.
- * This raw aggregated data is then further processed by other functions.
+ * This raw aggregated data serves as an intermediate step before further processing and categorization.
  *
- * @typedef {object} ParsedScanData
- * @property {Set<string>} uniqueUrls
- * @property {Set<string>} urlsWithPrebid
- * @property {VersionDistribution} rawVersionCounts
- * @property {ModuleDistribution} rawModuleCounts
- * @property {{ [moduleName: string]: Set<string> }} moduleWebsiteData
+ * @interface ParsedScanData
+ * @property {Set<string>} uniqueUrls - A set of all unique URLs encountered during scans.
+ * @property {Set<string>} urlsWithPrebid - A set of unique URLs where Prebid.js was detected.
+ * @property {VersionDistribution} rawVersionCounts - An aggregation of Prebid.js version counts as found in scan data.
+ * @property {ModuleDistribution} rawModuleCounts - An aggregation of Prebid.js module instance counts.
+ * @property {{ [moduleName: string]: Set<string> }} moduleWebsiteData - A map where keys are module names and values are Sets of unique website URLs using that module.
  */
 interface ParsedScanData {
   uniqueUrls: Set<string>;
@@ -88,15 +91,24 @@ interface ParsedScanData {
 }
 
 /**
- * Reads and parses all JSON scan data files from monthly subdirectories.
- * It aggregates data by calling the imported `_processSiteEntries` function.
- * File system operations are handled by utilities from `file-system-utils.js`.
+ * Reads and parses all JSON scan data files from monthly subdirectories within the `baseOutputDir`.
+ * It identifies directories matching the `monthDirRegex` (e.g., "YYYY-MM-Mon"), then reads all `.json`
+ * files within them. Data from these files is aggregated using `_processSiteEntries`.
+ * File system operations like reading directories and JSON files are delegated to utilities
+ * from `file-system-utils.js`, which may throw `AppError` for FS issues.
  *
  * @async
  * @function readAndParseFiles
- * @param {string} baseOutputDir - The base directory for scan data.
- * @param {RegExp} monthDirRegex - Regex to identify month-named subdirectories.
- * @returns {Promise<ParsedScanData>} Aggregated raw data.
+ * @param {string} baseOutputDir - The base directory where scan data (organized into monthly subdirectories) is stored.
+ * @param {RegExp} monthDirRegex - A regular expression used to identify month-named subdirectories.
+ * @returns {Promise<ParsedScanData>} A promise that resolves to an object containing aggregated raw data:
+ *                                   unique URLs, URLs with Prebid, raw version counts, raw module counts,
+ *                                   and module-to-website mappings.
+ * @throws {AppError} If reading the base output directory (`baseOutputDir`) fails (errorCode: `FS_READDIR_FAILED` from `readDirectory`).
+ * @throws {AppError} If reading a month directory fails (errorCode: `FS_READDIR_FAILED` from `readDirectory`).
+ * @throws {AppError} If reading or parsing a JSON file fails (errorCodes: `FS_READFILE_FAILED` or `JSON_PARSE_FAILED` from `readJsonFile`).
+ *                    These errors are logged, and the specific file/directory is skipped, but an error reading the base directory will propagate.
+ *                    A new AppError with `errorCode: 'STATS_DATA_READ_ERROR'` is thrown if any critical error occurs during this process.
  */
 async function readAndParseFiles(
   baseOutputDir: string,
@@ -109,7 +121,6 @@ async function readAndParseFiles(
   const urlsWithPrebid: Set<string> = new Set();
 
   try {
-    // Use readDirectory from file-system-utils.js
     const outputEntries: Dirent[] = await readDirectory(baseOutputDir, {
       withFileTypes: true,
     });
@@ -118,63 +129,62 @@ async function readAndParseFiles(
       if (entry.isDirectory() && monthDirRegex.test(entry.name)) {
         const monthDirPath: string = path.join(baseOutputDir, entry.name);
         try {
-          // Use readDirectory from file-system-utils.js
           const files: string[] = await readDirectory(monthDirPath);
 
           for (const file of files) {
             if (path.extname(file).toLowerCase() === '.json') {
               const filePath: string = path.join(monthDirPath, file);
               try {
-                // Use readJsonFile from file-system-utils.js
                 const siteEntries: SiteData[] =
                   await readJsonFile<SiteData[]>(filePath);
 
                 _processSiteEntries(
                   siteEntries,
-                  filePath, // Pass filePath as source info
+                  filePath,
                   uniqueUrls,
                   urlsWithPrebid,
                   rawVersionCounts,
                   rawModuleCounts,
                   moduleWebsiteData,
                 );
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              } catch (_parseError) {
-                // Error logging for readJsonFile is handled within readJsonFile itself.
-                // If readJsonFile throws, this catch block will handle it.
+              } catch (parseOrReadFileError) {
+                // Errors from readJsonFile are AppErrors
                 logger.instance.warn(
-                  `Skipping file due to parsing error: ${filePath}`,
+                  `Skipping file due to error: ${filePath}. Error: ${(parseOrReadFileError as Error).message}`,
+                  { details: (parseOrReadFileError as AppError).details },
                 );
               }
             }
           }
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_monthDirError) {
-          // Error logging for readDirectory is handled within readDirectory itself.
-          // If readDirectory throws, this catch block will handle it.
+        } catch (monthDirReadError) {
+          // Errors from readDirectory are AppErrors
           logger.instance.warn(
-            `Skipping directory due to reading error: ${monthDirPath}`,
+            `Skipping directory due to reading error: ${monthDirPath}. Error: ${(monthDirReadError as Error).message}`,
+            { details: (monthDirReadError as AppError).details },
           );
         }
       }
     }
   } catch (baseDirError: unknown) {
-    // Error logging for readDirectory is handled within readDirectory itself.
-    if (baseDirError instanceof Error) {
-      logger.instance.error(
-        `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted.`,
-        {
-          errorName: baseDirError.name,
-          errorMessage: baseDirError.message,
-        },
-      );
-    } else {
-      logger.instance.error(
-        `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted. An unknown error occurred.`,
-      );
-    }
-    // Rethrow or handle as critical if base directory processing is essential
-    throw baseDirError;
+    // Could be AppError from readDirectory or other fs error
+    const err = baseDirError as Error;
+    logger.instance.error(
+      `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted.`,
+      {
+        errorName: err.name,
+        errorMessage: err.message,
+        details: err instanceof AppError ? err.details : undefined,
+      },
+    );
+    const errorDetails: AppErrorDetails = {
+      errorCode: 'STATS_DATA_READ_ERROR',
+      originalError: err,
+      baseOutputDir,
+    };
+    throw new AppError(
+      `Failed to read or parse stats data from ${baseOutputDir}: ${err.message}`,
+      errorDetails,
+    );
   }
 
   return {
@@ -206,17 +216,18 @@ async function readAndParseFiles(
  * 5.  **Compile Final Data**: Assembles all processed data into the {@link FinalApiData} structure.
  *     This includes total site counts, version distributions, and module distributions (both instance-based and website-based).
  * 6.  **Write to File**: Writes the `FinalApiData` object as a formatted JSON string to the
- *     `api/api.json` file, specified by {@link finalApiFilePath}. Ensures the target directory exists.
+ *     `api/api.json` file, specified by {@link FINAL_API_FILE_PATH}. Ensures the target directory exists using {@link ensureDirectoryExists}.
  *
  * @async
  * @function updateAndCleanStats
  * @returns {Promise<void>} A promise that resolves when the statistics generation is complete and the
- *          `api/api.json` file has been successfully written. The promise may reject if critical
- *          errors occur during file I/O that are not handled internally by `readAndParseFiles`.
+ *          `api/api.json` file has been successfully written.
+ * @throws {AppError} Propagates `AppError` if critical errors occur during file I/O (e.g., from `readAndParseFiles`,
+ *                    `ensureDirectoryExists`, or `writeJsonFile`), or if other unexpected errors occur during processing.
+ *                    Specific errorCodes might include `STATS_DATA_READ_ERROR`, `FS_MKDIR_FAILED`, `FS_WRITEFILE_FAILED`.
  * @remarks
  * - This function uses constants imported from `stats-config.js` (e.g., `OUTPUT_DIR`, `FINAL_API_FILE_PATH`, `MIN_COUNT_THRESHOLD`).
- * - Errors encountered during the process (especially file operations or data processing steps)
- *   are logged using the configured `logger` instance.
+ * - Errors encountered during the process are logged using the configured `logger` instance.
  * - The output JSON file (`api/api.json`) is intended for consumption by an API, dashboard, or for direct analysis
  *   to understand Prebid.js adoption trends.
  */
@@ -266,17 +277,29 @@ async function updateAndCleanStats(): Promise<void> {
 
     // Step 6: Write the final data to api.json
     const targetApiDir: string = path.dirname(FINAL_API_FILE_PATH);
-    await ensureDirectoryExists(targetApiDir);
+    await ensureDirectoryExists(targetApiDir); // This can throw AppError (FS_MKDIR_FAILED)
 
     // Use writeJsonFile from file-system-utils.js
-    await writeJsonFile(FINAL_API_FILE_PATH, finalApiData);
+    await writeJsonFile(FINAL_API_FILE_PATH, finalApiData); // This can throw AppError (FS_WRITEFILE_FAILED)
     logger.instance.info(
       `Successfully updated statistics at ${FINAL_API_FILE_PATH}`,
     );
   } catch (err: unknown) {
-    // Catch errors from readAndParseFiles if rethrown, or from processing steps,
-    // or from ensureDirectoryExists/writeJsonFile if they rethrow.
-    if (err instanceof Error) {
+    // Catch errors from readAndParseFiles, ensureDirectoryExists, writeJsonFile, or other processing steps.
+    if (err instanceof AppError) {
+      // If it's already an AppError, log its details
+      logger.instance.error(
+        `A critical error occurred in updateAndCleanStats: ${err.message}`,
+        {
+          errorName: err.name,
+          errorCode: err.details?.errorCode,
+          originalErrorMsg: err.details?.originalError?.message,
+          stack: err.stack,
+          details: err.details,
+        },
+      );
+    } else if (err instanceof Error) {
+      // For other native errors
       logger.instance.error(
         'A critical error occurred in updateAndCleanStats:',
         {
@@ -286,11 +309,14 @@ async function updateAndCleanStats(): Promise<void> {
         },
       );
     } else {
+      // For unknown throw types
       logger.instance.error(
-        'A critical error occurred in updateAndCleanStats: An unknown error occurred.',
+        'A critical and unknown error occurred in updateAndCleanStats.',
+        { error: err },
       );
     }
-    // Depending on application design, might rethrow or exit process
+    // Rethrow to be handled by the calling command (e.g., stats/generate.ts)
+    // The calling command is expected to format it for the user.
     throw err;
   }
 }

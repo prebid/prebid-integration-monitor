@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
+import loggerModule from './logger.js'; // Assuming logger.js is in the same directory
+const logger = loggerModule.instance;
 async function parsePreloadUrls() {
     let loadList = [];
     const urlsRl = readline.createInterface({
@@ -12,6 +14,6 @@ async function parsePreloadUrls() {
             loadList.push(trimmedUrl);
         }
     }
-    console.log(loadList);
+    logger.info('Loaded URLs:', { urls: loadList });
 }
-parsePreloadUrls().catch(console.error);
+parsePreloadUrls().catch((error) => logger.error('Error in parsePreloadUrls:', { error }));

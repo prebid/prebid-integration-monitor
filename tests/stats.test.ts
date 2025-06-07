@@ -11,7 +11,7 @@ import mockFs from 'mock-fs'; // Restore mock-fs
 import fs from 'fs';
 import path from 'path';
 
-import { FinalApiData } from '../src/utils/update_stats.js'; // Importing for clarity
+import { FinalApiData } from '../src/utils/update-stats'; // Importing for clarity
 
 /**
  * @function readMockJson

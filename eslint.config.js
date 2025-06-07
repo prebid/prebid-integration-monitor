@@ -23,7 +23,10 @@ export default [
       'prettier/prettier': 'error', // Report Prettier violations as ESLint errors
       '@typescript-eslint/no-explicit-any': 'off', // Disable no-explicit-any
       'no-unused-vars': 'off', // Disable base no-unused-vars rule
-      '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }], // Configure @typescript-eslint/no-unused-vars
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ], // Configure @typescript-eslint/no-unused-vars
     },
   },
   {

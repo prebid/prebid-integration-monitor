@@ -4,6 +4,7 @@ import {
   ensureDirectoryExists,
   readDirectory,
 } from '../file-system-utils'; // .js extension resolved by Jest
+import { AppError } from '../../common/AppError.js'; // Import AppError
 import { Dirent, promises as fsPromises } from 'fs'; // Import Dirent directly for instanceof checks if needed
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import logger from '../logger.js';
@@ -68,8 +69,15 @@ describe('file-system-utils', () => {
     it('should propagate error if readFile fails', async () => {
       const mockError = new Error('File not found');
       (fsPromises.readFile as vi.Mock).mockRejectedValue(mockError);
-      await expect(readJsonFile('dummy/path.json')).rejects.toThrow(
-        'File not found',
+      await expect(readJsonFile('dummy/path.json')).rejects.toSatisfy(
+        (error: any) => {
+          expect(error).toBeInstanceOf(AppError);
+          expect(error.message).toContain(
+            'Error processing JSON file dummy/path.json: Failed to read file.',
+          );
+          expect(error.details.originalError.message).toBe('File not found');
+          return true;
+        },
       );
       expect(logger.instance.error).toHaveBeenCalledWith(
         expect.stringContaining('dummy/path.json'),
@@ -94,8 +102,15 @@ describe('file-system-utils', () => {
     it('should propagate error if writeFile fails', async () => {
       const mockError = new Error('Permission denied');
       (fsPromises.writeFile as vi.Mock).mockRejectedValue(mockError);
-      await expect(writeJsonFile('output/path.json', {})).rejects.toThrow(
-        'Permission denied',
+      await expect(writeJsonFile('output/path.json', {})).rejects.toSatisfy(
+        (error: any) => {
+          expect(error).toBeInstanceOf(AppError);
+          expect(error.message).toContain(
+            'Failed to write JSON file: output/path.json',
+          );
+          expect(error.details.originalError.message).toBe('Permission denied');
+          return true;
+        },
       );
       expect(logger.instance.error).toHaveBeenCalled();
     });
@@ -104,11 +119,19 @@ describe('file-system-utils', () => {
       const circularObj: any = { a: 1 };
       circularObj.b = circularObj; // Create circular reference
 
-      // No need to mock fsPromises.writeFile here, as stringify will throw first.
-      // The actual error is caught by the function's try-catch.
       await expect(
         writeJsonFile('output/path.json', circularObj),
-      ).rejects.toThrow(TypeError); // Or specific error by Node
+      ).rejects.toSatisfy((error: any) => {
+        expect(error).toBeInstanceOf(AppError);
+        expect(error.message).toContain(
+          'Failed to write JSON file: output/path.json',
+        ); // The AppError message
+        expect(error.details.originalError).toBeInstanceOf(TypeError); // Check original error type
+        expect(error.details.originalError.message).toContain(
+          'circular structure',
+        );
+        return true;
+      });
       expect(logger.instance.error).toHaveBeenCalled();
     });
   });
@@ -125,8 +148,17 @@ describe('file-system-utils', () => {
     it('should propagate error if mkdir fails critically (and re-throws)', async () => {
       const mockError = new Error('Something went wrong');
       (fsPromises.mkdir as vi.Mock).mockRejectedValue(mockError);
-      await expect(ensureDirectoryExists('new/dir')).rejects.toThrow(
-        'Something went wrong',
+      await expect(ensureDirectoryExists('new/dir')).rejects.toSatisfy(
+        (error: any) => {
+          expect(error).toBeInstanceOf(AppError);
+          expect(error.message).toContain(
+            'Failed to ensure directory exists: new/dir',
+          );
+          expect(error.details.originalError.message).toBe(
+            'Something went wrong',
+          );
+          return true;
+        },
       );
       expect(logger.instance.error).toHaveBeenCalled();
     });
@@ -180,8 +212,17 @@ describe('file-system-utils', () => {
     it('should propagate error if readdir fails', async () => {
       const mockError = new Error('Directory not found');
       (fsPromises.readdir as vi.Mock).mockRejectedValue(mockError);
-      await expect(readDirectory('some/path')).rejects.toThrow(
-        'Directory not found',
+      await expect(readDirectory('some/path')).rejects.toSatisfy(
+        (error: any) => {
+          expect(error).toBeInstanceOf(AppError);
+          expect(error.message).toContain(
+            'Failed to read directory: some/path',
+          );
+          expect(error.details.originalError.message).toBe(
+            'Directory not found',
+          );
+          return true;
+        },
       );
       expect(logger.instance.error).toHaveBeenCalled();
     });

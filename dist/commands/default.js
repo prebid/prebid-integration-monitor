@@ -1,64 +1,90 @@
 import { Command, Flags } from '@oclif/core';
 import { initTracer } from '../tracer.js';
-import { initializeLogger } from '../utils/logger.js';
+import { initializeLogger } from '../utils/logger.js'; // Import loggerModule
 import { executeMonitoringLogic } from '../services/monitoring-service.js';
+import { AppError } from '../common/AppError.js'; // Import AppError
 let logger; // Module-level logger variable
 /**
- * Default command for prebid-integration-monitor.
- * This command runs the main monitoring logic for the application.
+ * @class Default
+ * @description Default command for the Prebid Integration Monitor CLI.
+ * This command initializes essential services like logging and tracing,
+ * and then executes the main monitoring logic of the application as defined
+ * in `monitoring-service.ts`. It serves as the primary entry point when
+ * no specific subcommand is provided.
  */
 export default class Default extends Command {
     /**
-     * A brief description of what the command does.
-     * This is displayed when running `prebid-integration-monitor --help`.
+     * @property {string} description - A brief summary of what the command does.
+     * Displayed in the CLI help output.
      */
-    static description = 'Default command for prebid-integration-monitor. Runs the main monitoring logic.';
+    static description = 'Runs the main monitoring logic for the Prebid Integration Monitor. This is the default command if no other is specified.';
     // Add a logDir flag similar to the scan command for consistency
     /**
-     * Defines the flags (command-line options) accepted by this command.
+     * @property {object} flags - Defines the command-line flags accepted by this command.
+     * @property {object} flags.logDir - Flag to specify the directory for saving log files.
      */
     static flags = {
         logDir: Flags.string({
-            description: 'Directory to save log files',
+            description: 'Directory to save log files (e.g., app.log, error.log).',
             default: 'logs',
         }),
     };
-    // If the original script accepted command-line arguments that should be flags or args:
-    // static flags = {
-    //   help: Flags.help({char: 'h'}),
-    //   // exampleFlag: Flags.string({char: 'f', description: 'example flag'}),
-    // };
-    // static args = [
-    //   {name: 'exampleArg', description: 'example argument'},
-    // ];
     /**
-     * The main execution method for the command.
-     * This method is called when the command is run.
-     * It initializes the logger and tracer, then calls `executeMonitoringLogic`
-     * from `monitoring-service.ts` to perform the main application tasks.
-     * @returns {Promise<void>} A promise that resolves when the command has finished executing.
+     * Executes the default command's primary logic.
+     * This method initializes the logger and tracer, then calls `executeMonitoringLogic`
+     * from `monitoring-service.ts` to perform the application's main tasks.
+     * It includes structured error handling to catch and log errors, providing
+     * user-friendly messages and suggestions via `this.error`.
+     *
+     * @async
+     * @public
+     * @returns {Promise<void>} A promise that resolves when the command has finished executing,
+     *                          or rejects if an unrecoverable error occurs.
      */
     async run() {
         const { flags } = await this.parse(Default);
         // Initialize logger with the logDir from flags
         logger = initializeLogger(flags.logDir);
+        // Example test log - consider removing or making conditional for production builds.
         logger.info('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
         try {
             // Initialize the tracer as the first step
             initTracer();
             logger.info('Default oclif command starting...');
             // Call the refactored monitoring logic
-            // Pass logger and this.log to the service
-            // this.log is passed directly. If context issues arise, this.log.bind(this) can be used.
             await executeMonitoringLogic(logger, this.log);
-            // The following lines were part of the original tracer logic,
-            // and are now handled within executeMonitoringLogic or are implicitly covered.
-            // logger.info('Main application processing finished (oclif command).');
-            // this.log('Main application processing finished (oclif command).');
+            logger.info('Default command processing finished successfully.');
         }
         catch (error) {
-            logger.error('Error in oclif command execution:', error);
-            this.error(error, { exit: 1 });
+            let userMessage = 'An unexpected error occurred in the default command.';
+            const suggestions = ['Check logs for more details.'];
+            if (error instanceof AppError) {
+                logger.error(`AppError in default command: ${error.message}`, {
+                    // Ensure details are stringified if they could be complex objects
+                    details: error.details
+                        ? JSON.stringify(error.details, null, 2)
+                        : undefined,
+                    stack: error.stack,
+                });
+                userMessage = error.details?.errorCode
+                    ? `Default command failed with code: ${error.details.errorCode}. Message: ${error.message}`
+                    : error.message;
+            }
+            else if (error instanceof Error) {
+                logger.error(`Error in default command: ${error.message}`, {
+                    stack: error.stack,
+                });
+                userMessage = error.message;
+            }
+            else {
+                logger.error('An unknown error occurred in default command.', {
+                    errorDetail: JSON.stringify(error, null, 2),
+                });
+            }
+            this.error(userMessage, {
+                exit: 1,
+                suggestions,
+            });
         }
     }
 }
