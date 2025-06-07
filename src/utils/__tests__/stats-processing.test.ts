@@ -6,7 +6,6 @@ import {
 } from '../stats-processing'; // .js extension will be resolved by Jest
 import type {
   VersionComponents,
-  CategorizedModules,
   ModuleDistribution,
 } from '../stats-processing';
 import { DEFAULT_MODULE_CATEGORIES } from '../../config/stats-config.js'; // Actual config for some tests
@@ -62,7 +61,9 @@ describe('stats-processing', () => {
         preRelease: 'invalid',
       });
       // Assuming null is treated like undefined by the function's logic path for !versionString
-      expect(parseVersion(null as any)).toEqual<VersionComponents>({
+      expect(
+        parseVersion(null as unknown as string),
+      ).toEqual<VersionComponents>({
         major: 0,
         minor: 0,
         patch: 0,
@@ -156,7 +157,7 @@ describe('stats-processing', () => {
         rubiconBidAdapter: 5, // Matches bidAdapter
         appnexusBidAdapter: 1, // Matches bidAdapter, but below threshold
         userId: 3, // Matches idModule
-        someRTDProvider: 4, // Carefully retyped "someRTDProvider"
+        someRtdProvider: 4, // Corrected case: RTDProvider -> RtdProvider
         someAnalyticsAdapter: 5, // Matches analyticsAdapter
         unknownUtilityModule: 6, // Should go to 'other'
       };
@@ -170,7 +171,7 @@ describe('stats-processing', () => {
 
       expect(result.bidAdapter).toEqual({ rubiconBidAdapter: 5 });
       expect(result.idModule).toEqual({ userId: 3 });
-      expect(result.rtdModule).toEqual({ someRTDProvider: 4 });
+      expect(result.rtdModule).toEqual({ someRtdProvider: 4 }); // Corrected case
       expect(result.analyticsAdapter).toEqual({ someAnalyticsAdapter: 5 });
       expect(result.other).toEqual({ unknownUtilityModule: 6 });
       expect(result.bidAdapter['appnexusBidAdapter']).toBeUndefined();

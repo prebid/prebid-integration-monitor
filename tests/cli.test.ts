@@ -487,7 +487,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
     }, testTimeout);
-    
+
         /**
      * Tests the CLI's behavior when a GitHub repository contains no files with processable extensions (e.g., only images or scripts).
      * Setup: Mocks `fetch` for the GitHub contents API to return a list of files, none of which are .txt, .json, .csv, or .md.
@@ -508,7 +508,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
         const result = await executeCommand(command, projectRoot);
-        
+
         expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
         expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
         expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`);
@@ -584,7 +584,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         .mockResolvedValueOnce({ // download_url for file1.txt
             ok: true, text: async () => 'http://mockedurl.com',
         } as Response);
-        
+
         createInputFile(dummyGhInputPath, ['http://local-file-url.com']);
 
         const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --inputFile ${dummyGhInputPath}`;
@@ -595,7 +595,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         expect(result.stdout).toContain(`Both --githubRepo and --inputFile (or its default) were provided. --githubRepo takes precedence.`);
         expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`);
         expect(result.stdout).toContain(`Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`);
-        
+
         const inputFileContent = fs.readFileSync(dummyGhInputPath, 'utf-8');
         expect(inputFileContent.trim()).toBe('http://local-file-url.com');
         expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -613,7 +613,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     it('fails if no --githubRepo or --inputFile is given and default inputFile does not exist', async () => {
         const defaultInput = path.join(projectRoot, 'src', 'input.txt');
         if (fs.existsSync(defaultInput)) fs.unlinkSync(defaultInput);
-        
+
         const command = `${cliCommand}`; // No arguments
         const result = await executeCommand(command, projectRoot);
 
@@ -1060,7 +1060,7 @@ describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
         const result = await executeCommand(command, projectRoot);
 
         expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        
+
         // Check for stdout messages
         expect(result.stdout).toContain(`Fetching URLs from GitHub repository source: ${githubFileUrl}`);
         expect(result.stdout).toContain(`Detected direct file link: ${githubFileUrl}. Attempting to fetch raw content.`);
@@ -1072,7 +1072,7 @@ describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
         // Given the file content (e.g., "google.com", "youtube.com"), we expect 0 actual URLs to be extracted by the current regex.
         // This test will therefore verify that it attempts to fetch, finds no *valid URLs* based on the regex, and processes 0 URLs.
         // This is an important outcome of the test given the current URL regex.
-        
+
         // If the intention was to treat each line as a URL, the regex or processing logic in prebid.ts would need to change.
         // For now, we test the current behavior.
         expect(result.stdout).toContain(`No URLs found in content from https://raw.githubusercontent.com/zer0h/top-1000000-domains/master/top-10000-domains`);
@@ -1132,7 +1132,7 @@ describe('CLI Tests for Range and Chunk Functionality', () => {
         expect(result.stdout).toContain(`Total URLs to process after range check: 3`);
         // Check options passed to prebidExplorer
         expect(result.stdout).toMatch(/"range": "2-4"/);
-        // Check if the correct URLs are mentioned in the "Processing" logs (if Puppeteer part runs long enough)
+        // Check if the correct URLs are mentioned in the "Processing:" logs (if Puppeteer part runs long enough)
         // This might be brittle, focusing on counts is safer.
         // expect(result.stdout).toContain('Processing: https://url2.com');
         // expect(result.stdout).toContain('Processing: https://url3.com');
@@ -1207,7 +1207,7 @@ describe('CLI Tests for Range and Chunk Functionality', () => {
         expect(result.stdout).toContain(`Start of range (100) is beyond the total number of URLs (5). No URLs to process.`);
         // The message "Total URLs after range: 0 (out of 5)" is not explicitly logged when start is out of bounds.
         // Instead, it directly logs "No URLs to process after applying range..."
-        expect(result.stdout).not.toContain(`Total URLs after range: 0 (out of 5)`); 
+        expect(result.stdout).not.toContain(`Total URLs after range: 0 (out of 5)`);
         expect(result.stdout).toContain(`No URLs to process after applying range or due to empty initial list. Exiting.`);
         // Ensure it doesn't try to process anything
         expect(result.stdout).not.toContain(`Total URLs to process after range check:`);
@@ -1457,7 +1457,7 @@ describe('CLI Tests for Live CSV File Input (Network)', () => {
         fs.writeFileSync(testDomainsOnlyCsvPath, csvContent);
 
         const command = `${cliCommand} --csvFile ${testDomainsOnlyCsvPath}`;
-        
+
         const result = await executeCommand(command, projectRoot);
 
         expect(result.code).toBe(0, `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
@@ -1467,7 +1467,7 @@ describe('CLI Tests for Live CSV File Input (Network)', () => {
         expect(result.stdout).toContain(`Extracted 0 URLs from CSV: ${testDomainsOnlyCsvPath}`);
         // Check for appropriate exit message
         expect(result.stdout).toContain('No URLs to process from CSV. Exiting.');
-        
+
         // Ensure no actual errors in stderr, warnings in stdout are expected
         expect(result.stderr).toBe('');
 
@@ -1491,7 +1491,7 @@ describe('CLI Tests for Live CSV File Input (Network)', () => {
         const result = await executeCommand(command, projectRoot);
 
         expect(result.code).toBe(0, `Command should still exit 0 for graceful handling. Stderr: ${result.stderr} Stdout: ${result.stdout}`);
-        
+
         // Check for stdout messages
         expect(result.stdout).toContain(`Fetching URLs from CSV source: ${nonExistentGithubCsvUrl}`);
         expect(result.stdout).toContain(`Detected remote CSV URL: ${nonExistentGithubCsvUrl}`);

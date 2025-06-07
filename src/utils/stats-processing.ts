@@ -262,7 +262,9 @@ export function _categorizeModules<T>( // Made exportable for potential testing,
     // Iterate over strongly typed keys of moduleCategoryPredicates
     // Ensuring key is typed as a key of CategorizedModules for result[key] access
     // and also compatible with moduleCategoryPredicates which shares the same key structure.
-    const categoryKeys = Object.keys(moduleCategoryPredicates) as Array<keyof CategorizedModules>;
+    const categoryKeys = Object.keys(moduleCategoryPredicates) as Array<
+      keyof CategorizedModules
+    >;
     for (const key of categoryKeys) {
       if (moduleCategoryPredicates[key](moduleName)) {
         result[key][moduleName] = count; // result[key] is ModuleDistribution

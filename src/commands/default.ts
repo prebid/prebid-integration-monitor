@@ -1,6 +1,6 @@
 import { Command, Flags } from '@oclif/core';
 import { initTracer } from '../tracer.js';
-import loggerModule, { initializeLogger } from '../utils/logger.js';
+import { initializeLogger } from '../utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
 import { executeMonitoringLogic } from '../services/monitoring-service.js';
 

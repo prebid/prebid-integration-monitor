@@ -9,7 +9,7 @@ import type { Logger as WinstonLogger } from 'winston';
  */
 export async function executeMonitoringLogic(
   logger: WinstonLogger,
-  oclifLogger: (message?: string | undefined, ...args: any[]) => void,
+  oclifLogger: (message?: string | undefined, ...args: unknown[]) => void,
 ): Promise<void> {
   const tracer = trace.getTracer('prebid-integration-monitor-tracer');
 

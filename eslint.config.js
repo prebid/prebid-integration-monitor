@@ -26,6 +26,13 @@ export default [
   {
     // Ignores configuration for non-JS/TS files if Prettier was complaining
     // This is a guess, may need adjustment if Prettier issues persist for other file types
-    ignores: ["**/*.md", "**/*.json", "**/*.yaml", "**/*.yml", ".prettierrc.cjs", ".eslintrc.cjs"],
-  }
+    ignores: [
+      '**/*.md',
+      '**/*.json',
+      '**/*.yaml',
+      '**/*.yml',
+      '.prettierrc.cjs',
+      '.eslintrc.cjs',
+    ],
+  },
 ];
