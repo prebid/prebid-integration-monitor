@@ -37,7 +37,7 @@ export default [
       '**/*.json',
       '**/*.yaml',
       '**/*.yml',
-      '.prettierrc.cjs',
+      '.prettierrc.js',
       '.eslintrc.cjs',
       'dist/**', // Ignore the dist directory
       'tests/cli.test.ts', // Ignore the problematic test file
