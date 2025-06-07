@@ -6,6 +6,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'; // Added vi
 import { updateAndCleanStats } from '../src/utils/update-stats'; // Corrected import path
+import { initializeLogger } from '../src/utils/logger'; // Import initializeLogger
 import mockFs from 'mock-fs'; // Restore mock-fs
 import fs from 'fs';
 import path from 'path';
@@ -40,6 +41,10 @@ describe('updateAndCleanStats', () => {
    * system mocks for clarity and isolation.
    */
   beforeEach(() => {
+    // Initialize the logger before each test in this suite
+    // Use a temporary directory for logs during testing
+    const testLogDir = path.join(process.cwd(), 'temp-test-logs');
+    initializeLogger(testLogDir);
     // mockFs({}); // General mockFs setup in beforeEach can be tricky if tests define their own specific structures.
     // Let each test define its full mock structure for clarity.
   });
@@ -75,7 +80,8 @@ describe('updateAndCleanStats', () => {
    */
 
   // storePath is used by multiple tests, so define it at a higher scope.
-  const storePath = path.resolve(process.cwd(), 'src', 'store');
+  // It should match the path resolved by OUTPUT_DIR in stats-config.ts
+  const storePath = path.resolve(process.cwd(), 'store');
 
   /**
    * @typedef {Object} SiteCounts
