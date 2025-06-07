@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import {
   readDirectory,
@@ -20,8 +19,6 @@ import type {
   VersionDistribution,
   ModuleDistribution,
   ProcessedVersionDistribution, // Return type of imported processVersionDistribution
-  ProcessedModuleDistribution, // Return type of imported processModuleDistribution
-  ProcessedModuleWebsiteCounts, // Return type of imported processModuleWebsiteCounts
 } from './stats-processing.js';
 
 import {
@@ -141,7 +138,8 @@ async function readAndParseFiles(
                   rawModuleCounts,
                   moduleWebsiteData,
                 );
-              } catch (parseError: any) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              } catch (_parseError) {
                 // Error logging for readJsonFile is handled within readJsonFile itself.
                 // If readJsonFile throws, this catch block will handle it.
                 logger.instance.warn(
@@ -150,7 +148,8 @@ async function readAndParseFiles(
               }
             }
           }
-        } catch (monthDirError: any) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_monthDirError) {
           // Error logging for readDirectory is handled within readDirectory itself.
           // If readDirectory throws, this catch block will handle it.
           logger.instance.warn(
@@ -159,15 +158,21 @@ async function readAndParseFiles(
         }
       }
     }
-  } catch (baseDirError: any) {
+  } catch (baseDirError: unknown) {
     // Error logging for readDirectory is handled within readDirectory itself.
-    logger.instance.error(
-      `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted.`,
-      {
-        errorName: baseDirError.name,
-        errorMessage: baseDirError.message,
-      },
-    );
+    if (baseDirError instanceof Error) {
+      logger.instance.error(
+        `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted.`,
+        {
+          errorName: baseDirError.name,
+          errorMessage: baseDirError.message,
+        },
+      );
+    } else {
+      logger.instance.error(
+        `Critical error reading base output directory ${baseOutputDir}. Further processing may be impacted. An unknown error occurred.`,
+      );
+    }
     // Rethrow or handle as critical if base directory processing is essential
     throw baseDirError;
   }
@@ -268,24 +273,30 @@ async function updateAndCleanStats(): Promise<void> {
     logger.instance.info(
       `Successfully updated statistics at ${FINAL_API_FILE_PATH}`,
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Catch errors from readAndParseFiles if rethrown, or from processing steps,
     // or from ensureDirectoryExists/writeJsonFile if they rethrow.
-    logger.instance.error('A critical error occurred in updateAndCleanStats:', {
-      errorName: err.name,
-      errorMessage: err.message,
-      stack: err.stack,
-    });
+    if (err instanceof Error) {
+      logger.instance.error(
+        'A critical error occurred in updateAndCleanStats:',
+        {
+          errorName: err.name,
+          errorMessage: err.message,
+          stack: err.stack,
+        },
+      );
+    } else {
+      logger.instance.error(
+        'A critical error occurred in updateAndCleanStats: An unknown error occurred.',
+      );
+    }
     // Depending on application design, might rethrow or exit process
     throw err;
   }
 }
 
 // Export necessary functions for use elsewhere.
-export {
-  updateAndCleanStats,
-  readAndParseFiles,
-};
+export { updateAndCleanStats, readAndParseFiles };
 export type {
   FinalApiData,
   ParsedScanData,
