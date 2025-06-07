@@ -14,7 +14,7 @@
     "scan": "npm run build && node ./bin/run.js scan",
     "prebid:scan": "node ./bin/run.js scan",
     "docs:generate": "typedoc --options typedoc.json",
-    "lint": "eslint . --ext .ts",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false ./node_modules/.bin/eslint --config .eslintrc.cjs . --ext .ts --fix",
     "format": "prettier --write ."
   },
   "repository": {

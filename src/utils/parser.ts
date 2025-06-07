@@ -4,7 +4,7 @@ import loggerModule from './logger.js'; // Assuming logger.js is in the same dir
 const logger = loggerModule.instance;
 
 async function parsePreloadUrls(): Promise<void> {
-  let loadList: string[] = [];
+  const loadList: string[] = [];
 
   const urlsRl = readline.createInterface({
     input: fs.createReadStream('src/input.txt'),

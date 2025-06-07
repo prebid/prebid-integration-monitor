@@ -152,7 +152,7 @@ export default class Scan extends Command {
     } catch (error: unknown) {
       // Logger should already be initialized here.
       let userMessage = 'An unexpected error occurred during the Prebid scan.';
-      let suggestions = ['Check logs for more details.'];
+      const suggestions = ['Check logs for more details.'];
 
       if (error instanceof AppError) {
         logger.error(`AppError during Prebid scan: ${error.message}`, {

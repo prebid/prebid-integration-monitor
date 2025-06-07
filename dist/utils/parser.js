@@ -3,7 +3,7 @@ import * as readline from 'readline';
 import loggerModule from './logger.js'; // Assuming logger.js is in the same directory
 const logger = loggerModule.instance;
 async function parsePreloadUrls() {
-    let loadList = [];
+    const loadList = [];
     const urlsRl = readline.createInterface({
         input: fs.createReadStream('src/input.txt'),
         crlfDelay: Infinity,

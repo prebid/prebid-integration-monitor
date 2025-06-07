@@ -159,7 +159,7 @@ export async function prebidExplorer(options) {
     if (options.range) {
         logger.info(`Applying range: ${options.range}`);
         const originalUrlCount = allUrls.length;
-        let [startStr, endStr] = options.range.split('-');
+        const [startStr, endStr] = options.range.split('-');
         let start = startStr ? parseInt(startStr, 10) : 1;
         let end = endStr ? parseInt(endStr, 10) : allUrls.length;
         if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
