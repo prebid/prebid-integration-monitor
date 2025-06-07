@@ -1,145 +1,124 @@
 /**
  * @file Initializes and manages OpenTelemetry tracing for the application.
  * This module sets up the OpenTelemetry NodeSDK with appropriate exporters
- * and instrumentations to enable distributed tracing.
+ * (OTLP and Console) and automatic instrumentations to enable distributed tracing.
+ *
+ * @remarks
+ * The OTLP exporter's behavior (e.g., endpoint, headers, protocol) is typically configured
+ * through OpenTelemetry standard environment variables:
+ * - `OTEL_EXPORTER_OTLP_ENDPOINT`: The target URL for the OTLP collector (e.g., `http://localhost:4318/v1/traces`).
+ * - `OTEL_EXPORTER_OTLP_HEADERS`: Headers for the OTLP exporter (e.g., `api-key=YOUR_API_KEY`).
+ * - `OTEL_EXPORTER_OTLP_PROTOCOL`: The protocol to use (`http/protobuf` or `grpc`).
+ *
+ * Service-identifying attributes (like service name, version) can be configured by setting:
+ * - `OTEL_SERVICE_NAME`
+ * - `OTEL_SERVICE_VERSION`
+ * - `OTEL_DEPLOYMENT_ENVIRONMENT`
+ * If these are not set, the SDK might use default, less descriptive values. The commented-out
+ * `_createServiceResource` function provides an example of how to set these programmatically if needed.
  */
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { ConsoleSpanExporter, BatchSpanProcessor, } from '@opentelemetry/sdk-trace-node';
-// Resource identifies the entity producing telemetry (e.g., a service).
-// It's recommended to configure it with attributes like service name, version, environment, etc.
-// Example: new Resource({ [SemanticResourceAttributes.SERVICE_NAME]: 'your-service-name', [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0' })
-// Using named import for the TYPE, and require for the VALUE due to persistent TS2693 error.
-// import type { Resource as OpenTelemetryResourceType } from '@opentelemetry/resources';
+import loggerModule from './utils/logger.js';
+const logger = loggerModule.instance;
+// Resource and SemanticResourceAttributes would be needed if _createServiceResource is used.
+// import { Resource } from '@opentelemetry/resources';
 // import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-// const OpenTelemetryResourceValue = require('@opentelemetry/resources').Resource;
-/**
- * Creates a Resource instance for the service.
- * This helper function centralizes the logic for defining service-identifying attributes.
- * It reads service name, version, and environment from environment variables if available,
- * providing sensible defaults otherwise.
- *
- * Environment variables:
- * - OTEL_SERVICE_NAME: The name of the service.
- * - OTEL_SERVICE_VERSION: The version of the service.
- * - OTEL_DEPLOYMENT_ENVIRONMENT: The deployment environment (e.g., 'production', 'staging').
- *
- * @returns {OpenTelemetryResourceType} The configured Resource object.
- */
-// const _createServiceResource = (): OpenTelemetryResourceType => {
-//   // Type annotation uses the imported OpenTelemetryResourceType
-//   const serviceName = process.env.OTEL_SERVICE_NAME || 'unknown_service';
-//   const serviceVersion = process.env.OTEL_SERVICE_VERSION || '0.0.0';
-//   const deploymentEnvironment =
-//     process.env.OTEL_DEPLOYMENT_ENVIRONMENT || 'unknown';
-//   return new (OpenTelemetryResourceValue as new (
-//     attributes: Record<string, any>,
-//   ) => OpenTelemetryResourceType)({
-//     // Use the required value as constructor
+// Example of a helper function to create a Resource object with service details.
+// const _createServiceResource = (): Resource => {
+//   const serviceName = process.env.OTEL_SERVICE_NAME || 'prebid-explorer';
+//   const serviceVersion = process.env.OTEL_SERVICE_VERSION || 'unknown';
+//   const deploymentEnvironment = process.env.OTEL_DEPLOYMENT_ENVIRONMENT || 'development';
+//   return new Resource({
 //     [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
 //     [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
 //     [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: deploymentEnvironment,
-//     // Add any other common resource attributes here
 //   });
 // };
 /**
  * Holds the OpenTelemetry NodeSDK instance once initialized.
+ * This allows the SDK to be accessed globally within this module, for example, by the SIGTERM handler.
  * @type {NodeSDK | undefined}
  */
 let sdk;
 /**
  * Initializes the OpenTelemetry SDK for tracing.
  *
- * This function configures and starts the OpenTelemetry NodeSDK. It sets up
- * two span exporters:
- * 1. OTLPTraceExporter: Sends trace data to an OpenTelemetry collector (typically via HTTP/gRPC).
- *    The OTLPTraceExporter is configured here with default settings. It generally relies on
- *    environment variables for full configuration (e.g., OTEL_EXPORTER_OTLP_ENDPOINT,
- *    OTEL_EXPORTER_OTLP_HEADERS, OTEL_EXPORTER_OTLP_PROTOCOL).
- * 2. ConsoleSpanExporter: Prints trace data to the console, which is useful for local
- *    development and debugging.
+ * This function configures and starts the OpenTelemetry NodeSDK. It sets up two primary span exporters:
+ * 1.  **OTLPTraceExporter**: Sends trace data to an OpenTelemetry collector, typically over HTTP/protobuf or gRPC.
+ *     Its configuration (endpoint, headers, protocol) is primarily managed via standard OpenTelemetry
+ *     environment variables (e.g., `OTEL_EXPORTER_OTLP_ENDPOINT`).
+ * 2.  **ConsoleSpanExporter**: Prints trace data directly to the console. This is highly useful for local
+ *     development and debugging purposes, providing immediate visibility into traces.
  *
- * The SDK is also configured with automatic instrumentations for many popular Node.js
- * libraries via `getNodeAutoInstrumentations()`. This means common operations like HTTP requests,
- * database queries, etc., will be automatically traced without manual setup.
+ * The SDK is also enhanced with automatic instrumentations for many common Node.js libraries through
+ * `getNodeAutoInstrumentations()`. This feature automatically traces operations for libraries like HTTP clients,
+ * web frameworks (e.g., Express), and database clients (e.g., pg, mysql) without requiring manual
+ * instrumentation code for each.
  *
- * Note: The `Resource` for the SDK is not explicitly configured in this function by default.
- * While OpenTelemetry SDKs typically create a default Resource, this default may contain
- * minimal information (e.g., telemetry.sdk.language, telemetry.sdk.name, telemetry.sdk.version).
- * For effective telemetry analysis, filtering, and aggregation in observability backends,
- * explicitly create and configure a `Resource` object with attributes like
- * `SERVICE_NAME`, `SERVICE_VERSION`, and ideally `DEPLOYMENT_ENVIRONMENT`.
- * A helper function `_createServiceResource` is available below to facilitate this.
- * e.g. `new NodeSDK({ resource: _createServiceResource(), ... })`
+ * **Resource Configuration Note**: While this setup initializes tracing, for more effective telemetry
+ * analysis in observability platforms, it's crucial to define a `Resource`. A Resource includes attributes
+ * that identify your service (e.g., `service.name`, `service.version`). The OpenTelemetry SDK creates a default
+ * Resource if one isn't provided, but it's often minimal. The commented-out `_createServiceResource` function
+ * demonstrates how to create a customized Resource, which can then be passed to the `NodeSDK` constructor
+ * (e.g., `new NodeSDK({ resource: _createServiceResource(), ... })`).
  *
- * After configuration, this function starts the SDK, making tracing active for the application.
+ * After configuration, `sdk.start()` is called, activating tracing for the application.
+ * Errors during initialization are logged, and the application may continue without tracing if an error occurs.
  */
 export const initTracer = () => {
     try {
         const otlpExporter = new OTLPTraceExporter({
-        // Default configuration. For production, ensure OTLP endpoint and headers are configured,
-        // often via environment variables like:
-        // OTEL_EXPORTER_OTLP_ENDPOINT (e.g., 'http://localhost:4318/v1/traces' for OTLP/HTTP, or 'http://localhost:4317' for OTLP/gRPC)
-        // OTEL_EXPORTER_OTLP_HEADERS (e.g., 'api-key=YOUR_API_KEY,another-header=value')
-        // OTEL_EXPORTER_OTLP_PROTOCOL (e.g., 'http/protobuf' or 'grpc')
+        // Default OTLP exporter configuration.
+        // For production, ensure environment variables like OTEL_EXPORTER_OTLP_ENDPOINT are set.
+        // e.g., 'http://localhost:4318/v1/traces' for OTLP/HTTP
+        // e.g., 'api-key=YOUR_API_KEY' for OTEL_EXPORTER_OTLP_HEADERS
         });
-        const consoleExporter = new ConsoleSpanExporter();
-        // const resource = _createServiceResource(); // Call the helper if you uncomment resource below
+        const consoleExporter = new ConsoleSpanExporter(); // For local debugging visibility.
         sdk = new NodeSDK({
-            // To explicitly define a resource for your service, uncomment and use the helper function:
-            // resource: _createServiceResource(), // or resource: resource if defined above
-            // This helper reads OTEL_SERVICE_NAME, OTEL_SERVICE_VERSION, and OTEL_DEPLOYMENT_ENVIRONMENT
-            // from environment variables or uses defaults. See its JSDoc for more details.
-            // BatchSpanProcessor improves performance by collecting spans in batches before sending
-            // them to the exporter. This reduces the overhead of exporting each span individually
-            // and is generally recommended for production.
-            // Advanced configuration options include scheduledDelayMillis, maxQueueSize, maxExportBatchSize etc.
-            // See OpenTelemetry documentation for more details on BatchSpanProcessor configuration.
+            // To explicitly define a resource: resource: _createServiceResource(),
+            // BatchSpanProcessor is recommended for production to improve performance
+            // by sending spans in batches rather than individually.
             spanProcessors: [
-                new BatchSpanProcessor(consoleExporter), // For local debugging
-                new BatchSpanProcessor(otlpExporter), // For production export
+                new BatchSpanProcessor(consoleExporter), // Logs to console
+                new BatchSpanProcessor(otlpExporter), // Exports to OTLP endpoint
             ],
-            // Enables a suite of automatic instrumentations for common Node.js libraries
-            // (e.g., HTTP, Express, gRPC, various DB clients like pg, mysql).
-            // This can be configured to disable specific instrumentations or to pass options to them.
-            // For example, to disable http instrumentation: getNodeAutoInstrumentations({'@opentelemetry/instrumentation-http': {enabled: false}})
-            // See OpenTelemetry documentation for details on customizing auto-instrumentations.
+            // Automatically instruments supported Node.js libraries.
             instrumentations: [getNodeAutoInstrumentations()],
         });
-        console.log('OpenTelemetry NodeSDK initialized with OTLP and Console exporters. Auto-instrumentations are enabled. Attempting to start SDK...');
-        sdk.start();
-        console.log('OpenTelemetry NodeSDK started successfully.');
+        logger.info('OpenTelemetry NodeSDK initialized with OTLP and Console exporters. Auto-instrumentations are enabled. Attempting to start SDK...');
+        sdk.start(); // Activates the SDK.
+        logger.info('OpenTelemetry NodeSDK started successfully.');
     }
     catch (error) {
-        console.error('Failed to initialize or start OpenTelemetry SDK:', error);
-        // Depending on the application's criticality of tracing, you might choose to:
-        // 1. Re-throw the error to halt application startup if tracing is essential:
-        //    throw error;
-        // 2. Allow the application to continue without tracing (as is the current behavior):
-        //    console.warn('Application will continue without OpenTelemetry tracing enabled.');
-        // Note: If sdk.start() fails, the sdk instance might exist but tracing will not be active.
-        // The SIGTERM handler will still attempt shutdown if sdk is defined.
+        // Logs initialization errors. The application might continue without tracing.
+        logger.error('Failed to initialize or start OpenTelemetry SDK:', { error });
+        // Consider re-throwing for critical failures: throw error;
+        // Or log a specific warning: logger.warn('Application will continue without OpenTelemetry tracing enabled.');
     }
 };
 /**
- * Handles the SIGTERM signal to ensure graceful shutdown of the OpenTelemetry SDK.
+ * Handles the SIGTERM signal for graceful shutdown of the OpenTelemetry SDK.
  *
- * When a SIGTERM signal is received (e.g., during application termination by an orchestrator),
- * this handler attempts to shut down the OpenTelemetry SDK. This is crucial for
- * ensuring that any buffered telemetry data is flushed to the configured exporters
- * before the process exits, preventing data loss.
+ * When the application receives a SIGTERM signal (common in containerized environments
+ * or when a process manager stops the application), this handler is invoked.
+ * It attempts to shut down the OpenTelemetry SDK using `sdk.shutdown()`.
+ * This is a critical step to ensure that any buffered telemetry data (spans)
+ * is flushed to the configured exporters before the process exits, preventing data loss.
+ * The process will exit after attempting shutdown, regardless of success or failure.
  */
 process.on('SIGTERM', () => {
     if (sdk) {
         sdk
             .shutdown()
-            .then(() => console.log('Tracing terminated gracefully'))
-            .catch((error) => console.error('Error shutting down tracing', error))
+            .then(() => logger.info('OpenTelemetry tracing terminated gracefully.'))
+            .catch((error) => logger.error('Error shutting down OpenTelemetry tracing', { error }))
             .finally(() => process.exit(0));
     }
     else {
-        // If SDK was not initialized, exit directly.
+        // If SDK was never initialized, exit directly.
         process.exit(0);
     }
 });

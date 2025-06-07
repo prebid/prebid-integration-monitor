@@ -95,7 +95,24 @@ export interface TaskResultNoData {
 }
 
 /**
+ * Provides a structured way to describe errors that occur during page processing tasks.
+ * @interface ErrorDetails
+ */
+export interface ErrorDetails {
+  /**
+   * A code representing the type of error.
+   * @example 'NET_TIMEOUT', 'PBJS_NOT_FOUND', 'INTERNAL_ERROR'
+   */
+  code: string;
+  /** A human-readable message describing the error. */
+  message: string;
+  /** Optional stack trace of the original error, if available. */
+  stack?: string;
+}
+
+/**
  * Represents an outcome where an error occurred while attempting to process a page.
+ * @interface TaskResultError
  */
 export interface TaskResultError {
   /** Identifies the result type as an error. */
@@ -103,10 +120,9 @@ export interface TaskResultError {
   /** The URL of the page that was being processed when the error occurred. */
   url: string;
   /**
-   * A string code or message describing the error.
-   * @example "NET_TIMEOUT", "PBJS_NOT_FOUND"
+   * An {@link ErrorDetails} object containing structured information about the error.
    */
-  error: string;
+  error: ErrorDetails;
 }
 
 /**
