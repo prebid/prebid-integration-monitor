@@ -1,3 +1,17 @@
+/**
+ * @fileoverview This is the main orchestrator script for the Prebid Explorer tool.
+ * It leverages Puppeteer to launch a browser, load URLs from various sources
+ * (local files or GitHub), process each page to extract Prebid.js and other
+ * advertising technology information, and then saves these findings.
+ *
+ * The script is designed to be configurable through command-line options,
+ * allowing users to specify URL sources, Puppeteer behavior (vanilla vs. cluster),
+ * concurrency, output directories, and more.
+ *
+ * It coordinates helper modules for URL loading (`url-loader.ts`),
+ * Puppeteer task execution (`puppeteer-task.ts`), and results handling
+ * (`results-handler.ts`).
+ */
 import { initializeLogger } from './utils/logger.js';
 import { addExtra } from 'puppeteer-extra';
 import puppeteerVanilla from 'puppeteer';
@@ -56,7 +70,7 @@ export async function prebidExplorer(options) {
     logger.info('Starting Prebid Explorer with options:', options);
     // Apply puppeteer-extra stealth plugin to help avoid bot detection
     // Cast puppeteer to any before calling use
-    puppeteer.use(StealthPlugin());
+    puppeteer.use(StealthPlugin()); // Changed cast
     const resourcesToBlock = new Set([
         'image',
         'font',
@@ -68,12 +82,14 @@ export async function prebidExplorer(options) {
         // 'stylesheet', 'script', 'xhr', 'websocket' are usually essential and not blocked.
     ]);
     // Accessing .default property for the factory, or using the module itself if .default is not present
-    const blockResourcesFactory = BlockResourcesModule.default || BlockResourcesModule;
-    const blockResourcesPluginInstance = blockResourcesFactory({
+    const factory = (BlockResourcesModule.default ||
+        BlockResourcesModule);
+    const blockResourcesPluginInstance = factory({
+        // Changed factory definition and call
         blockedTypes: resourcesToBlock,
     });
     // Cast puppeteer to any before calling use
-    puppeteer.use(blockResourcesPluginInstance);
+    puppeteer.use(blockResourcesPluginInstance); // Changed cast
     logger.info(`Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`);
     const basePuppeteerOptions = {
         protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
@@ -217,8 +233,8 @@ export async function prebidExplorer(options) {
                     const settledChunkResults = await Promise.allSettled(chunkPromises);
                     settledChunkResults.forEach((settledResult) => {
                         if (settledResult.status === 'fulfilled') {
-                            // Ensure that settledResult.value is not null or undefined before pushing
-                            // Changed check to handle potential 'void' type for value
+                            // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
+                            // processPageTask is expected to always return a TaskResult.
                             if (typeof settledResult.value !== 'undefined') {
                                 taskResults.push(settledResult.value);
                             }
@@ -247,6 +263,7 @@ export async function prebidExplorer(options) {
                     logger.error(`An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`, { error });
                     // Cast cluster to any before calling isClosed and close
                     if (cluster && !cluster.isClosed())
+                        // Changed cast
                         await cluster.close(); // Ensure cluster is closed on error
                 }
             }
@@ -302,7 +319,7 @@ export async function prebidExplorer(options) {
                 const settledResults = await Promise.allSettled(promises);
                 settledResults.forEach((settledResult) => {
                     if (settledResult.status === 'fulfilled') {
-                        // Changed check to handle potential 'void' type for value
+                        // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
                         if (typeof settledResult.value !== 'undefined') {
                             taskResults.push(settledResult.value);
                         }
@@ -326,6 +343,7 @@ export async function prebidExplorer(options) {
                 logger.error('An unexpected error occurred during cluster processing orchestration', { error });
                 // Cast cluster to any before calling isClosed and close
                 if (cluster && !cluster.isClosed())
+                    // Changed cast
                     await cluster.close();
             }
         }

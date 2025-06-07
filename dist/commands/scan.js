@@ -91,8 +91,9 @@ export default class Scan extends Command {
             this.log('Prebid scan completed successfully.');
         }
         catch (error) {
-            this.log(`Full error during Prebid scan: ${error.stack || error}`); // Log full error
-            this.error(`An error occurred during the Prebid scan: ${error.message}`, {
+            const err = error;
+            this.log(`Full error during Prebid scan: ${err.stack || err}`); // Log full error
+            this.error(`An error occurred during the Prebid scan: ${err.message}`, {
                 exit: 1,
                 suggestions: ['Check logs for more details.'], // Suggestions are fine
             });

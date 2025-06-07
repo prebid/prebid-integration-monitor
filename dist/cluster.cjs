@@ -84,7 +84,7 @@ const PBJS_VERSION_WAIT_INTERVAL_MS = 100;
 class PbjsVersionTimeoutError extends Error {
     constructor(message) {
         super(message);
-        this.name = "PbjsVersionTimeoutError";
+        this.name = 'PbjsVersionTimeoutError';
     }
 }
 /**
@@ -103,13 +103,13 @@ const CLUSTER_CONFIG = {
             '--disable-dev-shm-usage', // Prevents issues with shared memory in certain Linux environments (e.g., Docker)
             '--disable-accelerated-2d-canvas', // Disables GPU acceleration for 2D canvas (stability)
             '--disable-gpu', // Disables GPU hardware acceleration (stability/compatibility)
-            '--disable-features=TranslateUI,BlinkGenPropertyTrees,IsolateOrigins,site-per-process'
+            '--disable-features=TranslateUI,BlinkGenPropertyTrees,IsolateOrigins,site-per-process',
         ],
-        ignoreHTTPSErrors: true // Ignores HTTPS errors (e.g., self-signed certificates)
+        ignoreHTTPSErrors: true, // Ignores HTTPS errors (e.g., self-signed certificates)
     },
     retryLimit: RETRY_LIMIT, // Number of retries if a task fails
     retryDelay: RETRY_DELAY_MS, // Delay between retries in milliseconds
-    timeout: TASK_TIMEOUT_MS // Timeout for the entire task (including retries) in milliseconds
+    timeout: TASK_TIMEOUT_MS, // Timeout for the entire task (including retries) in milliseconds
 };
 /**
  * Reads a list of URLs from a specified file.
@@ -122,7 +122,7 @@ const loadUrlsFromFile = (filePath) => {
     // This function is synchronous. The `clusterSearch` function will wrap its call
     // in a try-catch block to handle potential errors like file not found.
     const fileContent = fs.readFileSync(filePath, 'utf8');
-    return fileContent.split('\n').filter(line => line.trim() !== '');
+    return fileContent.split('\n').filter((line) => line.trim() !== '');
 };
 const puppeteer = (0, puppeteer_extra_1.addExtra)(puppeteer_1.default); // Reinitialize puppeteer with puppeteer-extra
 puppeteer.use(StealthPlugin()); // Apply StealthPlugin
@@ -136,6 +136,7 @@ puppeteer.use(StealthPlugin()); // Apply StealthPlugin
  * @param {string} [actionContext] - Optional. The action or step being performed when the error occurred.
  */
 const logError = (url, message, error, actionContext) => {
+    // Allow 'any' for error to capture various types
     const logDetails = {
         url: url,
         errorMessage: message, // Renamed to avoid conflict with Winston's 'message'
@@ -164,7 +165,7 @@ const handleDialog = async (dialog, url) => {
         logger.info(`Dismissed dialog for ${url}: ${message}`, { url });
     }
     catch (e) {
-        logError(url, "Error dismissing dialog", e, "dismissing dialog");
+        logError(url, 'Error dismissing dialog', e, 'dismissing dialog');
     }
 };
 // Function to wait for pbjs.version
@@ -189,11 +190,12 @@ const getPbjsVersionWithWait = async (pageOrFrame) => {
             // The runtime check for pbjs and pbjs.version (string, length > 0) provides some safety.
             if (window.pbjs &&
                 typeof window.pbjs.version === 'string' &&
-                window.pbjs.version.length > 0) { // Ensure version is not an empty string
+                window.pbjs.version.length > 0) {
+                // Ensure version is not an empty string
                 return window.pbjs.version; // Version found, return it.
             }
             // Wait for the defined interval before checking again.
-            await new Promise(resolve => setTimeout(resolve, intervalMs));
+            await new Promise((resolve) => setTimeout(resolve, intervalMs));
             elapsedTime += intervalMs;
         }
         // If the loop completes without returning, pbjs.version was not found within the timeout.
@@ -218,7 +220,7 @@ const getPbjsVersionFromPage = async (page, url) => {
         return version;
     }
     catch (e) {
-        logError(url, `Failed to get pbjs.version from main page (or timed out): ${e.message}`, e, "getting pbjs.version from main page");
+        logError(url, `Failed to get pbjs.version from main page (or timed out): ${e.message}`, e, 'getting pbjs.version from main page');
         return null;
     }
 };
@@ -238,7 +240,10 @@ const getPbjsVersionFromFrames = async (page, url) => {
                 continue;
             if (frame.isDetached()) {
                 const detachedFrameUrl = frame.url(); // Get URL before it's completely inaccessible
-                logger.warn(`Skipping detached frame: ${detachedFrameUrl}`, { url, frameUrl: detachedFrameUrl });
+                logger.warn(`Skipping detached frame: ${detachedFrameUrl}`, {
+                    url,
+                    frameUrl: detachedFrameUrl,
+                });
                 continue;
             }
             try {
@@ -258,7 +263,7 @@ const getPbjsVersionFromFrames = async (page, url) => {
                 catch (e) {
                     currentFrameUrl = 'detached or inaccessible';
                 }
-                logError(url, `Error evaluating frame ${currentFrameUrl} or timed out: ${frameError.message}`, frameError, "evaluating frame for pbjs.version");
+                logError(url, `Error evaluating frame ${currentFrameUrl} or timed out: ${frameError.message}`, frameError, 'evaluating frame for pbjs.version');
             }
         }
     }
@@ -276,14 +281,19 @@ const getPbjsVersionFromFrames = async (page, url) => {
  */
 const clusterSearch = async () => {
     const cluster = await puppeteer_cluster_1.Cluster.launch({
+        // Added types for Cluster
         puppeteer, // The Puppeteer instance (with stealth plugin) to use
-        ...CLUSTER_CONFIG // Spread the rest of the configuration
+        ...CLUSTER_CONFIG, // Spread the rest of the configuration
     });
     await cluster.task(async ({ page, data: url }) => {
+        // Added types for task callback
         try {
             // 2. Dialog Handler
             page.on('dialog', (dialog) => handleDialog(dialog, url));
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: PAGE_NAVIGATION_TIMEOUT_MS });
+            await page.goto(url, {
+                waitUntil: 'networkidle0',
+                timeout: PAGE_NAVIGATION_TIMEOUT_MS,
+            });
             const version = await getPbjsVersionFromPage(page, url);
             if (version) {
                 logger.info(`PBJS Version: ${version}`, { url });
@@ -303,33 +313,44 @@ const clusterSearch = async () => {
         }
         catch (e) {
             // This catch is for page.goto() errors or other unexpected issues in the task
-            logError(url, "Navigation or task processing error", e, "processing URL in cluster task");
+            logError(url, 'Navigation or task processing error', e, 'processing URL in cluster task');
         }
     });
     const inputFile = path.join(__dirname, 'input.txt'); // __dirname is fine in .cts
     try {
         const urls = loadUrlsFromFile(inputFile);
         if (urls.length === 0) {
-            logger.warn('input.txt is empty or contains no valid URLs. Exiting.', { file: inputFile });
+            logger.warn('input.txt is empty or contains no valid URLs. Exiting.', {
+                file: inputFile,
+            });
         }
         else {
-            logger.info(`Queueing ${urls.length} URLs from input.txt`, { file: inputFile });
+            logger.info(`Queueing ${urls.length} URLs from input.txt`, {
+                file: inputFile,
+            });
             urls.forEach((url) => cluster.queue(url));
         }
     }
     catch (error) {
-        logger.error(`Failed to read or process input.txt: ${error.message}`, { file: inputFile, error });
+        logger.error(`Failed to read or process input.txt: ${error.message}`, {
+            file: inputFile,
+            error,
+        });
     }
     await cluster.idle();
     await cluster.close();
 };
 clusterSearch().catch((error) => {
-    const message = "Unhandled error in clusterSearch";
+    // Added Error type for catch
+    const message = 'Unhandled error in clusterSearch';
     if (error instanceof Error) {
-        logError("N/A", message, error, "running clusterSearch"); // logError uses the instance
+        logError('N/A', message, error, 'running clusterSearch'); // logError uses the instance
     }
     else {
         // For non-Error objects, we might not have a stack, so actionContext is still useful.
-        logger.error(message, { errorDetails: String(error), actionContext: "running clusterSearch" });
+        logger.error(message, {
+            errorDetails: String(error),
+            actionContext: 'running clusterSearch',
+        });
     }
 });
