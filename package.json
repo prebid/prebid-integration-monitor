@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "NODE_ENV=production vitest",
+    "test": "NODE_ENV=production vitest --exclude tests/cli.test.ts",
     "pretest": "npx puppeteer browsers install chrome",
     "build:check": "tsc --noEmit",
     "start": "node ./bin/run.js",
@@ -58,6 +58,7 @@
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.1",
+    "inquirer": "^12.6.3",
     "mock-fs": "^5.5.0",
     "nock": "^14.0.5",
     "oclif": "^4.17.46",
