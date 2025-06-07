@@ -12,15 +12,10 @@
  * Puppeteer task execution (`puppeteer-task.ts`), and results handling
  * (`results-handler.ts`).
  */
-import * as fs from 'fs';
 import { initializeLogger } from './utils/logger.js';
 import type { Logger as WinstonLogger } from 'winston';
 import { addExtra } from 'puppeteer-extra';
-import puppeteerVanilla, {
-  Browser,
-  PuppeteerLaunchOptions,
-  Page,
-} from 'puppeteer';
+import puppeteerVanilla, { Browser, PuppeteerLaunchOptions } from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 // Using namespace import and attempting to access .default for CJS interop
 import * as BlockResourcesModule from 'puppeteer-extra-plugin-block-resources';
@@ -39,7 +34,7 @@ import {
 } from './utils/puppeteer-task.js';
 
 // Import shared types from the new common location
-import type { TaskResult, PageData } from './common/types.ts';
+import type { TaskResult } from './common/types.ts';
 
 import {
   processAndLogTaskResults,
@@ -101,7 +96,7 @@ let logger: WinstonLogger; // Global logger instance, initialized within prebidE
 // to handle the dynamic nature of puppeteer-extra plugins while retaining type safety
 // for the core puppeteerVanilla methods.
 const puppeteer = addExtra(
-  puppeteerVanilla as any,
+  puppeteerVanilla as any, // Changed from unknown to any
 ) as unknown as typeof puppeteerVanilla;
 
 /**
@@ -147,7 +142,7 @@ export async function prebidExplorer(
 
   // Apply puppeteer-extra stealth plugin to help avoid bot detection
   // Cast puppeteer to any before calling use
-  (puppeteer as any).use(StealthPlugin());
+  (puppeteer as any).use(StealthPlugin()); // Changed cast
 
   // Define specific type for blocked resource types for clarity
   type ResourceType =
@@ -174,12 +169,14 @@ export async function prebidExplorer(
     // 'stylesheet', 'script', 'xhr', 'websocket' are usually essential and not blocked.
   ]);
   // Accessing .default property for the factory, or using the module itself if .default is not present
-  const blockResourcesFactory = (BlockResourcesModule as any).default || BlockResourcesModule;
-  const blockResourcesPluginInstance = blockResourcesFactory({
+  const factory = ((BlockResourcesModule as any).default ||
+    BlockResourcesModule) as any;
+  const blockResourcesPluginInstance = factory({
+    // Changed factory definition and call
     blockedTypes: resourcesToBlock,
   });
   // Cast puppeteer to any before calling use
-  (puppeteer as any).use(blockResourcesPluginInstance);
+  (puppeteer as any).use(blockResourcesPluginInstance); // Changed cast
   logger.info(
     `Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`,
   );
@@ -404,13 +401,15 @@ export async function prebidExplorer(
           });
           await cluster.idle();
           await cluster.close();
-        } catch (error: any) {
+        } catch (error: unknown) {
           logger.error(
             `An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`,
             { error },
           );
           // Cast cluster to any before calling isClosed and close
-          if (cluster && !(cluster as any).isClosed()) await (cluster as any).close(); // Ensure cluster is closed on error
+          if (cluster && !(cluster as any).isClosed())
+            // Changed cast
+            await (cluster as any).close(); // Ensure cluster is closed on error
         }
       } else {
         // 'vanilla' Puppeteer for the current chunk
@@ -430,7 +429,7 @@ export async function prebidExplorer(
               processedUrls.add(url); // Add to global processedUrls
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           logger.error(
             `An error occurred during processing chunk ${chunkNumber} with vanilla Puppeteer.`,
             { error },
@@ -495,13 +494,15 @@ export async function prebidExplorer(
         });
         await cluster.idle();
         await cluster.close();
-      } catch (error: any) {
+      } catch (error: unknown) {
         logger.error(
           'An unexpected error occurred during cluster processing orchestration',
           { error },
         );
         // Cast cluster to any before calling isClosed and close
-        if (cluster && !(cluster as any).isClosed()) await (cluster as any).close();
+        if (cluster && !(cluster as any).isClosed())
+          // Changed cast
+          await (cluster as any).close();
       }
     } else {
       // 'vanilla' Puppeteer
@@ -520,7 +521,7 @@ export async function prebidExplorer(
             processedUrls.add(url);
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         logger.error(
           'An unexpected error occurred during vanilla Puppeteer processing',
           { error },

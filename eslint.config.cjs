@@ -1,8 +1,8 @@
 module.exports = [
   {
-    files: ["**/*.ts"],
+    files: ['**/*.ts'],
     rules: {
-      "no-unused-vars": "warn"
-    }
-  }
+      'no-unused-vars': 'warn',
+    },
+  },
 ];

@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path'; // Import path module for robust file path operations
 import type { Logger as WinstonLogger } from 'winston';
 // Import shared types from the new common location
-import type { TaskResult, PageData, TaskResultType } from '../common/types.js';
+import type { TaskResult, PageData } from '../common/types.js';
 
 /**
  * Iterates through an array of {@link TaskResult} objects, logs details for each outcome,
@@ -160,7 +160,7 @@ export function writeResultsToFile(
  * @param {string} inputFilepath - The path to the input file (e.g., "urls_to_scan.txt").
  * @param {string[]} urlsInCurrentProcessingScope - An array of all URLs that were candidates for processing
  *                                                  in the current execution batch (after any range or chunking).
- * @param {TaskResult[]} processedTaskResults - An array of {@link TaskResult} objects representing the outcomes
+ * @param {TaskResult[]} taskResults - An array of {@link TaskResult} objects representing the outcomes
  *                                             for the URLs in `urlsInCurrentProcessingScope`.
  * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages.
  * @example
@@ -201,9 +201,9 @@ export function updateInputFile(
       }
     }
 
-    const remainingUrlsInScope = urlsInCurrentProcessingScope.filter(
-      (url: string) => !successfullyProcessedUrls.has(url),
-    );
+    // const remainingUrlsInScope = urlsInCurrentProcessingScope.filter(
+    //   (url: string) => !successfullyProcessedUrls.has(url),
+    // );
 
     // For .txt files, we rewrite the file with only the remaining URLs.
     // If the original file contained URLs outside the current processing scope (e.g., due to --range),

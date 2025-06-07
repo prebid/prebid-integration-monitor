@@ -35,3 +35,7 @@ coverage
 
 # documentation
 docs/api
+
+# application generated data
+api/api.json
+store/
