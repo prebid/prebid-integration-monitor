@@ -1,6 +1,6 @@
 import { Command, Flags } from '@oclif/core';
 import { initTracer } from '../tracer.js';
-import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import loggerModule
+import { initializeLogger } from '../utils/logger.js'; // Import loggerModule
 import type { Logger as WinstonLogger } from 'winston';
 import { executeMonitoringLogic } from '../services/monitoring-service.js';
 import { AppError } from '../common/AppError.js'; // Import AppError
@@ -53,7 +53,7 @@ export default class Default extends Command {
     logger = initializeLogger(flags.logDir);
     // Example test log - consider removing or making conditional for production builds.
     logger.info(
-      'TEST_CONSOLE_OUTPUT: This is a test message from default command.',
+      'TEST_CONSOLE_OUTPUT: This is a test message from default command.'
     );
 
     try {

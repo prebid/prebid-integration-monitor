@@ -34,7 +34,7 @@ import type { Logger as WinstonLogger } from 'winston';
 export async function processFileContent(
   fileName: string,
   content: string,
-  logger: WinstonLogger,
+  logger: WinstonLogger
 ): Promise<string[]> {
   const extractedUrls = new Set<string>(); // Use Set for automatic deduplication and uniqueness
   const urlRegex = /(https?:\/\/[^\s"]+)/gi; // Regex for finding fully qualified URLs
@@ -61,7 +61,7 @@ export async function processFileContent(
             // Avoid adding if already found as FQDN
             extractedUrls.add(fullUrl);
             logger.info(
-              `Found and added schemeless domain as ${fullUrl} from ${fileName}`,
+              `Found and added schemeless domain as ${fullUrl} from ${fileName}`
             );
           }
         }
@@ -86,7 +86,7 @@ export async function processFileContent(
           data.forEach((item) => extractUrlsFromJsonRecursive(item));
         } else if (typeof data === 'object' && data !== null) {
           Object.values(data).forEach((value) =>
-            extractUrlsFromJsonRecursive(value),
+            extractUrlsFromJsonRecursive(value)
           );
         }
       }
@@ -94,7 +94,7 @@ export async function processFileContent(
       extractUrlsFromJsonRecursive(jsonData);
       if (urlsFromJson.size > 0) {
         logger.info(
-          `Extracted ${urlsFromJson.size} URLs from parsed JSON structure in ${fileName}`,
+          `Extracted ${urlsFromJson.size} URLs from parsed JSON structure in ${fileName}`
         );
         urlsFromJson.forEach((url) => extractedUrls.add(url));
       }
@@ -102,7 +102,7 @@ export async function processFileContent(
       // Use unknown for better type safety
       const parseError = e as Error;
       logger.warn(
-        `Failed to parse JSON from ${fileName}. Falling back to regex scan of raw content. Error: ${parseError.message}`,
+        `Failed to parse JSON from ${fileName}. Falling back to regex scan of raw content. Error: ${parseError.message}`
       );
       // Fallback is covered by the initial fqdnMatches scan at the beginning of the function
     }
@@ -123,19 +123,19 @@ export async function processFileContent(
             extractedUrls.add(url);
           } else if (url) {
             logger.warn(
-              `Skipping invalid or non-HTTP/S URL from CSV content in ${fileName}: "${url}"`,
+              `Skipping invalid or non-HTTP/S URL from CSV content in ${fileName}: "${url}"`
             );
           }
         }
       }
       logger.info(
-        `Extracted ${extractedUrls.size} URLs from CSV content in ${fileName} (after initial regex scan)`,
+        `Extracted ${extractedUrls.size} URLs from CSV content in ${fileName} (after initial regex scan)`
       );
     } catch (e: unknown) {
       // Use unknown for better type safety
       const csvError = e as Error;
       logger.warn(
-        `Failed to parse CSV content from ${fileName}. Error: ${csvError.message}`,
+        `Failed to parse CSV content from ${fileName}. Error: ${csvError.message}`
       );
       // Regex scan at the beginning of the function acts as a fallback
     }
@@ -166,7 +166,7 @@ export async function processFileContent(
 export async function fetchUrlsFromGitHub(
   repoUrl: string,
   numUrls: number | undefined,
-  logger: WinstonLogger,
+  logger: WinstonLogger
 ): Promise<string[]> {
   logger.info(`Attempting to fetch URLs from GitHub source: ${repoUrl}`);
 
@@ -176,7 +176,7 @@ export async function fetchUrlsFromGitHub(
     // Check if the URL is a direct link to a file view (contains /blob/)
     if (repoUrl.includes('/blob/')) {
       logger.info(
-        `Detected direct file link: ${repoUrl}. Attempting to fetch raw content.`,
+        `Detected direct file link: ${repoUrl}. Attempting to fetch raw content.`
       );
       const rawUrl = repoUrl
         .replace('github.com', 'raw.githubusercontent.com')
@@ -190,15 +190,15 @@ export async function fetchUrlsFromGitHub(
         const urlsFromFile = await processFileContent(
           fileName,
           content,
-          logger,
+          logger
         );
         urlsFromFile.forEach((url) => allExtractedUrls.add(url));
         logger.info(
-          `Extracted ${urlsFromFile.length} URLs from direct file link: ${rawUrl}`,
+          `Extracted ${urlsFromFile.length} URLs from direct file link: ${rawUrl}`
         );
       } else {
         logger.error(
-          `Failed to download content from direct file link: ${rawUrl} - Status: ${fileResponse.status} ${fileResponse.statusText}`,
+          `Failed to download content from direct file link: ${rawUrl} - Status: ${fileResponse.status} ${fileResponse.statusText}`
         );
         const errorBody = await fileResponse.text();
         logger.error(`Error body: ${errorBody}`);
@@ -210,7 +210,7 @@ export async function fetchUrlsFromGitHub(
       const repoPathMatch = repoUrl.match(/github\.com\/([^/]+\/[^/]+)/);
       if (!repoPathMatch || !repoPathMatch[1]) {
         logger.error(
-          `Invalid GitHub repository URL format: ${repoUrl}. Expected format like https://github.com/owner/repo`,
+          `Invalid GitHub repository URL format: ${repoUrl}. Expected format like https://github.com/owner/repo`
         );
         return [];
       }
@@ -218,7 +218,7 @@ export async function fetchUrlsFromGitHub(
 
       const contentsUrl = `https://api.github.com/repos/${repoPath}/contents`; // Using /contents without a subpath to list root.
       logger.info(
-        `Fetching repository root contents list from: ${contentsUrl}`,
+        `Fetching repository root contents list from: ${contentsUrl}`
       );
 
       const repoResponse: FetchResponse = await fetch(contentsUrl, {
@@ -228,7 +228,7 @@ export async function fetchUrlsFromGitHub(
       if (!repoResponse.ok) {
         logger.error(
           `Failed to fetch repository contents: ${repoResponse.status} ${repoResponse.statusText}`,
-          { url: contentsUrl },
+          { url: contentsUrl }
         );
         const errorBody = await repoResponse.text();
         logger.error(`GitHub API Error Body: ${errorBody}`);
@@ -251,7 +251,7 @@ export async function fetchUrlsFromGitHub(
 
       const targetExtensions = ['.txt', '.md', '.json'];
       logger.info(
-        `Found ${filesToProcess.length} items in the repository path. Filtering for files with extensions: ${targetExtensions.join(', ')}.`,
+        `Found ${filesToProcess.length} items in the repository path. Filtering for files with extensions: ${targetExtensions.join(', ')}.`
       );
 
       for (const item of filesToProcess) {
@@ -262,7 +262,7 @@ export async function fetchUrlsFromGitHub(
           targetExtensions.some((ext) => item.name.endsWith(ext))
         ) {
           logger.info(
-            `Fetching content for file: ${item.path} from ${item.download_url}`,
+            `Fetching content for file: ${item.path} from ${item.download_url}`
           );
           try {
             const fileResponse: FetchResponse = await fetch(item.download_url);
@@ -271,28 +271,28 @@ export async function fetchUrlsFromGitHub(
               const urlsFromFile = await processFileContent(
                 item.name,
                 content,
-                logger,
+                logger
               );
               urlsFromFile.forEach((url) => allExtractedUrls.add(url));
               logger.info(
-                `Extracted ${urlsFromFile.length} URLs from ${item.path}. Total unique URLs so far: ${allExtractedUrls.size}`,
+                `Extracted ${urlsFromFile.length} URLs from ${item.path}. Total unique URLs so far: ${allExtractedUrls.size}`
               );
             } else {
               logger.warn(
-                `Failed to download file content: ${item.path} - Status: ${fileResponse.status}`,
+                `Failed to download file content: ${item.path} - Status: ${fileResponse.status}`
               );
             }
           } catch (fileError: unknown) {
             const typedFileError = fileError as Error;
             logger.error(
               `Error fetching or processing file ${item.path}: ${typedFileError.message}`,
-              { fileUrl: item.download_url },
+              { fileUrl: item.download_url }
             );
           }
 
           if (numUrls && allExtractedUrls.size >= numUrls) {
             logger.info(
-              `Reached or exceeded URL limit of ${numUrls}. Stopping further file processing from GitHub.`,
+              `Reached or exceeded URL limit of ${numUrls}. Stopping further file processing from GitHub.`
             );
             break;
           }
@@ -302,7 +302,7 @@ export async function fetchUrlsFromGitHub(
 
     const finalUrls = Array.from(allExtractedUrls);
     logger.info(
-      `Total unique URLs extracted from GitHub before applying limit: ${finalUrls.length}`,
+      `Total unique URLs extracted from GitHub before applying limit: ${finalUrls.length}`
     );
     return numUrls ? finalUrls.slice(0, numUrls) : finalUrls;
   } catch (e: unknown) {
@@ -332,7 +332,7 @@ export async function fetchUrlsFromGitHub(
  */
 export function loadFileContents(
   filePath: string,
-  logger: WinstonLogger,
+  logger: WinstonLogger
 ): string | null {
   logger.info(`Attempting to read local file: ${filePath}`);
   try {

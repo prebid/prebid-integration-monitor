@@ -9,7 +9,7 @@ import type { Logger as WinstonLogger } from 'winston';
  */
 export async function executeMonitoringLogic(
   logger: WinstonLogger,
-  oclifLogger: (message?: string | undefined, ...args: unknown[]) => void,
+  oclifLogger: (message?: string | undefined, ...args: unknown[]) => void
 ): Promise<void> {
   const tracer = trace.getTracer('prebid-integration-monitor-tracer');
 
@@ -23,10 +23,10 @@ export async function executeMonitoringLogic(
         'child-task-span',
         async (childSpan: Span) => {
           logger.info(
-            'Inside child span, performing a task (monitoring_service)...',
+            'Inside child span, performing a task (monitoring_service)...'
           );
           oclifLogger(
-            'Inside child span, performing a task (monitoring_service)...',
+            'Inside child span, performing a task (monitoring_service)...'
           );
           childSpan.addEvent('Task processing started');
 
@@ -37,17 +37,17 @@ export async function executeMonitoringLogic(
           logger.info('Child span task complete (monitoring_service).');
           oclifLogger('Child span task complete (monitoring_service).');
           childSpan.end();
-        },
+        }
       );
 
       logger.info(
-        'Parent span continuing after child span (monitoring_service).',
+        'Parent span continuing after child span (monitoring_service).'
       );
       oclifLogger(
-        'Parent span continuing after child span (monitoring_service).',
+        'Parent span continuing after child span (monitoring_service).'
       );
       parentSpan.end();
-    },
+    }
   );
 
   logger.info('Main application processing finished (monitoring_service).');

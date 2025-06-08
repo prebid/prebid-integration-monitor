@@ -62,7 +62,7 @@ describe('stats-processing', () => {
       });
       // Assuming null is treated like undefined by the function's logic path for !versionString
       expect(
-        parseVersion(null as unknown as string),
+        parseVersion(null as unknown as string)
       ).toEqual<VersionComponents>({
         major: 0,
         minor: 0,
@@ -99,7 +99,7 @@ describe('stats-processing', () => {
       // Check logger was called for malformed strings (if they are not empty/null/undefined)
       parseVersion('xyz'); // call it
       expect(logger.instance.warn).toHaveBeenCalledWith(
-        expect.stringContaining('"xyz"'),
+        expect.stringContaining('"xyz"')
       );
     });
   });
@@ -166,7 +166,7 @@ describe('stats-processing', () => {
         dataSource,
         minCountThreshold,
         countExtractor,
-        DEFAULT_MODULE_CATEGORIES, // Use the actual imported categories
+        DEFAULT_MODULE_CATEGORIES // Use the actual imported categories
       );
 
       expect(result.bidAdapter).toEqual({ rubiconBidAdapter: 5 });
@@ -183,7 +183,7 @@ describe('stats-processing', () => {
         dataSource,
         minCountThreshold,
         countExtractor,
-        DEFAULT_MODULE_CATEGORIES,
+        DEFAULT_MODULE_CATEGORIES
       );
       expect(Object.keys(result.bidAdapter)).toHaveLength(0);
       expect(Object.keys(result.idModule)).toHaveLength(0);
@@ -198,7 +198,7 @@ describe('stats-processing', () => {
         dataSource,
         minCountThreshold,
         countExtractor,
-        DEFAULT_MODULE_CATEGORIES,
+        DEFAULT_MODULE_CATEGORIES
       );
       expect(Object.keys(result.bidAdapter)).toHaveLength(0);
       expect(Object.keys(result.idModule)).toHaveLength(0);

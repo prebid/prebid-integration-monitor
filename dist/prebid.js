@@ -30,7 +30,8 @@ let logger; // Global logger instance, initialized within prebidExplorer.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
 // to handle the dynamic nature of puppeteer-extra plugins while retaining type safety
 // for the core puppeteerVanilla methods.
-const puppeteer = addExtra(puppeteerVanilla);
+const puppeteer = addExtra(puppeteerVanilla // Changed from unknown to any
+);
 /**
  * The main entry point for the Prebid Explorer tool.
  * This asynchronous function orchestrates the entire process of:

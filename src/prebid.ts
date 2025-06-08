@@ -96,7 +96,7 @@ let logger: WinstonLogger; // Global logger instance, initialized within prebidE
 // to handle the dynamic nature of puppeteer-extra plugins while retaining type safety
 // for the core puppeteerVanilla methods.
 const puppeteer = addExtra(
-  puppeteerVanilla as any, // Changed from unknown to any
+  puppeteerVanilla as any // Changed from unknown to any
 ) as unknown as typeof puppeteerVanilla;
 
 /**
@@ -134,7 +134,7 @@ const puppeteer = addExtra(
  *   .catch(error => console.error("Prebid Explorer failed:", error));
  */
 export async function prebidExplorer(
-  options: PrebidExplorerOptions,
+  options: PrebidExplorerOptions
 ): Promise<void> {
   logger = initializeLogger(options.logDir); // Initialize the global logger
 
@@ -178,7 +178,7 @@ export async function prebidExplorer(
   // Cast puppeteer to any before calling use
   (puppeteer as any).use(blockResourcesPluginInstance); // Changed cast
   logger.info(
-    `Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`,
+    `Configured to block resource types: ${Array.from(resourcesToBlock).join(', ')}`
   );
 
   const basePuppeteerOptions: PuppeteerLaunchOptions = {
@@ -204,15 +204,15 @@ export async function prebidExplorer(
     allUrls = await fetchUrlsFromGitHub(
       options.githubRepo,
       options.numUrls,
-      logger,
+      logger
     );
     if (allUrls.length > 0) {
       logger.info(
-        `Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`,
+        `Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`
       );
     } else {
       logger.warn(
-        `No URLs found or fetched from GitHub repository: ${options.githubRepo}.`,
+        `No URLs found or fetched from GitHub repository: ${options.githubRepo}.`
       );
     }
   } else if (options.inputFile) {
@@ -224,27 +224,27 @@ export async function prebidExplorer(
         options.inputFile.substring(options.inputFile.lastIndexOf('.') + 1) ||
         'unknown';
       logger.info(
-        `Processing local file: ${options.inputFile} (detected type: ${fileType})`,
+        `Processing local file: ${options.inputFile} (detected type: ${fileType})`
       );
       allUrls = await processFileContent(
         options.inputFile,
         fileContent,
-        logger,
+        logger
       );
       if (allUrls.length > 0) {
         logger.info(
-          `Successfully loaded ${allUrls.length} URLs from local ${fileType.toUpperCase()} file: ${options.inputFile}`,
+          `Successfully loaded ${allUrls.length} URLs from local ${fileType.toUpperCase()} file: ${options.inputFile}`
         );
       } else {
         logger.warn(
-          `No URLs extracted from local ${fileType.toUpperCase()} file: ${options.inputFile}. Check file content and type handling.`,
+          `No URLs extracted from local ${fileType.toUpperCase()} file: ${options.inputFile}. Check file content and type handling.`
         );
       }
     } else {
       // loadFileContents already logs the error, but we should ensure allUrls is empty and potentially throw
       allUrls = []; // Ensure allUrls is empty if file read failed
       logger.error(
-        `Failed to load content from input file ${options.inputFile}. Cannot proceed with this source.`,
+        `Failed to load content from input file ${options.inputFile}. Cannot proceed with this source.`
       );
       // Depending on desired behavior, you might want to throw an error here
       // For now, it will proceed to the "No URLs to process" check.
@@ -252,7 +252,7 @@ export async function prebidExplorer(
   } else {
     // This case should ideally be prevented by CLI validation in scan.ts
     logger.error(
-      'No URL source provided. Either --githubRepo or inputFile argument must be specified.',
+      'No URL source provided. Either --githubRepo or inputFile argument must be specified.'
     );
     throw new Error('No URL source specified.');
   }
@@ -260,7 +260,7 @@ export async function prebidExplorer(
   // Exit if no URLs were found from the specified source.
   if (allUrls.length === 0) {
     logger.warn(
-      `No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`,
+      `No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`
     );
     return;
   }
@@ -280,7 +280,7 @@ export async function prebidExplorer(
     if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
       // Allow start = 0 for internal 0-based, but user input is 1-based
       logger.warn(
-        `Invalid range format: "${options.range}". Proceeding with all URLs. Start and end must be numbers. User input is 1-based.`,
+        `Invalid range format: "${options.range}". Proceeding with all URLs. Start and end must be numbers. User input is 1-based.`
       );
     } else {
       // Convert 1-based to 0-based indices
@@ -289,18 +289,18 @@ export async function prebidExplorer(
 
       if (start >= allUrls.length) {
         logger.warn(
-          `Start of range (${start + 1}) is beyond the total number of URLs (${allUrls.length}). No URLs to process.`,
+          `Start of range (${start + 1}) is beyond the total number of URLs (${allUrls.length}). No URLs to process.`
         );
         allUrls = [];
       } else if (start > end - 1) {
         logger.warn(
-          `Start of range (${start + 1}) is greater than end of range (${end}). Proceeding with URLs from start to end of list.`,
+          `Start of range (${start + 1}) is greater than end of range (${end}). Proceeding with URLs from start to end of list.`
         );
         allUrls = allUrls.slice(start);
       } else {
         allUrls = allUrls.slice(start, end); // end is exclusive for slice, matches 0-based end index
         logger.info(
-          `Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`,
+          `Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`
         );
       }
     }
@@ -308,7 +308,7 @@ export async function prebidExplorer(
 
   if (allUrls.length === 0) {
     logger.warn(
-      `No URLs to process after applying range or due to empty initial list. Exiting.`,
+      `No URLs to process after applying range or due to empty initial list. Exiting.`
     );
     return;
   }
@@ -338,7 +338,7 @@ export async function prebidExplorer(
       const currentChunkUrls = urlsToProcess.slice(i, i + chunkSize);
       const chunkNumber = Math.floor(i / chunkSize) + 1;
       logger.info(
-        `Processing chunk ${chunkNumber} of ${totalChunks}: URLs ${i + 1}-${Math.min(i + chunkSize, urlsToProcess.length)}`,
+        `Processing chunk ${chunkNumber} of ${totalChunks}: URLs ${i + 1}-${Math.min(i + chunkSize, urlsToProcess.length)}`
       );
 
       // Process the current chunk using either 'cluster' or 'vanilla' Puppeteer mode.
@@ -381,7 +381,7 @@ export async function prebidExplorer(
                 // though processPageTask is expected to always return a TaskResult.
                 logger.warn(
                   'A task from cluster.queue (chunked) fulfilled but with undefined/null value.',
-                  { settledResult },
+                  { settledResult }
                 );
               }
             } else if (settledResult.status === 'rejected') {
@@ -390,7 +390,7 @@ export async function prebidExplorer(
               // It's important to log this, as it might not be captured by processPageTask's own error handling.
               logger.error(
                 `A promise from cluster.queue (chunk ${chunkNumber}) was rejected. This is unexpected if processPageTask is robust.`,
-                { reason: settledResult.reason },
+                { reason: settledResult.reason }
               );
               // Optionally, create a TaskResultError here if the URL can be reliably determined.
               // const urlFromRejectedPromise = ... (this might be tricky to get reliably from the settledResult.reason)
@@ -404,7 +404,7 @@ export async function prebidExplorer(
         } catch (error: unknown) {
           logger.error(
             `An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`,
-            { error },
+            { error }
           );
           // Cast cluster to any before calling isClosed and close
           if (cluster && !(cluster as any).isClosed())
@@ -432,20 +432,20 @@ export async function prebidExplorer(
         } catch (error: unknown) {
           logger.error(
             `An error occurred during processing chunk ${chunkNumber} with vanilla Puppeteer.`,
-            { error },
+            { error }
           );
         } finally {
           if (browser) await browser.close();
         }
       }
       logger.info(
-        `Finished processing chunk ${chunkNumber} of ${totalChunks}.`,
+        `Finished processing chunk ${chunkNumber} of ${totalChunks}.`
       );
     }
   } else {
     // Process all URLs at once (no chunking)
     logger.info(
-      `Processing all ${urlsToProcess.length} URLs without chunking.`,
+      `Processing all ${urlsToProcess.length} URLs without chunking.`
     );
     if (options.puppeteerType === 'cluster') {
       const cluster: Cluster<
@@ -477,13 +477,13 @@ export async function prebidExplorer(
             } else {
               logger.warn(
                 'A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.',
-                { settledResult },
+                { settledResult }
               );
             }
           } else if (settledResult.status === 'rejected') {
             logger.error(
               'A promise from cluster.queue (non-chunked) was rejected. This is unexpected if processPageTask is robust.',
-              { reason: settledResult.reason },
+              { reason: settledResult.reason }
             );
             // Optionally, create a TaskResultError here
             // const urlFromRejectedPromise = ...
@@ -497,7 +497,7 @@ export async function prebidExplorer(
       } catch (error: unknown) {
         logger.error(
           'An unexpected error occurred during cluster processing orchestration',
-          { error },
+          { error }
         );
         // Cast cluster to any before calling isClosed and close
         if (cluster && !(cluster as any).isClosed())
@@ -524,7 +524,7 @@ export async function prebidExplorer(
       } catch (error: unknown) {
         logger.error(
           'An unexpected error occurred during vanilla Puppeteer processing',
-          { error },
+          { error }
         );
       } finally {
         if (browser) await browser.close();

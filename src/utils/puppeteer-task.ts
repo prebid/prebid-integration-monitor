@@ -159,7 +159,7 @@ export const processPageTask = async ({
         return data as PageData;
       },
       PBJS_VERSION_WAIT_TIMEOUT_MS, // Pass the constant from app-config
-      PBJS_VERSION_WAIT_INTERVAL_MS, // Pass the constant from app-config
+      PBJS_VERSION_WAIT_INTERVAL_MS // Pass the constant from app-config
     );
 
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data
@@ -176,7 +176,7 @@ export const processPageTask = async ({
       return { type: 'success', data: extractedPageData };
     } else {
       logger.warn(
-        `No relevant ad library or Prebid.js data found on ${trimmedUrl}`,
+        `No relevant ad library or Prebid.js data found on ${trimmedUrl}`
       );
       return { type: 'no_data', url: trimmedUrl };
     }

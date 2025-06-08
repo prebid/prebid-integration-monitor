@@ -29,7 +29,7 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
     };
     throw new AppError(
       `Failed to ensure directory exists: ${dirPath}`,
-      details,
+      details
     );
   }
 }
@@ -62,15 +62,15 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
  */
 export async function readDirectory(
   dirPath: string,
-  options: { withFileTypes: true },
+  options: { withFileTypes: true }
 ): Promise<Dirent[]>;
 export async function readDirectory(
   dirPath: string,
-  options?: { withFileTypes?: false },
+  options?: { withFileTypes?: false }
 ): Promise<string[]>;
 export async function readDirectory(
   dirPath: string,
-  options?: { withFileTypes?: boolean },
+  options?: { withFileTypes?: boolean }
 ): Promise<string[] | Dirent[]> {
   try {
     if (options?.withFileTypes) {
@@ -173,7 +173,7 @@ export async function readJsonFile<T>(filePath: string): Promise<T> {
  */
 export async function writeJsonFile(
   filePath: string,
-  data: any,
+  data: any
 ): Promise<void> {
   try {
     const jsonData: string = JSON.stringify(data, null, 2);

@@ -27,7 +27,7 @@ export const OUTPUT_DIR: string = path.join(PROJECT_ROOT, 'store');
 export const FINAL_API_FILE_PATH: string = path.join(
   PROJECT_ROOT,
   'api',
-  'api.json',
+  'api.json'
 );
 
 /**

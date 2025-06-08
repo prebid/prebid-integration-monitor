@@ -110,14 +110,14 @@ export function initializeLogger(logDir: string): Logger {
     format: winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.errors({ stack: true }),
-      winston.format.splat(),
+      winston.format.splat()
     ),
     transports: [
       new winston.transports.Console({
         level: process.env.LOG_LEVEL_CONSOLE || 'info',
         format: winston.format.combine(
           winston.format.colorize(),
-          winston.format.printf(formatConsoleLogMessage),
+          winston.format.printf(formatConsoleLogMessage)
         ),
       }),
       new winston.transports.File({
@@ -125,7 +125,7 @@ export function initializeLogger(logDir: string): Logger {
         level: process.env.LOG_LEVEL_APP || 'info',
         format: winston.format.combine(
           openTelemetryFormat(),
-          winston.format.json(),
+          winston.format.json()
         ),
       }),
       new winston.transports.File({
@@ -133,7 +133,7 @@ export function initializeLogger(logDir: string): Logger {
         level: 'error',
         format: winston.format.combine(
           openTelemetryFormat(),
-          winston.format.json(),
+          winston.format.json()
         ),
       }),
     ],
@@ -154,7 +154,7 @@ export default {
   get instance() {
     if (!logger) {
       throw new Error(
-        'Logger has not been initialized. Call initializeLogger(logDir) first.',
+        'Logger has not been initialized. Call initializeLogger(logDir) first.'
       );
     }
     return logger;

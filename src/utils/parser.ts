@@ -21,5 +21,5 @@ async function parsePreloadUrls(): Promise<void> {
 }
 
 parsePreloadUrls().catch((error) =>
-  logger.error('Error in parsePreloadUrls:', { error }),
+  logger.error('Error in parsePreloadUrls:', { error })
 );

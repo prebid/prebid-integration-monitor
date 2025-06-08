@@ -47,16 +47,16 @@ describe('file-system-utils', () => {
     it('should parse valid JSON string from file', async () => {
       const mockData = { key: 'value', count: 123 };
       (fsPromises.readFile as vi.Mock).mockResolvedValue(
-        JSON.stringify(mockData),
+        JSON.stringify(mockData)
       );
 
       const data = await readJsonFile<{ key: string; count: number }>(
-        'dummy/path.json',
+        'dummy/path.json'
       );
       expect(data).toEqual(mockData);
       expect(fsPromises.readFile).toHaveBeenCalledWith(
         'dummy/path.json',
-        'utf8',
+        'utf8'
       );
     });
 
@@ -73,15 +73,15 @@ describe('file-system-utils', () => {
         (error: any) => {
           expect(error).toBeInstanceOf(AppError);
           expect(error.message).toContain(
-            'Error processing JSON file dummy/path.json: Failed to read file.',
+            'Error processing JSON file dummy/path.json: Failed to read file.'
           );
           expect(error.details.originalError.message).toBe('File not found');
           return true;
-        },
+        }
       );
       expect(logger.instance.error).toHaveBeenCalledWith(
         expect.stringContaining('dummy/path.json'),
-        expect.objectContaining({ errorMessage: 'File not found' }),
+        expect.objectContaining({ errorMessage: 'File not found' })
       );
     });
   });
@@ -95,7 +95,7 @@ describe('file-system-utils', () => {
       expect(fsPromises.writeFile).toHaveBeenCalledWith(
         'output/path.json',
         JSON.stringify(mockData, null, 2),
-        'utf8',
+        'utf8'
       );
     });
 
@@ -106,11 +106,11 @@ describe('file-system-utils', () => {
         (error: any) => {
           expect(error).toBeInstanceOf(AppError);
           expect(error.message).toContain(
-            'Failed to write JSON file: output/path.json',
+            'Failed to write JSON file: output/path.json'
           );
           expect(error.details.originalError.message).toBe('Permission denied');
           return true;
-        },
+        }
       );
       expect(logger.instance.error).toHaveBeenCalled();
     });
@@ -120,15 +120,15 @@ describe('file-system-utils', () => {
       circularObj.b = circularObj; // Create circular reference
 
       await expect(
-        writeJsonFile('output/path.json', circularObj),
+        writeJsonFile('output/path.json', circularObj)
       ).rejects.toSatisfy((error: any) => {
         expect(error).toBeInstanceOf(AppError);
         expect(error.message).toContain(
-          'Failed to write JSON file: output/path.json',
+          'Failed to write JSON file: output/path.json'
         ); // The AppError message
         expect(error.details.originalError).toBeInstanceOf(TypeError); // Check original error type
         expect(error.details.originalError.message).toContain(
-          'circular structure',
+          'circular structure'
         );
         return true;
       });
@@ -152,13 +152,13 @@ describe('file-system-utils', () => {
         (error: any) => {
           expect(error).toBeInstanceOf(AppError);
           expect(error.message).toContain(
-            'Failed to ensure directory exists: new/dir',
+            'Failed to ensure directory exists: new/dir'
           );
           expect(error.details.originalError.message).toBe(
-            'Something went wrong',
+            'Something went wrong'
           );
           return true;
-        },
+        }
       );
       expect(logger.instance.error).toHaveBeenCalled();
     });
@@ -216,13 +216,13 @@ describe('file-system-utils', () => {
         (error: any) => {
           expect(error).toBeInstanceOf(AppError);
           expect(error.message).toContain(
-            'Failed to read directory: some/path',
+            'Failed to read directory: some/path'
           );
           expect(error.details.originalError.message).toBe(
-            'Directory not found',
+            'Directory not found'
           );
           return true;
-        },
+        }
       );
       expect(logger.instance.error).toHaveBeenCalled();
     });

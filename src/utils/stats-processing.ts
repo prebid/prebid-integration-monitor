@@ -163,7 +163,7 @@ import { DEFAULT_MODULE_CATEGORIES } from '../config/stats-config.js';
  *            returns `{ major: 0, minor: 0, patch: 0, preRelease: originalInputString }`.
  */
 export function parseVersion(
-  versionString: string | undefined,
+  versionString: string | undefined
 ): VersionComponents {
   if (!versionString) {
     // Optionally log if strict parsing is expected and undefined/null is an issue:
@@ -171,11 +171,11 @@ export function parseVersion(
     return { major: 0, minor: 0, patch: 0, preRelease: 'invalid' };
   }
   const match: RegExpMatchArray | null = versionString.match(
-    /^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/,
+    /^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/
   );
   if (!match) {
     logger.instance.warn(
-      `Could not parse version string: "${versionString}" into X.Y.Z format. Returning as custom preRelease.`,
+      `Could not parse version string: "${versionString}" into X.Y.Z format. Returning as custom preRelease.`
     );
     return { major: 0, minor: 0, patch: 0, preRelease: versionString };
   }
@@ -244,7 +244,7 @@ export function _categorizeModules<T>( // Made exportable for potential testing,
   dataSource: { [moduleName: string]: T },
   minCountThreshold: number,
   countExtractor: (item: T) => number,
-  moduleCategoryPredicates: Readonly<typeof DEFAULT_MODULE_CATEGORIES>, // Updated, Readonly for safety
+  moduleCategoryPredicates: Readonly<typeof DEFAULT_MODULE_CATEGORIES> // Updated, Readonly for safety
 ): CategorizedModules {
   const result: CategorizedModules = {
     bidAdapter: {},
@@ -289,13 +289,13 @@ export function _categorizeModules<T>( // Made exportable for potential testing,
  */
 export function processModuleWebsiteCounts(
   moduleWebsiteData: { [moduleName: string]: Set<string> },
-  minCountThreshold: number,
+  minCountThreshold: number
 ): ProcessedModuleWebsiteCounts {
   const categorized = _categorizeModules<Set<string>>(
     moduleWebsiteData,
     minCountThreshold,
     (dataSet: Set<string>) => dataSet.size,
-    DEFAULT_MODULE_CATEGORIES,
+    DEFAULT_MODULE_CATEGORIES
   );
   return {
     bidAdapterWebsites: categorized.bidAdapter,
@@ -316,10 +316,10 @@ export function processModuleWebsiteCounts(
  */
 export function processModuleDistribution(
   rawModuleCounts: ModuleDistribution,
-  minCountThreshold: number,
+  minCountThreshold: number
 ): ProcessedModuleDistribution {
   const sortedRawModules: string[] = Object.keys(rawModuleCounts).sort(
-    (a, b) => rawModuleCounts[b] - rawModuleCounts[a],
+    (a, b) => rawModuleCounts[b] - rawModuleCounts[a]
   );
   const sortedRawModuleCounts: ModuleDistribution = {};
   for (const moduleName of sortedRawModules) {
@@ -330,7 +330,7 @@ export function processModuleDistribution(
     sortedRawModuleCounts,
     minCountThreshold,
     (count: number) => count,
-    DEFAULT_MODULE_CATEGORIES,
+    DEFAULT_MODULE_CATEGORIES
   );
   return {
     bidAdapterInst: categorized.bidAdapter,
@@ -349,7 +349,7 @@ export function processModuleDistribution(
  * @returns Categorized version distributions.
  */
 export function processVersionDistribution(
-  rawVersionCounts: VersionDistribution,
+  rawVersionCounts: VersionDistribution
 ): ProcessedVersionDistribution {
   const releaseVersions: VersionDistribution = {};
   const buildVersions: VersionDistribution = {};
@@ -404,11 +404,11 @@ export function _processSiteEntries( // Made exportable for potential testing
   urlsWithPrebid: Set<string>,
   rawVersionCounts: VersionDistribution,
   rawModuleCounts: ModuleDistribution,
-  moduleWebsiteData: { [moduleName: string]: Set<string> },
+  moduleWebsiteData: { [moduleName: string]: Set<string> }
 ): void {
   if (!Array.isArray(siteEntries)) {
     logger.instance.warn(
-      `_processSiteEntries received non-array data for ${currentFileSourceInfo}`,
+      `_processSiteEntries received non-array data for ${currentFileSourceInfo}`
     );
     return;
   }
