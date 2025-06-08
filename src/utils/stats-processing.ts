@@ -127,13 +127,13 @@ export interface ProcessedModuleDistribution {
  *
  * @typedef {object} ProcessedVersionDistribution
  * @property {VersionDistribution} releaseVersions - Distribution of official release Prebid.js versions (e.g., "8.42.0").
- * @property {VersionDistribution} buildVersions - Distribution of Prebid.js build versions, typically ending with "-pre" (e.g., "8.42.0-pre").
+ * @property {VersionDistribution} prereleaseVersions - Distribution of Prebid.js pre-release versions (e.g., "8.42.0" from "8.42.0-pre").
  * @property {VersionDistribution} customVersions - Distribution of custom or non-standard Prebid.js versions
  *           (e.g., "8.42.0-custom", or versions not matching X.Y.Z or X.Y.Z-pre patterns).
  */
 export interface ProcessedVersionDistribution {
   releaseVersions: VersionDistribution;
-  buildVersions: VersionDistribution;
+  prereleaseVersions: VersionDistribution;
   customVersions: VersionDistribution;
 }
 
@@ -389,7 +389,7 @@ export function processVersionDistribution(
   rawVersionCounts: VersionDistribution
 ): ProcessedVersionDistribution {
   const releaseVersions: VersionDistribution = {};
-  const buildVersions: VersionDistribution = {};
+  const prereleaseVersions: VersionDistribution = {};
   const customVersions: VersionDistribution = {};
   const sortedRawVersions: string[] =
     Object.keys(rawVersionCounts).sort(compareVersions);
@@ -411,8 +411,8 @@ export function processVersionDistribution(
     } else if (parsedVersion.preRelease === 'pre') {
       // This is a build version, specifically marked with "-pre"
       // Includes X.Y.Z-pre and X.Y-pre (parsed as X.Y.0-pre)
-      const versionKey = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}-pre`;
-      buildVersions[versionKey] = count;
+      const versionKey = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`;
+      prereleaseVersions[versionKey] = count;
     } else {
       // This covers all other cases:
       // 1. Custom pre-release tags (e.g., "alpha", "beta.1", "custombuild").
@@ -440,7 +440,7 @@ export function processVersionDistribution(
       }
     }
   }
-  return { releaseVersions, buildVersions, customVersions };
+  return { releaseVersions, prereleaseVersions, customVersions };
 }
 
 /**
