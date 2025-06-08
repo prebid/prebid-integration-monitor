@@ -319,6 +319,31 @@ describe('updateAndCleanStats', () => {
           },
         ]),
       },
+      // Add a new month or file for new version formats to avoid altering existing counts too much initially
+      Apr: {
+        'data_new_formats.json': JSON.stringify([
+          {
+            url: 'http://site12.com', // New site for 9.35-pre
+            prebidInstances: [
+              {
+                version: '9.35-pre',
+                modules: ['appnexusBidAdapter', 'criteoIdSystem'],
+              },
+            ],
+          },
+          {
+            url: 'http://site13.com', // New site for v10.2-alpha
+            prebidInstances: [
+              {
+                version: 'v10.2-alpha',
+                modules: ['rubiconBidAdapter', 'sharedIdSystem'],
+              },
+            ],
+          },
+        ]),
+      },
+      // Corrected: Ensure 'Apr' is defined only once.
+      // The new data for 'Apr' is already added above, so this duplicate section is removed.
       Feb: {
         'data3.json': JSON.stringify([
           {
@@ -409,27 +434,32 @@ describe('updateAndCleanStats', () => {
 
     // Assertions from the original test plan
     assertSiteCounts(outputData, {
-      visitedSites: 11,
-      monitoredSites: 11,
-      prebidSites: 10,
+      visitedSites: 13, // Increased by 2 for site12 and site13
+      monitoredSites: 13, // Increased by 2
+      prebidSites: 12, // Increased by 2
     });
 
     assertVersionCounts(outputData, {
-      releaseVersions: { '8.2.0': 6, '8.1.0': 1, '7.53.0': 1 }, // Corrected
-      buildVersions: { '9.10.0-pre': 1 },
-      customVersions: { '1.2.3-custom': 1, '9.35': 1 }, // Corrected
+      releaseVersions: { '8.2.0': 6, '8.1.0': 1, '7.53.0': 1, '9.35.0': 1 }, // Unchanged from previous state
+      buildVersions: { '9.10.0-pre': 1, '9.35.0-pre': 1 }, // Added 9.35.0-pre
+      customVersions: { '1.2.3-custom': 1, '10.2.0-alpha': 1 }, // Added 10.2.0-alpha
     });
-    // Removed: expect(outputData.customVersions['9.35']).toBeUndefined(); // Corrected
+    // The version "9.35" should now be "9.35.0" in releaseVersions, not in customVersions.
 
     // Module counts based on MIN_COUNT_THRESHOLD = 5 (threshold from update_stats.js)
+    // Need to update module counts if the new sites affect them and they pass the threshold
+    // rubiconBidAdapter: 9 (original) + 1 (site13) = 10
+    // appnexusBidAdapter: 5 (original) + 1 (site12) = 6
+    // criteoIdSystem: 6 (original) + 1 (site12) = 7
+    // sharedIdSystem: was undefined (3, below threshold 5) + 1 (site13) = 4, still undefined.
     assertModuleInstanceCounts(outputData, {
-      bidAdapterInst: { rubiconBidAdapter: 9, appnexusBidAdapter: 5 },
-      idModuleInst: { criteoIdSystem: 6 },
+      bidAdapterInst: { rubiconBidAdapter: 10, appnexusBidAdapter: 6 },
+      idModuleInst: { criteoIdSystem: 7 },
       // analyticsAdapterInst, rtdModuleInst, otherModuleInst will be checked for absence of certain modules
     });
 
     // Assertions for modules that should be undefined (filtered out by threshold)
-    expect(outputData.idModuleInst['sharedIdSystem']).toBeUndefined();
+    expect(outputData.idModuleInst['sharedIdSystem']).toBeUndefined(); // Remains undefined (3+1=4, still < 5)
     expect(outputData.otherModuleInst['coreModuleOnly']).toBeUndefined();
     expect(outputData.rtdModuleInst['realTimeData']).toBeUndefined();
     expect(
@@ -438,24 +468,20 @@ describe('updateAndCleanStats', () => {
     expect(outputData.bidAdapterInst['nonExistentAdapter']).toBeUndefined();
     expect(outputData.otherModuleInst['belowThresholdModule']).toBeUndefined();
 
-    // Website Counts (New Assertions)
+    // Website Counts
     // MIN_COUNT_THRESHOLD = 5 also applies to website counts
     assertModuleWebsiteCounts(outputData, {
-      bidAdapterWebsites: { rubiconBidAdapter: 8, appnexusBidAdapter: 5 },
-      // idModuleWebsites, analyticsAdapterWebsites, rtdModuleWebsites, otherModuleWebsites will be checked for absence of certain modules
+      bidAdapterWebsites: { rubiconBidAdapter: 9, appnexusBidAdapter: 6 }, // rubicon: 8+1=9, appnexus: 5+1=6
+      idModuleWebsites: { criteoIdSystem: 5 }, // criteo: 4 (orig) +1 (site12) = 5. Now meets threshold.
+      // analyticsAdapterWebsites, rtdModuleWebsites, otherModuleWebsites are expected to be {} or contain modules >= threshold
     });
 
-    // Assertions for module website counts that should be undefined (filtered out by threshold)
-    // criteoIdSystem is on 4 unique sites (site1, site8, site9, site10), below threshold of 5
-    expect(outputData.idModuleWebsites['criteoIdSystem']).toBeUndefined();
-    // sharedIdSystem is on 3 unique sites (site1, site10, site11), below threshold
-    expect(outputData.idModuleWebsites['sharedIdSystem']).toBeUndefined();
-    // coreModuleOnly is on 3 unique sites (site1, site2, site6), below threshold
-    expect(outputData.otherModuleWebsites['coreModuleOnly']).toBeUndefined();
-    // anotherModule is on 1 unique site (site1), below threshold
-    expect(outputData.otherModuleWebsites['anotherModule']).toBeUndefined();
+    // Assertions for module website counts that should be undefined (filtered out by threshold for websites)
+    expect(outputData.idModuleWebsites['sharedIdSystem']).toBeUndefined(); // sharedIdSystem: 3 (orig) +1 (site13) = 4, still < 5
+    expect(outputData.otherModuleWebsites['coreModuleOnly']).toBeUndefined(); // Remains 3 (orig sites 1,2,6) < 5
+    expect(outputData.otherModuleWebsites['anotherModule']).toBeUndefined(); // Remains 1 < 5
 
-    // Check categories that should be empty based on current data
+    // Check categories that should be empty based on current data for website counts
     expect(Object.keys(outputData.rtdModuleWebsites || {}).length).toBe(0);
     expect(Object.keys(outputData.analyticsAdapterWebsites || {}).length).toBe(
       0

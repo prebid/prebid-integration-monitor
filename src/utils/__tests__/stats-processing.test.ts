@@ -25,6 +25,11 @@ vi.mock('../logger', () => ({
 }));
 
 describe('stats-processing', () => {
+  beforeEach(() => {
+    // Clear mock call history before each test
+    vi.clearAllMocks();
+  });
+
   describe('parseVersion', () => {
     it('should parse valid version strings correctly', () => {
       expect(parseVersion('1.2.3')).toEqual<VersionComponents>({
@@ -84,12 +89,13 @@ describe('stats-processing', () => {
         patch: 0,
         preRelease: 'abc',
       });
-      expect(parseVersion('1.2')).toEqual<VersionComponents>({
-        major: 0,
-        minor: 0,
-        patch: 0,
-        preRelease: '1.2',
-      });
+      // The case for '1.2' is now handled by 'should correctly parse "1.2" as major.minor'
+      // expect(parseVersion('1.2')).toEqual<VersionComponents>({
+      //   major: 0,
+      //   minor: 0,
+      //   patch: 0,
+      //   preRelease: '1.2',
+      // });
       expect(parseVersion('1.beta')).toEqual<VersionComponents>({
         major: 0,
         minor: 0,
@@ -99,8 +105,78 @@ describe('stats-processing', () => {
       // Check logger was called for malformed strings (if they are not empty/null/undefined)
       parseVersion('xyz'); // call it
       expect(logger.instance.warn).toHaveBeenCalledWith(
-        expect.stringContaining('"xyz"')
+        'Could not parse version string: "xyz" into X.Y.Z, X.Y, or X.Y-prerelease format. Returning as custom preRelease.'
       );
+    });
+
+    it('should parse major.minor-prerelease version strings correctly and not log a warning', () => {
+      const warnSpy = vi.spyOn(logger.instance, 'warn');
+      expect(parseVersion('9.35-pre')).toEqual<VersionComponents>({
+        major: 9,
+        minor: 35,
+        patch: 0,
+        preRelease: 'pre',
+      });
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should parse vMajor.minor-prerelease version strings correctly and not log a warning', () => {
+      const warnSpy = vi.spyOn(logger.instance, 'warn');
+      expect(parseVersion('v10.2-alpha.1')).toEqual<VersionComponents>({
+        major: 10,
+        minor: 2,
+        patch: 0,
+        preRelease: 'alpha.1',
+      });
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should parse major.minor version strings correctly and not log a warning', () => {
+      const warnSpy = vi.spyOn(logger.instance, 'warn');
+      expect(parseVersion('9.35')).toEqual<VersionComponents>({
+        major: 9,
+        minor: 35,
+        patch: 0,
+        preRelease: null,
+      });
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should parse vMajor.minor version strings correctly and not log a warning', () => {
+      const warnSpy = vi.spyOn(logger.instance, 'warn');
+      expect(parseVersion('v10.2')).toEqual<VersionComponents>({
+        major: 10,
+        minor: 2,
+        patch: 0,
+        preRelease: null,
+      });
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should handle major-only version strings as custom and log a warning', () => {
+      const warnSpy = vi.spyOn(logger.instance, 'warn');
+      expect(parseVersion('9')).toEqual<VersionComponents>({
+        major: 0,
+        minor: 0,
+        patch: 0,
+        preRelease: '9',
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Could not parse version string: "9" into X.Y.Z, X.Y, or X.Y-prerelease format. Returning as custom preRelease.'
+      );
+    });
+
+    // This test case was previously in 'should handle malformed version strings'
+    // It's updated to reflect the new behavior for "1.2"
+    it('should correctly parse "1.2" as major.minor and not log a warning', () => {
+      const warnSpy = vi.spyOn(logger.instance, 'warn');
+      expect(parseVersion('1.2')).toEqual<VersionComponents>({
+        major: 1,
+        minor: 2,
+        patch: 0,
+        preRelease: null,
+      });
+      expect(warnSpy).not.toHaveBeenCalled();
     });
   });
 
