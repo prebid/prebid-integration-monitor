@@ -89,13 +89,6 @@ describe('stats-processing', () => {
         patch: 0,
         preRelease: 'abc',
       });
-      // The case for '1.2' is now handled by 'should correctly parse "1.2" as major.minor'
-      // expect(parseVersion('1.2')).toEqual<VersionComponents>({
-      //   major: 0,
-      //   minor: 0,
-      //   patch: 0,
-      //   preRelease: '1.2',
-      // });
       expect(parseVersion('1.beta')).toEqual<VersionComponents>({
         major: 0,
         minor: 0,
@@ -166,7 +159,6 @@ describe('stats-processing', () => {
       );
     });
 
-    // This test case was previously in 'should handle malformed version strings'
     // It's updated to reflect the new behavior for "1.2"
     it('should correctly parse "1.2" as major.minor and not log a warning', () => {
       const warnSpy = vi.spyOn(logger.instance, 'warn');
