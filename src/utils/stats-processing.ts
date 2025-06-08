@@ -151,16 +151,27 @@ import { DEFAULT_MODULE_CATEGORIES } from '../config/stats-config.js';
 
 /**
  * Parses a Prebid.js version string into its major, minor, patch, and pre-release components.
- * Handles versions with an optional 'v' prefix and pre-release suffixes (e.g., "-pre", "-alpha.1").
+ * It attempts to match the following formats in order:
+ * 1. `vMajor.Minor-PreRelease` (e.g., "v1.2-alpha", "9.35-pre") - Patch defaults to 0.
+ * 2. `vMajor.Minor` (e.g., "v1.2", "9.35") - Patch defaults to 0, PreRelease is null.
+ * 3. `vMajor.Minor.Patch(-PreRelease)` (e.g., "v1.2.3", "7.53.0-pre")
+ * Handles an optional 'v' prefix for all formats.
  *
  * @function parseVersion
  * @param {string | undefined} versionString - The version string to parse.
- *        Examples: "7.53.0", "v8.1.0-pre", "9.0.0-alpha.1".
+ *        Examples:
+ *        - "7.53.0" -> `{ major: 7, minor: 53, patch: 0, preRelease: null }`
+ *        - "v8.1.0-pre" -> `{ major: 8, minor: 1, patch: 0, preRelease: "pre" }`
+ *        - "9.35" -> `{ major: 9, minor: 35, patch: 0, preRelease: null }`
+ *        - "v10.2" -> `{ major: 10, minor: 2, patch: 0, preRelease: null }`
+ *        - "9.35-pre" -> `{ major: 9, minor: 35, patch: 0, preRelease: "pre" }`
+ *        - "v10.2-alpha" -> `{ major: 10, minor: 2, patch: 0, preRelease: "alpha" }`
+ *        - "9.0.0-alpha.1" -> `{ major: 9, minor: 0, patch: 0, preRelease: "alpha.1" }`
  * @returns {VersionComponents} An object containing the parsed version components.
- *          If `versionString` is null, undefined, or cannot be parsed according to the expected format:
+ *          If `versionString` is null, undefined, or cannot be parsed:
  *          - For null/undefined input, returns `{ major: 0, minor: 0, patch: 0, preRelease: 'invalid' }`.
- *          - For unparseable strings (not matching `vX.Y.Z(-prerelease)`),
- *            returns `{ major: 0, minor: 0, patch: 0, preRelease: originalInputString }`.
+ *          - For unparseable strings (not matching any of the above formats like `vX.Y.Z(-prerelease)`, `vX.Y-prerelease`, or `vX.Y`),
+ *            logs a warning and returns `{ major: 0, minor: 0, patch: 0, preRelease: originalInputString }`.
  */
 export function parseVersion(
   versionString: string | undefined
@@ -170,20 +181,46 @@ export function parseVersion(
     // logger.instance.debug('parseVersion received null or undefined versionString.');
     return { major: 0, minor: 0, patch: 0, preRelease: 'invalid' };
   }
-  const match: RegExpMatchArray | null = versionString.match(
+
+  // New Regex for v?major.minor-prerelease format (e.g., 9.35-pre, v10.2-alpha)
+  const majorMinorPreReleaseMatch: RegExpMatchArray | null =
+    versionString.match(/^v?(\d+)\.(\d+)-(.*)$/);
+  if (majorMinorPreReleaseMatch) {
+    return {
+      major: parseInt(majorMinorPreReleaseMatch[1], 10),
+      minor: parseInt(majorMinorPreReleaseMatch[2], 10),
+      patch: 0, // Default patch to 0 for this format
+      preRelease: majorMinorPreReleaseMatch[3] || null, // Capture the pre-release string
+    };
+  }
+
+  // Regex for v?major.minor format (e.g., 9.35, v10.2)
+  const majorMinorMatch: RegExpMatchArray | null =
+    versionString.match(/^v?(\d+)\.(\d+)$/);
+  if (majorMinorMatch) {
+    return {
+      major: parseInt(majorMinorMatch[1], 10),
+      minor: parseInt(majorMinorMatch[2], 10),
+      patch: 0, // Default patch to 0 for major.minor versions
+      preRelease: null, // No pre-release for major.minor versions
+    };
+  }
+
+  // Existing regex for v?major.minor.patch(-prerelease) format (e.g., 7.53.0, v8.1.0-pre)
+  const fullVersionMatch: RegExpMatchArray | null = versionString.match(
     /^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/
   );
-  if (!match) {
+  if (!fullVersionMatch) {
     logger.instance.warn(
-      `Could not parse version string: "${versionString}" into X.Y.Z format. Returning as custom preRelease.`
+      `Could not parse version string: "${versionString}" into X.Y.Z, X.Y, or X.Y-prerelease format. Returning as custom preRelease.`
     );
     return { major: 0, minor: 0, patch: 0, preRelease: versionString };
   }
   return {
-    major: parseInt(match[1], 10),
-    minor: parseInt(match[2], 10),
-    patch: parseInt(match[3], 10),
-    preRelease: match[4] || null,
+    major: parseInt(fullVersionMatch[1], 10),
+    minor: parseInt(fullVersionMatch[2], 10),
+    patch: parseInt(fullVersionMatch[3], 10),
+    preRelease: fullVersionMatch[4] || null,
   };
 }
 
@@ -362,21 +399,44 @@ export function processVersionDistribution(
     const cleanedVersion: string = version.startsWith('v')
       ? version.substring(1)
       : version;
-    const originalVersionForCategorization: string = version;
 
-    if (originalVersionForCategorization.endsWith('-pre')) {
-      buildVersions[cleanedVersion] = count;
-    } else if (originalVersionForCategorization.includes('-')) {
-      customVersions[cleanedVersion] = count;
+    const parsedVersion = parseVersion(cleanedVersion); // Parse once
+
+    if (parsedVersion.preRelease === null) {
+      // This is a release version (X.Y.Z or X.Y parsed to X.Y.0)
+      // and parseVersion did not identify any pre-release tag.
+      // It also means major, minor, patch are actual numbers from parsing.
+      const versionKey = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`;
+      releaseVersions[versionKey] = count;
+    } else if (parsedVersion.preRelease === 'pre') {
+      // This is a build version, specifically marked with "-pre"
+      // Includes X.Y.Z-pre and X.Y-pre (parsed as X.Y.0-pre)
+      const versionKey = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}-pre`;
+      buildVersions[versionKey] = count;
     } else {
-      const parsedForValidation = parseVersion(cleanedVersion);
+      // This covers all other cases:
+      // 1. Custom pre-release tags (e.g., "alpha", "beta.1", "custombuild").
+      //    Format: X.Y.Z-prerelease or X.Y.0-prerelease.
+      // 2. Unparseable strings where `parseVersion` returns the original string as `preRelease`.
+      //    In this case, `parsedVersion.major/minor/patch` would be 0.
+      //    The key should be `cleanedVersion` to preserve the original unparseable string.
+      // 3. 'invalid' preRelease from null/undefined input (though these usually have count 0 or are filtered before this stage).
+
       if (
-        parsedForValidation.preRelease === null &&
-        cleanedVersion.match(/^\d+\.\d+\.\d+$/)
+        parsedVersion.major === 0 &&
+        parsedVersion.minor === 0 &&
+        parsedVersion.patch === 0 &&
+        parsedVersion.preRelease === cleanedVersion
       ) {
-        releaseVersions[cleanedVersion] = count;
-      } else {
+        // Case 2: Truly unparseable string, use cleanedVersion as key
         customVersions[cleanedVersion] = count;
+      } else if (parsedVersion.preRelease === 'invalid') {
+        // Case 3: 'invalid' from parseVersion (e.g. for null input, though unlikely here with a count)
+        customVersions[cleanedVersion] = count; // Or handle as a distinct category if needed
+      } else {
+        // Case 1: Custom pre-release tag. Format as X.Y.Z-tag or X.Y.0-tag.
+        const versionKey = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}-${parsedVersion.preRelease}`;
+        customVersions[versionKey] = count;
       }
     }
   }
