@@ -447,11 +447,6 @@ describe('updateAndCleanStats', () => {
     // The version "9.35" should now be "9.35.0" in releaseVersions, not in customVersions.
 
     // Module counts based on MIN_COUNT_THRESHOLD = 5 (threshold from update_stats.js)
-    // Need to update module counts if the new sites affect them and they pass the threshold
-    // rubiconBidAdapter: 9 (original) + 1 (site13) = 10
-    // appnexusBidAdapter: 5 (original) + 1 (site12) = 6
-    // criteoIdSystem: 6 (original) + 1 (site12) = 7
-    // sharedIdSystem: was undefined (3, below threshold 5) + 1 (site13) = 4, still undefined.
     assertModuleInstanceCounts(outputData, {
       bidAdapterInst: { rubiconBidAdapter: 10, appnexusBidAdapter: 6 },
       idModuleInst: { criteoIdSystem: 7 },
