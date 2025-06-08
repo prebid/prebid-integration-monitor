@@ -133,7 +133,7 @@ describe('updateAndCleanStats', () => {
     actualData: FinalApiData,
     expectedCounts: {
       releaseVersions: { [key: string]: number };
-      buildVersions: { [key: string]: number };
+      prereleaseVersions: { [key: string]: number };
       customVersions: { [key: string]: number };
     }
   ) {
@@ -141,9 +141,10 @@ describe('updateAndCleanStats', () => {
       actualData.releaseVersions,
       'Expected releaseVersions to match'
     ).toEqual(expectedCounts.releaseVersions);
-    expect(actualData.buildVersions, 'Expected buildVersions to match').toEqual(
-      expectedCounts.buildVersions
-    );
+    expect(
+      actualData.prereleaseVersions,
+      'Expected prereleaseVersions to match'
+    ).toEqual(expectedCounts.prereleaseVersions);
     expect(
       actualData.customVersions,
       'Expected customVersions to match'
@@ -441,7 +442,7 @@ describe('updateAndCleanStats', () => {
 
     assertVersionCounts(outputData, {
       releaseVersions: { '8.2.0': 6, '8.1.0': 1, '7.53.0': 1, '9.35.0': 1 }, // Unchanged from previous state
-      buildVersions: { '9.10.0-pre': 1, '9.35.0-pre': 1 }, // Added 9.35.0-pre
+      prereleaseVersions: { '9.10.0': 1, '9.35.0': 1 }, // Added 9.35.0-pre, suffix removed
       customVersions: { '1.2.3-custom': 1, '10.2.0-alpha': 1 }, // Added 10.2.0-alpha
     });
     // The version "9.35" should now be "9.35.0" in releaseVersions, not in customVersions.

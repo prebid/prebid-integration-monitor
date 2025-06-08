@@ -39,7 +39,7 @@ import { AppError, AppErrorDetails } from './../common/AppError.js';
  * @property {number} monitoredSites - Total number of unique URLs considered for monitoring (currently same as visitedSites).
  * @property {number} prebidSites - Total number of unique URLs where Prebid.js was detected.
  * @property {VersionDistribution} releaseVersions - Distribution of official release Prebid.js versions.
- * @property {VersionDistribution} buildVersions - Distribution of Prebid.js build versions (e.g., "-pre" suffix).
+ * @property {VersionDistribution} prereleaseVersions - Distribution of Prebid.js pre-release versions (e.g., "9.43.0" instead of "9.43.0-pre").
  * @property {VersionDistribution} customVersions - Distribution of custom or non-standard Prebid.js versions.
  * @property {ModuleDistribution} bidAdapterInst - Distribution of bid adapter modules by instance count.
  * @property {ModuleDistribution} idModuleInst - Distribution of ID system modules by instance count.
@@ -57,7 +57,7 @@ interface FinalApiData {
   monitoredSites: number;
   prebidSites: number;
   releaseVersions: VersionDistribution;
-  buildVersions: VersionDistribution;
+  prereleaseVersions: VersionDistribution;
   customVersions: VersionDistribution;
   bidAdapterInst: ModuleDistribution;
   idModuleInst: ModuleDistribution;
@@ -261,7 +261,7 @@ async function updateAndCleanStats(): Promise<void> {
       monitoredSites: parsedData.uniqueUrls.size, // Assuming all visited sites are monitored for this context
       prebidSites: parsedData.urlsWithPrebid.size,
       releaseVersions: versionStats.releaseVersions,
-      buildVersions: versionStats.buildVersions,
+      prereleaseVersions: versionStats.prereleaseVersions,
       customVersions: versionStats.customVersions,
       bidAdapterInst: moduleInstanceStats.bidAdapterInst,
       idModuleInst: moduleInstanceStats.idModuleInst,
