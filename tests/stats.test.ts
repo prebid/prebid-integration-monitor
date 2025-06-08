@@ -101,19 +101,19 @@ describe('updateAndCleanStats', () => {
       visitedSites: number;
       monitoredSites: number;
       prebidSites: number;
-    },
+    }
   ) {
     expect(
       actualData.visitedSites,
-      `Expected visitedSites to be ${expectedCounts.visitedSites}`,
+      `Expected visitedSites to be ${expectedCounts.visitedSites}`
     ).toBe(expectedCounts.visitedSites);
     expect(
       actualData.monitoredSites,
-      `Expected monitoredSites to be ${expectedCounts.monitoredSites}`,
+      `Expected monitoredSites to be ${expectedCounts.monitoredSites}`
     ).toBe(expectedCounts.monitoredSites);
     expect(
       actualData.prebidSites,
-      `Expected prebidSites to be ${expectedCounts.prebidSites}`,
+      `Expected prebidSites to be ${expectedCounts.prebidSites}`
     ).toBe(expectedCounts.prebidSites);
   }
 
@@ -135,18 +135,18 @@ describe('updateAndCleanStats', () => {
       releaseVersions: { [key: string]: number };
       buildVersions: { [key: string]: number };
       customVersions: { [key: string]: number };
-    },
+    }
   ) {
     expect(
       actualData.releaseVersions,
-      'Expected releaseVersions to match',
+      'Expected releaseVersions to match'
     ).toEqual(expectedCounts.releaseVersions);
     expect(actualData.buildVersions, 'Expected buildVersions to match').toEqual(
-      expectedCounts.buildVersions,
+      expectedCounts.buildVersions
     );
     expect(
       actualData.customVersions,
-      'Expected customVersions to match',
+      'Expected customVersions to match'
     ).toEqual(expectedCounts.customVersions);
   }
 
@@ -167,25 +167,25 @@ describe('updateAndCleanStats', () => {
    */
   function assertModuleInstanceCounts(
     actualData: FinalApiData,
-    expectedCounts: Partial<ModuleInstanceCounts>,
+    expectedCounts: Partial<ModuleInstanceCounts>
   ) {
     expect(
       actualData.bidAdapterInst,
-      'Expected bidAdapterInst to match',
+      'Expected bidAdapterInst to match'
     ).toEqual(expectedCounts.bidAdapterInst || {});
     expect(actualData.idModuleInst, 'Expected idModuleInst to match').toEqual(
-      expectedCounts.idModuleInst || {},
+      expectedCounts.idModuleInst || {}
     );
     expect(
       actualData.analyticsAdapterInst,
-      'Expected analyticsAdapterInst to match',
+      'Expected analyticsAdapterInst to match'
     ).toEqual(expectedCounts.analyticsAdapterInst || {});
     expect(actualData.rtdModuleInst, 'Expected rtdModuleInst to match').toEqual(
-      expectedCounts.rtdModuleInst || {},
+      expectedCounts.rtdModuleInst || {}
     );
     expect(
       actualData.otherModuleInst,
-      'Expected otherModuleInst to match',
+      'Expected otherModuleInst to match'
     ).toEqual(expectedCounts.otherModuleInst || {});
   }
 
@@ -205,27 +205,27 @@ describe('updateAndCleanStats', () => {
    */
   function assertModuleWebsiteCounts(
     actualData: FinalApiData,
-    expectedCounts: Partial<ModuleWebsiteCounts>,
+    expectedCounts: Partial<ModuleWebsiteCounts>
   ) {
     expect(
       actualData.bidAdapterWebsites,
-      'Expected bidAdapterWebsites to match',
+      'Expected bidAdapterWebsites to match'
     ).toEqual(expectedCounts.bidAdapterWebsites || {});
     expect(
       actualData.idModuleWebsites,
-      'Expected idModuleWebsites to match',
+      'Expected idModuleWebsites to match'
     ).toEqual(expectedCounts.idModuleWebsites || {});
     expect(
       actualData.analyticsAdapterWebsites,
-      'Expected analyticsAdapterWebsites to match',
+      'Expected analyticsAdapterWebsites to match'
     ).toEqual(expectedCounts.analyticsAdapterWebsites || {});
     expect(
       actualData.rtdModuleWebsites,
-      'Expected rtdModuleWebsites to match',
+      'Expected rtdModuleWebsites to match'
     ).toEqual(expectedCounts.rtdModuleWebsites || {});
     expect(
       actualData.otherModuleWebsites,
-      'Expected otherModuleWebsites to match',
+      'Expected otherModuleWebsites to match'
     ).toEqual(expectedCounts.otherModuleWebsites || {});
   }
 
@@ -433,7 +433,7 @@ describe('updateAndCleanStats', () => {
     expect(outputData.otherModuleInst['coreModuleOnly']).toBeUndefined();
     expect(outputData.rtdModuleInst['realTimeData']).toBeUndefined();
     expect(
-      outputData.analyticsAdapterInst['adagioAnalyticsAdapter'],
+      outputData.analyticsAdapterInst['adagioAnalyticsAdapter']
     ).toBeUndefined();
     expect(outputData.bidAdapterInst['nonExistentAdapter']).toBeUndefined();
     expect(outputData.otherModuleInst['belowThresholdModule']).toBeUndefined();
@@ -458,7 +458,7 @@ describe('updateAndCleanStats', () => {
     // Check categories that should be empty based on current data
     expect(Object.keys(outputData.rtdModuleWebsites || {}).length).toBe(0);
     expect(Object.keys(outputData.analyticsAdapterWebsites || {}).length).toBe(
-      0,
+      0
     );
   });
 

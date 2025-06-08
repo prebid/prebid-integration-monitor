@@ -1,4 +1,4 @@
-import { Command, Interfaces, Args, Flags } from '@oclif/core'; // Added Args, Flags
+import { Command, Interfaces } from '@oclif/core';
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js';
 import { scanArgs, scanFlags } from './scan-options.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import initializeLogger
@@ -50,7 +50,7 @@ export default class Scan extends Command {
    * @returns {PrebidExplorerOptions} An options object for `prebidExplorer`.
    */
   private _getPrebidExplorerOptions(
-    flags: Interfaces.InferredFlags<typeof Scan.flags>,
+    flags: Interfaces.InferredFlags<typeof Scan.flags>
   ): PrebidExplorerOptions {
     return {
       puppeteerType: flags.puppeteerType as 'vanilla' | 'cluster', // Cast ensured by flag options
@@ -86,7 +86,7 @@ export default class Scan extends Command {
   private _getInputSourceOptions(
     args: Interfaces.InferredArgs<typeof Scan.args>,
     flags: Interfaces.InferredFlags<typeof Scan.flags>,
-    options: PrebidExplorerOptions,
+    options: PrebidExplorerOptions
   ): void {
     if (flags.githubRepo) {
       this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
@@ -94,7 +94,7 @@ export default class Scan extends Command {
       // Warn if inputFile arg is provided but will be ignored (excluding default value for inputFile if that's how it's handled)
       if (args.inputFile && args.inputFile !== scanArgs.inputFile.default) {
         this.warn(
-          `--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`,
+          `--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`
         );
       }
     } else if (args.inputFile) {
@@ -105,7 +105,7 @@ export default class Scan extends Command {
       // However, as a safeguard:
       this.error(
         'No input source specified. Please provide the inputFile argument or use the --githubRepo flag.',
-        { exit: 1 },
+        { exit: 1 }
       );
     }
   }
@@ -166,11 +166,11 @@ export default class Scan extends Command {
           : error.message;
         if (error.details?.errorCode === 'PUPPETEER_LAUNCH_FAILED') {
           suggestions.push(
-            'Ensure Chrome/Chromium is installed correctly and puppeteer has permissions.',
+            'Ensure Chrome/Chromium is installed correctly and puppeteer has permissions.'
           );
         } else if (error.details?.errorCode?.includes('_FAILED')) {
           suggestions.push(
-            'This might indicate a problem with Puppeteer setup or resource accessibility.',
+            'This might indicate a problem with Puppeteer setup or resource accessibility.'
           );
         }
       } else if (error instanceof Error) {

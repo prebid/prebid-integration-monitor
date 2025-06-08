@@ -1,6 +1,6 @@
 import { Command, Flags } from '@oclif/core'; // Added Flags for consistency, though not used yet
 import { updateAndCleanStats } from '../../utils/update-stats.js';
-import loggerModule, { initializeLogger } from '../../utils/logger.js'; // Import initializeLogger
+import { initializeLogger } from '../../utils/logger.js'; // Import initializeLogger
 import { AppError } from '../../common/AppError.js';
 
 /**
@@ -79,7 +79,7 @@ export default class StatsGenerate extends Command {
               ? JSON.stringify(error.details, null, 2)
               : undefined,
             stack: error.stack,
-          },
+          }
         );
         userMessage = error.details?.errorCode
           ? `Statistics generation failed with code: ${error.details.errorCode}. Message: ${error.message}`
@@ -89,7 +89,7 @@ export default class StatsGenerate extends Command {
           error.details?.errorCode?.startsWith('FS_')
         ) {
           suggestions.push(
-            'This might be a file system or data parsing issue.',
+            'This might be a file system or data parsing issue.'
           );
         }
       } else if (error instanceof Error) {
@@ -100,7 +100,7 @@ export default class StatsGenerate extends Command {
       } else {
         logger.error(
           'An unknown error occurred during statistics generation.',
-          { errorDetail: JSON.stringify(error, null, 2) },
+          { errorDetail: JSON.stringify(error, null, 2) }
         );
       }
 

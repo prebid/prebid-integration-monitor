@@ -112,7 +112,7 @@ interface ParsedScanData {
  */
 async function readAndParseFiles(
   baseOutputDir: string,
-  monthDirRegex: RegExp,
+  monthDirRegex: RegExp
 ): Promise<ParsedScanData> {
   const rawVersionCounts: VersionDistribution = {};
   const rawModuleCounts: ModuleDistribution = {};
@@ -145,13 +145,13 @@ async function readAndParseFiles(
                   urlsWithPrebid,
                   rawVersionCounts,
                   rawModuleCounts,
-                  moduleWebsiteData,
+                  moduleWebsiteData
                 );
               } catch (parseOrReadFileError) {
                 // Errors from readJsonFile are AppErrors
                 logger.instance.warn(
                   `Skipping file due to error: ${filePath}. Error: ${(parseOrReadFileError as Error).message}`,
-                  { details: (parseOrReadFileError as AppError).details },
+                  { details: (parseOrReadFileError as AppError).details }
                 );
               }
             }
@@ -160,7 +160,7 @@ async function readAndParseFiles(
           // Errors from readDirectory are AppErrors
           logger.instance.warn(
             `Skipping directory due to reading error: ${monthDirPath}. Error: ${(monthDirReadError as Error).message}`,
-            { details: (monthDirReadError as AppError).details },
+            { details: (monthDirReadError as AppError).details }
           );
         }
       }
@@ -174,7 +174,7 @@ async function readAndParseFiles(
         errorName: err.name,
         errorMessage: err.message,
         details: err instanceof AppError ? err.details : undefined,
-      },
+      }
     );
     const errorDetails: AppErrorDetails = {
       errorCode: 'STATS_DATA_READ_ERROR',
@@ -183,7 +183,7 @@ async function readAndParseFiles(
     };
     throw new AppError(
       `Failed to read or parse stats data from ${baseOutputDir}: ${err.message}`,
-      errorDetails,
+      errorDetails
     );
   }
 
@@ -236,7 +236,7 @@ async function updateAndCleanStats(): Promise<void> {
     // Step 1: Read and parse raw data from scan files
     const parsedData: ParsedScanData = await readAndParseFiles(
       OUTPUT_DIR,
-      MONTH_ABBR_REGEX,
+      MONTH_ABBR_REGEX
     );
 
     // Step 2: Process and categorize version distributions
@@ -246,13 +246,13 @@ async function updateAndCleanStats(): Promise<void> {
     // Step 3: Process and categorize module instance distributions
     const moduleInstanceStats = processModuleDistribution(
       parsedData.rawModuleCounts,
-      MIN_COUNT_THRESHOLD,
+      MIN_COUNT_THRESHOLD
     );
 
     // Step 4: Process and categorize module website distributions
     const moduleWebsiteStats = processModuleWebsiteCounts(
       parsedData.moduleWebsiteData,
-      MIN_COUNT_THRESHOLD,
+      MIN_COUNT_THRESHOLD
     );
 
     // Step 5: Compile all processed data into the final API structure
@@ -282,7 +282,7 @@ async function updateAndCleanStats(): Promise<void> {
     // Use writeJsonFile from file-system-utils.js
     await writeJsonFile(FINAL_API_FILE_PATH, finalApiData); // This can throw AppError (FS_WRITEFILE_FAILED)
     logger.instance.info(
-      `Successfully updated statistics at ${FINAL_API_FILE_PATH}`,
+      `Successfully updated statistics at ${FINAL_API_FILE_PATH}`
     );
   } catch (err: unknown) {
     // Catch errors from readAndParseFiles, ensureDirectoryExists, writeJsonFile, or other processing steps.
@@ -296,7 +296,7 @@ async function updateAndCleanStats(): Promise<void> {
           originalErrorMsg: err.details?.originalError?.message,
           stack: err.stack,
           details: err.details,
-        },
+        }
       );
     } else if (err instanceof Error) {
       // For other native errors
@@ -306,13 +306,13 @@ async function updateAndCleanStats(): Promise<void> {
           errorName: err.name,
           errorMessage: err.message,
           stack: err.stack,
-        },
+        }
       );
     } else {
       // For unknown throw types
       logger.instance.error(
         'A critical and unknown error occurred in updateAndCleanStats.',
-        { error: err },
+        { error: err }
       );
     }
     // Rethrow to be handled by the calling command (e.g., stats/generate.ts)

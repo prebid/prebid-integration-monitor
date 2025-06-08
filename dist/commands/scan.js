@@ -1,4 +1,4 @@
-import { Command } from '@oclif/core'; // Added Args, Flags
+import { Command } from '@oclif/core';
 import { prebidExplorer } from '../prebid.js';
 import { scanArgs, scanFlags } from './scan-options.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import initializeLogger

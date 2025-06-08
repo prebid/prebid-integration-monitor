@@ -1,7 +1,7 @@
 import { Args, Command, Flags } from '@oclif/core';
 import fetch from 'node-fetch';
 import { mkdir, writeFile } from 'fs/promises';
-import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import logger & initializeLogger
+import { initializeLogger } from '../utils/logger.js'; // Import logger & initializeLogger
 import { AppError } from '../common/AppError.js';
 import * as path from 'path';
 import { URL } from 'url';
@@ -93,7 +93,7 @@ export default class Inspect extends Command {
     logger.info(`Format: ${flags.format}`);
     if (flags.filename) {
       logger.info(
-        `Custom filename specified: ${flags.filename}.${flags.format}`,
+        `Custom filename specified: ${flags.filename}.${flags.format}`
       );
     }
 
@@ -107,7 +107,7 @@ export default class Inspect extends Command {
       const response = await fetch(args.url);
       const responseBody = await response.text();
       logger.info(
-        `Received response: ${response.status} ${response.statusText}`,
+        `Received response: ${response.status} ${response.statusText}`
       );
 
       // Prepare data to be stored
@@ -187,7 +187,7 @@ export default class Inspect extends Command {
                       inspectionData as {
                         response: { headers: Record<string, string> };
                       }
-                    ).response.headers,
+                    ).response.headers
                   ).map(([name, value]) => ({ name, value })),
                   content: {
                     size: responseBody.length,
@@ -232,7 +232,7 @@ export default class Inspect extends Command {
           {
             details: JSON.stringify(error.details, null, 2),
             stack: error.stack,
-          },
+          }
         );
         userMessage = error.details?.errorCode
           ? `Inspection failed for ${args.url} with code: ${error.details.errorCode}. Message: ${error.message}`
@@ -245,13 +245,13 @@ export default class Inspect extends Command {
           `Error during inspection of ${args.url}: ${error.message}`,
           {
             stack: error.stack,
-          },
+          }
         );
         userMessage = `Error during inspection of ${args.url}: ${error.message}`;
       } else {
         currentLogger.error(
           `An unknown error occurred during inspection of ${args.url}.`,
-          { errorDetail: JSON.stringify(error, null, 2) },
+          { errorDetail: JSON.stringify(error, null, 2) }
         );
       }
 

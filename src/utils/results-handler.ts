@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path'; // Import path module for robust file path operations
 import type { Logger as WinstonLogger } from 'winston';
 // Import shared types from the new common location
-import type { TaskResult, PageData, ErrorDetails } from '../common/types.js';
+import type { TaskResult, PageData } from '../common/types.js';
 
 /**
  * Processes an array of {@link TaskResult} objects. It logs the outcome of each task
@@ -40,7 +40,7 @@ import type { TaskResult, PageData, ErrorDetails } from '../common/types.js';
  */
 export function processAndLogTaskResults(
   taskResults: TaskResult[],
-  logger: WinstonLogger,
+  logger: WinstonLogger
 ): PageData[] {
   const successfulResults: PageData[] = [];
   if (!taskResults || taskResults.length === 0) {
@@ -52,7 +52,7 @@ export function processAndLogTaskResults(
   for (const taskResult of taskResults) {
     if (!taskResult) {
       logger.warn(
-        `A task returned no result or an undefined entry in taskResults. This should ideally not happen.`,
+        `A task returned no result or an undefined entry in taskResults. This should ideally not happen.`
       );
       continue;
     }
@@ -70,14 +70,14 @@ export function processAndLogTaskResults(
       case 'no_data':
         logger.warn(
           `NO_DATA: No relevant ad tech data found for ${taskResult.url}`,
-          { url: taskResult.url },
+          { url: taskResult.url }
         );
         break;
       case 'error':
         // Log structured error details
         logger.error(
           `ERROR: Processing failed for ${taskResult.url} - Code: ${taskResult.error.code}, Msg: ${taskResult.error.message}`,
-          { url: taskResult.url, errorDetails: taskResult.error }, // errorDetails will contain code, message, and stack
+          { url: taskResult.url, errorDetails: taskResult.error } // errorDetails will contain code, message, and stack
         );
         break;
       default:
@@ -85,12 +85,12 @@ export function processAndLogTaskResults(
         const exhaustiveCheck: never = type; // TypeScript will error here if any TaskResultType is unhandled
         logger.warn(
           `Unknown task result type encountered: '${exhaustiveCheck}'`,
-          { result: taskResult },
+          { result: taskResult }
         );
     }
   }
   logger.info(
-    `Finished processing task results. ${successfulResults.length} successful extractions.`,
+    `Finished processing task results. ${successfulResults.length} successful extractions.`
   );
   return successfulResults;
 }
@@ -113,7 +113,7 @@ export function processAndLogTaskResults(
 export function writeResultsToFile(
   resultsToSave: PageData[],
   baseOutputDir: string,
-  logger: WinstonLogger,
+  logger: WinstonLogger
 ): void {
   if (!resultsToSave || resultsToSave.length === 0) {
     logger.info('No results to save to file.');
@@ -130,7 +130,7 @@ export function writeResultsToFile(
     // Create a year-month directory, e.g., "2023-01-Jan"
     const monthDir = path.join(
       baseOutputDir,
-      `${year}-${monthPadded}-${monthShort}`,
+      `${year}-${monthPadded}-${monthShort}`
     );
     if (!fs.existsSync(monthDir)) {
       fs.mkdirSync(monthDir, { recursive: true }); // Create directory recursively if it doesn't exist
@@ -143,7 +143,7 @@ export function writeResultsToFile(
     const jsonOutput = JSON.stringify(resultsToSave, null, 2); // Pretty print JSON
     fs.writeFileSync(filePath, jsonOutput + '\n', 'utf8'); // Add newline for POSIX compatibility
     logger.info(
-      `Successfully wrote ${resultsToSave.length} results to ${filePath}`,
+      `Successfully wrote ${resultsToSave.length} results to ${filePath}`
     );
   } catch (e: unknown) {
     const err = e as Error; // Cast to Error for standard properties
@@ -203,11 +203,11 @@ export function updateInputFile(
   inputFilepath: string,
   urlsInCurrentProcessingScope: string[],
   taskResults: TaskResult[],
-  logger: WinstonLogger,
+  logger: WinstonLogger
 ): void {
   if (!inputFilepath.endsWith('.txt')) {
     logger.info(
-      `Skipping modification of input file as it is not a .txt file: ${inputFilepath}`,
+      `Skipping modification of input file as it is not a .txt file: ${inputFilepath}`
     );
     return;
   }
@@ -236,7 +236,7 @@ export function updateInputFile(
         .filter((line) => line !== ''); // Filter out empty lines after trimming
 
       const currentScopeSet = new Set(
-        urlsInCurrentProcessingScope.map((url) => url.trim()),
+        urlsInCurrentProcessingScope.map((url) => url.trim())
       );
 
       finalUrlsToWrite = originalUrls.filter((url) => {
@@ -250,20 +250,20 @@ export function updateInputFile(
     } else {
       // If the input file doesn't exist, new file will contain only unsuccessful URLs from current scope
       logger.warn(
-        `Input file ${inputFilepath} not found for updating. Will create it with remaining (unsuccessful or unprocessed) URLs from current scope.`,
+        `Input file ${inputFilepath} not found for updating. Will create it with remaining (unsuccessful or unprocessed) URLs from current scope.`
       );
       finalUrlsToWrite = urlsInCurrentProcessingScope.filter(
-        (url: string) => !successfullyProcessedUrlsInScope.has(url.trim()),
+        (url: string) => !successfullyProcessedUrlsInScope.has(url.trim())
       );
     }
 
     fs.writeFileSync(
       inputFilepath,
       finalUrlsToWrite.join('\n') + (finalUrlsToWrite.length > 0 ? '\n' : ''), // Add trailing newline if not empty
-      'utf8',
+      'utf8'
     );
     logger.info(
-      `${inputFilepath} updated. ${successfullyProcessedUrlsInScope.size} URLs from current scope successfully processed and removed. ${finalUrlsToWrite.length} URLs remain or were added.`,
+      `${inputFilepath} updated. ${successfullyProcessedUrlsInScope.size} URLs from current scope successfully processed and removed. ${finalUrlsToWrite.length} URLs remain or were added.`
     );
   } catch (e: unknown) {
     const writeError = e as Error;

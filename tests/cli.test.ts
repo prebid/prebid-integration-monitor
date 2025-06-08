@@ -27,7 +27,7 @@ interface ExecResult {
  */
 function executeCommand(
   command: string,
-  cwd: string = '.',
+  cwd: string = '.'
 ): Promise<ExecResult> {
   return new Promise((resolve) => {
     // Ensure a 'production' like environment for the CLI execution
@@ -36,7 +36,7 @@ function executeCommand(
     if (env.NODE_OPTIONS) {
       env.NODE_OPTIONS = env.NODE_OPTIONS.replace(
         /--loader\s+ts-node\/esm/g,
-        '',
+        ''
       ).trim();
       if (!env.NODE_OPTIONS) delete env.NODE_OPTIONS; // Remove if empty
     }
@@ -106,7 +106,7 @@ describe('CLI Tests for Scan Command', () => {
   const customInputPath = path.join(
     projectRoot,
     'tests',
-    'custom_scan_input.txt',
+    'custom_scan_input.txt'
   );
   const dummyGithubInputFile = path.join(projectRoot, 'dummy_github_input.txt');
   // testCsvFilePath is removed as --csvFile flag is removed. Local CSVs use testInputActualCsv.
@@ -120,12 +120,12 @@ describe('CLI Tests for Scan Command', () => {
   const dummyGhInputPathConst = path.join(projectRoot, 'dummy_gh_input.txt');
   const rangeChunkInputPathConst = path.join(
     projectRoot,
-    'test_range_chunk_input.txt',
+    'test_range_chunk_input.txt'
   );
   const rangeChunkCsvPathConst = path.join(projectRoot, 'test_range_chunk.csv'); // Retained for range tests using CSV as inputFile
   const testFailedUrlsInputPathConst = path.join(
     projectRoot,
-    'test_failed_urls_input.txt',
+    'test_failed_urls_input.txt'
   ); // For AllSuite cleanup
 
   const allTestsCleanupPaths = [
@@ -196,19 +196,19 @@ describe('CLI Tests for Scan Command', () => {
       }
       expect(result.code).toBe(
         0,
-        `Command failed with code ${result.code}. Stderr: ${result.stderr}`,
+        `Command failed with code ${result.code}. Stderr: ${result.stderr}`
       );
       // Actual log message uses the relative path 'src/input.txt' as passed in options
       expect(result.stdout).toContain(
-        `Initial URLs read from src/input.txt count:`,
+        `Initial URLs read from src/input.txt count:`
       );
       const inputFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8'); // Reads src/input.txt
       expect(inputFileContent.trim()).toBe(
         '',
-        'Input file should be empty after processing',
+        'Input file should be empty after processing'
       );
     },
-    generalScanTestTimeout,
+    generalScanTestTimeout
   );
 
   /**
@@ -225,20 +225,20 @@ describe('CLI Tests for Scan Command', () => {
       createInputFile(defaultInputFilePath, ['https://example.com']); // Will create src/input.txt
       const result = await executeCommand(
         `${cliCommand} --puppeteerType=vanilla`,
-        projectRoot,
+        projectRoot
       );
 
       expect(result.code).toBe(
         0,
-        `Command failed with code ${result.code}. Stderr: ${result.stderr}`,
+        `Command failed with code ${result.code}. Stderr: ${result.stderr}`
       );
       expect(result.stdout).toContain('"puppeteerType": "vanilla"');
       // Actual log message uses the relative path 'src/input.txt'
       expect(result.stdout).toContain(
-        `Initial URLs read from src/input.txt count:`,
+        `Initial URLs read from src/input.txt count:`
       );
     },
-    generalScanTestTimeout,
+    generalScanTestTimeout
   );
 
   /**
@@ -261,16 +261,16 @@ describe('CLI Tests for Scan Command', () => {
 
       const result = await executeCommand(
         `${cliCommand} ${testInputFilePath} --outputDir=${testOutputDirPath}`,
-        projectRoot,
+        projectRoot
       );
       expect(result.code).toBe(
         0,
-        `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+        `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`
       );
 
       expect(
         fs.existsSync(testOutputDirPath),
-        'Output directory was not created',
+        'Output directory was not created'
       ).toBe(true);
 
       const now = new Date();
@@ -283,19 +283,19 @@ describe('CLI Tests for Scan Command', () => {
       if (result.stdout.includes('Results have been written to')) {
         expect(
           fs.existsSync(expectedOutputFile),
-          `Expected output file ${expectedOutputFile} was not created, but stdout indicates it should exist.`,
+          `Expected output file ${expectedOutputFile} was not created, but stdout indicates it should exist.`
         ).toBe(true);
       } else if (result.stdout.includes('No results to save.')) {
         expect(
           fs.existsSync(expectedOutputFile),
-          `Output file ${expectedOutputFile} was created, but stdout indicates no results were saved.`,
+          `Output file ${expectedOutputFile} was created, but stdout indicates no results were saved.`
         ).toBe(false);
         // Optionally, check if monthDir exists or is empty
         if (fs.existsSync(monthDir)) {
           const filesInMonthDir = fs.readdirSync(monthDir);
           expect(filesInMonthDir.length).toBe(
             0,
-            `Month directory ${monthDir} should be empty if no results are saved.`,
+            `Month directory ${monthDir} should be empty if no results are saved.`
           );
         }
       } else {
@@ -305,17 +305,17 @@ describe('CLI Tests for Scan Command', () => {
         // Defaulting to expecting the file not to exist if messages are unclear, adjust as needed.
         expect(
           fs.existsSync(expectedOutputFile),
-          `Output file ${expectedOutputFile} existence is ambiguous based on stdout.`,
+          `Output file ${expectedOutputFile} existence is ambiguous based on stdout.`
         ).toBe(false);
       }
 
       const inputFileContent = fs.readFileSync(testInputFilePath, 'utf-8'); // Reads test_input_cli.txt
       expect(inputFileContent.trim()).toBe(
         '',
-        'Input file should be empty after processing successful URLs',
+        'Input file should be empty after processing successful URLs'
       );
     },
-    generalScanTestTimeout,
+    generalScanTestTimeout
   );
 
   /**
@@ -343,16 +343,16 @@ describe('CLI Tests for Scan Command', () => {
       expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
       // Actual log message uses the relative path 'src/input.txt'
       expect(result.stdout).toContain(
-        `Initial URLs read from src/input.txt count:`,
+        `Initial URLs read from src/input.txt count:`
       );
 
       const inputFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8'); // Checks src/input.txt
       expect(inputFileContent.trim()).toBe(
         '',
-        'Default input file (src/input.txt) should be empty after processing',
+        'Default input file (src/input.txt) should be empty after processing'
       );
     },
-    generalScanTestTimeout,
+    generalScanTestTimeout
   );
 
   /**
@@ -376,28 +376,28 @@ describe('CLI Tests for Scan Command', () => {
 
       const result = await executeCommand(
         `${cliCommand} ${customInputPath}`,
-        projectRoot,
+        projectRoot
       );
 
       expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
       // Actual log message includes the resolved path and count
       expect(result.stdout).toContain(
-        `Initial URLs read from ${customInputPath} count:`,
+        `Initial URLs read from ${customInputPath} count:`
       );
 
       const customFileContent = fs.readFileSync(customInputPath, 'utf-8');
       expect(customFileContent.trim()).toBe(
         '',
-        'Custom input file should be empty after processing',
+        'Custom input file should be empty after processing'
       );
 
       // Ensure default file (src/input.txt) was not touched
       const defaultFileContent = fs.readFileSync(defaultInputFilePath, 'utf-8');
       expect(defaultFileContent.trim()).toBe(
-        'https://should-not-be-used.example.com',
+        'https://should-not-be-used.example.com'
       );
     },
-    generalScanTestTimeout,
+    generalScanTestTimeout
   );
 
   /**
@@ -415,10 +415,10 @@ describe('CLI Tests for Scan Command', () => {
       const result = await executeCommand(`${cliCommand} --help`, projectRoot);
       expect(result.code).toBe(
         0,
-        `Help command failed with code ${result.code}. Stderr: ${result.stderr}`,
+        `Help command failed with code ${result.code}. Stderr: ${result.stderr}`
       );
       expect(result.stdout).toContain(
-        'Scans websites for Prebid.js integrations.',
+        'Scans websites for Prebid.js integrations.'
       );
       expect(result.stdout).toContain('USAGE');
       expect(result.stdout).toContain('$ app scan [INPUTFILE]');
@@ -430,7 +430,7 @@ describe('CLI Tests for Scan Command', () => {
       expect(result.stdout).toContain('--githubRepo');
       expect(result.stdout).toContain('--numUrls');
     },
-    helpTestTimeout,
+    helpTestTimeout
   );
 });
 
@@ -534,30 +534,30 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`,
+          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
         );
         // Expected: url1.com, https://schemeless.from.txt.com, url2.com, url3.com/json, url4.com, url5.com
         // Note: "schemeless.from.json.org" is NOT expected as schemeless detection is for .txt only.
         expect(result.stdout).toContain(
-          `Successfully loaded 6 URLs from GitHub repository: ${MOCK_REPO_URL}`,
+          `Successfully loaded 6 URLs from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(`Total URLs to process: 6`);
         expect(fetchMock).toHaveBeenCalledTimes(4); // 1 for contents, 3 for file downloads
         expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
         expect(fetchMock.mock.calls[1][0]).toBe(
-          'https://example.com/file1.txt',
+          'https://example.com/file1.txt'
         );
         expect(fetchMock.mock.calls[2][0]).toBe(
-          'https://example.com/data.json',
+          'https://example.com/data.json'
         );
         expect(fetchMock.mock.calls[3][0]).toBe(
-          'https://example.com/ignored.md',
+          'https://example.com/ignored.md'
         );
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -604,24 +604,24 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`,
+          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          `Successfully loaded ${numUrlsToFetch} URLs from GitHub repository: ${MOCK_REPO_URL}`,
+          `Successfully loaded ${numUrlsToFetch} URLs from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process: ${numUrlsToFetch}`,
+          `Total URLs to process: ${numUrlsToFetch}`
         );
         expect(fetchMock).toHaveBeenCalledTimes(2); // 1 for contents, 1 for file1.txt
         expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
         expect(fetchMock.mock.calls[1][0]).toBe(
-          'https://example.com/file1.txt',
+          'https://example.com/file1.txt'
         );
       },
-      testTimeout,
+      testTimeout
     );
   });
 
@@ -663,21 +663,21 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // The command exits 0 but logs an error and processes 0 URLs.
         expect(result.code).toBe(
           0,
-          `Command should exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command should exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Failed to fetch repository contents: 404 Not Found`,
+          `Failed to fetch repository contents: 404 Not Found`
         );
         expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`,
+          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.',
+          'No URLs to process from GitHub. Exiting.'
         );
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -714,20 +714,20 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`,
+          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`,
+          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.',
+          'No URLs to process from GitHub. Exiting.'
         );
         expect(fetchMock).toHaveBeenCalledTimes(1);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -776,17 +776,17 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`,
+          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.',
+          'No URLs to process from GitHub. Exiting.'
         );
         expect(fetchMock).toHaveBeenCalledTimes(3); // Contents API + two file downloads
       },
-      testTimeout,
+      testTimeout
     );
   });
 
@@ -839,24 +839,24 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         // Check for the specific log message about ignoring inputFile
         expect(result.stdout).toContain(
-          `Both --githubRepo and --inputFile (or its default) were provided. --githubRepo takes precedence.`,
+          `Both --githubRepo and --inputFile (or its default) were provided. --githubRepo takes precedence.`
         );
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`,
+          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          `Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`,
+          `Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`
         );
 
         const inputFileContent = fs.readFileSync(dummyGhInputPath, 'utf-8');
         expect(inputFileContent.trim()).toBe('http://local-file-url.com');
         expect(fetchMock).toHaveBeenCalledTimes(2);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -881,17 +881,17 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // The command itself exits 0. If a hard error is required, prebidExplorer or scan.ts needs modification.
         expect(result.code).toBe(
           0,
-          `Command should exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command should exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Failed to load content from input file ${defaultInput}. Cannot proceed with this source.`,
+          `Failed to load content from input file ${defaultInput}. Cannot proceed with this source.`
         );
         expect(result.stdout).toContain(
-          `No URLs to process from InputFile. Exiting.`,
+          `No URLs to process from InputFile. Exiting.`
         );
         expect(result.stderr).toBe(''); // No actual error thrown to stderr in this specific path
       },
-      testTimeout,
+      testTimeout
     );
   });
 
@@ -954,26 +954,26 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         // Expected: http://valid-example.com, https://another-valid.example.org/path,
         // https://schemeless.example.com, https://domain.net, https://quoted.domain.org
         expect(result.stdout).toContain(
-          `Successfully loaded 5 URLs from GitHub repository: ${MOCK_REPO_URL}`,
+          `Successfully loaded 5 URLs from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(result.stdout).toContain(
-          `Found and added schemeless domain as https://schemeless.example.com from urls.txt`,
+          `Found and added schemeless domain as https://schemeless.example.com from urls.txt`
         );
         expect(result.stdout).toContain(
-          `Found and added schemeless domain as https://domain.net from urls.txt`,
+          `Found and added schemeless domain as https://domain.net from urls.txt`
         );
         expect(result.stdout).toContain(
-          `Found and added schemeless domain as https://quoted.domain.org from urls.txt`,
+          `Found and added schemeless domain as https://quoted.domain.org from urls.txt`
         );
         expect(result.stdout).toContain(`Total URLs to process: 5`);
         expect(fetchMock).toHaveBeenCalledTimes(2);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1009,25 +1009,25 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Detected direct file link: ${directJsonUrl}`,
+          `Detected direct file link: ${directJsonUrl}`
         );
         expect(result.stdout).toContain(
-          `Fetching content directly from raw URL: ${rawJsonUrl}`,
+          `Fetching content directly from raw URL: ${rawJsonUrl}`
         );
         expect(result.stdout).toContain(`Processing .json file: data.json`);
         expect(result.stdout).toContain(
-          `Extracted 2 URLs from parsed JSON structure in data.json`,
+          `Extracted 2 URLs from parsed JSON structure in data.json`
         );
         expect(result.stdout).toContain(
-          `Successfully loaded 2 URLs from GitHub repository: ${directJsonUrl}`,
+          `Successfully loaded 2 URLs from GitHub repository: ${directJsonUrl}`
         );
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(fetchMock).toHaveBeenCalledWith(rawJsonUrl);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1061,31 +1061,31 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Detected direct file link: ${directTxtUrl}`,
+          `Detected direct file link: ${directTxtUrl}`
         );
         expect(result.stdout).toContain(
-          `Fetching content directly from raw URL: ${rawTxtUrl}`,
+          `Fetching content directly from raw URL: ${rawTxtUrl}`
         );
         expect(result.stdout).toContain(
-          `Processing .txt file: domains.txt for schemeless domains.`,
+          `Processing .txt file: domains.txt for schemeless domains.`
         );
         expect(result.stdout).toContain(
-          `Found and added schemeless domain as https://direct-domain.com from domains.txt`,
+          `Found and added schemeless domain as https://direct-domain.com from domains.txt`
         );
         expect(result.stdout).toContain(
-          `Found and added schemeless domain as https://sub.direct-domain.co.uk from domains.txt`,
+          `Found and added schemeless domain as https://sub.direct-domain.co.uk from domains.txt`
         );
         // Expected: https://direct-domain.com, https://sub.direct-domain.co.uk, http://full-url.com
         expect(result.stdout).toContain(
-          `Successfully loaded 3 URLs from GitHub repository: ${directTxtUrl}`,
+          `Successfully loaded 3 URLs from GitHub repository: ${directTxtUrl}`
         );
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(fetchMock).toHaveBeenCalledWith(rawTxtUrl);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1126,21 +1126,21 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Processing .json file: malformed.json`,
+          `Processing .json file: malformed.json`
         );
         expect(result.stdout).toContain(
-          `Failed to parse JSON from malformed.json. Falling back to regex scan of raw content.`,
+          `Failed to parse JSON from malformed.json. Falling back to regex scan of raw content.`
         );
         // The fallback regex scan should find "https://fallback-url.com"
         expect(result.stdout).toContain(
-          `Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`,
+          `Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`
         );
         expect(fetchMock).toHaveBeenCalledTimes(2);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1193,19 +1193,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
 
         // Assertions
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${targetUrl}`,
+          `Fetching URLs from GitHub repository source: ${targetUrl}`
         );
         // The tool should identify it as a direct file link and transform it for the API call, then use the download_url
         expect(result.stdout).toContain(
-          `Detected direct file link: ${targetUrl}. Attempting to fetch raw content.`,
+          `Detected direct file link: ${targetUrl}. Attempting to fetch raw content.`
         );
         expect(result.stdout).toContain(
-          `Fetching content directly from raw URL: ${downloadUrl}`,
+          `Fetching content directly from raw URL: ${downloadUrl}`
         );
 
         // Check fetch mock calls
@@ -1285,19 +1285,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // Because the content is "domain1.com\ndomain2.com\ngoogle.com", and the current regex
         // `/(https?:\/\/[^\s"]+)/gi` looks for "http://" or "https://", it will not find any URLs.
         expect(result.stdout).toContain(
-          `No URLs found in content from ${downloadUrl}`,
+          `No URLs found in content from ${downloadUrl}`
         );
         expect(result.stdout).toContain(
-          `Total URLs extracted before limiting: 0`,
+          `Total URLs extracted before limiting: 0`
         );
         expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${targetUrl}`,
+          `No URLs found or fetched from GitHub repository: ${targetUrl}`
         );
         expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.',
+          'No URLs to process from GitHub. Exiting.'
         );
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1378,18 +1378,18 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
 
         // Assertions
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${targetUrl}`,
+          `Fetching URLs from GitHub repository source: ${targetUrl}`
         );
         expect(result.stdout).toContain(
-          `Detected direct file link: ${targetUrl}. Attempting to fetch raw content.`,
+          `Detected direct file link: ${targetUrl}. Attempting to fetch raw content.`
         );
         expect(result.stdout).toContain(
-          `Fetching content directly from raw URL: ${rawDownloadUrl}`,
+          `Fetching content directly from raw URL: ${rawDownloadUrl}`
         );
 
         // Verify fetch call
@@ -1404,7 +1404,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // - "https://example.com" is a URL
         // So, 2 URLs should be extracted.
         expect(result.stdout).toContain(
-          `Successfully loaded 2 URLs from GitHub repository: ${targetUrl}`,
+          `Successfully loaded 2 URLs from GitHub repository: ${targetUrl}`
         );
         expect(result.stdout).toContain(`Total URLs to process: 2`);
 
@@ -1415,7 +1415,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // expect(result.stdout).toContain(`No URLs found or fetched from GitHub repository: ${targetUrl}`);
         // expect(result.stdout).toContain("No URLs to process from GitHub. Exiting.");
       },
-      testTimeout,
+      testTimeout
     );
   });
 
@@ -1465,19 +1465,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
 
         // Check for stdout messages
         expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${githubFileUrl}`,
+          `Fetching URLs from GitHub repository source: ${githubFileUrl}`
         );
         expect(result.stdout).toContain(
-          `Detected direct file link: ${githubFileUrl}. Attempting to fetch raw content.`,
+          `Detected direct file link: ${githubFileUrl}. Attempting to fetch raw content.`
         );
         // The raw URL will be like: https://raw.githubusercontent.com/zer0h/top-1000000-domains/master/top-10000-domains
         expect(result.stdout).toMatch(
-          /Fetching content directly from raw URL: https:\/\/raw\.githubusercontent\.com\/zer0h\/top-1000000-domains\/master\/top-10000-domains/,
+          /Fetching content directly from raw URL: https:\/\/raw\.githubusercontent\.com\/zer0h\/top-1000000-domains\/master\/top-10000-domains/
         );
         // It should extract URLs from the file. The file contains domain names, which are not full URLs.
         // The regex /(https?:\/\/[^\s"]+)/gi will NOT match simple domain names like "google.com".
@@ -1489,19 +1489,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // If the intention was to treat each line as a URL, the regex or processing logic in prebid.ts would need to change.
         // For now, we test the current behavior.
         expect(result.stdout).toContain(
-          `No URLs found in content from https://raw.githubusercontent.com/zer0h/top-1000000-domains/master/top-10000-domains`,
+          `No URLs found in content from https://raw.githubusercontent.com/zer0h/top-1000000-domains/master/top-10000-domains`
         );
         expect(result.stdout).toContain(
-          `Total URLs extracted before limiting: 0`,
+          `Total URLs extracted before limiting: 0`
         );
         expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${githubFileUrl}.`,
+          `No URLs found or fetched from GitHub repository: ${githubFileUrl}.`
         );
         expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.',
+          'No URLs to process from GitHub. Exiting.'
         ); // Corrected message
       },
-      networkTestTimeout,
+      networkTestTimeout
     );
   });
 
@@ -1514,7 +1514,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     const testTimeout = 20000; // Adjusted timeout for these tests, can be tuned
     const testInputFilePath = path.join(
       projectRoot,
-      'test_range_chunk_input.txt',
+      'test_range_chunk_input.txt'
     );
     const testCsvFilePath = path.join(projectRoot, 'test_range_chunk.csv'); // For CSV specific range/chunk tests
     const rangeAndChunkTestPaths = [testInputFilePath, testCsvFilePath];
@@ -1560,15 +1560,15 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         }
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 5`);
         expect(result.stdout).toContain(`Applying range: 2-4`);
         expect(result.stdout).toContain(
-          `Applied range: Processing URLs from 2 to 4 (0-based index 1 to 3). Total URLs after range: 3 (out of 5)`,
+          `Applied range: Processing URLs from 2 to 4 (0-based index 1 to 3). Total URLs after range: 3 (out of 5)`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 3`,
+          `Total URLs to process after range check: 3`
         );
         // Check options passed to prebidExplorer
         expect(result.stdout).toMatch(/"range": "2-4"/);
@@ -1580,7 +1580,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         // expect(result.stdout).not.toContain('Processing: https://url1.com');
         // expect(result.stdout).not.toContain('Processing: https://url5.com');
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1608,19 +1608,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 5`);
         expect(result.stdout).toContain(`Applying range: 3-`);
         expect(result.stdout).toContain(
-          `Applied range: Processing URLs from 3 to 5 (0-based index 2 to 4). Total URLs after range: 3 (out of 5)`,
+          `Applied range: Processing URLs from 3 to 5 (0-based index 2 to 4). Total URLs after range: 3 (out of 5)`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 3`,
+          `Total URLs to process after range check: 3`
         );
         expect(result.stdout).toMatch(/"range": "3-"/);
       },
-      testTimeout * 2,
+      testTimeout * 2
     ); // Increased timeout
 
     /**
@@ -1648,19 +1648,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 5`);
         expect(result.stdout).toContain(`Applying range: -2`);
         expect(result.stdout).toContain(
-          `Applied range: Processing URLs from 1 to 2 (0-based index 0 to 1). Total URLs after range: 2 (out of 5)`,
+          `Applied range: Processing URLs from 1 to 2 (0-based index 0 to 1). Total URLs after range: 2 (out of 5)`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 2`,
+          `Total URLs to process after range check: 2`
         );
         expect(result.stdout).toMatch(/"range": "-2"/);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1687,27 +1687,27 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 5`);
         expect(result.stdout).toContain(`Applying range: 100-110`);
         expect(result.stdout).toContain(
-          `Start of range (100) is beyond the total number of URLs (5). No URLs to process.`,
+          `Start of range (100) is beyond the total number of URLs (5). No URLs to process.`
         );
         // The message "Total URLs after range: 0 (out of 5)" is not explicitly logged when start is out of bounds.
         // Instead, it directly logs "No URLs to process after applying range..."
         expect(result.stdout).not.toContain(
-          `Total URLs after range: 0 (out of 5)`,
+          `Total URLs after range: 0 (out of 5)`
         );
         expect(result.stdout).toContain(
-          `No URLs to process after applying range or due to empty initial list. Exiting.`,
+          `No URLs to process after applying range or due to empty initial list. Exiting.`
         );
         // Ensure it doesn't try to process anything
         expect(result.stdout).not.toContain(
-          `Total URLs to process after range check:`,
+          `Total URLs to process after range check:`
         );
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1732,20 +1732,20 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 3`);
         expect(result.stdout).toContain(`Applying range: abc`);
         expect(result.stdout).toContain(
-          `Invalid range format: "abc". Proceeding with all URLs.`,
+          `Invalid range format: "abc". Proceeding with all URLs.`
         );
         // It should then proceed with all 3 URLs
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 3`,
+          `Total URLs to process after range check: 3`
         );
         expect(result.stdout).toMatch(/"range": "abc"/); // The invalid flag is still passed in options
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1772,23 +1772,23 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 3`);
         expect(result.stdout).toContain(`Applying range: 1-2-3`);
         // Current behavior: "1-2-3" is parsed as range 1-2.
         expect(result.stdout).not.toContain(
-          `Invalid range format: "1-2-3". Proceeding with all URLs.`,
+          `Invalid range format: "1-2-3". Proceeding with all URLs.`
         );
         expect(result.stdout).toContain(
-          `Applied range: Processing URLs from 1 to 2 (0-based index 0 to 1). Total URLs after range: 2 (out of 3).`,
+          `Applied range: Processing URLs from 1 to 2 (0-based index 0 to 1). Total URLs after range: 2 (out of 3).`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 2`,
+          `Total URLs to process after range check: 2`
         );
         expect(result.stdout).toMatch(/"range": "1-2-3"/); // The flag value itself is still passed as "1-2-3"
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1814,31 +1814,31 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(
-          `Processing local file: ${testInputActualCsv} (detected type: csv)`,
+          `Processing local file: ${testInputActualCsv} (detected type: csv)`
         );
         expect(result.stdout).toContain(
-          `Successfully loaded 5 URLs from local CSV file: ${testInputActualCsv}`,
+          `Successfully loaded 5 URLs from local CSV file: ${testInputActualCsv}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 5`);
         expect(result.stdout).toContain(`Applying range: 2-4`);
         expect(result.stdout).toContain(
-          `Applied range: Processing URLs from 2 to 4 (0-based index 1 to 3). Total URLs after range: 3 (out of 5)`,
+          `Applied range: Processing URLs from 2 to 4 (0-based index 1 to 3). Total URLs after range: 3 (out of 5)`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 3`,
+          `Total URLs to process after range check: 3`
         );
         expect(result.stdout).toMatch(/"range": "2-4"/);
         expect(result.stdout).toContain(
-          `Skipping modification of original CSV input file: ${testInputActualCsv}`,
+          `Skipping modification of original CSV input file: ${testInputActualCsv}`
         );
 
         const fileContent = fs.readFileSync(testInputActualCsv, 'utf-8');
         expect(fileContent.trim()).toBe(csvContent.trim()); // File should not be emptied
       },
-      testTimeout * 2,
+      testTimeout * 2
     ); // Increased timeout
 
     // --- Tests for --chunkSize --- (These should be fine, just ensure they use inputFile for local files)
@@ -1856,7 +1856,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
       async () => {
         const urls = Array.from(
           { length: 10 },
-          (_, i) => `https://url${i + 1}.com`,
+          (_, i) => `https://url${i + 1}.com`
         );
         createInputFile(testInputFilePath, urls);
         const command = `${cliCommand} ${testInputFilePath} --chunkSize 3`;
@@ -1864,15 +1864,15 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 10`);
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 10`,
+          `Total URLs to process after range check: 10`
         );
         expect(result.stdout).toMatch(/"chunkSize": 3/);
         expect(result.stdout).toContain(
-          `Chunked processing enabled. Chunk size: 3`,
+          `Chunked processing enabled. Chunk size: 3`
         );
         expect(result.stdout).toContain(`Total chunks to process: 4`); // 10 / 3 = 3.33 -> 4 chunks
         expect(result.stdout).toContain(`Processing chunk 1 of 4: URLs 1-3`);
@@ -1885,7 +1885,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         expect(result.stdout).toContain(`Finished processing chunk 4 of 4`);
         // Potentially check that all 10 URLs were mentioned in "Processing:" logs if reliable
       },
-      testTimeout * 6,
+      testTimeout * 6
     ); // Further Increased timeout to 120s
 
     /**
@@ -1911,21 +1911,21 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 3`);
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 3`,
+          `Total URLs to process after range check: 3`
         );
         expect(result.stdout).toMatch(/"chunkSize": 10/);
         expect(result.stdout).toContain(
-          `Chunked processing enabled. Chunk size: 10`,
+          `Chunked processing enabled. Chunk size: 10`
         );
         expect(result.stdout).toContain(`Total chunks to process: 1`);
         expect(result.stdout).toContain(`Processing chunk 1 of 1: URLs 1-3`);
         expect(result.stdout).toContain(`Finished processing chunk 1 of 1`);
       },
-      testTimeout,
+      testTimeout
     );
 
     /**
@@ -1951,19 +1951,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 3`);
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 3`,
+          `Total URLs to process after range check: 3`
         );
         expect(result.stdout).not.toContain(`Chunked processing enabled`);
         expect(result.stdout).not.toContain(`Processing chunk`);
         expect(result.stdout).toContain(
-          `Processing all 3 URLs without chunking.`,
+          `Processing all 3 URLs without chunking.`
         );
       },
-      testTimeout,
+      testTimeout
     );
 
     // --- Tests for --range and --chunkSize combined ---
@@ -1976,7 +1976,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
       async () => {
         const urls = Array.from(
           { length: 20 },
-          (_, i) => `https://url${i + 1}.com`,
+          (_, i) => `https://url${i + 1}.com`
         );
         createInputFile(testInputFilePath, urls);
         // Range 5-15 (1-based) means indices 4-14 (0-based), so url5 to url15. Total 11 URLs.
@@ -1986,21 +1986,21 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         expect(result.stdout).toContain(`Initial total URLs found: 20`);
         expect(result.stdout).toContain(`Applying range: 5-15`);
         expect(result.stdout).toContain(
-          `Applied range: Processing URLs from 5 to 15 (0-based index 4 to 14). Total URLs after range: 11 (out of 20)`,
+          `Applied range: Processing URLs from 5 to 15 (0-based index 4 to 14). Total URLs after range: 11 (out of 20)`
         );
         expect(result.stdout).toContain(
-          `Total URLs to process after range check: 11`,
+          `Total URLs to process after range check: 11`
         );
         expect(result.stdout).toMatch(/"range": "5-15"/);
         expect(result.stdout).toMatch(/"chunkSize": 4/);
 
         expect(result.stdout).toContain(
-          `Chunked processing enabled. Chunk size: 4`,
+          `Chunked processing enabled. Chunk size: 4`
         );
         expect(result.stdout).toContain(`Total chunks to process: 3`); // 11 / 4 = 2.75 -> 3 chunks
 
@@ -2013,7 +2013,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         expect(result.stdout).toContain(`Processing chunk 3 of 3: URLs 9-11`); // Processes last 3 of the 11 ranged URLs
         expect(result.stdout).toContain(`Finished processing chunk 3 of 3`);
       },
-      testTimeout * 4,
+      testTimeout * 4
     ); // Further Increased timeout to 80s
   });
 
@@ -2035,7 +2035,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
       // Cleanup the new local CSV if it exists from a previous run
       const testDomainsOnlyCsvPath = path.join(
         projectRoot,
-        'test_domains_only.csv',
+        'test_domains_only.csv'
       );
       cleanupTestArtifacts([testDomainsOnlyCsvPath]);
     });
@@ -2045,7 +2045,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
       // Cleanup the new local CSV after each test
       const testDomainsOnlyCsvPath = path.join(
         projectRoot,
-        'test_domains_only.csv',
+        'test_domains_only.csv'
       );
       cleanupTestArtifacts([testDomainsOnlyCsvPath]);
     });
@@ -2067,7 +2067,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
       async () => {
         const testDomainsOnlyCsvPath = path.join(
           projectRoot,
-          'test_domains_only.csv',
+          'test_domains_only.csv'
         );
         const csvContent = 'domain\ngoogle.com\nexample.com\nyoutube.com';
         fs.writeFileSync(testDomainsOnlyCsvPath, csvContent);
@@ -2078,25 +2078,25 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
         // Check for local file processing messages
         expect(result.stdout).toContain(
-          `Reading local CSV file: ${testDomainsOnlyCsvPath}`,
+          `Reading local CSV file: ${testDomainsOnlyCsvPath}`
         );
         // This is the key assertion: 0 URLs should be loaded because domains don't match the URL regex
         expect(result.stdout).toContain(
-          `Extracted 0 URLs from CSV: ${testDomainsOnlyCsvPath}`,
+          `Extracted 0 URLs from CSV: ${testDomainsOnlyCsvPath}`
         );
         // Check for appropriate exit message
         expect(result.stdout).toContain(
-          'No URLs to process from CSV. Exiting.',
+          'No URLs to process from CSV. Exiting.'
         );
 
         // Ensure no actual errors in stderr, warnings in stdout are expected
         expect(result.stderr).toBe('');
       },
-      networkTestTimeout,
+      networkTestTimeout
     ); // networkTestTimeout might be overkill now but safe
 
     /**
@@ -2121,41 +2121,41 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
         expect(result.code).toBe(
           0,
-          `Command should still exit 0 for graceful handling. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+          `Command should still exit 0 for graceful handling. Stderr: ${result.stderr} Stdout: ${result.stdout}`
         );
 
         // Check for stdout messages
         expect(result.stdout).toContain(
-          `Fetching URLs from CSV source: ${nonExistentGithubCsvUrl}`,
+          `Fetching URLs from CSV source: ${nonExistentGithubCsvUrl}`
         );
         expect(result.stdout).toContain(
-          `Detected remote CSV URL: ${nonExistentGithubCsvUrl}`,
+          `Detected remote CSV URL: ${nonExistentGithubCsvUrl}`
         );
         // Expect transformation attempt
         const expectedRawUrl =
           'https://raw.githubusercontent.com/completely/nonexistent/repo/main/somefilethatdoesnotexist.csv';
         expect(result.stdout).toContain(
-          `Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`,
+          `Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`
         );
 
         // Expect failure to download
         expect(result.stdout).toContain(
-          `Failed to download CSV content from ${expectedRawUrl}: 404 Not Found`,
+          `Failed to download CSV content from ${expectedRawUrl}: 404 Not Found`
         );
         // Allow for slight variations in the "Error body" message, e.g., "404: Not Found" or just "Not Found"
         expect(result.stdout).toMatch(/Error body: (404: )?Not Found/);
 
         expect(result.stdout).toContain(
-          `No URLs found or fetched from CSV file: ${nonExistentGithubCsvUrl}.`,
+          `No URLs found or fetched from CSV file: ${nonExistentGithubCsvUrl}.`
         );
         expect(result.stdout).toContain(
-          'No URLs to process from CSV. Exiting.',
+          'No URLs to process from CSV. Exiting.'
         );
 
         // Ensure no actual errors in stderr (warnings in stdout are expected)
         expect(result.stderr).toBe('');
       },
-      networkTestTimeout,
+      networkTestTimeout
     ); // Use the existing networkTestTimeout
   });
 
@@ -2171,7 +2171,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     const testTimeout = 20000; // Standard timeout for these tests
     const localTestOutputDirPath = path.join(
       projectRoot,
-      'test_output_local_files',
+      'test_output_local_files'
     ); // Specific output for this suite
 
     // Define common paths for this suite
@@ -2179,11 +2179,11 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     const testInputActualCsv = path.join(projectRoot, 'test_input_actual.csv');
     const testInputActualJson = path.join(
       projectRoot,
-      'test_input_actual.json',
+      'test_input_actual.json'
     );
     const testFailedUrlsInputPath = path.join(
       projectRoot,
-      'test_failed_urls_input.txt',
+      'test_failed_urls_input.txt'
     );
 
     // testOutputDirPath is defined globally, using localTestOutputDirPath for this suite to avoid conflicts if needed
@@ -2242,7 +2242,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
 
           const remainingContent = fs
@@ -2265,7 +2265,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             /([\d]+) URLs successfully processed and removed. ([\d]+) URLs remain in current scope \(includes unprocessed or failed\)/;
           const match = result.stdout.match(logRegex);
           expect(match).not.toBeNull(
-            `Log message not found or did not match. Stdout: ${result.stdout}`,
+            `Log message not found or did not match. Stdout: ${result.stdout}`
           );
           if (match) {
             expect(match[1]).toBe('2'); // Successfully processed
@@ -2273,10 +2273,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
           }
           // Check for the specific file update log
           expect(result.stdout).toContain(
-            `${testFailedUrlsInputPath} updated.`,
+            `${testFailedUrlsInputPath} updated.`
           );
         },
-        generalScanTestTimeout * 2,
+        generalScanTestTimeout * 2
       ); // Allow more time due to multiple URLs and potential timeouts
 
       /**
@@ -2302,30 +2302,30 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualTxt}`,
+            `Using input file: ${testInputActualTxt}`
           );
           // The message from prebid.ts is "Successfully loaded X URLs from local TXT file: path/to/file.txt"
           // However, the initial log from scan.ts uses the file type from extension.
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualTxt} (detected type: txt)`,
+            `Processing local file: ${testInputActualTxt} (detected type: txt)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${urls.length} URLs from local TXT file: ${testInputActualTxt}`,
+            `Successfully loaded ${urls.length} URLs from local TXT file: ${testInputActualTxt}`
           );
           expect(result.stdout).toContain(
-            `Total URLs to process after range check: ${urls.length}`,
+            `Total URLs to process after range check: ${urls.length}`
           );
 
           const inputFileContent = fs.readFileSync(testInputActualTxt, 'utf-8');
           expect(inputFileContent.trim()).toBe(
             '',
-            'TXT input file should be empty after processing',
+            'TXT input file should be empty after processing'
           );
         },
-        testTimeout,
+        testTimeout
       );
     });
 
@@ -2363,37 +2363,37 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualCsv}`,
+            `Using input file: ${testInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualCsv} (detected type: csv)`,
+            `Processing local file: ${testInputActualCsv} (detected type: csv)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${expectedValidUrls} URLs from local CSV file: ${testInputActualCsv}`,
+            `Successfully loaded ${expectedValidUrls} URLs from local CSV file: ${testInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Skipping invalid or non-HTTP/S URL from CSV content in ${testInputActualCsv}: "not_a_url"`,
+            `Skipping invalid or non-HTTP/S URL from CSV content in ${testInputActualCsv}: "not_a_url"`
           );
           expect(result.stdout).toContain(
-            `Skipping invalid or non-HTTP/S URL from CSV content in ${testInputActualCsv}: "ftp://ignored.com"`,
+            `Skipping invalid or non-HTTP/S URL from CSV content in ${testInputActualCsv}: "ftp://ignored.com"`
           );
           expect(result.stdout).toContain(
-            `Total URLs to process after range check: ${expectedValidUrls}`,
+            `Total URLs to process after range check: ${expectedValidUrls}`
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original CSV input file: ${testInputActualCsv}`,
+            `Skipping modification of original CSV input file: ${testInputActualCsv}`
           );
 
           const inputFileContent = fs.readFileSync(testInputActualCsv, 'utf-8');
           expect(inputFileContent.trim()).toBe(
             csvContent.trim(),
-            'CSV input file should NOT be empty after processing',
+            'CSV input file should NOT be empty after processing'
           );
         },
-        testTimeout,
+        testTimeout
       );
     });
 
@@ -2423,34 +2423,34 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualJson}`,
+            `Using input file: ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualJson} (detected type: json)`,
+            `Processing local file: ${testInputActualJson} (detected type: json)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${urls.length} URLs from local JSON file: ${testInputActualJson}`,
+            `Successfully loaded ${urls.length} URLs from local JSON file: ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Total URLs to process after range check: ${urls.length}`,
+            `Total URLs to process after range check: ${urls.length}`
           );
 
           const inputFileContent = fs.readFileSync(
             testInputActualJson,
-            'utf-8',
+            'utf-8'
           );
           expect(inputFileContent.trim()).toBe(
             JSON.stringify(urls),
-            'JSON input file should NOT be empty after processing',
+            'JSON input file should NOT be empty after processing'
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original JSON input file: ${testInputActualJson}`,
+            `Skipping modification of original JSON input file: ${testInputActualJson}`
           );
         },
-        testTimeout,
+        testTimeout
       );
 
       /**
@@ -2481,7 +2481,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
           };
           fs.writeFileSync(
             testInputActualJson,
-            JSON.stringify(jsonObj, null, 2),
+            JSON.stringify(jsonObj, null, 2)
           );
           const expectedValidUrls = 5; // json-obj1, json-obj2, json-obj3, json-obj-in-array, another-in-array
 
@@ -2490,37 +2490,37 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualJson}`,
+            `Using input file: ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualJson} (detected type: json)`,
+            `Processing local file: ${testInputActualJson} (detected type: json)`
           );
           expect(result.stdout).toContain(
-            `Extracted ${expectedValidUrls} URLs from parsed JSON structure in ${testInputActualJson}`,
+            `Extracted ${expectedValidUrls} URLs from parsed JSON structure in ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${expectedValidUrls} URLs from local JSON file: ${testInputActualJson}`,
+            `Successfully loaded ${expectedValidUrls} URLs from local JSON file: ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Total URLs to process after range check: ${expectedValidUrls}`,
+            `Total URLs to process after range check: ${expectedValidUrls}`
           );
 
           const inputFileContent = fs.readFileSync(
             testInputActualJson,
-            'utf-8',
+            'utf-8'
           );
           expect(inputFileContent.trim()).toBe(
             JSON.stringify(jsonObj, null, 2),
-            'JSON input file should NOT be empty after processing',
+            'JSON input file should NOT be empty after processing'
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original JSON input file: ${testInputActualJson}`,
+            `Skipping modification of original JSON input file: ${testInputActualJson}`
           );
         },
-        testTimeout,
+        testTimeout
       );
 
       /**
@@ -2547,38 +2547,38 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualJson}`,
+            `Using input file: ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualJson} (detected type: json)`,
+            `Processing local file: ${testInputActualJson} (detected type: json)`
           );
           expect(result.stdout).toContain(
-            `Failed to parse JSON from ${testInputActualJson}. Falling back to regex scan of raw content.`,
+            `Failed to parse JSON from ${testInputActualJson}. Falling back to regex scan of raw content.`
           );
           // Regex scan is expected to find both "http://malformed-key.com" and "https://fallback-in-malformed.com"
           expect(result.stdout).toContain(
-            `Successfully loaded 2 URLs from local JSON file: ${testInputActualJson}`,
+            `Successfully loaded 2 URLs from local JSON file: ${testInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Total URLs to process after range check: 2`,
+            `Total URLs to process after range check: 2`
           );
 
           const inputFileContent = fs.readFileSync(
             testInputActualJson,
-            'utf-8',
+            'utf-8'
           );
           expect(inputFileContent.trim()).toBe(
             malformedJsonContent.trim(),
-            'Malformed JSON input file should NOT be empty after processing',
+            'Malformed JSON input file should NOT be empty after processing'
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original JSON input file: ${testInputActualJson}`,
+            `Skipping modification of original JSON input file: ${testInputActualJson}`
           );
         },
-        testTimeout,
+        testTimeout
       );
     });
 
@@ -2603,19 +2603,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualTxt}`,
+            `Using input file: ${testInputActualTxt}`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${urls.length} URLs from local TXT file: ${testInputActualTxt}`,
+            `Successfully loaded ${urls.length} URLs from local TXT file: ${testInputActualTxt}`
           );
           expect(result.stdout).not.toContain(
-            'Fetching URLs from GitHub repository',
+            'Fetching URLs from GitHub repository'
           );
         },
-        testTimeout,
+        testTimeout
       );
 
       // This test replaces the old "--csvFile over inputFile"
@@ -2643,28 +2643,28 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
           expect(result.code).toBe(
             0,
-            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`,
+            `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualCsv}`,
+            `Using input file: ${testInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualCsv} (detected type: csv)`,
+            `Processing local file: ${testInputActualCsv} (detected type: csv)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${csvUrls.length} URLs from local CSV file: ${testInputActualCsv}`,
+            `Successfully loaded ${csvUrls.length} URLs from local CSV file: ${testInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original CSV input file: ${testInputActualCsv}`,
+            `Skipping modification of original CSV input file: ${testInputActualCsv}`
           );
 
           const csvFileContent = fs.readFileSync(testInputActualCsv, 'utf-8');
           expect(csvFileContent.trim()).toBe(
             csvContent.trim(),
-            'CSV file used as inputFile should not be emptied.',
+            'CSV file used as inputFile should not be emptied.'
           );
         },
-        testTimeout,
+        testTimeout
       );
     });
   }); // Added for the main describe block

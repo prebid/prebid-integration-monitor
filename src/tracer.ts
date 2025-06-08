@@ -99,7 +99,7 @@ export const initTracer = () => {
     });
 
     logger.info(
-      'OpenTelemetry NodeSDK initialized with OTLP and Console exporters. Auto-instrumentations are enabled. Attempting to start SDK...',
+      'OpenTelemetry NodeSDK initialized with OTLP and Console exporters. Auto-instrumentations are enabled. Attempting to start SDK...'
     );
     sdk.start(); // Activates the SDK.
     logger.info('OpenTelemetry NodeSDK started successfully.');
@@ -127,7 +127,7 @@ process.on('SIGTERM', () => {
       .shutdown()
       .then(() => logger.info('OpenTelemetry tracing terminated gracefully.'))
       .catch((error) =>
-        logger.error('Error shutting down OpenTelemetry tracing', { error }),
+        logger.error('Error shutting down OpenTelemetry tracing', { error })
       )
       .finally(() => process.exit(0));
   } else {

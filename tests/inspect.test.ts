@@ -129,7 +129,7 @@ describe('Inspect Command', () => {
 
     const expectedFilePath = path.join(
       MOCKED_OUTPUT_DIR,
-      `${customFilename}.json`,
+      `${customFilename}.json`
     );
     const content = JSON.parse(await readFile(expectedFilePath, 'utf-8'));
     expect(content.request.url).toBe(MOCKED_URL);
@@ -152,7 +152,7 @@ describe('Inspect Command', () => {
     const filePath = path.join(MOCKED_OUTPUT_DIR, files[0]);
     const content = JSON.parse(await readFile(filePath, 'utf-8'));
     expect(content.log.creator.name).toBe(
-      'prebid-integration-monitor/inspect-command',
+      'prebid-integration-monitor/inspect-command'
     );
     // Version will be from the testConfigInstance.version
     expect(content.log.creator.version).toBe(testConfigInstance.version);
