@@ -2,23 +2,15 @@ import { Args, Flags } from '@oclif/core';
 
 export const scanArgs = {
   inputFile: Args.string({
-    description: 'Input file path (accepts .txt, .csv, .json)',
+    name: 'inputFile',
+    description:
+      'Input file path (accepts .txt, .csv, .json). If not provided, the command will attempt to read URLs from stdin.',
     required: false,
-    default: 'src/input.txt',
+    default: undefined,
   }),
 };
 
 export const scanFlags = {
-  githubRepo: Flags.string({
-    description: 'GitHub repository URL to fetch URLs from',
-    required: false,
-  }),
-  numUrls: Flags.integer({
-    description:
-      'Number of URLs to load from the GitHub repository (used only with --githubRepo)',
-    default: 100,
-    required: false,
-  }),
   puppeteerType: Flags.string({
     description: 'Type of Puppeteer to use',
     options: ['vanilla', 'cluster'],

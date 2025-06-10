@@ -20,7 +20,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import * as BlockResourcesModule from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
 // Import functions from new modules
-import { processFileContent, fetchUrlsFromGitHub, loadFileContents, } from './utils/url-loader.js';
+import { processFileContent, loadFileContents, } from './utils/url-loader.js';
 import { processPageTask, // The core function for processing a single page
 // TaskResult and PageData are now imported from common/types
  } from './utils/puppeteer-task.js';
@@ -100,23 +100,15 @@ export async function prebidExplorer(options) {
         ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
     };
     // results array is correctly typed with PageData from puppeteer-task.ts
-    const taskResults = []; // Correctly typed with TaskResult from puppeteer-task.ts
-    /** @type {string[]} Array to store all URLs fetched from the specified source. */
+    const taskResults = [];
     let allUrls = [];
-    /** @type {Set<string>} Set to keep track of URLs that have been processed or are queued for processing. */
     const processedUrls = new Set();
-    /** @type {string} String to identify the source of URLs (e.g., 'GitHub', 'InputFile'). */
-    let urlSourceType = ''; // To track the source for logging and file updates
-    // Determine the source of URLs (GitHub or local file) and fetch them.
-    if (options.githubRepo) {
-        urlSourceType = 'GitHub';
-        allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
-        if (allUrls.length > 0) {
-            logger.info(`Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`);
-        }
-        else {
-            logger.warn(`No URLs found or fetched from GitHub repository: ${options.githubRepo}.`);
-        }
+    let urlSourceType = '';
+    // Determine the source of URLs (direct list, GitHub, or local file) and fetch them.
+    if (options.urlsToScan && options.urlsToScan.length > 0) {
+        urlSourceType = 'DirectList';
+        allUrls = options.urlsToScan;
+        logger.info(`Using directly provided list of ${allUrls.length} URLs.`);
     }
     else if (options.inputFile) {
         urlSourceType = 'InputFile';
@@ -144,7 +136,7 @@ export async function prebidExplorer(options) {
     }
     else {
         // This case should ideally be prevented by CLI validation in scan.ts
-        logger.error('No URL source provided. Either --githubRepo or inputFile argument must be specified.');
+        logger.error('No URL source provided. Either a direct list of URLs (urlsToScan), an inputFile, or a GitHub repository (githubRepo) must be specified.');
         throw new Error('No URL source specified.');
     }
     // Exit if no URLs were found from the specified source.
@@ -192,13 +184,11 @@ export async function prebidExplorer(options) {
     logger.info(`Total URLs to process after range check: ${allUrls.length}`, {
         firstFew: allUrls.slice(0, 5),
     });
-    /** @type {string[]} URLs to be processed after applying range and other filters. */
-    const urlsToProcess = allUrls; // This now contains potentially ranged URLs
+    const urlsToProcess = allUrls;
     // Define the core processing task (used by both vanilla and cluster)
     // Note: The actual definition of processPageTask is now imported.
     // We pass it to the cluster or call it directly, along with the logger.
     // 2. Chunk Processing Logic
-    /** @type {number} Size of chunks for processing URLs. 0 means no chunking. */
     const chunkSize = options.chunkSize && options.chunkSize > 0 ? options.chunkSize : 0;
     // Process URLs in chunks if chunkSize is specified.
     if (chunkSize > 0) {

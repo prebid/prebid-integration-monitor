@@ -427,11 +427,70 @@ describe('CLI Tests for Scan Command', () => {
       expect(result.stdout).toContain('--headless');
       expect(result.stdout).toContain('--outputDir');
       expect(result.stdout).toContain('--logDir');
-      expect(result.stdout).toContain('--githubRepo');
-      expect(result.stdout).toContain('--numUrls');
+      expect(result.stdout).not.toContain('--githubRepo');
+      expect(result.stdout).not.toContain('--numUrls');
     },
     helpTestTimeout
   );
+
+  it(
+    'should process URLs piped from stdin for scan command',
+    async () => {
+      const urlsToPipe = [
+        'https://example.com/stdin1',
+        'https://example.org/stdin2',
+      ];
+      // Correctly resolve the path to bin/run relative to the projectRoot
+      const runScriptPath = path.join(projectRoot, 'bin', 'run');
+      const commandParts = [
+        runScriptPath,
+        'scan',
+        `--logDir=${testLogDirLoad}`,
+      ];
+
+      const child = cp.spawn('node', commandParts, {
+        cwd: projectRoot,
+        env: { ...process.env, NODE_ENV: 'production' },
+        stdio: ['pipe', 'pipe', 'pipe'], // pipe stdin, stdout, stderr
+      });
+
+      let stdout = '';
+      let stderr = '';
+      child.stdout.on('data', (data) => (stdout += data.toString()));
+      child.stderr.on('data', (data) => (stderr += data.toString()));
+
+      child.stdin.write(urlsToPipe.join('\n') + '\n');
+      child.stdin.end();
+
+      const exitCode = await new Promise<number | null>((resolve) => {
+        child.on('close', (code) => resolve(code));
+        // Handle potential errors during spawn or child process execution
+        child.on('error', (err) => {
+          console.error('Spawn error:', err);
+          resolve(null); // Or reject(err) if you want the test to fail more explicitly on spawn error
+        });
+      });
+
+      expect(exitCode).toBe(
+        0,
+        `Scan command with stdin failed. Code: ${exitCode}, Stderr: ${stderr}, Stdout: ${stdout}`
+      );
+      // Check for logs from scan.ts run method
+      expect(stdout).toContain('Reading URLs from stdin...');
+      expect(stdout).toContain(
+        `Successfully read ${urlsToPipe.length} URLs from stdin.`
+      );
+      // Check for logs from prebid.ts (prebidExplorer function)
+      expect(stdout).toContain(
+        `Using directly provided list of ${urlsToPipe.length} URLs.`
+      );
+      // This log comes from prebid.ts after range check (which won't alter if no range flag)
+      expect(stdout).toContain(
+        `Total URLs to process after range check: ${urlsToPipe.length}`
+      );
+    },
+    generalScanTestTimeout
+  ); // Use generalScanTestTimeout as it involves scan logic, though not full Puppeteer runs on complex sites for this test
 });
 
 // This constant can still be used for testing purely invalid URL formats if needed,
@@ -479,11 +538,11 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
      *                   Verifies the correct number of total URLs processed and that `fetch` was called the expected number of times with the correct URLs.
      */
     it(
-      'fetches from various file types in a mock GitHub repo',
+      'fetches from various file types in a mock GitHub repo (now uses load then scan)',
       async () => {
         fetchMock
           .mockResolvedValueOnce({
-            // GitHub contents API
+            // GitHub contents API for load
             ok: true,
             json: async () => [
               {
@@ -500,83 +559,85 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
                 name: 'ignored.md',
                 type: 'file',
                 download_url: 'https://example.com/ignored.md',
-              }, // .md is processed, but content here is simple
+              },
               {
                 name: 'image.png',
                 type: 'file',
                 download_url: 'https://example.com/image.png',
-              }, // Should be ignored by default
+              },
             ],
           } as Response)
           .mockResolvedValueOnce({
-            // download_url for file1.txt
+            // download_url for file1.txt for load
             ok: true,
             text: async () => 'http://url1.com\nschemeless.from.txt.com',
           } as Response)
           .mockResolvedValueOnce({
-            // download_url for data.json
+            // download_url for data.json for load
             ok: true,
             text: async () =>
               JSON.stringify({
                 description: 'Check https://url2.com',
                 details: { link: 'http://url3.com/json' },
-                list: ['https://url4.com', 'schemeless.from.json.org'], // schemeless in JSON currently not processed
+                list: ['https://url4.com', 'schemeless.from.json.org'],
               }),
           } as Response)
           .mockResolvedValueOnce({
-            // download_url for ignored.md
+            // download_url for ignored.md for load
             ok: true,
             text: async () => 'Markdown with https://url5.com',
           } as Response);
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const intermediateFile = path.join(
+          projectRoot,
+          'test_gh_load_to_scan.txt'
+        );
+        cleanupTestArtifacts([intermediateFile]);
 
-        expect(result.code).toBe(
+        const loadResult = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --outputFile ${intermediateFile}`,
+          projectRoot
+        );
+        expect(loadResult.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command failed. Stderr: ${loadResult.stderr}`
         );
-        expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
+        expect(loadResult.stdout).toContain(
+          `Loaded 6 URLs to ${intermediateFile}`
         );
-        // Expected: url1.com, https://schemeless.from.txt.com, url2.com, url3.com/json, url4.com, url5.com
-        // Note: "schemeless.from.json.org" is NOT expected as schemeless detection is for .txt only.
-        expect(result.stdout).toContain(
-          `Successfully loaded 6 URLs from GitHub repository: ${MOCK_REPO_URL}`
+
+        // Now run scan with the intermediate file
+        const scanResult = await executeCommand(
+          `${cliCommand} ${intermediateFile}`,
+          projectRoot
         );
-        expect(result.stdout).toContain(`Total URLs to process: 6`);
-        expect(fetchMock).toHaveBeenCalledTimes(4); // 1 for contents, 3 for file downloads
-        expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
-        expect(fetchMock.mock.calls[1][0]).toBe(
-          'https://example.com/file1.txt'
+        expect(scanResult.code).toBe(
+          0,
+          `Scan command failed. Stderr: ${scanResult.stderr}`
         );
-        expect(fetchMock.mock.calls[2][0]).toBe(
-          'https://example.com/data.json'
+        // Scan command's stdout should indicate processing URLs from the intermediate file
+        expect(scanResult.stdout).toContain(
+          `Using input file: ${intermediateFile}`
         );
-        expect(fetchMock.mock.calls[3][0]).toBe(
-          'https://example.com/ignored.md'
+        expect(scanResult.stdout).toContain(
+          `Successfully loaded 6 URLs from local TXT file: ${intermediateFile}`
         );
+        expect(scanResult.stdout).toContain(
+          `Total URLs to process after range check: 6`
+        );
+
+        expect(fetchMock).toHaveBeenCalledTimes(4); // Still 4 calls for the load part
+        cleanupTestArtifacts([intermediateFile]);
       },
-      testTimeout
+      testTimeout * 2 // Increased timeout for two commands
     );
 
-    /**
-     * Tests the '--numUrls' flag in conjunction with '--githubRepo' to limit the number of URLs fetched.
-     * Setup: Mocks the global `fetch` function.
-     *        - GitHub contents API call: Returns two files.
-     *        - First file download: Returns content with more URLs than the limit.
-     * Action: Executes the CLI with '--githubRepo' and '--numUrls' set to a value less than the total available URLs in the first file.
-     * Expected Outcome: Command exits successfully (code 0).
-     *                   Only the specified number of URLs are loaded and processed.
-     *                   `fetch` is only called for the contents API and the first file (not the second, as the limit is reached).
-     *                   Stdout confirms the limited number of URLs processed.
-     */
     it(
-      'limits URLs with --numUrls from a mock GitHub repo',
+      'limits URLs with --numUrls from a mock GitHub repo (now uses load then scan)',
       async () => {
         fetchMock
           .mockResolvedValueOnce({
-            // GitHub contents API
+            // GitHub contents API for load
             ok: true,
             json: async () => [
               {
@@ -592,36 +653,54 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             ],
           } as Response)
           .mockResolvedValueOnce({
-            // download_url for file1.txt
+            // download_url for file1.txt for load
             ok: true,
             text: async () =>
-              'http://url1.com\nhttps://url2.com\nhttp://url3.com', // 3 URLs here
+              'http://url1.com\nhttps://url2.com\nhttp://url3.com',
           } as Response);
-        // data.json's content fetch will not happen due to numUrls limit reached by file1.txt
-        const numUrlsToFetch = 2;
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --numUrls ${numUrlsToFetch}`;
-        const result = await executeCommand(command, projectRoot);
 
-        expect(result.code).toBe(
+        const numUrlsToFetch = 2;
+        const intermediateFile = path.join(
+          projectRoot,
+          'test_gh_load_num_to_scan.txt'
+        );
+        cleanupTestArtifacts([intermediateFile]);
+
+        const loadResult = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --numUrls ${numUrlsToFetch} --outputFile ${intermediateFile}`,
+          projectRoot
+        );
+        expect(loadResult.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command failed. Stderr: ${loadResult.stderr}`
         );
-        expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
+        expect(loadResult.stdout).toContain(
+          `Loaded ${numUrlsToFetch} URLs to ${intermediateFile}`
         );
-        expect(result.stdout).toContain(
-          `Successfully loaded ${numUrlsToFetch} URLs from GitHub repository: ${MOCK_REPO_URL}`
+
+        // Now run scan with the intermediate file
+        const scanResult = await executeCommand(
+          `${cliCommand} ${intermediateFile}`,
+          projectRoot
         );
-        expect(result.stdout).toContain(
-          `Total URLs to process: ${numUrlsToFetch}`
+        expect(scanResult.code).toBe(
+          0,
+          `Scan command failed. Stderr: ${scanResult.stderr}`
         );
-        expect(fetchMock).toHaveBeenCalledTimes(2); // 1 for contents, 1 for file1.txt
-        expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
-        expect(fetchMock.mock.calls[1][0]).toBe(
-          'https://example.com/file1.txt'
+        expect(scanResult.stdout).toContain(
+          `Using input file: ${intermediateFile}`
         );
+        expect(scanResult.stdout).toContain(
+          `Successfully loaded ${numUrlsToFetch} URLs from local TXT file: ${intermediateFile}`
+        );
+        expect(scanResult.stdout).toContain(
+          `Total URLs to process after range check: ${numUrlsToFetch}`
+        );
+
+        expect(fetchMock).toHaveBeenCalledTimes(2); // 1 for contents, 1 for file1.txt for load
+        cleanupTestArtifacts([intermediateFile]);
       },
-      testTimeout
+      testTimeout * 2 // Increased timeout
     );
   });
 
@@ -646,10 +725,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
      *                   `fetch` is called once for the contents API.
      */
     it(
-      'handles a 404 for mock GitHub repo contents',
+      'handles a 404 for mock GitHub repo contents (load fails, scan gets no URLs)',
       async () => {
         fetchMock.mockResolvedValueOnce({
-          // GitHub contents API
+          // GitHub contents API for load
           ok: false,
           status: 404,
           statusText: 'Not Found',
@@ -657,43 +736,81 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
           text: async () => '{"message":"Not Found"}',
         } as Response);
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const intermediateFile = path.join(
+          projectRoot,
+          'test_gh_404_to_scan.txt'
+        );
+        cleanupTestArtifacts([intermediateFile]);
 
-        // The command exits 0 but logs an error and processes 0 URLs.
-        expect(result.code).toBe(
+        // Expect load command to indicate failure or produce an empty output
+        const loadResult = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --outputFile ${intermediateFile}`,
+          projectRoot
+        );
+        // load command itself might exit 0 if it considers this a "handled" error by logging,
+        // or non-zero if this.error({exit:1}) is used.
+        // Based on current load error handling, it will log "Failed to fetch repository contents" and "Failed to load URLs", exiting 1.
+        expect(loadResult.code).not.toBe(
           0,
-          `Command should exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command should fail. Stderr: ${loadResult.stderr}, Stdout: ${loadResult.stdout}`
         );
-        expect(result.stdout).toContain(
-          `Failed to fetch repository contents: 404 Not Found`
+        expect(loadResult.stdout).toContain(
+          'Failed to fetch repository contents'
         );
-        expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`
-        );
-        expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.'
-        );
-        expect(fetchMock).toHaveBeenCalledTimes(1);
-        expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
+        expect(loadResult.stdout).toContain('Failed to load URLs');
+
+        // Since load failed to produce the intermediate file or it's empty, scan should indicate no URLs.
+        // Check if intermediateFile was created and is empty, or not created at all.
+        const fileExists = fs.existsSync(intermediateFile);
+        if (fileExists) {
+          const fileContent = fs.readFileSync(intermediateFile, 'utf-8');
+          expect(fileContent.trim()).toBe('');
+        }
+
+        // Run scan. If intermediateFile is empty or not found, scan should also indicate no URLs.
+        // scan command will error if the input file doesn't exist.
+        // If load command doesn't create the file on error, this will fail.
+        // For this test, let's assume load might create an empty file or no file.
+        // If no file, scan will error. If empty file, scan will say 0 URLs.
+        let scanResult: ExecResult;
+        if (!fileExists) {
+          scanResult = await executeCommand(
+            `${cliCommand} ${intermediateFile}`,
+            projectRoot
+          );
+          expect(scanResult.code).not.toBe(
+            0,
+            `Scan command should fail if input file does not exist. Stderr: ${scanResult.stderr}`
+          );
+          expect(scanResult.stdout).toContain(
+            `Failed to read from input file: ${intermediateFile}`
+          );
+        } else {
+          // File exists but is empty
+          scanResult = await executeCommand(
+            `${cliCommand} ${intermediateFile}`,
+            projectRoot
+          );
+          expect(scanResult.code).toBe(
+            0,
+            `Scan command failed. Stderr: ${scanResult.stderr}`
+          );
+          expect(scanResult.stdout).toContain(
+            `No URLs found in ${intermediateFile}. Exiting.`
+          );
+        }
+
+        expect(fetchMock).toHaveBeenCalledTimes(1); // Only for the load command
+        cleanupTestArtifacts([intermediateFile]);
       },
       testTimeout
     );
 
-    /**
-     * Tests the CLI's behavior when a GitHub repository contains no files with processable extensions (e.g., only images or scripts).
-     * Setup: Mocks `fetch` for the GitHub contents API to return a list of files, none of which are .txt, .json, .csv, or .md.
-     * Action: Executes the CLI with '--githubRepo'.
-     * Expected Outcome: Command exits successfully (code 0).
-     *                   Stdout indicates that while the repository was accessed, no relevant files were found,
-     *                   leading to 0 URLs being processed.
-     *                   `fetch` is called only once (for the contents API).
-     */
     it(
-      'handles mock GitHub repo with no relevant files',
+      'handles mock GitHub repo with no relevant files (load produces 0 URLs, scan gets 0 URLs)',
       async () => {
         fetchMock.mockResolvedValueOnce({
-          // GitHub contents API
+          // GitHub contents API for load
           ok: true,
           json: async () => [
             {
@@ -705,47 +822,56 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
               name: 'script.js',
               type: 'file',
               download_url: 'https://example.com/script.js',
-            }, // Not a target extension
+            },
           ],
         } as Response);
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const intermediateFile = path.join(
+          projectRoot,
+          'test_gh_no_relevant_to_scan.txt'
+        );
+        cleanupTestArtifacts([intermediateFile]);
 
-        expect(result.code).toBe(
+        const loadResult = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --outputFile ${intermediateFile}`,
+          projectRoot
+        );
+        expect(loadResult.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command failed. Stderr: ${loadResult.stderr}`
         );
-        expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
+        // The load command will output "Loaded 0 URLs to..."
+        expect(loadResult.stdout).toContain(
+          `Loaded 0 URLs to ${intermediateFile}`
         );
-        expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`
+
+        const fileContent = fs.readFileSync(intermediateFile, 'utf-8');
+        expect(fileContent.trim()).toBe('');
+
+        const scanResult = await executeCommand(
+          `${cliCommand} ${intermediateFile}`,
+          projectRoot
         );
-        expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.'
+        expect(scanResult.code).toBe(
+          0,
+          `Scan command failed. Stderr: ${scanResult.stderr}`
         );
-        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(scanResult.stdout).toContain(
+          `No URLs found in ${intermediateFile}. Exiting.`
+        );
+
+        expect(fetchMock).toHaveBeenCalledTimes(1); // Only for the load command
+        cleanupTestArtifacts([intermediateFile]);
       },
       testTimeout
     );
 
-    /**
-     * Tests the scenario where a GitHub repository contains processable file types (.txt, .json) but these files do not contain any URLs.
-     * Setup: Mocks `fetch`.
-     *        - Contents API call: Returns .txt and .json files.
-     *        - File download calls: Return content without any URLs for both files.
-     * Action: Executes the CLI with '--githubRepo'.
-     * Expected Outcome: Command exits successfully (code 0).
-     *                   Stdout shows that files were processed but no URLs were found or loaded.
-     *                   `fetch` is called for the contents API and for each of the two files.
-     */
     it(
-      'handles mock GitHub repo with relevant files but no URLs',
+      'handles mock GitHub repo with relevant files but no URLs (load produces 0 URLs, scan gets 0 URLs)',
       async () => {
         fetchMock
           .mockResolvedValueOnce({
-            // GitHub contents API
+            // GitHub contents API for load
             ok: true,
             json: async () => [
               {
@@ -761,62 +887,71 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             ],
           } as Response)
           .mockResolvedValueOnce({
-            // download_url for empty.txt
             ok: true,
             text: async () => 'This file has no URLs.',
-          } as Response)
+          } as Response) // empty.txt
           .mockResolvedValueOnce({
-            // download_url for empty.json
             ok: true,
             text: async () => JSON.stringify({ message: 'No URLs here' }),
-          } as Response);
+          } as Response); // empty.json
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL}`;
-        const result = await executeCommand(command, projectRoot);
+        const intermediateFile = path.join(
+          projectRoot,
+          'test_gh_empty_files_to_scan.txt'
+        );
+        cleanupTestArtifacts([intermediateFile]);
 
-        expect(result.code).toBe(
+        const loadResult = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --outputFile ${intermediateFile}`,
+          projectRoot
+        );
+        expect(loadResult.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command failed. Stderr: ${loadResult.stderr}`
         );
-        expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${MOCK_REPO_URL}`
+        expect(loadResult.stdout).toContain(
+          `Loaded 0 URLs to ${intermediateFile}`
         );
-        expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.'
+
+        const fileContent = fs.readFileSync(intermediateFile, 'utf-8');
+        expect(fileContent.trim()).toBe('');
+
+        const scanResult = await executeCommand(
+          `${cliCommand} ${intermediateFile}`,
+          projectRoot
         );
-        expect(fetchMock).toHaveBeenCalledTimes(3); // Contents API + two file downloads
+        expect(scanResult.code).toBe(
+          0,
+          `Scan command failed. Stderr: ${scanResult.stderr}`
+        );
+        expect(scanResult.stdout).toContain(
+          `No URLs found in ${intermediateFile}. Exiting.`
+        );
+
+        expect(fetchMock).toHaveBeenCalledTimes(3); // 1 for contents, 2 for files for load
+        cleanupTestArtifacts([intermediateFile]);
       },
       testTimeout
     );
   });
 
-  describe('Flag Interactions with GitHub Repo Input', () => {
+  describe('Flag Interactions with GitHub Repo Input (now relevant to `load` command)', () => {
     beforeEach(() => {
       fetchMock = vi.spyOn(global, 'fetch');
-      cleanupTestArtifacts([dummyGhInputPath]);
+      cleanupTestArtifacts([dummyGhInputPath, testLoadOutput]); // testLoadOutput for --outputFile tests
     });
 
     afterEach(() => {
       vi.restoreAllMocks();
-      cleanupTestArtifacts([dummyGhInputPath]);
+      cleanupTestArtifacts([dummyGhInputPath, testLoadOutput]);
     });
-    /**
-     * Tests that the '--githubRepo' flag takes precedence if both '--githubRepo' and '--inputFile' are provided.
-     * Setup: Mocks `fetch` to return content for a GitHub file.
-     *        Creates a local input file with different URLs.
-     * Action: Executes the CLI with both '--githubRepo' and '--inputFile' flags.
-     * Expected Outcome: Command exits successfully (code 0).
-     *                   URLs are fetched from the GitHub repository, not the local input file.
-     *                   Stdout includes a message indicating that '--githubRepo' is taking precedence.
-     *                   The local input file's content remains untouched.
-     *                   `fetch` is called for GitHub API and file download.
-     */
+
     it(
-      'prioritizes --githubRepo over --inputFile',
+      'load command prioritizes --githubRepo over inputFile',
       async () => {
         fetchMock
           .mockResolvedValueOnce({
-            // GitHub contents API
+            // GitHub contents API for load
             ok: true,
             json: async () => [
               {
@@ -827,99 +962,83 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             ],
           } as Response)
           .mockResolvedValueOnce({
-            // download_url for file1.txt
+            // download_url for file1.txt for load
             ok: true,
             text: async () => 'http://mockedurl.com',
           } as Response);
 
-        createInputFile(dummyGhInputPath, ['http://local-file-url.com']);
+        createInputFile(dummyGhInputPath, ['http://local-file-url.com']); // This is test_load_input.txt effectively
 
-        const command = `${cliCommand} --githubRepo ${MOCK_REPO_URL} --inputFile ${dummyGhInputPath}`;
-        const result = await executeCommand(command, projectRoot);
+        // Execute load command with both --githubRepo and an inputFile argument
+        const result = await executeCommand(
+          `${cliLoadCommand} ${dummyGhInputPath} --githubRepo ${MOCK_REPO_URL} --outputFile ${testLoadOutput}`,
+          projectRoot
+        );
 
         expect(result.code).toBe(
           0,
-          `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command failed. Stderr: ${result.stderr}, Stdout: ${result.stdout}`
         );
-        // Check for the specific log message about ignoring inputFile
+        // Load command should log that it's using GitHub
         expect(result.stdout).toContain(
-          `Both --githubRepo and --inputFile (or its default) were provided. --githubRepo takes precedence.`
+          `Input source: GitHub repository (${MOCK_REPO_URL})`
         );
-        expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${MOCK_REPO_URL}`
-        );
-        expect(result.stdout).toContain(
-          `Successfully loaded 1 URLs from GitHub repository: ${MOCK_REPO_URL}`
-        );
-
+        // Check output file content
+        const outputFileContent = fs
+          .readFileSync(testLoadOutput, 'utf-8')
+          .trim();
+        expect(outputFileContent).toBe('http://mockedurl.com');
+        // Ensure local file was not used (its content should remain)
         const inputFileContent = fs.readFileSync(dummyGhInputPath, 'utf-8');
         expect(inputFileContent.trim()).toBe('http://local-file-url.com');
-        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(fetchMock).toHaveBeenCalledTimes(2); // For GitHub load
       },
       testTimeout
     );
 
-    /**
-     * Tests the CLI's behavior when neither '--githubRepo' nor '--inputFile' is provided,
-     * and the default input file ('src/input.txt') does not exist.
-     * Setup: Ensures 'src/input.txt' is deleted.
-     * Action: Executes the CLI command without any source-providing flags.
-     * Expected Outcome: Command exits successfully (code 0) as the application handles this gracefully.
-     *                   Stdout indicates that loading from the default input file failed and no URLs will be processed from it.
-     *                   No error is thrown to stderr.
-     */
+    // This test is for scan: if no inputFile is given and stdin is TTY (no pipe)
     it(
-      'fails if no --githubRepo or --inputFile is given and default inputFile does not exist',
+      'scan command errors if no inputFile is given and stdin is TTY',
       async () => {
-        const defaultInput = path.join(projectRoot, 'src', 'input.txt');
-        if (fs.existsSync(defaultInput)) fs.unlinkSync(defaultInput);
+        // Ensure default input 'src/input.txt' does not exist to avoid it being used.
+        const defaultScanInput = path.join(projectRoot, 'src', 'input.txt');
+        if (fs.existsSync(defaultScanInput)) fs.unlinkSync(defaultScanInput);
+        // Also ensure scanArgs.inputFile.default is undefined in scan-options.ts (done in previous step)
 
-        const command = `${cliCommand}`; // No arguments
-        const result = await executeCommand(command, projectRoot);
+        const result = await executeCommand(`${cliCommand}`, projectRoot); // No inputFile, not piping from stdin
 
-        // prebidExplorer now handles the missing default file gracefully by logging and creating no URLs.
-        // The command itself exits 0. If a hard error is required, prebidExplorer or scan.ts needs modification.
-        expect(result.code).toBe(
+        // scan should error because no input file and no stdin.
+        expect(result.code).not.toBe(
           0,
-          `Command should exit 0. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Scan command should fail. Stderr: ${result.stderr}, Stdout: ${result.stdout}`
         );
+        // Oclif usually prints help for missing arguments, or our custom error.
+        // Our scan command now explicitly errors:
         expect(result.stdout).toContain(
-          `Failed to load content from input file ${defaultInput}. Cannot proceed with this source.`
+          'No input specified. Provide an input file argument or pipe data from stdin.'
         );
-        expect(result.stdout).toContain(
-          `No URLs to process from InputFile. Exiting.`
-        );
-        expect(result.stderr).toBe(''); // No actual error thrown to stderr in this specific path
       },
       testTimeout
     );
   });
 
-  describe('URL Extraction from Specific GitHub File Structures and Direct Links', () => {
+  describe('URL Extraction from Specific GitHub File Structures and Direct Links (for `load` command)', () => {
+    // This suite now tests `load`'s ability to extract from GitHub, then `scan` uses the result.
+    const intermediateFilePrefix = 'test_gh_extract_to_scan_';
+
     beforeEach(() => {
       fetchMock = vi.spyOn(global, 'fetch');
-      cleanupTestArtifacts([dummyGhInputPath]);
+      // General cleanup for any intermediate files that might be created
+      // No specific dummyGhInputPath needed here as it's about GitHub mock content
     });
 
     afterEach(() => {
       vi.restoreAllMocks();
-      cleanupTestArtifacts([dummyGhInputPath]);
+      // Glob pattern might be too complex for simple cleanup; specific file names are better.
     });
-    /**
-     * Tests the extraction of various URL types (HTTP, HTTPS, schemeless domains) from a .txt file in a mock GitHub repo.
-     * Also verifies that malformed or unsupported URLs are ignored.
-     * Setup: Mocks `fetch`.
-     *        - Contents API: Returns a .txt file.
-     *        - .txt file download: Returns content with a mix of valid URLs, schemeless domains,
-     *          quoted domains, malformed schemeless domains, and unsupported schemes (ftp).
-     * Action: Executes CLI with '--githubRepo' and a '--numUrls' limit greater than the number of expected valid URLs.
-     * Expected Outcome: Command exits successfully (code 0).
-     *                   Correctly extracts and counts valid HTTP/HTTPS URLs and schemeless domains (which are prepended with https).
-     *                   Stdout logs messages for each added schemeless domain.
-     *                   The total number of processed URLs matches the count of valid extracted URLs.
-     */
+
     it(
-      'extracts various URL types from mock GitHub .txt file',
+      'load extracts various URL types from mock GitHub .txt file, then scan processes them',
       async () => {
         const txtContent = `
             http://valid-example.com
@@ -1420,7 +1539,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
   });
 
   // Removed the describe block "CLI Tests for CSV File Input"
-  // Removed the describe block "CLI Tests for Live CSV File Input (Network)"
+  // The suite "CLI Tests for Live CSV File Input (Network)" which tested `scan --csvFile` is now removed
+  // as --csvFile flag is removed from scan. Local CSVs are tested via `scan <inputFile.csv>`.
+  // Remote CSVs would be handled by `load --githubRepo <URL_to_csv_file>`.
 
   /**
    * Test suite for the '--githubRepo' flag functionality using live GitHub repositories.
@@ -1428,9 +1549,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
    * They cover scenarios like fetching from direct file URLs.
    * IMPORTANT: These tests are subject to network conditions and external repository states.
    */
-  describe('CLI Tests for Live GitHub Repository Input (Network)', () => {
+  describe('CLI Tests for Live GitHub Repository Input (Network) (now uses `load` then `scan`)', () => {
     // IMPORTANT:
-    // The tests in this suite interact with actual, live GitHub repositories
+    // The tests in this suite interact with actual, live GitHub repositories via the `load` command.
     // and require an active internet connection.
     // They are subject to network flakiness, API rate limits (though unlikely for
     // the small number of tests), and changes in the target repositories' content.
@@ -1453,55 +1574,56 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
      *                   This test primarily verifies the handling of direct GitHub links and content that doesn't match the URL regex.
      */
     it(
-      'should successfully scan a small number of URLs from a live, direct GitHub file URL (for --githubRepo)',
+      'load should fetch a small number of URLs from a live, direct GitHub file URL, then scan processes them',
       async () => {
         const githubFileUrl =
           'https://github.com/zer0h/top-1000000-domains/blob/master/top-10000-domains';
-        const numUrlsToScan = 7; // Small number to keep the test reasonably fast
-        const command = `${cliCommand} --githubRepo ${githubFileUrl} --numUrls ${numUrlsToScan}`;
+        const numUrlsToLoad = 7;
+        const intermediateFile = path.join(
+          projectRoot,
+          'test_live_gh_load_to_scan.txt'
+        );
+        cleanupTestArtifacts([intermediateFile]);
 
-        // No mocks here, this will make actual network calls.
-        const result = await executeCommand(command, projectRoot);
+        // Use load command to fetch and save
+        const loadCommand = `${cliLoadCommand} --githubRepo ${githubFileUrl} --numUrls ${numUrlsToLoad} --outputFile ${intermediateFile} --logDir ${testLogDirLoad}`;
+        const loadResult = await executeCommand(loadCommand, projectRoot);
 
-        expect(result.code).toBe(
+        expect(loadResult.code).toBe(
           0,
-          `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`
+          `Load command failed. Stderr: ${loadResult.stderr}, Stdout: ${loadResult.stdout}`
+        );
+        // Load command will extract schemeless domains from this file and prepend https.
+        // So it *will* find URLs.
+        expect(loadResult.stdout).toContain(
+          `Loaded ${numUrlsToLoad} URLs to ${intermediateFile}`
         );
 
-        // Check for stdout messages
-        expect(result.stdout).toContain(
-          `Fetching URLs from GitHub repository source: ${githubFileUrl}`
-        );
-        expect(result.stdout).toContain(
-          `Detected direct file link: ${githubFileUrl}. Attempting to fetch raw content.`
-        );
-        // The raw URL will be like: https://raw.githubusercontent.com/zer0h/top-1000000-domains/master/top-10000-domains
-        expect(result.stdout).toMatch(
-          /Fetching content directly from raw URL: https:\/\/raw\.githubusercontent\.com\/zer0h\/top-1000000-domains\/master\/top-10000-domains/
-        );
-        // It should extract URLs from the file. The file contains domain names, which are not full URLs.
-        // The regex /(https?:\/\/[^\s"]+)/gi will NOT match simple domain names like "google.com".
-        // It will only match full URLs if they were present.
-        // Given the file content (e.g., "google.com", "youtube.com"), we expect 0 actual URLs to be extracted by the current regex.
-        // This test will therefore verify that it attempts to fetch, finds no *valid URLs* based on the regex, and processes 0 URLs.
-        // This is an important outcome of the test given the current URL regex.
+        // Verify intermediate file content (optional, but good for sanity)
+        const loadedUrls = fs
+          .readFileSync(intermediateFile, 'utf-8')
+          .trim()
+          .split('\n');
+        expect(loadedUrls.length).toBe(numUrlsToLoad);
+        loadedUrls.forEach((url) => expect(url).startsWith('https://'));
 
-        // If the intention was to treat each line as a URL, the regex or processing logic in prebid.ts would need to change.
-        // For now, we test the current behavior.
-        expect(result.stdout).toContain(
-          `No URLs found in content from https://raw.githubusercontent.com/zer0h/top-1000000-domains/master/top-10000-domains`
+        // Now run scan with the intermediate file
+        const scanCommand = `${cliCommand} ${intermediateFile}`;
+        const scanResult = await executeCommand(scanCommand, projectRoot);
+        expect(scanResult.code).toBe(
+          0,
+          `Scan command failed. Stderr: ${scanResult.stderr}, Stdout: ${scanResult.stdout}`
         );
-        expect(result.stdout).toContain(
-          `Total URLs extracted before limiting: 0`
+        expect(scanResult.stdout).toContain(
+          `Successfully loaded ${numUrlsToLoad} URLs from local TXT file: ${intermediateFile}`
         );
-        expect(result.stdout).toContain(
-          `No URLs found or fetched from GitHub repository: ${githubFileUrl}.`
+        expect(scanResult.stdout).toContain(
+          `Total URLs to process after range check: ${numUrlsToLoad}`
         );
-        expect(result.stdout).toContain(
-          'No URLs to process from GitHub. Exiting.'
-        ); // Corrected message
+
+        cleanupTestArtifacts([intermediateFile]);
       },
-      networkTestTimeout
+      networkTestTimeout * 2 // Allow time for two commands and network access
     );
   });
 
@@ -2023,141 +2145,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
    * and local CSV files that might contain domain-only entries or non-existent remote files.
    * It replaces older, broader CSV testing suites.
    */
-  describe('CLI Tests for Live CSV File Input (Network)', () => {
-    const networkTestTimeout = 90000; // Longer timeout for actual network requests
-    // let fetchMock: ReturnType<typeof vi.spyOn>; // fetchMock is not consistently working for child processes
-
-    beforeEach(() => {
-      // Ensure fetch is NOT mocked for these live tests
-      if (vi.isMockFunction(global.fetch)) {
-        vi.restoreAllMocks();
-      }
-      // Cleanup the new local CSV if it exists from a previous run
-      const testDomainsOnlyCsvPath = path.join(
-        projectRoot,
-        'test_domains_only.csv'
-      );
-      cleanupTestArtifacts([testDomainsOnlyCsvPath]);
-    });
-
-    afterEach(() => {
-      // vi.restoreAllMocks();
-      // Cleanup the new local CSV after each test
-      const testDomainsOnlyCsvPath = path.join(
-        projectRoot,
-        'test_domains_only.csv'
-      );
-      cleanupTestArtifacts([testDomainsOnlyCsvPath]);
-    });
-
-    // Modified Test Case: From live Jirehlov CSV to local small CSV with domains only
-    /**
-     * Tests the CLI's handling of a local CSV file that contains only domain names (not full URLs).
-     * Setup: Creates a local CSV file ('test_domains_only.csv') with a header and three domain names.
-     * Action: Executes the CLI command with the `--csvFile` flag pointing to this local CSV.
-     * Expected Outcome: Command exits successfully (code 0).
-     *                   Stdout indicates that the local CSV file is being read.
-     *                   Crucially, it should report that 0 URLs were extracted because the domain names
-     *                   do not match the CLI's URL validation regex (which expects a scheme).
-     *                   It then logs that there are no URLs to process from the CSV and exits.
-     *                   `stderr` should be empty.
-     */
-    it(
-      'should correctly identify 0 URLs from a local CSV file containing only domains',
-      async () => {
-        const testDomainsOnlyCsvPath = path.join(
-          projectRoot,
-          'test_domains_only.csv'
-        );
-        const csvContent = 'domain\ngoogle.com\nexample.com\nyoutube.com';
-        fs.writeFileSync(testDomainsOnlyCsvPath, csvContent);
-
-        const command = `${cliCommand} --csvFile ${testDomainsOnlyCsvPath}`;
-
-        const result = await executeCommand(command, projectRoot);
-
-        expect(result.code).toBe(
-          0,
-          `Command failed with code ${result.code}. Stderr: ${result.stderr} Stdout: ${result.stdout}`
-        );
-        // Check for local file processing messages
-        expect(result.stdout).toContain(
-          `Reading local CSV file: ${testDomainsOnlyCsvPath}`
-        );
-        // This is the key assertion: 0 URLs should be loaded because domains don't match the URL regex
-        expect(result.stdout).toContain(
-          `Extracted 0 URLs from CSV: ${testDomainsOnlyCsvPath}`
-        );
-        // Check for appropriate exit message
-        expect(result.stdout).toContain(
-          'No URLs to process from CSV. Exiting.'
-        );
-
-        // Ensure no actual errors in stderr, warnings in stdout are expected
-        expect(result.stderr).toBe('');
-      },
-      networkTestTimeout
-    ); // networkTestTimeout might be overkill now but safe
-
-    /**
-     * Tests the CLI's graceful handling of a non-existent GitHub CSV file URL.
-     * Setup: Defines a URL pointing to a non-existent CSV file on GitHub.
-     * Action: Executes the CLI command with the `--csvFile` flag pointing to this non-existent URL.
-     * Expected Outcome: Command exits successfully (code 0) due to graceful error handling.
-     *                   Stdout indicates an attempt to fetch from the CSV source and detection of a remote CSV URL.
-     *                   It logs the transformation of the GitHub blob URL to a raw content URL.
-     *                   Critically, it logs a failure to download the CSV content (e.g., 404 Not Found).
-     *                   It then reports that no URLs were found or fetched and exits without processing.
-     *                   `stderr` should be empty.
-     */
-    it(
-      'should handle a non-existent GitHub CSV file URL gracefully',
-      async () => {
-        const nonExistentGithubCsvUrl =
-          'https://github.com/completely/nonexistent/repo/blob/main/somefilethatdoesnotexist.csv';
-        const command = `${cliCommand} --csvFile ${nonExistentGithubCsvUrl}`;
-
-        const result = await executeCommand(command, projectRoot);
-
-        expect(result.code).toBe(
-          0,
-          `Command should still exit 0 for graceful handling. Stderr: ${result.stderr} Stdout: ${result.stdout}`
-        );
-
-        // Check for stdout messages
-        expect(result.stdout).toContain(
-          `Fetching URLs from CSV source: ${nonExistentGithubCsvUrl}`
-        );
-        expect(result.stdout).toContain(
-          `Detected remote CSV URL: ${nonExistentGithubCsvUrl}`
-        );
-        // Expect transformation attempt
-        const expectedRawUrl =
-          'https://raw.githubusercontent.com/completely/nonexistent/repo/main/somefilethatdoesnotexist.csv';
-        expect(result.stdout).toContain(
-          `Transformed GitHub blob URL to raw content URL: ${expectedRawUrl}`
-        );
-
-        // Expect failure to download
-        expect(result.stdout).toContain(
-          `Failed to download CSV content from ${expectedRawUrl}: 404 Not Found`
-        );
-        // Allow for slight variations in the "Error body" message, e.g., "404: Not Found" or just "Not Found"
-        expect(result.stdout).toMatch(/Error body: (404: )?Not Found/);
-
-        expect(result.stdout).toContain(
-          `No URLs found or fetched from CSV file: ${nonExistentGithubCsvUrl}.`
-        );
-        expect(result.stdout).toContain(
-          'No URLs to process from CSV. Exiting.'
-        );
-
-        // Ensure no actual errors in stderr (warnings in stdout are expected)
-        expect(result.stderr).toBe('');
-      },
-      networkTestTimeout
-    ); // Use the existing networkTestTimeout
-  });
+  // The suite "CLI Tests for Live CSV File Input (Network)" which tested `scan --csvFile` is now removed
+  // as --csvFile flag is removed from scan. Local CSVs are tested via `scan <inputFile.csv>`.
+  // Remote CSVs would be handled by `load --githubRepo <URL_to_csv_file>`.
 
   /**
    * Test suite for handling various local file input types via the 'inputFile' argument.
@@ -2669,4 +2659,540 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     });
   }); // Added for the main describe block
 }); // Added for the outermost describe block
+
+// Test suite for the 'load' command
+const cliLoadCommand = `node ${path.join(projectRoot, 'bin', 'run')} load`;
+
+describe('CLI Tests for Load Command', () => {
+  const loadTestTimeout = 10000; // Standard timeout for load tests (no Puppeteer)
+  const testLoadInputTxt = path.join(projectRoot, 'test_load_input.txt');
+  const testLoadInputCsv = path.join(projectRoot, 'test_load_input.csv');
+  const testLoadInputJson = path.join(projectRoot, 'test_load_input.json');
+  const testLoadOutput = path.join(projectRoot, 'test_load_output.txt');
+  const testLogDirLoad = path.join(projectRoot, 'test_logs_load');
+
+  const loadTestArtifacts = [
+    testLoadInputTxt,
+    testLoadInputCsv,
+    testLoadInputJson,
+    testLoadOutput,
+    testLogDirLoad,
+  ];
+
+  beforeAll(() => {
+    cleanupTestArtifacts(loadTestArtifacts);
+  });
+
+  afterAll(() => {
+    cleanupTestArtifacts(loadTestArtifacts);
+  });
+
+  beforeEach(() => {
+    cleanupTestArtifacts(loadTestArtifacts); // Clean before each test
+  });
+
+  afterEach(() => {
+    // Additional cleanup if needed after each test specifically
+  });
+
+  it(
+    'load --help should display help',
+    async () => {
+      const result = await executeCommand(
+        `${cliLoadCommand} --help`,
+        projectRoot
+      );
+      expect(result.code).toBe(
+        0,
+        `Help command failed. Stderr: ${result.stderr}`
+      );
+      expect(result.stdout).toContain(
+        'Loads URLs from a file or GitHub repository.'
+      );
+      expect(result.stdout).toContain('USAGE');
+      expect(result.stdout).toContain('$ app load [INPUTFILE] [FLAGS...]');
+      expect(result.stdout).toContain('--githubRepo');
+      expect(result.stdout).toContain('--numUrls');
+      expect(result.stdout).toContain('--outputFile');
+      expect(result.stdout).toContain('--logDir');
+    },
+    loadTestTimeout
+  );
+
+  describe('Load from Local Files (stdout)', () => {
+    it(
+      'should load URLs from a local .txt file and print to stdout',
+      async () => {
+        const urls = ['http://example.com/txt1', 'https://example.org/txt2'];
+        createInputFile(testLoadInputTxt, urls);
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputTxt}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Loaded URLs:');
+        urls.forEach((url) => expect(result.stdout).toContain(url));
+
+        const inputFileContent = fs.readFileSync(testLoadInputTxt, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          urls.join('\n').trim(),
+          '.txt file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should load URLs from a local .csv file and print to stdout',
+      async () => {
+        const csvContent =
+          'url,other\nhttp://example.com/csv1,data\nhttps://example.org/csv2,data2\ninvalid-url,data3';
+        fs.writeFileSync(testLoadInputCsv, csvContent);
+        const expectedUrls = [
+          'http://example.com/csv1',
+          'https://example.org/csv2',
+        ];
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputCsv}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Loaded URLs:');
+        expectedUrls.forEach((url) => expect(result.stdout).toContain(url));
+        expect(result.stdout).not.toContain('invalid-url');
+
+        const inputFileContent = fs.readFileSync(testLoadInputCsv, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          csvContent.trim(),
+          '.csv file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should load URLs from a local .json file (array of strings) and print to stdout',
+      async () => {
+        const urls = [
+          'http://example.com/jsonA1',
+          'https://example.org/jsonA2',
+        ];
+        fs.writeFileSync(testLoadInputJson, JSON.stringify(urls));
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputJson}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Loaded URLs:');
+        urls.forEach((url) => expect(result.stdout).toContain(url));
+
+        const inputFileContent = fs.readFileSync(testLoadInputJson, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          JSON.stringify(urls),
+          '.json file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should load URLs from a local .json file (object with URLs in values) and print to stdout',
+      async () => {
+        const jsonObj = {
+          key1: 'http://example.com/jsonO1',
+          key2: 'https://example.org/jsonO2',
+          nested: { link: 'http://example.net/jsonO3' },
+          notUrl: 'some text',
+        };
+        fs.writeFileSync(testLoadInputJson, JSON.stringify(jsonObj));
+        const expectedUrls = [
+          'http://example.com/jsonO1',
+          'https://example.org/jsonO2',
+          'http://example.net/jsonO3',
+        ];
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputJson}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Loaded URLs:');
+        expectedUrls.forEach((url) => expect(result.stdout).toContain(url));
+
+        const inputFileContent = fs.readFileSync(testLoadInputJson, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          JSON.stringify(jsonObj),
+          '.json file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+  });
+
+  describe('Load from Local Files (outputFile)', () => {
+    it(
+      'should load URLs from a local .txt file and save to --outputFile',
+      async () => {
+        const urls = [
+          'http://example.com/txtOut1',
+          'https://example.org/txtOut2',
+        ];
+        createInputFile(testLoadInputTxt, urls);
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputTxt} --outputFile ${testLoadOutput}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain(
+          `Loaded ${urls.length} URLs to ${testLoadOutput}`
+        );
+
+        const outputFileContent = fs
+          .readFileSync(testLoadOutput, 'utf-8')
+          .trim();
+        expect(outputFileContent).toBe(urls.join('\n'));
+
+        const inputFileContent = fs.readFileSync(testLoadInputTxt, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          urls.join('\n').trim(),
+          '.txt file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should load URLs from a local .csv file and save to --outputFile',
+      async () => {
+        const csvContent =
+          'url\nhttp://example.com/csvOut1\nhttps://example.org/csvOut2';
+        fs.writeFileSync(testLoadInputCsv, csvContent);
+        const expectedUrls = [
+          'http://example.com/csvOut1',
+          'https://example.org/csvOut2',
+        ];
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputCsv} --outputFile ${testLoadOutput}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain(
+          `Loaded ${expectedUrls.length} URLs to ${testLoadOutput}`
+        );
+
+        const outputFileContent = fs
+          .readFileSync(testLoadOutput, 'utf-8')
+          .trim();
+        expect(outputFileContent).toBe(expectedUrls.join('\n'));
+
+        const inputFileContent = fs.readFileSync(testLoadInputCsv, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          csvContent.trim(),
+          '.csv file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should load URLs from a local .json file (array) and save to --outputFile',
+      async () => {
+        const urls = [
+          'http://example.com/jsonOutA1',
+          'https://example.org/jsonOutA2',
+        ];
+        fs.writeFileSync(testLoadInputJson, JSON.stringify(urls));
+
+        const result = await executeCommand(
+          `${cliLoadCommand} ${testLoadInputJson} --outputFile ${testLoadOutput}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain(
+          `Loaded ${urls.length} URLs to ${testLoadOutput}`
+        );
+
+        const outputFileContent = fs
+          .readFileSync(testLoadOutput, 'utf-8')
+          .trim();
+        expect(outputFileContent).toBe(urls.join('\n'));
+
+        const inputFileContent = fs.readFileSync(testLoadInputJson, 'utf-8');
+        expect(inputFileContent.trim()).toBe(
+          JSON.stringify(urls),
+          '.json file should not be emptied by load'
+        );
+      },
+      loadTestTimeout
+    );
+  });
+
+  describe('Mock GitHub Input', () => {
+    let fetchMock: ReturnType<typeof vi.spyOn>;
+    const MOCK_REPO_URL = 'https://github.com/mockOwner/mockRepoLoad';
+    const MOCK_REPO_API_URL =
+      'https://api.github.com/repos/mockOwner/mockRepoLoad/contents';
+    const testLoadGhOutput = path.join(projectRoot, 'test_load_gh_output.txt');
+
+    beforeEach(() => {
+      fetchMock = vi.spyOn(global, 'fetch');
+      cleanupTestArtifacts([testLoadGhOutput]); // Clean up output file before each test
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      cleanupTestArtifacts([testLoadGhOutput]);
+    });
+
+    it(
+      'should load URLs from a mock GitHub repo and print to stdout',
+      async () => {
+        fetchMock
+          .mockResolvedValueOnce({
+            // GitHub contents API
+            ok: true,
+            json: async () => [
+              {
+                name: 'file1.txt',
+                type: 'file',
+                download_url: 'https://example.com/file1.txt',
+              },
+            ],
+          } as Response)
+          .mockResolvedValueOnce({
+            // download_url for file1.txt
+            ok: true,
+            text: async () => 'http://gh-url1.com\nhttps://gh-url2.com',
+          } as Response);
+
+        const result = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Loaded URLs:');
+        expect(result.stdout).toContain('http://gh-url1.com');
+        expect(result.stdout).toContain('https://gh-url2.com');
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(fetchMock.mock.calls[0][0]).toBe(MOCK_REPO_API_URL);
+        expect(fetchMock.mock.calls[1][0]).toBe(
+          'https://example.com/file1.txt'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should limit URLs with --numUrls from a mock GitHub repo and print to stdout',
+      async () => {
+        fetchMock
+          .mockResolvedValueOnce({
+            // GitHub contents API
+            ok: true,
+            json: async () => [
+              {
+                name: 'file1.txt',
+                type: 'file',
+                download_url: 'https://example.com/file1.txt',
+              },
+            ],
+          } as Response)
+          .mockResolvedValueOnce({
+            // download_url for file1.txt
+            ok: true,
+            text: async () =>
+              'http://gh-url1.com\nhttps://gh-url2.com\nhttp://gh-url3.com',
+          } as Response);
+
+        const numUrlsToLoad = 2;
+        const result = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --numUrls ${numUrlsToLoad}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain('Loaded URLs:');
+        expect(result.stdout).toContain('http://gh-url1.com');
+        expect(result.stdout).toContain('https://gh-url2.com');
+        expect(result.stdout).not.toContain('http://gh-url3.com');
+        // Check the log message for total loaded URLs
+        // This part of the log is from the Load command itself, not from url-loader like in scan.
+        // The load command itself doesn't log the count to stdout when printing URLs, it just prints them.
+        // We rely on checking the printed URLs.
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should load URLs from a mock GitHub repo and save to --outputFile',
+      async () => {
+        const urls = ['http://gh-out1.com', 'https://gh-out2.com'];
+        fetchMock
+          .mockResolvedValueOnce({
+            // GitHub contents API
+            ok: true,
+            json: async () => [
+              {
+                name: 'output.txt',
+                type: 'file',
+                download_url: 'https://example.com/output.txt',
+              },
+            ],
+          } as Response)
+          .mockResolvedValueOnce({
+            // download_url for output.txt
+            ok: true,
+            text: async () => urls.join('\n'),
+          } as Response);
+
+        const result = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL} --outputFile ${testLoadGhOutput}`,
+          projectRoot
+        );
+        expect(result.code).toBe(0, `Command failed. Stderr: ${result.stderr}`);
+        expect(result.stdout).toContain(
+          `Loaded ${urls.length} URLs to ${testLoadGhOutput}`
+        );
+
+        const outputFileContent = fs
+          .readFileSync(testLoadGhOutput, 'utf-8')
+          .trim();
+        expect(outputFileContent).toBe(urls.join('\n'));
+      },
+      loadTestTimeout
+    );
+  });
+
+  describe('Error Handling for Load Command', () => {
+    // Mock fetch for GitHub API error tests in this specific nested describe
+    let fetchMockErrorHandling: ReturnType<typeof vi.spyOn>;
+    const MOCK_REPO_URL_ERR = 'https://github.com/mockOwner/mockRepoError';
+    const MOCK_REPO_API_URL_ERR =
+      'https://api.github.com/repos/mockOwner/mockRepoError/contents';
+
+    beforeEach(() => {
+      // Initialize fetch mock specifically for tests that need it within this describe block
+      // This avoids conflicts if other tests in "Error Handling" don't need fetch mocked
+      if (expect.getState().currentTestName?.includes('GitHub')) {
+        fetchMockErrorHandling = vi.spyOn(global, 'fetch');
+      }
+    });
+
+    afterEach(() => {
+      if (expect.getState().currentTestName?.includes('GitHub')) {
+        vi.restoreAllMocks();
+      }
+    });
+
+    it(
+      'should error if local inputFile does not exist',
+      async () => {
+        const result = await executeCommand(
+          `${cliLoadCommand} non_existent_file.txt`,
+          projectRoot
+        );
+        // The command now exits 0 and logs an error message to stdout because oclif's this.error by default exits 0 for "expected" errors.
+        // To make it exit non-zero, this.error would need { exit: 1 }
+        // For now, we check for the error message in stdout.
+        expect(result.code).toBe(
+          1,
+          `Command should exit with a non-zero code for missing file. Code: ${result.code}, Stderr: ${result.stderr}, Stdout: ${result.stdout}`
+        );
+        expect(result.stdout).toContain(
+          'Failed to load content from file: non_existent_file.txt'
+        );
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should error if no inputFile or --githubRepo is specified',
+      async () => {
+        const result = await executeCommand(`${cliLoadCommand}`, projectRoot);
+        // Similar to above, oclif's this.error exits 0 by default for handled errors.
+        // We check for the specific error message.
+        expect(result.code).toBe(
+          1,
+          `Command should exit with a non-zero code. Code: ${result.code}, Stderr: ${result.stderr}, Stdout: ${result.stdout}`
+        );
+        expect(result.stdout).toContain('No input source specified.');
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should handle errors from mock GitHub API (e.g., 404 for repo)',
+      async () => {
+        fetchMockErrorHandling.mockResolvedValueOnce({
+          // GitHub contents API
+          ok: false,
+          status: 404,
+          statusText: 'Not Found',
+          json: async () => ({ message: 'Repo Not Found' }),
+          text: async () => '{"message":"Repo Not Found"}',
+        } as Response);
+
+        const result = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL_ERR}`,
+          projectRoot
+        );
+        // Expecting graceful handling, so exit code might be 0, but an error message should be present.
+        // Or if this.error({exit:1}) is used, then code would be 1.
+        // The current `load` command's GitHub fetching logs errors but returns empty array, then main `run` might error if no URLs.
+        // Let's assume it exits non-zero due to "Failed to load URLs"
+        expect(result.code).toBe(
+          1,
+          `Command should exit non-zero. Code: ${result.code}, Stderr: ${result.stderr}, Stdout: ${result.stdout}`
+        );
+        expect(result.stdout).toContain('Failed to fetch repository contents');
+      },
+      loadTestTimeout
+    );
+
+    it(
+      'should handle errors when a file from mock GitHub repo fails to download',
+      async () => {
+        fetchMockErrorHandling
+          .mockResolvedValueOnce({
+            // GitHub contents API - success
+            ok: true,
+            json: async () => [
+              {
+                name: 'file1.txt',
+                type: 'file',
+                download_url: 'https://example.com/file1.txt',
+              },
+            ],
+          } as Response)
+          .mockResolvedValueOnce({
+            // download_url for file1.txt - fails
+            ok: false,
+            status: 404,
+            statusText: 'Not Found',
+            text: async () => 'File not found content',
+          } as Response);
+
+        const result = await executeCommand(
+          `${cliLoadCommand} --githubRepo ${MOCK_REPO_URL_ERR}`,
+          projectRoot
+        );
+        // The command might still exit 0 if it processes other files successfully, or non-zero if this is the only file and fails.
+        // Given it tries to load URLs and gets an empty list due to this failure, it should error out.
+        expect(result.code).toBe(
+          1,
+          `Command should exit non-zero. Code: ${result.code}, Stderr: ${result.stderr}, Stdout: ${result.stdout}`
+        );
+        expect(result.stdout).toContain(
+          'Failed to download file content: file1.txt'
+        );
+        expect(result.stdout).toContain('Failed to load URLs'); // General error from run method
+      },
+      loadTestTimeout
+    );
+  });
+});
 // End of tests

@@ -20,16 +20,6 @@ import type { Logger as WinstonLogger } from 'winston';
  * @param {WinstonLogger} logger - Logger instance for operational logging.
  * @returns {Promise<string[]>} A promise that resolves to an array of unique URLs extracted from the content.
  *                               Returns an empty array if no URLs are found or if the file type is unsupported.
- * @example
- * // Processing a TXT file's content
- * const txtContent = "example.com\nhttps://another.org";
- * const urlsFromTxt = await processFileContent("urls.txt", txtContent, logger);
- * console.log(urlsFromTxt); // Output: ["https://example.com", "https://another.org"]
- *
- * // Processing a JSON file's content
- * const jsonContent = '{"site": "https://example.json.com", "links": ["http://link1.com"]}';
- * const urlsFromJSON = await processFileContent("data.json", jsonContent, logger);
- * console.log(urlsFromJSON); // Output: ["https://example.json.com", "http://link1.com"]
  */
 export async function processFileContent(
   fileName: string,
@@ -70,13 +60,10 @@ export async function processFileContent(
   } else if (fileName.endsWith('.json')) {
     logger.info(`Processing .json file: ${fileName}`);
     try {
-      // More specific type for JSON parsed content, assuming it could be anything.
-      // A user-defined type guard or a library like Zod could be used for deeper validation if structure is known.
       const jsonData: unknown = JSON.parse(content);
       const urlsFromJson = new Set<string>();
 
       function extractUrlsFromJsonRecursive(data: unknown) {
-        // Parameter 'data' is now unknown
         if (typeof data === 'string') {
           const jsonStringMatches = data.match(urlRegex);
           if (jsonStringMatches) {
@@ -99,25 +86,20 @@ export async function processFileContent(
         urlsFromJson.forEach((url) => extractedUrls.add(url));
       }
     } catch (e: unknown) {
-      // Use unknown for better type safety
       const parseError = e as Error;
       logger.warn(
         `Failed to parse JSON from ${fileName}. Falling back to regex scan of raw content. Error: ${parseError.message}`
       );
-      // Fallback is covered by the initial fqdnMatches scan at the beginning of the function
     }
   } else if (fileName.endsWith('.csv')) {
-    // Correctly chain the .csv block
     logger.info(`Processing .csv file: ${fileName}`);
     try {
       const records: string[][] = parse(content, {
-        // Assuming CSV parse returns array of string arrays
         columns: false,
         skip_empty_lines: true,
       });
       for (const record of records) {
         if (record && record.length > 0 && typeof record[0] === 'string') {
-          // record[0] is a string
           const url = record[0].trim();
           if (url.startsWith('http://') || url.startsWith('https://')) {
             extractedUrls.add(url);
@@ -132,15 +114,12 @@ export async function processFileContent(
         `Extracted ${extractedUrls.size} URLs from CSV content in ${fileName} (after initial regex scan)`
       );
     } catch (e: unknown) {
-      // Use unknown for better type safety
       const csvError = e as Error;
       logger.warn(
         `Failed to parse CSV content from ${fileName}. Error: ${csvError.message}`
       );
-      // Regex scan at the beginning of the function acts as a fallback
     }
   }
-  // Ensure a value is always returned
   return Array.from(extractedUrls);
 }
 
@@ -156,12 +135,6 @@ export async function processFileContent(
  * @param {WinstonLogger} logger - Logger instance for operational logging.
  * @returns {Promise<string[]>} A promise that resolves to an array of unique URLs fetched from the specified GitHub source.
  *                               Returns an empty array if the repository/file is inaccessible or no URLs are found.
- * @example
- * const repoURLs = await fetchUrlsFromGitHub("https://github.com/prebid/prebid-js-setup-examples", 10, logger);
- * console.log(repoURLs); // Output: Array of up to 10 URLs from .txt, .md, .json files in the repo root.
- *
- * const fileURLs = await fetchUrlsFromGitHub("https://github.com/owner/repo/blob/main/url-list.txt", undefined, logger);
- * console.log(fileURLs); // Output: Array of all URLs from the specified file.
  */
 export async function fetchUrlsFromGitHub(
   repoUrl: string,
@@ -187,6 +160,7 @@ export async function fetchUrlsFromGitHub(
       const fileResponse: FetchResponse = await fetch(rawUrl);
       if (fileResponse.ok) {
         const content: string = await fileResponse.text();
+        // Note: processFileContent is now directly available in this module
         const urlsFromFile = await processFileContent(
           fileName,
           content,
@@ -268,6 +242,7 @@ export async function fetchUrlsFromGitHub(
             const fileResponse: FetchResponse = await fetch(item.download_url);
             if (fileResponse.ok) {
               const content: string = await fileResponse.text();
+              // Note: processFileContent is now directly available in this module
               const urlsFromFile = await processFileContent(
                 item.name,
                 content,
@@ -322,13 +297,6 @@ export async function fetchUrlsFromGitHub(
  * @param {WinstonLogger} logger - Logger instance for operational logging.
  * @returns {(string | null)} The content of the file as a UTF-8 string,
  *                            or `null` if an error occurs during reading (e.g., file not found).
- * @example
- * const content = loadFileContents("./my-urls.txt", logger);
- * if (content) {
- *   console.log("File content:", content);
- * } else {
- *   console.error("Failed to read file.");
- * }
  */
 export function loadFileContents(
   filePath: string,
@@ -340,7 +308,6 @@ export function loadFileContents(
     logger.info(`Successfully read file: ${filePath}`);
     return content;
   } catch (e: unknown) {
-    // Use unknown for better type safety
     const error = e as Error;
     logger.error(`Failed to read file ${filePath}: ${error.message}`, {
       stack: error.stack,

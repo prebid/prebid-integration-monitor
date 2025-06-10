@@ -3,6 +3,10 @@ import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js';
 import { scanArgs, scanFlags } from './scan-options.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import initializeLogger
 import { AppError } from '../common/AppError.js';
+import * as readline from 'readline';
+import type { Logger as WinstonLogger } from 'winston';
+import { loadFileContents, processFileContent } from '../utils/url-loader.js';
+// import { EventEmitter } from 'events'; // For progress reporting (optional, if you keep setupEventHandlers)
 
 /**
  * @class Scan
@@ -25,14 +29,14 @@ export default class Scan extends Command {
    * Displayed in the CLI help output.
    */
   static override description =
-    'Scans websites for Prebid.js integrations and other ad technologies. \nInput can be a local file (TXT, CSV, JSON) or a GitHub repository.';
+    'Scans websites for Prebid.js integrations and other ad technologies. \nInput can be a local file (TXT, CSV, JSON) or URLs from stdin.';
   /**
    * @property {string[]} examples - Illustrative examples of how to use the command.
    * Displayed in the CLI help output.
    */
   static override examples = [
     '<%= config.bin %> <%= command.id %> urls.txt --puppeteerType=cluster --concurrency=10',
-    '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/owner/repo/blob/main/urls.txt --numUrls 50',
+    'cat urls.txt | <%= config.bin %> <%= command.id %> --puppeteerType=vanilla --outputDir ./scan_results',
     '<%= config.bin %> <%= command.id %> urls.csv --range="1-100" --chunkSize=20 --outputDir=./scan_results --logDir=./scan_logs',
   ];
   /**
@@ -59,7 +63,7 @@ export default class Scan extends Command {
       monitor: flags.monitor,
       outputDir: flags.outputDir,
       logDir: flags.logDir,
-      numUrls: flags.numUrls,
+      // numUrls: flags.numUrls, // Removed
       range: flags.range,
       chunkSize: flags.chunkSize,
       puppeteerLaunchOptions: {
@@ -83,32 +87,7 @@ export default class Scan extends Command {
    * @param {PrebidExplorerOptions} options - The options object to be updated.
    * @throws {Error} If no input source (neither `inputFile` argument nor `githubRepo` flag) is specified.
    */
-  private _getInputSourceOptions(
-    args: Interfaces.InferredArgs<typeof Scan.args>,
-    flags: Interfaces.InferredFlags<typeof Scan.flags>,
-    options: PrebidExplorerOptions
-  ): void {
-    if (flags.githubRepo) {
-      this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
-      options.githubRepo = flags.githubRepo;
-      // Warn if inputFile arg is provided but will be ignored (excluding default value for inputFile if that's how it's handled)
-      if (args.inputFile && args.inputFile !== scanArgs.inputFile.default) {
-        this.warn(
-          `--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`
-        );
-      }
-    } else if (args.inputFile) {
-      this.log(`Using input file: ${args.inputFile}`);
-      options.inputFile = args.inputFile;
-    } else {
-      // This should ideally be caught by oclif's argument/flag requirement system if configured appropriately.
-      // However, as a safeguard:
-      this.error(
-        'No input source specified. Please provide the inputFile argument or use the --githubRepo flag.',
-        { exit: 1 }
-      );
-    }
-  }
+  // Removed _getInputSourceOptions as URL source is handled directly in run()
 
   /**
    * Executes the scan command.
@@ -131,8 +110,60 @@ export default class Scan extends Command {
     initializeLogger(flags.logDir);
     const logger = loggerModule.instance;
 
-    const options = this._getPrebidExplorerOptions(flags);
-    this._getInputSourceOptions(args, flags, options); // This method might call this.error and exit
+    let urlsToScan: string[] = [];
+
+    if (args.inputFile) {
+      logger.info(`Reading URLs from input file: ${args.inputFile}`);
+      const fileContent = loadFileContents(args.inputFile, logger);
+      if (fileContent) {
+        const fileName = args.inputFile.split('/').pop() || args.inputFile;
+        urlsToScan = await processFileContent(fileName, fileContent, logger);
+        if (urlsToScan.length === 0) {
+          logger.warn(`No URLs found in ${args.inputFile}. Exiting.`);
+          this.exit(0); // Exit gracefully if no URLs
+        }
+        logger.info(
+          `Successfully read ${urlsToScan.length} URLs from ${args.inputFile}.`
+        );
+      } else {
+        this.error(`Failed to read from input file: ${args.inputFile}`, {
+          exit: 1,
+        });
+      }
+    } else if (!process.stdin.isTTY) {
+      logger.info('Reading URLs from stdin...');
+      try {
+        urlsToScan = await this.readUrlsFromStdin(logger);
+        if (urlsToScan.length === 0) {
+          logger.warn('No URLs read from stdin. Exiting.');
+          this.exit(0); // Exit gracefully if no URLs
+        }
+        logger.info(`Successfully read ${urlsToScan.length} URLs from stdin.`);
+      } catch (error: unknown) {
+        logger.error(
+          'Failed to read URLs from stdin:',
+          (error as Error).message
+        ); // Cast error
+        this.error(`Error reading from stdin: ${(error as Error).message}`, {
+          exit: 1,
+        });
+      }
+    } else {
+      this.error(
+        'No input specified. Provide an input file argument or pipe data from stdin.',
+        { exit: 1 }
+      );
+    }
+
+    const options: PrebidExplorerOptions = {
+      ...this._getPrebidExplorerOptions(flags),
+      urlsToScan, // Pass the loaded URLs
+    };
+
+    // Remove inputFile from options if urlsToScan is populated, to avoid confusion in prebidExplorer
+    if (options.urlsToScan && options.urlsToScan.length > 0) {
+      delete options.inputFile;
+    }
 
     logger.info(`Starting Prebid scan with options:`);
     // Log the options (excluding potentially sensitive puppeteerLaunchOptions if necessary in future)
@@ -147,7 +178,8 @@ export default class Scan extends Command {
     logger.info(JSON.stringify(loggableOptions, null, 2));
 
     try {
-      await prebidExplorer(options);
+      // Pass eventEmitter if prebidExplorer is designed to use it
+      await prebidExplorer(options /* , eventEmitter */);
       this.log('Prebid scan completed successfully.');
     } catch (error: unknown) {
       // Logger should already be initialized here.
@@ -189,5 +221,35 @@ export default class Scan extends Command {
         suggestions,
       });
     }
+  }
+
+  // Helper method to read URLs from stdin
+  private async readUrlsFromStdin(logger: WinstonLogger): Promise<string[]> {
+    const lines: string[] = [];
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: false,
+    });
+
+    return new Promise((resolve, reject) => {
+      rl.on('line', (line) => {
+        const trimmedLine = line.trim();
+        if (trimmedLine) {
+          // Basic regex for schemeless domains (e.g., example.com)
+          if (
+            trimmedLine.startsWith('http://') ||
+            trimmedLine.startsWith('https://') ||
+            trimmedLine.match(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+          ) {
+            lines.push(trimmedLine);
+          } else {
+            logger.warn(`Skipping invalid line from stdin: ${line}`);
+          }
+        }
+      });
+      rl.on('close', () => resolve(lines));
+      rl.on('error', (err) => reject(err));
+    });
   }
 }
