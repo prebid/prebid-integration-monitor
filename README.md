@@ -106,35 +106,24 @@ This application is now structured as an oclif (Open CLI Framework) command-line
 
 ### `scan` Command
 
-The `scan` command is used to analyze a list of websites for Prebid.js integrations and other specified ad technology libraries. It processes URLs from an input file, launches Puppeteer instances to visit these pages, and collects data, saving the results to an output directory.
+The `scan` command is used to analyze a list of websites for Prebid.js integrations and other specified ad technology libraries. It processes URLs from a local input file, launches Puppeteer instances to visit these pages, and collects data, saving the results to an output directory.
 
 **Syntax:**
 
 ```bash
-./bin/run scan [INPUTFILE] [FLAGS...]
-# or in development: node ./bin/dev.js scan [INPUTFILE] [FLAGS...]
-# or using npm script: npm run prebid:scan -- [INPUTFILE] [FLAGS...] (note the -- to pass arguments to the script)
+./bin/run scan INPUTFILE [FLAGS...]
+# or in development: node ./bin/dev.js scan INPUTFILE [FLAGS...]
+# or using npm script: npm run prebid:scan -- INPUTFILE [FLAGS...] (note the -- to pass arguments to the script)
 ```
 
 **Argument:**
 
-- `INPUTFILE`: (Optional) Path to a local input file containing URLs.
+- `INPUTFILE`: (Required) Path to a local input file containing URLs.
   - Accepts `.txt` (one URL per line), `.csv` (URLs in the first column), or `.json` (extracts all string values that are URLs) files.
-  - This argument is required if `--githubRepo` is not used.
-  - If `--githubRepo` is provided, `INPUTFILE` is ignored.
-  - If neither `INPUTFILE` nor `--githubRepo` is specified, the command will show an error (unless the default `src/input.txt` exists and is readable).
-  - Defaults to `src/input.txt` if no other source is specified.
 
 **Flags:**
 
-- `--githubRepo <URL>`: Specifies a public GitHub URL from which to fetch URLs.
-  - This can be a base repository URL (e.g., `https://github.com/owner/repo`) to scan for URLs within processable files (like `.txt`, `.json`, `.md`) in the repository root.
-  - Alternatively, it can be a direct link to a specific processable file within a repository (e.g., `https://github.com/owner/repo/blob/main/some/path/file.txt`). In this case, only the specified file will be fetched and processed.
-  - Example (repository): `--githubRepo https://github.com/owner/repo`
-  - Example (direct file): `--githubRepo https://github.com/owner/repo/blob/main/urls.txt`
-- `--numUrls <number>`: When used with `--githubRepo`, this flag limits the number of URLs to be extracted and processed from the repository.
-  - Default: `100`
-  - Example: `--numUrls 50`
+- `--numUrls <number>`: Limits the number of URLs to be processed from the input file.
 - `--puppeteerType <option>`: Specifies the Puppeteer operational mode.
   - Options: `vanilla`, `cluster` (default)
   - `vanilla`: Processes URLs sequentially using a single Puppeteer browser instance.
@@ -146,32 +135,32 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 - `--monitor`: Enables `puppeteer-cluster`'s web monitoring interface (available at `http://localhost:21337` by default) when `puppeteerType=cluster`.
   - Default: `false`
 - `--outputDir <value>`: Specifies the directory where scan results (JSON files) will be saved.
-  - Default: `output` (in the project root)
-  - Results are typically saved in a subdirectory structure like `output/Month/YYYY-MM-DD.json`.
+  - Default: `store` (in the project root)
+  - Results are typically saved in a subdirectory structure like `store/Month/YYYY-MM-DD.json`.
 - `--logDir <value>`: Specifies the directory where log files (`app.log`, `error.log`) will be saved.
   - Default: `logs` (in the project root)
-- `--range <string>`: Specify a line range (e.g., '10-20', '5-', '-15') to process from the input source (file, CSV, or GitHub-extracted URLs). Uses 1-based indexing. If the source is a GitHub repo, the range applies to the aggregated list of URLs extracted from all targeted files in the repo.
+- `--range <string>`: Specify a line range (e.g., '10-20', '5-', '-15') to process from the input file. Uses 1-based indexing.
   - Example: `--range 10-50` or `--range 1-`
 - `--chunkSize <number>`: Process URLs in chunks of this size. This processes all URLs (whether from the full input or a specified range) but does so by loading and analyzing only `chunkSize` URLs at a time. Useful for very large lists of URLs to manage resources or process incrementally.
   - Example: `--chunkSize 50`
 
 **Usage Examples:**
 
-1.  **Basic scan (using default `input.txt` and cluster mode):**
+1.  **Basic scan (using `my_urls.txt` and cluster mode):**
 
     ```bash
-    ./bin/run scan
+    ./bin/run scan my_urls.txt
     ```
 
-    _(Ensure `./bin/run` has execute permissions or use `node ./bin/run scan`)_
+    _(Ensure `./bin/run` has execute permissions or use `node ./bin/run scan my_urls.txt`)_
 
 2.  **Scan using vanilla Puppeteer:**
 
     ```bash
-    ./bin/run scan --puppeteerType=vanilla
+    ./bin/run scan my_urls.txt --puppeteerType=vanilla
     ```
 
-3.  **Scan with a specific input file and output directory:**
+3.  **Scan with a specific output directory:**
 
     ```bash
     ./bin/run scan my_urls.txt --outputDir=./my_results
@@ -180,50 +169,88 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 4.  **Scan in non-headless (headed) mode:**
 
     ```bash
-    ./bin/run scan --no-headless
+    ./bin/run scan my_urls.txt --no-headless
     ```
 
 5.  **Scan with increased concurrency and monitoring for cluster mode:**
 
     ```bash
-    ./bin/run scan --concurrency=10 --monitor
+    ./bin/run scan my_urls.txt --concurrency=10 --monitor
     ```
 
-6.  **Scan URLs from a GitHub repository:**
-
-    ```bash
-    ./bin/run scan --githubRepo https://github.com/owner/repo
-    ```
-
-7.  **Scan a limited number of URLs from a GitHub repository:**
-
-    ```bash
-    ./bin/run scan --githubRepo https://github.com/owner/repo --numUrls 50
-    ```
-
-8.  **Scan URLs from a local CSV file (using INPUTFILE argument):**
+6.  **Scan URLs from a local CSV file:**
 
     ```bash
     ./bin/run scan ./data/urls_to_scan.csv
     ```
 
-9.  **Scan URLs from a local JSON file (using INPUTFILE argument):**
+7.  **Scan URLs from a local JSON file, limiting to 50 URLs:**
 
     ```bash
-    ./bin/run scan ./data/urls_to_scan.json
+    ./bin/run scan ./data/urls_to_scan.json --numUrls 50
     ```
 
-10. **Scan a specific range of URLs from a large input file, in chunks:**
+8.  **Scan a specific range of URLs from a large input file, in chunks:**
     ```bash
     ./bin/run scan very_large_list_of_sites.txt --range 1001-2000 --chunkSize 100
     ```
 
-#### Notes on URL Extraction
+#### Notes on URL Extraction for `scan`
+The `scan` command itself does not directly extract URLs from files; it relies on the input file providing a direct list of URLs. The URL extraction logic (handling TXT, CSV, JSON, schemeless domains) is primarily managed by the `load` command. For the `scan` command, ensure your `INPUTFILE` contains one URL per line if it's a `.txt` file, or is a correctly formatted CSV/JSON that the underlying Prebid Explorer can process.
 
-- When processing `.txt` files (or GitHub files treated as text), the scanner looks for fully qualified URLs (e.g., `http://example.com`) and also attempts to identify and prepend `https://` to schemeless domains (e.g., `example.com` becomes `https://example.com`).
-- For `.csv` files, URLs are expected to be in the first column and should be fully qualified (e.g., `http://example.com`). Schemeless domains from CSVs are currently skipped.
+### `load` Command
+
+The `load` command is used to fetch and list URLs from various sources, such as local files (TXT, CSV, JSON) or files within public GitHub repositories. This command is useful for pre-validating input sources or simply listing URLs before further processing.
+
+**Syntax:**
+
+```bash
+./bin/run load [INPUTFILE] [FLAGS...]
+# or in development: node ./bin/dev.js load [INPUTFILE] [FLAGS...]
+```
+
+**Argument:**
+
+- `INPUTFILE`: (Optional) Path to a local input file.
+  - Accepts `.txt` (one URL per line, also detects schemeless domains), `.csv` (extracts URLs from the first column), or `.json` (extracts all string values that look like URLs).
+  - This argument is required if `--githubRepo` is not used.
+
+**Flags:**
+
+- `--githubRepo <URL>`: Specifies a public GitHub URL from which to fetch URLs.
+  - This can be a base repository URL (e.g., `https://github.com/owner/repo`) to scan for URLs within processable files (like `.txt`, `.json`, `.md`) in the repository root.
+  - Alternatively, it can be a direct link to a specific processable file within a repository (e.g., `https://github.com/owner/repo/blob/main/some/path/file.txt`).
+- `-n, --numUrls <number>`: Limits the number of URLs to be loaded and displayed.
+- `--logDir <value>`: Specifies the directory where log files will be saved for the load operation.
+  - Default: `logs`
+
+**Usage Examples:**
+
+1.  **Load URLs from a local text file:**
+    ```bash
+    ./bin/run load urls.txt
+    ```
+
+2.  **Load URLs from a specific file in a GitHub repository:**
+    ```bash
+    ./bin/run load --githubRepo https://github.com/owner/repo/blob/main/urls.txt
+    ```
+
+3.  **Load a limited number of URLs from a local CSV file:**
+    ```bash
+    ./bin/run load my_url_list.csv -n 50
+    ```
+
+4.  **Load URLs from a GitHub repository, limiting to 20 URLs and specifying a log directory:**
+    ```bash
+    ./bin/run load --githubRepo https://github.com/prebid/prebid-js-setup-examples --numUrls 20 --logDir ./custom_logs
+    ```
+
+#### Notes on URL Extraction for `load`
+
+- When processing `.txt` files (or GitHub files treated as text), the `load` command looks for fully qualified URLs (e.g., `http://example.com`) and also attempts to identify and prepend `https://` to schemeless domains (e.g., `example.com` becomes `https://example.com`).
+- For `.csv` files, URLs are expected to be in the first column and should be fully qualified (e.g., `http://example.com`). Schemeless domains from CSVs are currently skipped by the CSV parser logic.
 - For `.json` files, all string values are recursively scanned. Fully qualified URLs are extracted. If a malformed JSON file is encountered, a fallback regex scan of the raw content is performed.
-- Entries in input sources that are malformed (e.g., `htp://missing-t.com`) or use unsupported schemes (e.g., `ftp://`) are generally skipped.
 
 ### `stats:generate` Command
 
@@ -239,7 +266,7 @@ The `stats:generate` command processes stored website scan data (typically found
 
 **Flags:**
 
-This command currently does not take any specific flags.
+This command currently does not take any specific flags beyond the global `--logDir`.
 
 **Usage Example:**
 

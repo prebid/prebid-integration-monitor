@@ -26,7 +26,9 @@ import {
   BatchSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
 import loggerModule from './utils/logger.js';
-const logger = loggerModule.instance;
+import type { Logger as WinstonLogger } from 'winston';
+
+let logger: WinstonLogger;
 // Resource and SemanticResourceAttributes would be needed if _createServiceResource is used.
 // import { Resource } from '@opentelemetry/resources';
 // import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
@@ -76,6 +78,8 @@ let sdk: NodeSDK | undefined;
  * Errors during initialization are logged, and the application may continue without tracing if an error occurs.
  */
 export const initTracer = () => {
+  // Get the logger instance here, assuming initializeLogger has been called by the command
+  logger = loggerModule.instance;
   try {
     const otlpExporter = new OTLPTraceExporter({
       // Default OTLP exporter configuration.

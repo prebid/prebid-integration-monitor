@@ -1,22 +1,28 @@
 import { Args, Flags } from '@oclif/core';
 
+/**
+ * Defines the arguments for the `scan` command.
+ * @property {object} inputFile - Argument for the path to a local input file (TXT, CSV, JSON) containing URLs. This is a required argument.
+ */
 export const scanArgs = {
   inputFile: Args.string({
-    description: 'Input file path (accepts .txt, .csv, .json)',
-    required: false,
-    default: 'src/input.txt',
+    description:
+      'Path to a local input file (TXT, CSV, JSON) containing URLs to scan.',
+    required: true,
+    // `default` should be removed when `required: true`, oclif handles this.
+    // default: 'src/input.txt',
   }),
 };
 
+/**
+ * Defines the flags for the `scan` command.
+ * These flags allow users to configure aspects of the scan such as Puppeteer behavior,
+ * output directories, logging, URL processing limits (range, chunking, total number), etc.
+ * The `githubRepo` flag has been removed as the command now only supports local file inputs.
+ */
 export const scanFlags = {
-  githubRepo: Flags.string({
-    description: 'GitHub repository URL to fetch URLs from',
-    required: false,
-  }),
   numUrls: Flags.integer({
-    description:
-      'Number of URLs to load from the GitHub repository (used only with --githubRepo)',
-    default: 100,
+    description: 'Limit the number of URLs to process from the input file.',
     required: false,
   }),
   puppeteerType: Flags.string({

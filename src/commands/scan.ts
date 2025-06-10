@@ -1,13 +1,13 @@
 import { Command, Interfaces } from '@oclif/core';
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js';
-import { scanArgs, scanFlags } from './scan-options.js';
+import { scanArgs, scanFlags } from '../utils/scan-options.js'; // Updated path
 import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import initializeLogger
 import { AppError } from '../common/AppError.js';
 
 /**
  * @class Scan
  * @description Oclif command for scanning websites for Prebid.js integrations and other ad technologies.
- * This command allows users to specify a source of URLs (either a local file or a GitHub repository),
+ * This command allows users to specify a source of URLs from a local file,
  * configure Puppeteer's behavior (e.g., headless mode, concurrency for cluster operations),
  * define output directories for results and logs, and control aspects of the scan like URL ranges or chunking.
  * It utilizes the `prebidExplorer` function to perform the core scanning logic.
@@ -15,9 +15,7 @@ import { AppError } from '../common/AppError.js';
 export default class Scan extends Command {
   /**
    * @property {object} args - Defines the command-line arguments accepted by this command.
-   * @property {object} args.inputFile - Path to a local input file containing URLs.
-   *                                     Supports `.txt`, `.csv`, or `.json` files.
-   *                                     This is optional if `--githubRepo` is used.
+   * @property {object} args.inputFile - Path to a local input file (TXT, CSV, JSON) containing URLs to scan. This argument is required.
    */
   static override args = scanArgs;
   /**
@@ -25,19 +23,19 @@ export default class Scan extends Command {
    * Displayed in the CLI help output.
    */
   static override description =
-    'Scans websites for Prebid.js integrations and other ad technologies. \nInput can be a local file (TXT, CSV, JSON) or a GitHub repository.';
+    'Scans websites for Prebid.js integrations and other ad technologies using a list of URLs from a local file.';
   /**
    * @property {string[]} examples - Illustrative examples of how to use the command.
    * Displayed in the CLI help output.
    */
   static override examples = [
     '<%= config.bin %> <%= command.id %> urls.txt --puppeteerType=cluster --concurrency=10',
-    '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/owner/repo/blob/main/urls.txt --numUrls 50',
     '<%= config.bin %> <%= command.id %> urls.csv --range="1-100" --chunkSize=20 --outputDir=./scan_results --logDir=./scan_logs',
+    '<%= config.bin %> <%= command.id %> path/to/your/urls.json --numUrls 50',
   ];
   /**
    * @property {object} flags - Defines the command-line flags accepted by this command.
-   * Refer to `scan-options.ts` for detailed descriptions of each flag.
+   * Refer to `src/utils/scan-options.ts` for detailed descriptions of each flag.
    */
   static override flags = scanFlags;
 
@@ -72,39 +70,28 @@ export default class Scan extends Command {
   }
 
   /**
-   * Determines the input source (file or GitHub repository) based on provided arguments and flags.
-   * It updates the `options` object with `inputFile` or `githubRepo` accordingly.
-   * This method prioritizes `githubRepo` if both are somehow provided (though CLI flags should prevent this).
-   * It logs the chosen source and warns if `inputFile` is ignored.
+   * Validates and sets the input file option for the scan.
+   * This method ensures that an input file is provided (as it's a required argument)
+   * and sets it in the `options` object for `prebidExplorer`.
    *
    * @private
-   * @param {Interfaces.InferredArgs<typeof Scan.args>} args - The parsed arguments object.
-   * @param {Interfaces.InferredFlags<typeof Scan.flags>} flags - The parsed flags object.
-   * @param {PrebidExplorerOptions} options - The options object to be updated.
-   * @throws {Error} If no input source (neither `inputFile` argument nor `githubRepo` flag) is specified.
+   * @param {Interfaces.InferredArgs<typeof Scan.args>} args - The parsed arguments object, expecting `args.inputFile`.
+   * @param {PrebidExplorerOptions} options - The options object to be updated with the input file path.
+   * @throws {Error} If `args.inputFile` is not provided (though oclif's argument parsing should prevent this).
    */
   private _getInputSourceOptions(
     args: Interfaces.InferredArgs<typeof Scan.args>,
-    flags: Interfaces.InferredFlags<typeof Scan.flags>,
     options: PrebidExplorerOptions
   ): void {
-    if (flags.githubRepo) {
-      this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
-      options.githubRepo = flags.githubRepo;
-      // Warn if inputFile arg is provided but will be ignored (excluding default value for inputFile if that's how it's handled)
-      if (args.inputFile && args.inputFile !== scanArgs.inputFile.default) {
-        this.warn(
-          `--githubRepo provided, inputFile argument ('${args.inputFile}') will be ignored.`
-        );
-      }
-    } else if (args.inputFile) {
+    if (args.inputFile) {
       this.log(`Using input file: ${args.inputFile}`);
       options.inputFile = args.inputFile;
     } else {
-      // This should ideally be caught by oclif's argument/flag requirement system if configured appropriately.
-      // However, as a safeguard:
+      // This error should ideally be caught by oclif's argument requirement system,
+      // as inputFile in scanArgs is now marked as required: true.
+      // Adding a safeguard here.
       this.error(
-        'No input source specified. Please provide the inputFile argument or use the --githubRepo flag.',
+        'No input file specified. Please provide the inputFile argument.',
         { exit: 1 }
       );
     }
@@ -132,7 +119,7 @@ export default class Scan extends Command {
     const logger = loggerModule.instance;
 
     const options = this._getPrebidExplorerOptions(flags);
-    this._getInputSourceOptions(args, flags, options); // This method might call this.error and exit
+    this._getInputSourceOptions(args, options); // This method might call this.error and exit
 
     logger.info(`Starting Prebid scan with options:`);
     // Log the options (excluding potentially sensitive puppeteerLaunchOptions if necessary in future)
