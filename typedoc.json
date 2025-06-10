@@ -1,5 +1,6 @@
 {
-  "entryPoints": [],
+  "entryPoints": ["./src"],
+  "entryPointStrategy": "expand",
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown"],
   "exclude": ["**/node_modules/**", "**/dist/**", "**/tests/**", "**/bin/**"],

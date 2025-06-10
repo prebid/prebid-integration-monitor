@@ -40,6 +40,7 @@ import {
   processAndLogTaskResults,
   writeResultsToFile,
   updateInputFile,
+  writeErrorUrlToFile,
 } from './utils/results-handler.js';
 
 /**
@@ -535,6 +536,48 @@ export async function prebidExplorer(
   // Use functions from results-handler.ts
   const successfulResults = processAndLogTaskResults(taskResults, logger);
   writeResultsToFile(successfulResults, options.outputDir, logger);
+
+  const ERROR_FILES_DIR = 'errors';
+  for (const taskResult of taskResults) {
+    if (taskResult.type === 'no_data') {
+      writeErrorUrlToFile(taskResult.url, 'no_prebid', ERROR_FILES_DIR, logger);
+    } else if (taskResult.type === 'error') {
+      let errorTypeForFile: 'navigation_error' | 'processing_error' =
+        'processing_error';
+      // Common navigation/network related error codes that suggest a navigation problem
+      const navigationErrorCodes = [
+        'TIMEOUT', // Generic timeout, often navigation related
+        'PUPPETEER_TIMEOUT', // Specific Puppeteer timeout
+        'NAVIGATION_FAILED', // General navigation failure
+        'ERR_CONNECTION_REFUSED',
+        'ERR_CONNECTION_RESET',
+        'ERR_CONNECTION_TIMED_OUT',
+        'ERR_EMPTY_RESPONSE',
+        'ERR_TUNNEL_CONNECTION_FAILED',
+        'ERR_CERT_AUTHORITY_INVALID',
+        'ERR_SSL_PROTOCOL_ERROR',
+        'ERR_ADDRESS_UNREACHABLE',
+        'ERR_PROXY_CONNECTION_FAILED',
+        'ERR_NAME_NOT_RESOLVED',
+        'ERR_INTERNET_DISCONNECTED',
+        'ERR_TIMED_OUT', // Chromium's generic timeout error
+        // Add more codes as identified
+      ];
+      if (
+        taskResult.error &&
+        taskResult.error.code &&
+        navigationErrorCodes.includes(taskResult.error.code)
+      ) {
+        errorTypeForFile = 'navigation_error';
+      }
+      writeErrorUrlToFile(
+        taskResult.url,
+        errorTypeForFile,
+        ERROR_FILES_DIR,
+        logger
+      );
+    }
+  }
 
   if (urlSourceType === 'InputFile' && options.inputFile) {
     updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);

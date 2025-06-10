@@ -97,18 +97,22 @@ export function processAndLogTaskResults(
 
 /**
  * Writes an array of {@link PageData} objects to a JSON file.
- * The file is organized into a directory structure based on the current year and month,
- * and the filename includes the current date (e.g., `<outputDir>/<YYYY-MM-Mon>/<YYYY-MM-DD>.json`).
- * If the target directory (including year-month subdirectory) does not exist, it will be created.
+ * The file is organized into a directory structure: `baseOutputDir/Mmm-YYYY/YYYY-MM-DD.json`.
+ * For example, results for April 2nd, 2025, would be in `baseOutputDir/Apr-2025/2025-04-02.json`.
+ * If the target directory (including the month-year subdirectory) does not exist, it will be created.
  *
- * @param {PageData[]} resultsToSave - An array of `PageData` objects to be written to the file.
+ * If a file for the current day already exists and contains a valid JSON array, new results are appended to it.
+ * Otherwise, a new file is created, or an existing file with invalid content (not a JSON array) is overwritten.
+ *
+ * @param {PageData[]} resultsToSave - An array of `PageData` objects to be written.
  *                                     If empty or undefined, the function logs this and returns without writing.
- * @param {string} baseOutputDir - The root directory where the dated subdirectories and result files will be created.
- * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages, including success or failure of file operations.
+ * @param {string} baseOutputDir - The root directory for the dated subdirectories and result files (e.g., "store").
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages.
  * @example
- * const dataToSave = [{ url: 'https://a.com', libraries: [], date: '2023-01-01', prebidInstances: [] }];
- * writeResultsToFile(dataToSave, "/app/output", logger);
- * // This might create a file like /app/output/2023-01-Jan/2023-01-15.json (assuming current date is Jan 15, 2023)
+ * const exampleData = [{ url: 'https://example.com', libraries: ['libX'], date: '2025-04-02', prebidInstances: [] }];
+ * // Assuming 'baseOutputDir' is 'store' and current date is April 2nd, 2025:
+ * writeResultsToFile(exampleData, "store", logger);
+ * // This would create or append to: store/Apr-2025/2025-04-02.json
  */
 export function writeResultsToFile(
   resultsToSave: PageData[],
@@ -127,11 +131,8 @@ export function writeResultsToFile(
     const monthShort = now.toLocaleString('default', { month: 'short' }); // e.g., "Jan", "Feb"
     const dayPadded = String(now.getDate()).padStart(2, '0'); // Ensure two digits for day
 
-    // Create a year-month directory, e.g., "2023-01-Jan"
-    const monthDir = path.join(
-      baseOutputDir,
-      `${year}-${monthPadded}-${monthShort}`
-    );
+    // Create a month-year directory, e.g., "Apr-2025"
+    const monthDir = path.join(baseOutputDir, `${monthShort}-${year}`);
     if (!fs.existsSync(monthDir)) {
       fs.mkdirSync(monthDir, { recursive: true }); // Create directory recursively if it doesn't exist
       logger.info(`Created output directory: ${monthDir}`);
@@ -140,11 +141,36 @@ export function writeResultsToFile(
     const dateFilename = `${year}-${monthPadded}-${dayPadded}.json`;
     const filePath = path.join(monthDir, dateFilename);
 
-    const jsonOutput = JSON.stringify(resultsToSave, null, 2); // Pretty print JSON
-    fs.writeFileSync(filePath, jsonOutput + '\n', 'utf8'); // Add newline for POSIX compatibility
-    logger.info(
-      `Successfully wrote ${resultsToSave.length} results to ${filePath}`
-    );
+    if (fs.existsSync(filePath)) {
+      let existingData: PageData[] = [];
+      try {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        existingData = JSON.parse(fileContent);
+        if (!Array.isArray(existingData)) {
+          logger.warn(
+            `Existing file ${filePath} does not contain a valid JSON array. Overwriting.`
+          );
+          existingData = [];
+        }
+      } catch (parseError: any) {
+        logger.warn(
+          `Error parsing existing file ${filePath}. Overwriting. Error: ${parseError.message}`
+        );
+        existingData = [];
+      }
+      const combinedData = existingData.concat(resultsToSave);
+      const jsonOutput = JSON.stringify(combinedData, null, 2);
+      fs.writeFileSync(filePath, jsonOutput + '\n', 'utf8'); // Add newline for POSIX compatibility
+      logger.info(
+        `Successfully appended ${resultsToSave.length} results to ${filePath}. Total results: ${combinedData.length}`
+      );
+    } else {
+      const jsonOutput = JSON.stringify(resultsToSave, null, 2); // Pretty print JSON
+      fs.writeFileSync(filePath, jsonOutput + '\n', 'utf8'); // Add newline for POSIX compatibility
+      logger.info(
+        `Successfully wrote ${resultsToSave.length} new results to ${filePath}`
+      );
+    }
   } catch (e: unknown) {
     const err = e as Error; // Cast to Error for standard properties
     logger.error('Failed to write results to file system.', {
@@ -270,5 +296,76 @@ export function updateInputFile(
     logger.error(`Failed to update ${inputFilepath}: ${writeError.message}`, {
       stack: writeError.stack,
     });
+  }
+}
+
+/**
+ * Appends a URL to a specified error file based on the type of error encountered.
+ * Error files are simple text files with one URL per line.
+ *
+ * - If the `baseErrorDir` does not exist, it will be created recursively.
+ * - The filename is determined by `errorType`:
+ *   - 'no_prebid': "no_prebid.txt"
+ *   - 'navigation_error': "navigation_errors.txt"
+ *   - 'processing_error': "error_processing.txt"
+ *
+ * @param {string} url - The URL to write to the error file.
+ * @param {'no_prebid' | 'navigation_error' | 'processing_error'} errorType - The category of error, determining the target file.
+ * @param {string} url - The URL to log to the error file.
+ * @param {'no_prebid' | 'navigation_error' | 'processing_error'} errorType - The category of error, which dictates the filename.
+ * @param {string} baseErrorDir - The base directory where error files will be stored (e.g., "errors").
+ *                                This directory will be created if it doesn't exist.
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages.
+ * @example
+ * // To log a URL that had a navigation issue:
+ * writeErrorUrlToFile("https://example.com/timed_out", "navigation_error", "errors", logger);
+ * // This appends "https://example.com/timed_out" to the "errors/navigation_errors.txt" file.
+ *
+ * // To log a URL where no Prebid.js was found:
+ * writeErrorUrlToFile("https://example.com/no_prebid_here", "no_prebid", "errors", logger);
+ * // This appends "https://example.com/no_prebid_here" to the "errors/no_prebid.txt" file.
+ */
+export function writeErrorUrlToFile(
+  url: string,
+  errorType: 'no_prebid' | 'navigation_error' | 'processing_error',
+  baseErrorDir: string,
+  logger: WinstonLogger
+): void {
+  let filename: string;
+  switch (errorType) {
+    case 'no_prebid':
+      filename = 'no_prebid.txt';
+      break;
+    case 'navigation_error':
+      filename = 'navigation_errors.txt';
+      break;
+    case 'processing_error':
+      filename = 'error_processing.txt';
+      break;
+    default:
+      // Should be unreachable if errorType is correctly typed
+      logger.error(
+        `Invalid errorType provided: ${errorType}. Cannot write URL to error file.`
+      );
+      return;
+  }
+
+  const filePath = path.join(baseErrorDir, filename);
+
+  try {
+    if (!fs.existsSync(baseErrorDir)) {
+      fs.mkdirSync(baseErrorDir, { recursive: true });
+      logger.info(`Created error directory: ${baseErrorDir}`);
+    }
+
+    fs.appendFileSync(filePath, url + '\n', 'utf8');
+    logger.info(`Appended URL ${url} to ${filePath}`);
+  } catch (error: any) {
+    logger.error(
+      `Failed to append URL ${url} to ${filePath}: ${error.message}`,
+      {
+        stack: error.stack,
+      }
+    );
   }
 }
