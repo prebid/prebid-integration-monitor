@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "test": "vitest --exclude tests/cli.test.ts",
     "pretest": "npx puppeteer browsers install chrome",
     "build:check": "tsc --noEmit",
@@ -63,6 +63,7 @@
     "nock": "^14.0.5",
     "oclif": "^4.17.46",
     "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
     "typedoc": "^0.28.5",
     "typedoc-plugin-markdown": "^4.6.4",
     "typescript": "^5.8.3",
