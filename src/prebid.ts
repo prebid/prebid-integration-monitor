@@ -38,7 +38,9 @@ import type { TaskResult } from './common/types.ts';
 
 import {
   processAndLogTaskResults,
-  writeResultsToFile,
+  writeResultsToStoreFile,
+  appendNoPrebidUrls,
+  appendErrorUrls,
   updateInputFile,
 } from './utils/results-handler.js';
 
@@ -534,7 +536,13 @@ export async function prebidExplorer(
 
   // Use functions from results-handler.ts
   const successfulResults = processAndLogTaskResults(taskResults, logger);
-  writeResultsToFile(successfulResults, options.outputDir, logger);
+
+  // Write results to store directory by default
+  writeResultsToStoreFile(successfulResults, process.cwd(), logger);
+
+  // Append URLs to error files based on task results
+  appendNoPrebidUrls(taskResults, logger);
+  appendErrorUrls(taskResults, logger);
 
   if (urlSourceType === 'InputFile' && options.inputFile) {
     updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);

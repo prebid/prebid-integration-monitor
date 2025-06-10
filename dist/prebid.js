@@ -24,7 +24,7 @@ import { processFileContent, fetchUrlsFromGitHub, loadFileContents, } from './ut
 import { processPageTask, // The core function for processing a single page
 // TaskResult and PageData are now imported from common/types
  } from './utils/puppeteer-task.js';
-import { processAndLogTaskResults, writeResultsToFile, updateInputFile, } from './utils/results-handler.js';
+import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, } from './utils/results-handler.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -377,7 +377,11 @@ export async function prebidExplorer(options) {
     }
     // Use functions from results-handler.ts
     const successfulResults = processAndLogTaskResults(taskResults, logger);
-    writeResultsToFile(successfulResults, options.outputDir, logger);
+    // Write results to store directory by default
+    writeResultsToStoreFile(successfulResults, process.cwd(), logger);
+    // Append URLs to error files based on task results
+    appendNoPrebidUrls(taskResults, logger);
+    appendErrorUrls(taskResults, logger);
     if (urlSourceType === 'InputFile' && options.inputFile) {
         updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);
     }

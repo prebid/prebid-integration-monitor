@@ -148,6 +148,7 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
 - `--outputDir <value>`: Specifies the directory where scan results (JSON files) will be saved.
   - Default: `output` (in the project root)
   - Results are typically saved in a subdirectory structure like `output/Month/YYYY-MM-DD.json`.
+  - **Note**: By default, scan results are automatically stored in the `store/` directory using the format `store/mmm-yyyy/yyyy-mm-dd.json` (e.g., `store/Apr-2025/2025-04-15.json`) and appended to existing files.
 - `--logDir <value>`: Specifies the directory where log files (`app.log`, `error.log`) will be saved.
   - Default: `logs` (in the project root)
 - `--range <string>`: Specify a line range (e.g., '10-20', '5-', '-15') to process from the input source (file, CSV, or GitHub-extracted URLs). Uses 1-based indexing. If the source is a GitHub repo, the range applies to the aggregated list of URLs extracted from all targeted files in the repo.
@@ -217,6 +218,18 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
     ```bash
     ./bin/run scan very_large_list_of_sites.txt --range 1001-2000 --chunkSize 100
     ```
+
+#### Default Storage and Error Handling
+
+By default, the scan command automatically:
+
+1. **Stores Prebid Data**: Results are automatically saved to `store/mmm-yyyy/yyyy-mm-dd.json` format (e.g., `store/Apr-2025/2025-04-15.json`) and appended to existing files for the current date.
+
+2. **Logs URLs with No Prebid**: URLs where no Prebid.js integration is found are automatically appended to `errors/no_prebid.txt`.
+
+3. **Logs Error URLs**: 
+   - URLs with name resolution errors (`ERR_NAME_NOT_RESOLVED`) are logged to `errors/navigation_errors.txt` in the format: `url,ERROR_CODE`
+   - Other processing errors are logged to `errors/error_processing.txt` with timestamp, URL, message, and error details.
 
 #### Notes on URL Extraction
 

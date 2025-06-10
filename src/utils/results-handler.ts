@@ -96,6 +96,88 @@ export function processAndLogTaskResults(
 }
 
 /**
+ * Writes an array of {@link PageData} objects to a JSON file in the store directory.
+ * The file is organized into a directory structure based on the current year and month,
+ * using the format `store/<mmm-yyyy>/<yyyy-mm-dd>.json` (e.g., `store/Apr-2025/2025-04-15.json`).
+ * If the target directory does not exist, it will be created. Results are appended to existing files.
+ *
+ * @param {PageData[]} resultsToSave - An array of `PageData` objects to be written to the file.
+ *                                     If empty or undefined, the function logs this and returns without writing.
+ * @param {string} baseOutputDir - The root directory where the dated subdirectories and result files will be created.
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages, including success or failure of file operations.
+ * @example
+ * const dataToSave = [{ url: 'https://a.com', libraries: [], date: '2023-01-01', prebidInstances: [] }];
+ * writeResultsToStoreFile(dataToSave, "/app", logger);
+ * // This might create a file like /app/store/Jan-2023/2023-01-15.json (assuming current date is Jan 15, 2023)
+ */
+export function writeResultsToStoreFile(
+  resultsToSave: PageData[],
+  baseOutputDir: string,
+  logger: WinstonLogger
+): void {
+  if (!resultsToSave || resultsToSave.length === 0) {
+    logger.info('No results to save to store file.');
+    return;
+  }
+
+  try {
+    const now = new Date();
+    const year = now.getFullYear().toString();
+    const monthPadded = String(now.getMonth() + 1).padStart(2, '0'); // Ensure two digits for month
+    const monthShort = now.toLocaleString('default', { month: 'short' }); // e.g., "Jan", "Feb"
+    const dayPadded = String(now.getDate()).padStart(2, '0'); // Ensure two digits for day
+
+    // Create store directory structure: store/mmm-yyyy format (e.g., "Apr-2025")
+    const storeDir = path.join(baseOutputDir, 'store');
+    const monthDir = path.join(storeDir, `${monthShort}-${year}`);
+
+    if (!fs.existsSync(monthDir)) {
+      fs.mkdirSync(monthDir, { recursive: true }); // Create directory recursively if it doesn't exist
+      logger.info(`Created store directory: ${monthDir}`);
+    }
+
+    const dateFilename = `${year}-${monthPadded}-${dayPadded}.json`;
+    const filePath = path.join(monthDir, dateFilename);
+
+    // Check if file exists to append to existing data
+    let existingData: PageData[] = [];
+    if (fs.existsSync(filePath)) {
+      try {
+        const existingContent = fs.readFileSync(filePath, 'utf8');
+        if (existingContent.trim()) {
+          existingData = JSON.parse(existingContent);
+          if (!Array.isArray(existingData)) {
+            existingData = [];
+          }
+        }
+      } catch {
+        logger.warn(
+          `Failed to parse existing file ${filePath}, will overwrite`
+        );
+        existingData = [];
+      }
+    }
+
+    // Append new results to existing data
+    const combinedData = [...existingData, ...resultsToSave];
+    const jsonOutput = JSON.stringify(combinedData, null, 2); // Pretty print JSON
+    fs.writeFileSync(filePath, jsonOutput + '\n', 'utf8'); // Add newline for POSIX compatibility
+    logger.info(
+      `Successfully wrote ${resultsToSave.length} new results (${combinedData.length} total) to ${filePath}`
+    );
+  } catch (e: unknown) {
+    const err = e as Error; // Cast to Error for standard properties
+    logger.error('Failed to write results to store file system.', {
+      errorName: err.name,
+      errorMessage: err.message,
+      stack: err.stack, // Include stack trace for debugging
+    });
+    // Note: This function currently does not re-throw the error.
+    // The caller (e.g., prebidExplorer) will continue, potentially without saved results for this batch.
+  }
+}
+
+/**
  * Writes an array of {@link PageData} objects to a JSON file.
  * The file is organized into a directory structure based on the current year and month,
  * and the filename includes the current date (e.g., `<outputDir>/<YYYY-MM-Mon>/<YYYY-MM-DD>.json`).
@@ -154,6 +236,135 @@ export function writeResultsToFile(
     });
     // Note: This function currently does not re-throw the error.
     // The caller (e.g., prebidExplorer) will continue, potentially without saved results for this batch.
+  }
+}
+
+/**
+ * Appends URLs to the no_prebid.txt file when no prebid data is found.
+ * This function automatically logs URLs that returned 'no_data' results to track sites without Prebid integration.
+ *
+ * @param {TaskResult[]} taskResults - An array of task results to process
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages
+ */
+export function appendNoPrebidUrls(
+  taskResults: TaskResult[],
+  logger: WinstonLogger
+): void {
+  const noPrebidUrls = taskResults
+    .filter((result) => result && result.type === 'no_data')
+    .map((result) => (result as any).url)
+    .filter((url) => url);
+
+  if (noPrebidUrls.length === 0) {
+    return;
+  }
+
+  try {
+    const noPrebidFilePath = path.join(
+      process.cwd(),
+      'errors',
+      'no_prebid.txt'
+    );
+
+    // Ensure errors directory exists
+    const errorsDir = path.dirname(noPrebidFilePath);
+    if (!fs.existsSync(errorsDir)) {
+      fs.mkdirSync(errorsDir, { recursive: true });
+      logger.info(`Created errors directory: ${errorsDir}`);
+    }
+
+    // Append URLs to the file, one per line
+    const urlsToAppend = noPrebidUrls.join('\n') + '\n';
+    fs.appendFileSync(noPrebidFilePath, urlsToAppend, 'utf8');
+
+    logger.info(`Appended ${noPrebidUrls.length} URLs to no_prebid.txt`);
+  } catch (e: unknown) {
+    const err = e as Error;
+    logger.error('Failed to append URLs to no_prebid.txt', {
+      errorName: err.name,
+      errorMessage: err.message,
+      stack: err.stack,
+    });
+  }
+}
+
+/**
+ * Appends URLs to appropriate error files based on error types.
+ * URLs with name resolution errors (ERR_NAME_NOT_RESOLVED) go to navigation_errors.txt,
+ * other errors go to error_processing.txt.
+ *
+ * @param {TaskResult[]} taskResults - An array of task results to process
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages
+ */
+export function appendErrorUrls(
+  taskResults: TaskResult[],
+  logger: WinstonLogger
+): void {
+  const errorResults = taskResults.filter(
+    (result) => result && result.type === 'error'
+  );
+
+  if (errorResults.length === 0) {
+    return;
+  }
+
+  const navigationErrors: string[] = [];
+  const processingErrors: string[] = [];
+
+  for (const result of errorResults) {
+    const errorResult = result as any;
+    const url = errorResult.url;
+    const errorCode = errorResult.error?.code || '';
+    const errorMessage = errorResult.error?.message || '';
+
+    if (errorCode.includes('ERR_NAME_NOT_RESOLVED')) {
+      navigationErrors.push(`${url},${errorCode}`);
+    } else {
+      // Format: timestamp | URL | Message | Error
+      const timestamp = new Date().toISOString();
+      const logEntry = `${timestamp} | URL: ${url} | Message: ${errorMessage} | Error: ${errorCode}`;
+      processingErrors.push(logEntry);
+    }
+  }
+
+  try {
+    const errorsDir = path.join(process.cwd(), 'errors');
+
+    // Ensure errors directory exists
+    if (!fs.existsSync(errorsDir)) {
+      fs.mkdirSync(errorsDir, { recursive: true });
+      logger.info(`Created errors directory: ${errorsDir}`);
+    }
+
+    // Append navigation errors (name not resolved)
+    if (navigationErrors.length > 0) {
+      const navigationErrorsPath = path.join(
+        errorsDir,
+        'navigation_errors.txt'
+      );
+      const navigationContent = navigationErrors.join('\n') + '\n';
+      fs.appendFileSync(navigationErrorsPath, navigationContent, 'utf8');
+      logger.info(
+        `Appended ${navigationErrors.length} URLs to navigation_errors.txt`
+      );
+    }
+
+    // Append processing errors
+    if (processingErrors.length > 0) {
+      const processingErrorsPath = path.join(errorsDir, 'error_processing.txt');
+      const processingContent = processingErrors.join('\n') + '\n';
+      fs.appendFileSync(processingErrorsPath, processingContent, 'utf8');
+      logger.info(
+        `Appended ${processingErrors.length} URLs to error_processing.txt`
+      );
+    }
+  } catch (e: unknown) {
+    const err = e as Error;
+    logger.error('Failed to append URLs to error files', {
+      errorName: err.name,
+      errorMessage: err.message,
+      stack: err.stack,
+    });
   }
 }
 
