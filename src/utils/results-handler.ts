@@ -5,24 +5,31 @@
  * directory structure, and updating input files (e.g., removing successfully processed URLs).
  */
 
-import * as fs from 'fs';
+import * as fs from 'fs'; // fs.existsSync is still used by appendToErrorFile, and current writeResultsToFile
 import * as path from 'path'; // Import path module for robust file path operations
 import type { Logger as WinstonLogger } from 'winston';
 // Import shared types from the new common location
 import type { TaskResult, PageData } from '../common/types.js';
+import {
+  ensureDirectoryExists,
+  readJsonFile,
+  writeJsonFile,
+} from './file-system-utils.js'; // Corrected import path
 
 /**
  * Processes an array of {@link TaskResult} objects. It logs the outcome of each task
- * (success, no data, or error) using the provided logger and aggregates all {@link PageData}
- * from tasks that were successfully processed.
+ * (success, no data, or error) using the provided logger, aggregates all {@link PageData}
+ * from successfully processed tasks, and triggers side effects such as writing URLs to
+ * specific error files (e.g., for 'no_data' or 'error' types via `appendToErrorFile`).
  *
  * For tasks of type 'error', it logs the structured {@link ErrorDetails} including
- * `code`, `message`, and potentially `stack`.
+ * `code`, `message`, and potentially `stack`. It also categorizes errors to different
+ * files (e.g., navigation errors vs. other processing errors).
  *
  * @param {TaskResult[]} taskResults - An array of task results. Each element is an object
  *                                     conforming to the `TaskResult` discriminated union
  *                                     (i.e., {@link TaskResultSuccess}, {@link TaskResultNoData}, or {@link TaskResultError}).
- * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages.
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages and passing to helper functions.
  * @returns {PageData[]} An array containing only the `PageData` objects from successful tasks.
  *                       Returns an empty array if no tasks were successful or if the input `taskResults` is empty.
  * @example
@@ -72,13 +79,43 @@ export function processAndLogTaskResults(
           `NO_DATA: No relevant ad tech data found for ${taskResult.url}`,
           { url: taskResult.url }
         );
+
+        appendToErrorFile(
+          path.join('errors', 'no_prebid.txt'),
+          taskResult.url,
+          logger
+        );
         break;
       case 'error':
-        // Log structured error details
+        const errorDetails = taskResult.error; // Standardize access
+        const errorMessage = (errorDetails.message || '').toLowerCase();
+        const errorCode = (errorDetails.code || '').toLowerCase();
+
+        // Log structured error details (already done, but good to be aware of context)
         logger.error(
-          `ERROR: Processing failed for ${taskResult.url} - Code: ${taskResult.error.code}, Msg: ${taskResult.error.message}`,
-          { url: taskResult.url, errorDetails: taskResult.error } // errorDetails will contain code, message, and stack
+          `ERROR: Processing failed for ${taskResult.url} - Code: ${errorCode}, Msg: ${errorMessage}`,
+          { url: taskResult.url, errorDetails: errorDetails }
         );
+
+        // Determine error type for file logging
+        if (
+          errorCode.includes('enotfound') || // General DNS resolution failure
+          errorCode.includes('err_name_not_resolved') || // Specific DNS resolution error code
+          errorMessage.includes('dns probe finished nxdomain') || // Common browser DNS error message
+          errorMessage.includes('net::err_name_not_resolved') // Chromium specific DNS error
+        ) {
+          appendToErrorFile(
+            path.join('errors', 'navigation_errors.txt'),
+            taskResult.url,
+            logger
+          );
+        } else {
+          appendToErrorFile(
+            path.join('errors', 'error_processing.txt'),
+            taskResult.url,
+            logger
+          );
+        }
         break;
       default:
         // This path should ideally be unreachable if 'type' is always a valid TaskResultType.
@@ -96,70 +133,159 @@ export function processAndLogTaskResults(
 }
 
 /**
- * Writes an array of {@link PageData} objects to a JSON file.
- * The file is organized into a directory structure based on the current year and month,
- * and the filename includes the current date (e.g., `<outputDir>/<YYYY-MM-Mon>/<YYYY-MM-DD>.json`).
- * If the target directory (including year-month subdirectory) does not exist, it will be created.
+ * Appends a URL to a specified file, typically used for logging URLs that resulted in specific errors or conditions.
+ * This function ensures that the directory for the `filePath` exists before attempting to append the URL.
+ * If the directory does not exist, it will be created recursively.
+ * Each URL is appended on a new line.
  *
- * @param {PageData[]} resultsToSave - An array of `PageData` objects to be written to the file.
- *                                     If empty or undefined, the function logs this and returns without writing.
- * @param {string} baseOutputDir - The root directory where the dated subdirectories and result files will be created.
- * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages, including success or failure of file operations.
- * @example
- * const dataToSave = [{ url: 'https://a.com', libraries: [], date: '2023-01-01', prebidInstances: [] }];
- * writeResultsToFile(dataToSave, "/app/output", logger);
- * // This might create a file like /app/output/2023-01-Jan/2023-01-15.json (assuming current date is Jan 15, 2023)
+ * @async
+ * @function appendToErrorFile
+ * @param {string} filePath - The path to the file where the URL should be appended (e.g., 'errors/no_prebid.txt').
+ * @param {string} url - The URL string to append to the file.
+ * @param {WinstonLogger} logger - An instance of WinstonLogger used for logging the operation's success or failure.
+ * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
-export function writeResultsToFile(
-  resultsToSave: PageData[],
-  baseOutputDir: string,
+async function appendToErrorFile(
+  filePath: string,
+  url: string,
   logger: WinstonLogger
-): void {
+): Promise<void> {
+  try {
+    const dir = path.dirname(filePath);
+    // Check if the directory exists, create it if it doesn't
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      logger.info(`Created directory for error file: ${dir}`);
+    }
+    fs.appendFileSync(filePath, url + '\n', 'utf8'); // Add newline for each URL
+    logger.info(`Appended ${url} to ${filePath}`);
+  } catch (e: unknown) {
+    const err = e as Error; // Cast to Error for standard properties
+    logger.error(`Failed to append URL to ${filePath}: ${err.message}`, {
+      url,
+      filePath,
+      errorName: err.name, // Standard error properties
+      stack: err.stack, // Include stack trace for debugging
+    });
+    // Depending on requirements, this could re-throw or handle more gracefully.
+    // For now, it logs and continues.
+  }
+}
+
+/**
+ * Writes an array of {@link PageData} objects to a JSON file.
+ * The function implements an append-or-create logic: if the target file already exists and contains
+ * a valid JSON array, the new data is appended to it. Otherwise, a new file is created (or an
+ * invalid existing file is overwritten).
+ *
+ * The output directory structure for these Prebid results is fixed as: `store/<Mmm-yyyy>/<yyyy-mm-dd>.json`,
+ * (e.g., `store/Apr-2023/2023-04-01.json`).
+ * The `_baseOutputDir` parameter is currently ignored for this specific output logic, with 'store/'
+ * being used as the root.
+ *
+ * This function is asynchronous and leverages utility functions for directory creation and file operations.
+ *
+ * @async
+ * @function writeResultsToFile
+ * @param {PageData[]} resultsToSave - An array of `PageData` objects to be written.
+ *                                     If empty or undefined, the function logs this and returns without writing.
+ * @param {string} _baseOutputDir - This parameter is currently **ignored** for this function's primary logic,
+ *                                  as the output path is hardcoded to `store/` for Prebid JSON results.
+ *                                  It's maintained for potential signature compatibility elsewhere.
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages,
+ *                                 including success or failure of file operations.
+ * @returns {Promise<void>} A promise that resolves when the write operation is complete or if there's nothing to save.
+ * @example
+ * const dataToSave = [{ url: 'https://example.com', date: '2023-04-01', libraries: [], prebidInstances: [] }];
+ * // This call will attempt to write/append to 'store/Apr-2023/2023-04-01.json' (assuming the current date is April 1, 2023).
+ * await writeResultsToFile(dataToSave, "any_path_can_be_here_it_is_ignored", logger);
+ */
+export async function writeResultsToFile(
+  resultsToSave: PageData[],
+  _baseOutputDir: string, // Parameter's value is ignored for the 'store/' prebid data logic.
+  logger: WinstonLogger
+): Promise<void> {
   if (!resultsToSave || resultsToSave.length === 0) {
     logger.info('No results to save to file.');
     return;
   }
 
+  const internalBaseDir = 'store'; // Hardcoded base directory
+
   try {
     const now = new Date();
-    const year = now.getFullYear().toString();
-    const monthPadded = String(now.getMonth() + 1).padStart(2, '0'); // Ensure two digits for month
-    const monthShort = now.toLocaleString('default', { month: 'short' }); // e.g., "Jan", "Feb"
-    const dayPadded = String(now.getDate()).padStart(2, '0'); // Ensure two digits for day
+    const year = now.getFullYear().toString(); // YYYY
+    const monthShort = now.toLocaleString('en-US', { month: 'short' }); // Mmm (e.g., Apr)
+    const monthPadded = String(now.getMonth() + 1).padStart(2, '0'); // MM for filename
+    const dayPadded = String(now.getDate()).padStart(2, '0'); // DD for filename
 
-    // Create a year-month directory, e.g., "2023-01-Jan"
-    const monthDir = path.join(
-      baseOutputDir,
-      `${year}-${monthPadded}-${monthShort}`
-    );
-    if (!fs.existsSync(monthDir)) {
-      fs.mkdirSync(monthDir, { recursive: true }); // Create directory recursively if it doesn't exist
-      logger.info(`Created output directory: ${monthDir}`);
-    }
+    // Directory structure: store/Mmm-yyyy
+    const outputDir = path.join(internalBaseDir, `${monthShort}-${year}`);
+
+    // Ensure the directory exists
+    await ensureDirectoryExists(outputDir); // Use await here
 
     const dateFilename = `${year}-${monthPadded}-${dayPadded}.json`;
-    const filePath = path.join(monthDir, dateFilename);
+    const filePath = path.join(outputDir, dateFilename);
 
-    const jsonOutput = JSON.stringify(resultsToSave, null, 2); // Pretty print JSON
-    fs.writeFileSync(filePath, jsonOutput + '\n', 'utf8'); // Add newline for POSIX compatibility
+    let finalResults: PageData[] = resultsToSave;
+
+    // Check if file exists to append
+    if (fs.existsSync(filePath)) {
+      logger.info(`File ${filePath} exists. Attempting to read and append.`);
+      try {
+        const existingData = await readJsonFile<PageData[]>(filePath);
+        if (Array.isArray(existingData)) {
+          finalResults = existingData.concat(resultsToSave);
+          logger.info(
+            `Successfully read and appended ${resultsToSave.length} new results to ${filePath}. Total results: ${finalResults.length}`
+          );
+        } else {
+          logger.warn(
+            `Existing file ${filePath} is not a valid JSON array. Overwriting with new results.`
+          );
+          // finalResults is already resultsToSave
+        }
+      } catch (readError: any) {
+        // Handle cases where readJsonFile throws an AppError (e.g. invalid JSON, file not found though existsSync passed)
+        logger.warn(
+          `Could not read or parse existing file ${filePath}. Error: ${readError.message}. Overwriting with new results.`,
+          {
+            errorCode: readError.details?.errorCode,
+            originalErrorMessage: readError.details?.originalError?.message,
+          }
+        );
+        // finalResults is already resultsToSave
+      }
+    } else {
+      logger.info(`File ${filePath} does not exist. Creating new file.`);
+    }
+
+    await writeJsonFile(filePath, finalResults); // Use await here
     logger.info(
-      `Successfully wrote ${resultsToSave.length} results to ${filePath}`
+      `Successfully wrote ${finalResults.length} results to ${filePath}`
     );
   } catch (e: unknown) {
-    const err = e as Error; // Cast to Error for standard properties
-    logger.error('Failed to write results to file system.', {
+    const err = e as Error; // General error casting
+    // Check if it's an AppError from our utils for more details
+    let logDetails: any = {
       errorName: err.name,
       errorMessage: err.message,
-      stack: err.stack, // Include stack trace for debugging
-    });
-    // Note: This function currently does not re-throw the error.
-    // The caller (e.g., prebidExplorer) will continue, potentially without saved results for this batch.
+      stack: err.stack,
+    };
+    if ((e as any).details?.errorCode) {
+      logDetails.errorCode = (e as any).details.errorCode;
+      logDetails.originalError = (e as any).details.originalError?.message;
+    }
+    logger.error('Failed to write results to file system.', logDetails);
+    // Decide if to re-throw or handle. For now, it logs.
   }
 }
 
 /**
  * Updates a specified input file (expected to be a `.txt` file containing a list of URLs, one per line)
  * by removing URLs that were successfully processed in the current run.
+ * This function is not directly related to `writeResultsToFile` changes but is part of the same file.
  *
  * The logic is as follows:
  * 1. Reads all URLs from the existing `inputFilepath`.
