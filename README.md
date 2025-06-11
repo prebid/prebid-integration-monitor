@@ -155,6 +155,10 @@ The `scan` command is used to analyze a list of websites for Prebid.js integrati
   - Example: `--range 10-50` or `--range 1-`
 - `--chunkSize <number>`: Process URLs in chunks of this size. This processes all URLs (whether from the full input or a specified range) but does so by loading and analyzing only `chunkSize` URLs at a time. Useful for very large lists of URLs to manage resources or process incrementally.
   - Example: `--chunkSize 50`
+- `--verbose`: A boolean flag to control the verbosity of log output, especially for errors.
+  - Default: `false`
+  - When `false` (default): Error messages related to URL processing are shortened for console display (e.g., `error: Error processing http://example.com : Connection timed out`). Full details are still available in `logs/error.log`.
+  - When `true` (`--verbose`): Full error messages, including stack traces where available, are displayed in the console for all logs, including errors. This provides maximum detail for debugging.
 
 **Usage Examples:**
 
@@ -227,7 +231,7 @@ By default, the scan command automatically:
 
 2. **Logs URLs with No Prebid**: URLs where no Prebid.js integration is found are automatically appended to `errors/no_prebid.txt`.
 
-3. **Logs Error URLs**: 
+3. **Logs Error URLs**:
    - URLs with name resolution errors (`ERR_NAME_NOT_RESOLVED`) are logged to `errors/navigation_errors.txt` in the format: `url,ERROR_CODE`
    - Other processing errors are logged to `errors/error_processing.txt` with timestamp, URL, message, and error details.
 
