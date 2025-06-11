@@ -113,7 +113,7 @@ export default class Scan extends Command {
         const { args, flags } = await this.parse(Scan);
         // Initialize logger here so it's available for all subsequent operations, including option processing.
         // Note: loggerModule.instance will be set by initializeLogger.
-        initializeLogger(flags.logDir);
+        initializeLogger(flags.logDir, flags.verbose); // Pass the verbose flag
         const logger = loggerModule.instance;
         const options = this._getPrebidExplorerOptions(flags);
         this._getInputSourceOptions(args, flags, options); // This method might call this.error and exit
@@ -137,11 +137,13 @@ export default class Scan extends Command {
             let userMessage = 'An unexpected error occurred during the Prebid scan.';
             let suggestions = ['Check logs for more details.'];
             if (error instanceof AppError) {
+                // Ensure stack is logged if verbose or if it's an unexpected AppError
+                // The logger itself will handle the actual printing of the stack based on its level and formatters
                 logger.error(`AppError during Prebid scan: ${error.message}`, {
                     details: error.details
                         ? JSON.stringify(error.details, null, 2)
                         : undefined,
-                    stack: error.stack,
+                    stack: error.stack, // stack is already included
                 });
                 userMessage = error.details?.errorCode
                     ? `Scan failed with code: ${error.details.errorCode}. Message: ${error.message}`
@@ -154,6 +156,7 @@ export default class Scan extends Command {
                 }
             }
             else if (error instanceof Error) {
+                // Stack is already included for logger.error
                 logger.error(`Error during Prebid scan: ${error.message}`, {
                     stack: error.stack,
                 });
@@ -161,9 +164,12 @@ export default class Scan extends Command {
             }
             else {
                 logger.error('An unknown error occurred during Prebid scan.', {
-                    errorDetail: JSON.stringify(error, null, 2),
+                    errorDetail: JSON.stringify(error, null, 2), // Already stringified
                 });
             }
+            // this.error will show stack trace if OCLIF_DEBUG is set.
+            // Our verbose flag primarily controls our application logger's verbosity.
+            // For oclif's error reporting, the user can use OCLIF_DEBUG for oclif's own verbose output.
             this.error(userMessage, {
                 exit: 1,
                 suggestions,

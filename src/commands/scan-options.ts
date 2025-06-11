@@ -55,4 +55,9 @@ export const scanFlags = {
       'Process URLs in chunks of this size. Processes all URLs in the specified range or input, but one chunk at a time.',
     required: false,
   }),
+  verbose: Flags.boolean({
+    description:
+      'Enable verbose output, including full error messages and stack traces.',
+    default: false,
+  }),
 };
