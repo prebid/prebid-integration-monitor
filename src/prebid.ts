@@ -344,10 +344,11 @@ export async function prebidExplorer(
   });
 
   // 1. URL Range Logic
-  // Apply URL range filtering if specified in options.
+  // Apply URL range filtering if specified in options, but only for non-GitHub sources
+  // (GitHub sources already apply range optimization during fetching)
   const filteringTracer = new URLFilteringTracer(allUrls.length, logger);
   
-  if (options.range) {
+  if (options.range && urlSourceType !== 'GitHub') {
     logger.info(`Applying range: ${options.range}`);
     const originalUrlCount = allUrls.length;
     let [startStr, endStr] = options.range.split('-');
@@ -382,6 +383,9 @@ export async function prebidExplorer(
         );
       }
     }
+  } else if (options.range && urlSourceType === 'GitHub') {
+    logger.info(`Range ${options.range} already applied during GitHub fetch optimization. Skipping duplicate range filtering.`);
+    filteringTracer.recordRangeFiltering(allUrls.length, allUrls.length, options.range);
   }
 
   if (allUrls.length === 0) {

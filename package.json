@@ -9,6 +9,8 @@
     "test": "vitest --exclude tests/cli.test.ts",
     "pretest": "npx puppeteer browsers install chrome",
     "build:check": "tsc --noEmit",
+    "test:all": "npm run test && npm run test:critical",
+    "validate:all": "npm run build:check && npm run lint && npm run format && npm run sync-agent-docs && npm run test:all && npm run validate:integration",
     "start": "node ./bin/run.js",
     "dev": "node --loader ts-node/esm ./bin/dev.js default",
     "scan": "npm run build && node ./bin/run.js scan",
@@ -19,7 +21,13 @@
     "sync-agent-docs": "node scripts/sync-agent-docs.js",
     "validate-docs": "node scripts/sync-agent-docs.js --validate",
     "setup-git-hook": "node scripts/sync-agent-docs.js --setup-hook",
-    "docs-status": "node scripts/sync-agent-docs.js && echo 'Documentation sync complete'"
+    "docs-status": "node scripts/sync-agent-docs.js && echo 'Documentation sync complete'",
+    "test:integration": "npm test src/__tests__/github-range-integration.test.ts && npm test src/__tests__/cli-integration-regression.test.ts",
+    "test:regression": "npm test src/__tests__/github-range-integration.test.ts && npm test src/__tests__/cli-integration-regression.test.ts && npm test src/__tests__/optimization-integration.test.ts",
+    "test:critical": "npm test src/__tests__/github-range-integration.test.ts && npm test src/__tests__/cli-integration-regression.test.ts && npm test src/__tests__/puppeteer-accuracy.test.ts",
+    "validate:integration": "node scripts/validate-integration.js",
+    "validate:pre-commit": ".githooks/pre-commit",
+    "setup:hooks": "git config core.hooksPath .githooks && echo 'Git hooks configured to use .githooks directory'"
   },
   "repository": {
     "type": "git",

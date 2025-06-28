@@ -103,6 +103,27 @@ This application includes several performance optimizations for handling large-s
 - **URL Processing**: 200+ URLs per second processing rate
 - **Memory Usage**: <50MB increase for 50,000 URL datasets
 
+### Prebid Detection Accuracy Optimizations
+
+This application includes advanced optimizations specifically designed to improve Prebid.js detection accuracy and reliability:
+
+#### Enhanced Website Interaction
+- **Smart Navigation**: Progressive timeout strategy with intelligent retry logic for different error types
+- **Realistic User Simulation**: Mouse movements, clicks, and event triggers that activate ad tech loading
+- **Dynamic Content Loading**: Intelligent scrolling with pause points to allow ad content to load
+- **Popup Dismissal**: Automatic detection and dismissal of cookie banners, modals, and other blocking elements
+
+#### Advanced Prebid Detection
+- **Multi-Stage Detection**: Detects Prebid instances in various initialization states (complete, partial, queue)
+- **Enhanced Polling**: Adaptive polling intervals with frame-safe error handling
+- **Ad Tech Initialization**: Waits for common ad technology signals before attempting detection
+- **Robust Error Handling**: Retries for detached frame errors and other temporary failures
+
+#### Browser Authenticity
+- **Realistic Browser Profile**: Authentic user agents, viewport sizes, and browser properties
+- **Anti-Detection**: Removes automation markers and sets realistic hardware characteristics
+- **Enhanced Stealth**: Automatic permission denial and popup blocking for uninterrupted scanning
+
 ### Configuration Options
 
 #### Database Optimization
@@ -360,10 +381,54 @@ The `inspect` command fetches data from a given URL and stores the HTTP request 
 
 ## Running Tests
 
-To run the test suite using Vitest:
+### Basic Testing
+To run the basic test suite using Vitest:
 
 ```bash
 npm test
+```
+
+### Comprehensive Validation
+To run the complete validation pipeline (recommended before commits):
+
+```bash
+npm run validate:all
+```
+
+This runs:
+- TypeScript type checking
+- ESLint code linting  
+- Prettier code formatting
+- Documentation synchronization
+- All unit tests
+- Critical integration tests
+- GitHub range processing validation
+
+### Specific Test Categories
+
+```bash
+# Run all tests including critical integration tests
+npm run test:all
+
+# Run integration tests only
+npm run test:integration
+
+# Run regression tests (includes performance tests)
+npm run test:regression
+
+# Run critical tests (GitHub range, CLI, Puppeteer accuracy)
+npm run test:critical
+```
+
+### Pre-commit Validation
+Set up automatic validation before commits:
+
+```bash
+# Setup git hooks
+npm run setup:hooks
+
+# Manual pre-commit validation
+npm run validate:pre-commit
 ```
 
 **Note on `vitest` execution:** In some environments, if `vitest` is not found via the npm script, you might need to run it using `npx`:
@@ -371,8 +436,6 @@ npm test
 ```bash
 npx -p vitest vitest run
 ```
-
-This will execute all tests found in the `tests/` directory.
 
 ## Linting and Formatting
 

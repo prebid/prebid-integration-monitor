@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Pre-commit hook to prevent GitHub range processing bugs and similar issues
+set -e
+
+echo "🔍 Running comprehensive pre-commit validation..."
+
+# Run the complete validation pipeline
+echo "🚀 Running complete validation (build, lint, format, docs, tests, integration)..."
+npm run validate:all
+if [ $? -ne 0 ]; then
+    echo "❌ Comprehensive validation failed. Please fix all issues before committing."
+    echo "   This includes: TypeScript errors, linting issues, formatting, docs sync, tests, and integration tests."
+    exit 1
+fi
+
+# 7. Check for common anti-patterns that could cause range processing bugs
+echo "🔍 Checking for range processing anti-patterns..."
+
+# Check for double range application patterns
+if grep -r "options\.range.*allUrls\.slice" src/ --include="*.ts" --exclude-dir="__tests__"; then
+    echo "⚠️  WARNING: Found potential double range application pattern. Review carefully."
+    echo "   This pattern caused the GitHub range bug. Ensure range is only applied once."
+fi
+
+# Check for GitHub source type handling
+if grep -r "urlSourceType.*GitHub" src/ --include="*.ts" --exclude-dir="__tests__" | grep -v "!==.*GitHub"; then
+    echo "✅ Good: Found GitHub source type handling."
+else
+    echo "⚠️  WARNING: No GitHub source type differentiation found. This could cause range processing issues."
+fi
+
+# Check for range optimization usage
+if grep -r "rangeOptions" src/ --include="*.ts" --exclude-dir="__tests__"; then
+    echo "✅ Good: Found range optimization usage."
+else
+    echo "⚠️  WARNING: No range optimization found. Large ranges may cause memory issues."
+fi
+
+# 8. Validate test coverage for critical functions
+echo "🎯 Validating test coverage for critical functions..."
+
+critical_functions=(
+    "fetchUrlsFromGitHub"
+    "processContentWithRangeOptimization"
+    "processPrebidWithOptions"
+)
+
+for func in "${critical_functions[@]}"; do
+    if grep -r "describe.*$func\|it.*$func" src/__tests__/ --include="*.ts" > /dev/null; then
+        echo "✅ $func has test coverage"
+    else
+        echo "⚠️  WARNING: $func may lack adequate test coverage"
+    fi
+done
+
+# 9. Check for proper error handling in range processing
+echo "🛡️  Checking error handling patterns..."
+
+if grep -r "No URLs to process" src/ --include="*.ts" --exclude-dir="__tests__"; then
+    echo "✅ Found 'No URLs to process' handling - ensure this has proper test coverage"
+fi
+
+if grep -r "beyond the total number of URLs" src/ --include="*.ts" --exclude-dir="__tests__"; then
+    echo "✅ Found range boundary checking - good defensive programming"
+fi
+
+# 10. Memory usage validation for large range operations
+echo "💾 Validating memory usage patterns..."
+
+if grep -r "process\.memoryUsage" src/__tests__/ --include="*.ts" > /dev/null; then
+    echo "✅ Found memory usage testing - good for large range operations"
+else
+    echo "⚠️  WARNING: No memory usage testing found. Large ranges could cause memory issues."
+fi
+
+echo ""
+echo "✅ Pre-commit validation completed successfully!"
+echo "🚀 Ready to commit. All integration tests passed and anti-patterns checked."
+echo ""

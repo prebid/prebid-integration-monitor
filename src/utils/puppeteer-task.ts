@@ -232,52 +232,36 @@ export async function navigateWithRetry(
     try {
       logger?.debug(`Navigation attempt ${attempt} for ${url}`);
       
-      // Use a longer timeout for the first attempt, shorter for retries
-      const timeout = attempt === 1 ? 60000 : 30000;
+      // Use progressive timeout strategy - longer for first attempt
+      const timeout = attempt === 1 ? 60000 : Math.max(30000, 60000 - (attempt * 10000));
       
+      // Use multiple wait conditions for better reliability
       await page.goto(url, { 
         timeout, 
-        waitUntil: 'networkidle2' 
+        waitUntil: ['networkidle2', 'domcontentloaded']
       });
       
-      // Wait a moment for any immediate popups/redirects
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Enhanced post-navigation checks
+      await performPostNavigationChecks(page, url, logger);
       
-      // Attempt to dismiss any popups
-      await dismissPopups(page, logger);
-      
-      // Check if we got redirected to an error page or parking page
-      const currentUrl = page.url();
-      const pageTitle = await page.title().catch(() => '');
-      
-      if (currentUrl.includes('parked-content') || 
-          pageTitle.toLowerCase().includes('domain parked') ||
-          pageTitle.toLowerCase().includes('this domain may be for sale')) {
-        throw new Error('Page appears to be parked or unavailable');
-      }
-      
-      logger?.debug(`Successfully navigated to ${url} (final URL: ${currentUrl})`);
+      logger?.debug(`Successfully navigated to ${url} (final URL: ${page.url()})`);
       return; // Success!
       
     } catch (error) {
       lastError = error as Error;
       logger?.debug(`Navigation attempt ${attempt} failed for ${url}:`, error);
       
-      // Don't retry certain types of errors
-      if (error instanceof Error) {
-        const errorMessage = error.message.toLowerCase();
-        if (errorMessage.includes('net::err_name_not_resolved') ||
-            errorMessage.includes('net::err_cert_authority_invalid') ||
-            errorMessage.includes('net::err_cert_common_name_invalid')) {
-          // DNS or certificate errors are unlikely to be resolved by retrying
-          throw error;
-        }
+      // Enhanced error classification for smarter retries
+      if (!shouldRetryNavigation(error as Error, attempt, maxRetries)) {
+        throw error;
       }
       
       if (attempt <= maxRetries) {
-        // Wait before retry, with exponential backoff
-        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-        logger?.debug(`Waiting ${waitTime}ms before retry...`);
+        // Progressive backoff with jitter to avoid thundering herd
+        const baseWait = 1000 * Math.pow(2, attempt - 1);
+        const jitter = Math.random() * 1000;
+        const waitTime = Math.min(baseWait + jitter, 8000);
+        logger?.debug(`Waiting ${Math.round(waitTime)}ms before retry...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
     }
@@ -288,41 +272,256 @@ export async function navigateWithRetry(
 }
 
 /**
- * Scrolls the page to trigger lazy-loaded content and dynamic elements
+ * Enhanced post-navigation validation and setup
+ * @param page - The Puppeteer page instance
+ * @param originalUrl - The original URL we attempted to navigate to
+ * @param logger - Optional logger for debugging
+ */
+async function performPostNavigationChecks(page: Page, originalUrl: string, logger?: WinstonLogger): Promise<void> {
+  // Wait for initial page stabilization
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Dismiss popups that might interfere with content detection
+  await dismissPopups(page, logger);
+  
+  // Check for problematic redirects or error pages
+  const currentUrl = page.url();
+  const pageTitle = await page.title().catch(() => '');
+  const pageContent = await page.content().catch(() => '');
+  
+  // Enhanced error page detection
+  const errorIndicators = [
+    'parked-content', 'domain parked', 'this domain may be for sale',
+    'page not found', '404', 'server error', '500', 'access denied',
+    'site temporarily unavailable', 'under construction'
+  ];
+  
+  const hasErrorIndicator = errorIndicators.some(indicator => 
+    pageTitle.toLowerCase().includes(indicator) || 
+    pageContent.toLowerCase().includes(indicator) ||
+    currentUrl.toLowerCase().includes(indicator)
+  );
+  
+  if (hasErrorIndicator) {
+    throw new Error(`Page appears to be unavailable or redirected to error page (${pageTitle})`);
+  }
+  
+  // Check for major redirects that might indicate issues
+  const originalDomain = new URL(originalUrl).hostname;
+  const currentDomain = new URL(currentUrl).hostname;
+  
+  if (originalDomain !== currentDomain) {
+    logger?.debug(`Domain redirect detected: ${originalDomain} -> ${currentDomain}`);
+    
+    // Common problematic redirect patterns
+    const problematicDomains = ['parking', 'sedo.com', 'godaddy.com', 'namecheap.com'];
+    if (problematicDomains.some(domain => currentDomain.includes(domain))) {
+      throw new Error(`Redirected to problematic domain: ${currentDomain}`);
+    }
+  }
+}
+
+/**
+ * Determine if navigation error should trigger a retry
+ * @param error - The error that occurred
+ * @param attempt - Current attempt number
+ * @param maxRetries - Maximum retry attempts
+ * @returns true if should retry, false otherwise
+ */
+function shouldRetryNavigation(error: Error, attempt: number, maxRetries: number): boolean {
+  const errorMessage = error.message.toLowerCase();
+  
+  // Never retry these permanent failures
+  const permanentErrors = [
+    'net::err_name_not_resolved',
+    'net::err_cert_authority_invalid', 
+    'net::err_cert_common_name_invalid',
+    'net::err_cert_date_invalid',
+    'net::err_connection_refused'
+  ];
+  
+  if (permanentErrors.some(permError => errorMessage.includes(permError))) {
+    return false;
+  }
+  
+  // Retry timeouts and temporary failures
+  const retryableErrors = [
+    'timeout',
+    'net::err_connection_timed_out',
+    'net::err_connection_reset',
+    'net::err_network_changed',
+    'navigation failed',
+    'target closed'
+  ];
+  
+  const isRetryable = retryableErrors.some(retryError => errorMessage.includes(retryError));
+  return isRetryable && attempt <= maxRetries;
+}
+
+/**
+ * Enhanced dynamic content triggering specifically optimized for ad tech detection
  * @param page - The Puppeteer page instance
  * @param logger - Optional logger for debugging
  */
 export async function triggerDynamicContent(page: Page, logger?: WinstonLogger): Promise<void> {
   try {
-    logger?.debug('Triggering dynamic content loading...');
+    logger?.debug('Triggering dynamic content loading optimized for ad tech...');
     
-    // Scroll down to trigger lazy loading
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
-        let totalHeight = 0;
-        const distance = 100;
-        const timer = setInterval(() => {
-          const scrollHeight = document.body.scrollHeight;
-          window.scrollBy(0, distance);
-          totalHeight += distance;
+    // Phase 1: Simulate real user behavior for better ad loading
+    await simulateUserInteraction(page, logger);
+    
+    // Phase 2: Smart scrolling to trigger lazy-loaded content
+    await performSmartScrolling(page, logger);
+    
+    // Phase 3: Wait for ad tech libraries to initialize
+    await waitForAdTechInitialization(page, logger);
+    
+    logger?.debug('Enhanced dynamic content loading completed');
+  } catch (error) {
+    logger?.debug('Error during enhanced dynamic content loading:', error);
+    // Don't throw - this is best effort
+  }
+}
 
-          if (totalHeight >= scrollHeight) {
-            clearInterval(timer);
-            // Scroll back to top
-            window.scrollTo(0, 0);
-            resolve();
-          }
-        }, 50);
+/**
+ * Simulate realistic user interactions that often trigger ad loading
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ */
+async function simulateUserInteraction(page: Page, logger?: WinstonLogger): Promise<void> {
+  try {
+    // Mouse movement to trigger hover events that might load ads
+    await page.mouse.move(100, 100);
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await page.mouse.move(500, 300);
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Click on non-interactive areas to trigger focus events
+    await page.evaluate(() => {
+      // Trigger various events that ad networks listen for
+      document.body.click();
+      
+      // Dispatch custom events that some ad techs use
+      const events = ['DOMContentLoaded', 'load', 'scroll', 'resize'];
+      events.forEach(eventType => {
+        try {
+          const event = new Event(eventType, { bubbles: true });
+          document.dispatchEvent(event);
+        } catch (e) {
+          // Ignore event dispatch errors
+        }
       });
     });
     
-    // Wait for any content that was triggered by scrolling
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    logger?.debug('Dynamic content loading completed');
+    logger?.debug('User interaction simulation completed');
   } catch (error) {
-    logger?.debug('Error during dynamic content loading:', error);
-    // Don't throw - this is best effort
+    logger?.debug('Error during user interaction simulation:', error);
+  }
+}
+
+/**
+ * Intelligent scrolling that pauses to allow ad loading at key viewport positions
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ */
+async function performSmartScrolling(page: Page, logger?: WinstonLogger): Promise<void> {
+  try {
+    await page.evaluate(() => {
+      return new Promise<void>((resolve) => {
+        let totalHeight = 0;
+        const distance = 150; // Slightly larger steps
+        const pauseDuration = 300; // Longer pause for ad loading
+        let scrollCount = 0;
+        const maxScrolls = 20; // Prevent infinite scrolling
+        
+        const timer = setInterval(() => {
+          const scrollHeight = document.body.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          
+          // Scroll by distance
+          window.scrollBy(0, distance);
+          totalHeight += distance;
+          scrollCount++;
+          
+          // Stop scrolling if we've reached the bottom or max scrolls
+          if (totalHeight >= scrollHeight - viewportHeight || scrollCount >= maxScrolls) {
+            clearInterval(timer);
+            
+            // Scroll to key positions where ads commonly load
+            const keyPositions = [0, scrollHeight * 0.25, scrollHeight * 0.5, scrollHeight * 0.75, 0];
+            let positionIndex = 0;
+            
+            const positionTimer = setInterval(() => {
+              if (positionIndex < keyPositions.length) {
+                window.scrollTo(0, keyPositions[positionIndex]);
+                positionIndex++;
+              } else {
+                clearInterval(positionTimer);
+                resolve();
+              }
+            }, 800); // Wait at each position for ad loading
+          }
+        }, pauseDuration);
+      });
+    });
+    
+    logger?.debug('Smart scrolling completed');
+  } catch (error) {
+    logger?.debug('Error during smart scrolling:', error);
+  }
+}
+
+/**
+ * Wait for common ad technology initialization patterns
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ */
+async function waitForAdTechInitialization(page: Page, logger?: WinstonLogger): Promise<void> {
+  try {
+    // Wait for common ad tech initialization signals
+    await page.evaluate(() => {
+      return new Promise<void>((resolve) => {
+        let checkCount = 0;
+        const maxChecks = 15; // 7.5 seconds total
+        
+        const checkInitialization = () => {
+          checkCount++;
+          
+          // Check for common ad tech initialization signals
+          const signals = [
+            // Google Ad Manager / DFP
+            () => (window as any).googletag && (window as any).googletag.apiReady,
+            // Amazon A9/UAM
+            () => (window as any).apstag && (window as any).apstag.initialized,
+            // Header bidding signals
+            () => (window as any).pbjs && (window as any).pbjs.libLoaded,
+            // General ad loading completion
+            () => document.querySelectorAll('[id*="google_ads"], [id*="ad-"], .ad-container, .advertisement').length > 0
+          ];
+          
+          const hasSignal = signals.some(check => {
+            try {
+              return check();
+            } catch (e) {
+              return false;
+            }
+          });
+          
+          if (hasSignal || checkCount >= maxChecks) {
+            resolve();
+          } else {
+            setTimeout(checkInitialization, 500);
+          }
+        };
+        
+        // Start checking after a brief delay
+        setTimeout(checkInitialization, 1000);
+      });
+    });
+    
+    logger?.debug('Ad tech initialization wait completed');
+  } catch (error) {
+    logger?.debug('Error waiting for ad tech initialization:', error);
   }
 }
 
@@ -436,35 +635,74 @@ export async function extractDataSafely(
             // Ignore individual library detection errors
           }
 
-          // Polling function for a single Prebid global variable with enhanced error handling
+          // Enhanced polling function with multi-stage detection for better reliability
           const getPbjsInstanceData = async (globalVarName: string) => {
             let elapsedTime = 0;
+            let lastPartialInstance = null;
             
             while (elapsedTime < pbjsTimeoutMs) {
               try {
                 const pbjsInstance = customWindow[globalVarName];
                 
+                // Stage 1: Check for fully initialized instance
                 if (
                   pbjsInstance &&
                   typeof pbjsInstance.version === 'string' &&
                   pbjsInstance.version.length > 0 &&
                   Array.isArray(pbjsInstance.installedModules)
                 ) {
-                  return {
+                  // Additional validation for complete initialization
+                  const isFullyLoaded = (
+                    pbjsInstance.libLoaded === true ||
+                    typeof pbjsInstance.requestBids === 'function' ||
+                    typeof pbjsInstance.addAdUnits === 'function'
+                  );
+                  
+                  if (isFullyLoaded) {
+                    return {
+                      globalVarName: globalVarName,
+                      version: pbjsInstance.version,
+                      modules: pbjsInstance.installedModules.map(String),
+                      initializationState: 'complete'
+                    };
+                  }
+                }
+                
+                // Stage 2: Check for partially loaded instance (still initializing)
+                if (pbjsInstance && typeof pbjsInstance === 'object') {
+                  // Store partial instance info but continue polling
+                  lastPartialInstance = {
                     globalVarName: globalVarName,
-                    version: pbjsInstance.version,
-                    modules: pbjsInstance.installedModules.map(String),
+                    version: pbjsInstance.version || 'unknown',
+                    modules: Array.isArray(pbjsInstance.installedModules) 
+                      ? pbjsInstance.installedModules.map(String) 
+                      : [],
+                    initializationState: 'partial'
                   };
                 }
+                
+                // Stage 3: Check for Prebid command queue (pre-initialization)
+                if (Array.isArray(pbjsInstance) && pbjsInstance.length > 0) {
+                  lastPartialInstance = {
+                    globalVarName: globalVarName,
+                    version: 'queue-detected',
+                    modules: [],
+                    initializationState: 'queue'
+                  };
+                }
+                
               } catch (e) {
-                // If we get an error accessing the instance, it might be a frame issue
-                // Continue polling in case it becomes accessible again
+                // Continue polling on errors - might be frame attachment issues
               }
               
-              await new Promise((resolve) => setTimeout(resolve, pbjsIntervalMs));
-              elapsedTime += pbjsIntervalMs;
+              // Use shorter intervals initially, then longer ones
+              const interval = elapsedTime < pbjsTimeoutMs / 3 ? pbjsIntervalMs : pbjsIntervalMs * 2;
+              await new Promise((resolve) => setTimeout(resolve, interval));
+              elapsedTime += interval;
             }
-            return null;
+            
+            // Return partial instance if we found one but couldn't get complete data
+            return lastPartialInstance;
           };
 
           // Check for Prebid.js instances if _pbjsGlobals array exists

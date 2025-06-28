@@ -1,0 +1,165 @@
+name: Comprehensive Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  comprehensive-validation:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run comprehensive validation
+      run: npm run validate:all
+      env:
+        CI: true
+
+    - name: Check for documentation sync
+      run: |
+        # Run docs sync and check if any files changed
+        npm run sync-agent-docs
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "❌ Documentation is out of sync!"
+          echo "Files that need to be updated:"
+          git status --porcelain
+          echo ""
+          echo "Please run 'npm run sync-agent-docs' and commit the changes."
+          exit 1
+        else
+          echo "✅ Documentation is in sync"
+        fi
+
+    - name: Validate GitHub range processing patterns
+      run: |
+        echo "🔍 Checking for GitHub range processing anti-patterns..."
+        
+        # Check for double range application patterns
+        if grep -r "options\.range.*allUrls\.slice" src/ --include="*.ts" --exclude-dir="__tests__"; then
+          echo "⚠️  WARNING: Found potential double range application pattern."
+          echo "   This pattern caused the GitHub range bug. Review carefully."
+        fi
+        
+        # Check for GitHub source type handling
+        if ! grep -r "urlSourceType.*!==.*['\"]GitHub['\"]" src/ --include="*.ts" --exclude-dir="__tests__"; then
+          echo "❌ ERROR: No GitHub source type differentiation found."
+          echo "   This could cause range processing issues."
+          exit 1
+        fi
+        
+        echo "✅ GitHub range processing patterns look good"
+
+    - name: Integration test coverage check
+      run: |
+        echo "🧪 Verifying critical integration tests exist..."
+        
+        # Check for critical test files
+        if [ ! -f "src/__tests__/github-range-integration.test.ts" ]; then
+          echo "❌ Missing GitHub range integration tests"
+          exit 1
+        fi
+        
+        if [ ! -f "src/__tests__/cli-integration-regression.test.ts" ]; then
+          echo "❌ Missing CLI integration regression tests"
+          exit 1
+        fi
+        
+        # Check if GitHub range bug scenario is tested
+        if ! grep -q "THE BUG SCENARIO\|500000-500002" src/__tests__/github-range-integration.test.ts; then
+          echo "❌ GitHub range bug scenario test not found"
+          exit 1
+        fi
+        
+        echo "✅ All critical integration tests are present"
+
+  performance-regression:
+    runs-on: ubuntu-latest
+    needs: comprehensive-validation
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run performance regression tests
+      run: npm run test:regression
+      env:
+        CI: true
+
+    - name: Memory usage validation
+      run: |
+        echo "💾 Running memory usage validation..."
+        npm test src/__tests__/optimization-integration.test.ts -- --grep "Memory"
+        
+    - name: Database performance validation  
+      run: |
+        echo "🗄️ Running database performance validation..."
+        npm test src/__tests__/optimization-integration.test.ts -- --grep "Performance"
+
+  security-and-patterns:
+    runs-on: ubuntu-latest
+    needs: comprehensive-validation
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+
+    - name: Check for hardcoded secrets
+      run: |
+        echo "🔐 Checking for hardcoded secrets..."
+        if grep -r "api_key\|secret\|password\|token" src/ --include="*.ts" --exclude-dir="__tests__" | grep -v "// Example\|TODO\|FIXME"; then
+          echo "⚠️  Potential hardcoded secrets found. Please review."
+        else
+          echo "✅ No hardcoded secrets detected"
+        fi
+
+    - name: Validate file permissions
+      run: |
+        echo "🔒 Checking file permissions..."
+        find . -name "*.sh" -o -name "pre-commit" | xargs ls -la
+        
+    - name: Check for TODO/FIXME patterns
+      run: |
+        echo "📝 Checking for unresolved TODOs/FIXMEs..."
+        TODO_COUNT=$(grep -r "TODO\|FIXME" src/ --include="*.ts" --exclude-dir="__tests__" | wc -l || echo "0")
+        echo "Found $TODO_COUNT TODO/FIXME items"
+        if [ "$TODO_COUNT" -gt 10 ]; then
+          echo "⚠️  High number of TODO/FIXME items. Consider addressing some."
+        fi

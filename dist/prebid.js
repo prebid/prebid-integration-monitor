@@ -197,9 +197,10 @@ export async function prebidExplorer(options) {
         firstFew: allUrls.slice(0, 5),
     });
     // 1. URL Range Logic
-    // Apply URL range filtering if specified in options.
+    // Apply URL range filtering if specified in options, but only for non-GitHub sources
+    // (GitHub sources already apply range optimization during fetching)
     const filteringTracer = new URLFilteringTracer(allUrls.length, logger);
-    if (options.range) {
+    if (options.range && urlSourceType !== 'GitHub') {
         logger.info(`Applying range: ${options.range}`);
         const originalUrlCount = allUrls.length;
         let [startStr, endStr] = options.range.split('-');
@@ -227,6 +228,10 @@ export async function prebidExplorer(options) {
                 logger.info(`Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`);
             }
         }
+    }
+    else if (options.range && urlSourceType === 'GitHub') {
+        logger.info(`Range ${options.range} already applied during GitHub fetch optimization. Skipping duplicate range filtering.`);
+        filteringTracer.recordRangeFiltering(allUrls.length, allUrls.length, options.range);
     }
     if (allUrls.length === 0) {
         logger.warn(`No URLs to process after applying range or due to empty initial list. Exiting.`);
