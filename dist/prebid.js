@@ -27,6 +27,8 @@ import { processPageTask, // The core function for processing a single page
  } from './utils/puppeteer-task.js';
 import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, } from './utils/results-handler.js';
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
+import { filterValidUrls } from './utils/domain-validator.js';
+import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -114,7 +116,10 @@ export async function prebidExplorer(options) {
         protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
         defaultViewport: null, // Sets the viewport to null, effectively using the default viewport of the browser window.
         headless: options.headless,
-        args: options.puppeteerLaunchOptions?.args || [],
+        args: [
+            ...ENHANCED_PUPPETEER_ARGS, // Use enhanced args for better stability
+            ...(options.puppeteerLaunchOptions?.args || []) // Allow additional custom args
+        ],
         ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
     };
     // results array is correctly typed with PageData from puppeteer-task.ts
@@ -221,6 +226,16 @@ export async function prebidExplorer(options) {
             closeUrlTracker();
             return;
         }
+    }
+    // Pre-filter URLs for valid domains to avoid expensive Puppeteer operations on invalid domains
+    logger.info('Pre-filtering URLs for domain validity...');
+    const preFilterCount = allUrls.length;
+    allUrls = await filterValidUrls(allUrls, logger, false); // Pattern-only validation for speed
+    logger.info(`Domain pre-filtering complete: ${preFilterCount} total, ${allUrls.length} valid, ${preFilterCount - allUrls.length} filtered out`);
+    if (allUrls.length === 0) {
+        logger.warn('No valid URLs remaining after domain filtering. Exiting.');
+        closeUrlTracker();
+        return;
     }
     /** @type {string[]} URLs to be processed after applying range and other filters. */
     const urlsToProcess = allUrls; // This now contains potentially ranged URLs

@@ -17,25 +17,313 @@ import {
   PBJS_VERSION_WAIT_TIMEOUT_MS,
   PBJS_VERSION_WAIT_INTERVAL_MS,
 } from '../config/app-config.js';
+import { createAuthenticUserAgent } from './user-agent.js';
 
 /**
  * Configures a given Puppeteer {@link Page} instance with standard settings
- * suitable for web scraping tasks.
- * This includes setting a default navigation timeout using `PUPPETEER_DEFAULT_PAGE_TIMEOUT`
- * and a common desktop Chrome user agent string using `DEFAULT_USER_AGENT`.
+ * suitable for web scraping tasks with enhanced authenticity.
+ * This includes setting a default navigation timeout, an authentic user agent
+ * that matches the actual Chrome version, and additional browser properties
+ * for better bot detection avoidance.
  *
  * @param {Page} page - The Puppeteer `Page` instance to be configured.
+ * @param {WinstonLogger} [logger] - Optional logger for debugging user agent generation.
  * @returns {Promise<Page>} A promise that resolves with the same `Page` instance after configuration.
  * @example
  * const browser = await puppeteer.launch();
  * const page = await browser.newPage();
- * await configurePage(page);
- * // page is now configured with default timeout and user agent.
+ * await configurePage(page, logger);
+ * // page is now configured with authentic settings.
  */
-export async function configurePage(page: Page): Promise<Page> {
+export async function configurePage(page: Page, logger?: WinstonLogger): Promise<Page> {
   page.setDefaultTimeout(PUPPETEER_DEFAULT_PAGE_TIMEOUT);
-  await page.setUserAgent(DEFAULT_USER_AGENT);
+  
+  try {
+    // Generate authentic user agent that matches Puppeteer's Chrome version
+    const authenticUserAgent = await createAuthenticUserAgent({
+      platform: 'auto',
+      usePuppeteerVersion: true
+    }, logger);
+    
+    await page.setUserAgent(authenticUserAgent);
+    logger?.debug(`Set authentic user agent: ${authenticUserAgent}`);
+  } catch (error) {
+    // Fallback to default user agent if dynamic generation fails
+    logger?.warn('Failed to generate authentic user agent, using fallback', { error });
+    await page.setUserAgent(DEFAULT_USER_AGENT);
+  }
+  
+  // Set realistic viewport size (common desktop resolution)
+  await page.setViewport({
+    width: 1920,
+    height: 1080,
+    deviceScaleFactor: 1,
+    isMobile: false,
+    hasTouch: false,
+    isLandscape: true
+  });
+  
+  // Note: HTTPS errors are handled through launch args instead of page.setIgnoreHTTPSErrors
+  
+  // Set additional browser properties for authenticity
+  await page.evaluateOnNewDocument(() => {
+    // Remove webdriver property that indicates automation
+    delete (navigator as any).webdriver;
+    
+    // Override plugins length to appear more like a real browser
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => ({
+        length: 3,
+        '0': { name: 'Chrome PDF Plugin' },
+        '1': { name: 'Chromium PDF Plugin' },
+        '2': { name: 'Microsoft Edge PDF Plugin' }
+      })
+    });
+    
+    // Override languages to be consistent with user agent
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['en-US', 'en']
+    });
+    
+    // Set realistic hardware concurrency
+    Object.defineProperty(navigator, 'hardwareConcurrency', {
+      get: () => 8
+    });
+    
+    // Set realistic memory info
+    Object.defineProperty(navigator, 'deviceMemory', {
+      get: () => 8
+    });
+    
+    // Override permissions API to avoid permission prompts
+    if (navigator.permissions) {
+      Object.defineProperty(navigator, 'permissions', {
+        get: () => ({
+          query: () => Promise.resolve({ state: 'denied' })
+        })
+      });
+    }
+  });
+  
+  // Set up automatic popup/modal/notification dismissal
+  await page.evaluateOnNewDocument(() => {
+    // Auto-dismiss common notification permission requests
+    if ('Notification' in window && window.Notification) {
+      Object.defineProperty(window, 'Notification', {
+        value: {
+          permission: 'denied',
+          requestPermission: () => Promise.resolve('denied')
+        }
+      });
+    }
+    
+    // Auto-dismiss geolocation requests
+    if (navigator.geolocation) {
+      Object.defineProperty(navigator, 'geolocation', {
+        get: () => ({
+          getCurrentPosition: () => {},
+          watchPosition: () => {},
+          clearWatch: () => {}
+        })
+      });
+    }
+  });
+  
   return page;
+}
+
+/**
+ * Attempts to dismiss common popups, modals, and overlays that might block content
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ */
+export async function dismissPopups(page: Page, logger?: WinstonLogger): Promise<void> {
+  try {
+    // Common selectors for cookie consent banners, modals, and popups
+    const popupSelectors = [
+      // Cookie consent banners
+      '[class*="cookie"] button[class*="accept"]',
+      '[class*="cookie"] button[class*="agree"]',
+      '[class*="consent"] button[class*="accept"]',
+      '[class*="consent"] button[class*="agree"]',
+      'button[data-accept="cookie"]',
+      'button[id*="cookie"][id*="accept"]',
+      
+      // Generic modal close buttons
+      '[class*="modal"] [class*="close"]',
+      '[class*="popup"] [class*="close"]',
+      '[class*="overlay"] [class*="close"]',
+      'button[aria-label="Close"]',
+      'button[aria-label="close"]',
+      '[data-dismiss="modal"]',
+      
+      // Age verification
+      'button[class*="age"][class*="confirm"]',
+      'button[class*="verify"][class*="age"]',
+      'input[value*="Yes"][type="button"]',
+      
+      // Newsletter signups
+      '[class*="newsletter"] [class*="close"]',
+      '[class*="subscribe"] [class*="close"]',
+      
+      // Generic "X" close buttons
+      'button:has-text("×")',
+      'button:has-text("✕")',
+      'span:has-text("×")',
+      '.close:has-text("×")'
+    ];
+
+    for (const selector of popupSelectors) {
+      try {
+        // Use a short timeout to quickly check if element exists
+        const element = await page.$(selector);
+        if (element) {
+          const isVisible = await element.isIntersectingViewport();
+          if (isVisible) {
+            await element.click();
+            logger?.debug(`Dismissed popup using selector: ${selector}`);
+            // Wait a moment for any animation to complete
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+      } catch (error) {
+        // Ignore individual selector failures
+        continue;
+      }
+    }
+
+    // Handle notification permission dialogs (browser-level)
+    await page.evaluate(() => {
+      // Deny any pending notification requests
+      if ('Notification' in window && Notification.permission === 'default') {
+        try {
+          Notification.requestPermission().then(() => {
+            // Request will be auto-denied by our override
+          });
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+    });
+
+  } catch (error) {
+    logger?.debug('Error during popup dismissal:', error);
+    // Don't throw - popup dismissal is best effort
+  }
+}
+
+/**
+ * Enhanced navigation function with retry logic and error handling
+ * @param page - The Puppeteer page instance
+ * @param url - The URL to navigate to
+ * @param logger - Optional logger for debugging
+ * @param maxRetries - Maximum number of retry attempts
+ * @returns Promise that resolves when navigation is complete
+ */
+export async function navigateWithRetry(
+  page: Page, 
+  url: string, 
+  logger?: WinstonLogger, 
+  maxRetries: number = 2
+): Promise<void> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+    try {
+      logger?.debug(`Navigation attempt ${attempt} for ${url}`);
+      
+      // Use a longer timeout for the first attempt, shorter for retries
+      const timeout = attempt === 1 ? 60000 : 30000;
+      
+      await page.goto(url, { 
+        timeout, 
+        waitUntil: 'networkidle2' 
+      });
+      
+      // Wait a moment for any immediate popups/redirects
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Attempt to dismiss any popups
+      await dismissPopups(page, logger);
+      
+      // Check if we got redirected to an error page or parking page
+      const currentUrl = page.url();
+      const pageTitle = await page.title().catch(() => '');
+      
+      if (currentUrl.includes('parked-content') || 
+          pageTitle.toLowerCase().includes('domain parked') ||
+          pageTitle.toLowerCase().includes('this domain may be for sale')) {
+        throw new Error('Page appears to be parked or unavailable');
+      }
+      
+      logger?.debug(`Successfully navigated to ${url} (final URL: ${currentUrl})`);
+      return; // Success!
+      
+    } catch (error) {
+      lastError = error as Error;
+      logger?.debug(`Navigation attempt ${attempt} failed for ${url}:`, error);
+      
+      // Don't retry certain types of errors
+      if (error instanceof Error) {
+        const errorMessage = error.message.toLowerCase();
+        if (errorMessage.includes('net::err_name_not_resolved') ||
+            errorMessage.includes('net::err_cert_authority_invalid') ||
+            errorMessage.includes('net::err_cert_common_name_invalid')) {
+          // DNS or certificate errors are unlikely to be resolved by retrying
+          throw error;
+        }
+      }
+      
+      if (attempt <= maxRetries) {
+        // Wait before retry, with exponential backoff
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        logger?.debug(`Waiting ${waitTime}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
+  }
+  
+  // If we get here, all retries failed
+  throw lastError || new Error(`Failed to navigate to ${url} after ${maxRetries + 1} attempts`);
+}
+
+/**
+ * Scrolls the page to trigger lazy-loaded content and dynamic elements
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ */
+export async function triggerDynamicContent(page: Page, logger?: WinstonLogger): Promise<void> {
+  try {
+    logger?.debug('Triggering dynamic content loading...');
+    
+    // Scroll down to trigger lazy loading
+    await page.evaluate(() => {
+      return new Promise<void>((resolve) => {
+        let totalHeight = 0;
+        const distance = 100;
+        const timer = setInterval(() => {
+          const scrollHeight = document.body.scrollHeight;
+          window.scrollBy(0, distance);
+          totalHeight += distance;
+
+          if (totalHeight >= scrollHeight) {
+            clearInterval(timer);
+            // Scroll back to top
+            window.scrollTo(0, 0);
+            resolve();
+          }
+        }, 50);
+      });
+    });
+    
+    // Wait for any content that was triggered by scrolling
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    logger?.debug('Dynamic content loading completed');
+  } catch (error) {
+    logger?.debug('Error during dynamic content loading:', error);
+    // Don't throw - this is best effort
+  }
 }
 
 /**
@@ -89,8 +377,13 @@ export const processPageTask = async ({
   const trimmedUrl: string = url.trim(); // Ensure URL is trimmed before processing
   logger.info(`Attempting to process URL: ${trimmedUrl}`);
   try {
-    await configurePage(page); // Use the configurePage from this module
-    await page.goto(trimmedUrl, { timeout: 60000, waitUntil: 'networkidle2' });
+    await configurePage(page, logger); // Use the configurePage from this module
+    
+    // Use enhanced navigation with retry logic
+    await navigateWithRetry(page, trimmedUrl, logger);
+    
+    // Trigger dynamic content loading (lazy loading, etc.)
+    await triggerDynamicContent(page, logger);
 
     // Define a type for the window object to avoid using 'any' repeatedly
     interface CustomWindow extends Window {

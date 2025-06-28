@@ -46,6 +46,8 @@ import {
 } from './utils/results-handler.js';
 
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
+import { filterValidUrls } from './utils/domain-validator.js';
+import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
 
 /**
  * Defines the configuration options for the `prebidExplorer` function.
@@ -221,7 +223,10 @@ export async function prebidExplorer(
     protocolTimeout: 1000000, // Increased timeout for browser protocol communication.
     defaultViewport: null, // Sets the viewport to null, effectively using the default viewport of the browser window.
     headless: options.headless,
-    args: options.puppeteerLaunchOptions?.args || [],
+    args: [
+      ...ENHANCED_PUPPETEER_ARGS, // Use enhanced args for better stability
+      ...(options.puppeteerLaunchOptions?.args || []) // Allow additional custom args
+    ],
     ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
   };
 
@@ -366,6 +371,20 @@ export async function prebidExplorer(
       closeUrlTracker();
       return;
     }
+  }
+
+  // Pre-filter URLs for valid domains to avoid expensive Puppeteer operations on invalid domains
+  logger.info('Pre-filtering URLs for domain validity...');
+  const preFilterCount = allUrls.length;
+  allUrls = await filterValidUrls(allUrls, logger, false); // Pattern-only validation for speed
+  logger.info(
+    `Domain pre-filtering complete: ${preFilterCount} total, ${allUrls.length} valid, ${preFilterCount - allUrls.length} filtered out`
+  );
+
+  if (allUrls.length === 0) {
+    logger.warn('No valid URLs remaining after domain filtering. Exiting.');
+    closeUrlTracker();
+    return;
   }
 
   /** @type {string[]} URLs to be processed after applying range and other filters. */
