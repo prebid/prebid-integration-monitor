@@ -215,12 +215,67 @@ export async function prebidExplorer(options) {
     logger.info(`Total URLs to process after range check: ${allUrls.length}`, {
         firstFew: allUrls.slice(0, 5),
     });
-    // Filter out already processed URLs if skip-processed is enabled
-    if (options.skipProcessed) {
+    // Pre-filter processed URLs if requested (more efficient for large lists)
+    if (options.prefilterProcessed) {
+        logger.info('Pre-filtering processed URLs before loading full range...');
+        // Analyze the current range efficiency
+        if (options.range) {
+            const [startStr, endStr] = options.range.split('-');
+            const start = startStr ? parseInt(startStr, 10) - 1 : 0; // Convert to 0-based
+            const end = endStr ? parseInt(endStr, 10) : allUrls.length;
+            // Reload all URLs temporarily to analyze efficiency
+            let fullUrlList = [];
+            if (options.githubRepo) {
+                fullUrlList = await fetchUrlsFromGitHub(options.githubRepo, undefined, logger);
+            }
+            else if (options.inputFile) {
+                const fileContent = loadFileContents(options.inputFile, logger);
+                if (fileContent) {
+                    fullUrlList = await processFileContent(options.inputFile, fileContent, logger);
+                }
+            }
+            if (fullUrlList.length > 0) {
+                const analysis = urlTracker.analyzeUrlRange(start, Math.min(end, fullUrlList.length), fullUrlList);
+                logger.info('Range analysis results:', {
+                    totalInRange: analysis.totalInRange,
+                    processedCount: analysis.processedCount,
+                    unprocessedCount: analysis.unprocessedCount,
+                    processedPercentage: analysis.processedPercentage.toFixed(1) + '%'
+                });
+                if (analysis.isFullyProcessed) {
+                    logger.info('🎯 RANGE FULLY PROCESSED: All URLs in this range have been processed!');
+                    // Suggest next ranges
+                    const suggestions = urlTracker.suggestNextRanges(fullUrlList, 1000, 3);
+                    if (suggestions.length > 0) {
+                        logger.info('💡 SUGGESTED NEXT RANGES:');
+                        suggestions.forEach((suggestion, index) => {
+                            logger.info(`   ${index + 1}. --range "${suggestion.startUrl}-${suggestion.endUrl}" (~${suggestion.estimatedUnprocessed} unprocessed, ${suggestion.efficiency.toFixed(1)}% efficiency)`);
+                        });
+                    }
+                    logger.info('Use --forceReprocess to reprocess this range, or choose a different range.');
+                    closeUrlTracker();
+                    return;
+                }
+                else if (analysis.processedPercentage > 80) {
+                    logger.warn(`⚠️  LOW EFFICIENCY: ${analysis.processedPercentage.toFixed(1)}% of URLs already processed`);
+                    logger.info('Consider using --forceReprocess or choosing a different range for better efficiency.');
+                }
+            }
+        }
+    }
+    // Track URLs skipped due to skip-processed
+    let urlsSkippedProcessed = 0;
+    // Handle different processing modes
+    if (options.forceReprocess) {
+        logger.info('🔄 FORCE REPROCESS: Processing all URLs regardless of previous status');
+        // Don't filter anything - process all URLs
+    }
+    else if (options.skipProcessed) {
         logger.info('Filtering out previously processed URLs...');
         const originalCount = allUrls.length;
         allUrls = urlTracker.filterUnprocessedUrls(allUrls);
-        logger.info(`URL filtering complete: ${originalCount} total, ${allUrls.length} unprocessed, ${originalCount - allUrls.length} skipped`);
+        urlsSkippedProcessed = originalCount - allUrls.length;
+        logger.info(`URL filtering complete: ${originalCount} total, ${allUrls.length} unprocessed, ${urlsSkippedProcessed} skipped`);
         if (allUrls.length === 0) {
             logger.info('All URLs have been previously processed. Exiting.');
             closeUrlTracker();
@@ -263,8 +318,10 @@ export async function prebidExplorer(options) {
                     puppeteer,
                     puppeteerOptions: basePuppeteerOptions,
                 });
-                // Register the imported processPageTask with the cluster
-                await cluster.task(processPageTask);
+                // Register a wrapper task that properly calls processPageTask
+                await cluster.task(async ({ page, data }) => {
+                    return await processPageTask({ page, data });
+                });
                 try {
                     const chunkPromises = currentChunkUrls
                         .filter((url) => url)
@@ -277,17 +334,30 @@ export async function prebidExplorer(options) {
                     });
                     // Wait for all promises in the chunk to settle
                     const settledChunkResults = await Promise.allSettled(chunkPromises);
-                    settledChunkResults.forEach((settledResult) => {
+                    settledChunkResults.forEach((settledResult, index) => {
                         if (settledResult.status === 'fulfilled') {
                             // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
                             // processPageTask is expected to always return a TaskResult.
-                            if (typeof settledResult.value !== 'undefined') {
-                                taskResults.push(settledResult.value);
+                            if (typeof settledResult.value !== 'undefined' && settledResult.value !== null) {
+                                // Validate TaskResult structure
+                                if (settledResult.value && typeof settledResult.value === 'object' && 'type' in settledResult.value) {
+                                    taskResults.push(settledResult.value);
+                                }
+                                else {
+                                    logger.warn(`A task from cluster.queue (chunked) fulfilled with invalid TaskResult structure.`, {
+                                        chunkIndex: index,
+                                        value: settledResult.value,
+                                        valueType: typeof settledResult.value
+                                    });
+                                }
                             }
                             else {
                                 // This case might occur if a task somehow resolves with no value,
                                 // though processPageTask is expected to always return a TaskResult.
-                                logger.warn('A task from cluster.queue (chunked) fulfilled but with undefined/null value.', { settledResult });
+                                logger.warn('A task from cluster.queue (chunked) fulfilled but with undefined/null value.', {
+                                    chunkIndex: index,
+                                    valueType: typeof settledResult.value
+                                });
                             }
                         }
                         else if (settledResult.status === 'rejected') {
@@ -354,7 +424,10 @@ export async function prebidExplorer(options) {
                 puppeteer,
                 puppeteerOptions: basePuppeteerOptions,
             });
-            await cluster.task(processPageTask);
+            // Register a wrapper task that properly calls processPageTask
+            await cluster.task(async ({ page, data }) => {
+                return await processPageTask({ page, data });
+            });
             try {
                 const promises = urlsToProcess
                     .filter((url) => url)
@@ -363,14 +436,27 @@ export async function prebidExplorer(options) {
                     return cluster.queue({ url, logger });
                 });
                 const settledResults = await Promise.allSettled(promises);
-                settledResults.forEach((settledResult) => {
+                settledResults.forEach((settledResult, index) => {
                     if (settledResult.status === 'fulfilled') {
                         // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
-                        if (typeof settledResult.value !== 'undefined') {
-                            taskResults.push(settledResult.value);
+                        if (typeof settledResult.value !== 'undefined' && settledResult.value !== null) {
+                            // Validate TaskResult structure
+                            if (settledResult.value && typeof settledResult.value === 'object' && 'type' in settledResult.value) {
+                                taskResults.push(settledResult.value);
+                            }
+                            else {
+                                logger.warn(`A task from cluster.queue (non-chunked) fulfilled with invalid TaskResult structure.`, {
+                                    index: index,
+                                    value: settledResult.value,
+                                    valueType: typeof settledResult.value
+                                });
+                            }
                         }
                         else {
-                            logger.warn('A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.', { settledResult });
+                            logger.warn('A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.', {
+                                index: index,
+                                valueType: typeof settledResult.value
+                            });
                         }
                     }
                     else if (settledResult.status === 'rejected') {
@@ -435,6 +521,88 @@ export async function prebidExplorer(options) {
     if (urlSourceType === 'InputFile' && options.inputFile) {
         updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);
     }
+    // Generate comprehensive processing summary
+    const originalUrlCount = allUrls.length + (preFilterCount - allUrls.length) + urlsSkippedProcessed; // Total before any filtering
+    const skippedUrlCount = urlsSkippedProcessed;
+    const processedUrlCount = taskResults.length;
+    const successfulExtractions = successfulResults.length;
+    const errorCount = taskResults.filter(r => r.type === 'error').length;
+    const noDataCount = taskResults.filter(r => r.type === 'no_data').length;
+    // Get final database statistics
+    const finalStats = urlTracker.getStats();
+    const totalInDatabase = Object.values(finalStats).reduce((sum, count) => sum + count, 0);
+    // Check if output file was created
+    const today = new Date().toISOString().slice(0, 10);
+    const outputPath = `store/Jun-2025/${today}.json`;
+    let outputFileCreated = false;
+    try {
+        const fs = await import('fs');
+        outputFileCreated = fs.existsSync(outputPath);
+    }
+    catch (e) {
+        // If we can't check, assume it wasn't created
+    }
+    // Log comprehensive summary
+    logger.info('========================================');
+    logger.info('SCAN SUMMARY');
+    logger.info('========================================');
+    if (options.range) {
+        logger.info(`📋 URL range processed: ${options.range}`);
+    }
+    logger.info(`📊 Total URLs in range: ${originalUrlCount}`);
+    logger.info(`🔄 URLs actually processed: ${processedUrlCount}`);
+    if (options.skipProcessed && skippedUrlCount > 0) {
+        logger.info(`⏭️  URLs skipped (already processed): ${skippedUrlCount}`);
+    }
+    logger.info(`🎯 Successful data extractions: ${successfulExtractions}`);
+    logger.info(`⚠️  Errors encountered: ${errorCount}`);
+    logger.info(`🚫 No ad tech found: ${noDataCount}`);
+    if (outputFileCreated) {
+        logger.info(`📁 Output file created: ${outputPath}`);
+    }
+    else {
+        logger.info(`📁 No output file created (no successful extractions)`);
+    }
+    logger.info(`💾 Database total: ${totalInDatabase.toLocaleString()} processed URLs`);
+    // Add helpful guidance
+    if (successfulExtractions === 0 && processedUrlCount === 0) {
+        logger.info('');
+        logger.info('💡 No data was extracted because:');
+        if (skippedUrlCount > 0) {
+            logger.info(`   • ${skippedUrlCount} URLs were already processed (use --resetTracking to reprocess)`);
+        }
+        if (noDataCount > 0) {
+            logger.info(`   • ${noDataCount} URLs had no ad technology detected`);
+        }
+        if (errorCount > 0) {
+            logger.info(`   • ${errorCount} URLs encountered errors during processing`);
+        }
+        if (skippedUrlCount === originalUrlCount) {
+            logger.info('   • All URLs in this range have been previously processed!');
+        }
+    }
+    if (options.skipProcessed) {
+        logger.info('');
+        logger.info('🔧 Options for next run:');
+        if (skippedUrlCount === originalUrlCount) {
+            logger.info('   • Process new range (all URLs in current range already done)');
+            if (options.range) {
+                const rangeMatch = options.range.match(/(\d+)-(\d+)/);
+                if (rangeMatch) {
+                    const endNum = parseInt(rangeMatch[2]);
+                    const suggestedStart = endNum + 1;
+                    const suggestedEnd = endNum + 1000;
+                    logger.info(`   • Suggested: --range "${suggestedStart}-${suggestedEnd}"`);
+                }
+            }
+        }
+        else {
+            logger.info('   • Continue with next range: --range "1001-2000"');
+        }
+        logger.info('   • Reprocess this range: --resetTracking');
+        logger.info('   • Process without deduplication: remove --skipProcessed');
+    }
+    logger.info('========================================');
     // Close URL tracker connection
     closeUrlTracker();
 }

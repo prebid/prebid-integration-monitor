@@ -36,6 +36,8 @@ export default class Scan extends Command {
     '<%= config.bin %> <%= command.id %> urls.csv --range="1-100" --chunkSize=20 --outputDir=./scan_results --logDir=./scan_logs',
     '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --skipProcessed',
     '<%= config.bin %> <%= command.id %> urls.txt --skipProcessed --resetTracking',
+    '<%= config.bin %> <%= command.id %> urls.txt --batchMode --startUrl=10001 --totalUrls=5000 --batchSize=250 --skipProcessed',
+    '<%= config.bin %> <%= command.id %> urls.txt --batchMode --startUrl=1 --totalUrls=1000 --batchSize=100 --resumeBatch=5',
   ];
   /**
    * @property {object} flags - Defines the command-line flags accepted by this command.
@@ -66,6 +68,8 @@ export default class Scan extends Command {
       chunkSize: flags.chunkSize,
       skipProcessed: flags.skipProcessed,
       resetTracking: flags.resetTracking,
+      prefilterProcessed: flags.prefilterProcessed,
+      forceReprocess: flags.forceReprocess,
       puppeteerLaunchOptions: {
         headless: flags.headless, // Ensure headless state is consistent
         args: ['--no-sandbox', '--disable-setuid-sandbox'], // Default args for broader compatibility
@@ -115,12 +119,295 @@ export default class Scan extends Command {
   }
 
   /**
+   * Validates batch mode parameters
+   * @private
+   * @param flags - The parsed flags object
+   */
+  private _validateBatchMode(flags: Interfaces.InferredFlags<typeof Scan.flags>): void {
+    if (flags.batchMode) {
+      if (!flags.startUrl || !flags.totalUrls) {
+        this.error('Batch mode requires both --startUrl and --totalUrls flags.', { exit: 1 });
+      }
+      if (flags.startUrl < 1) {
+        this.error('--startUrl must be 1 or greater.', { exit: 1 });
+      }
+      if (flags.totalUrls < 1) {
+        this.error('--totalUrls must be 1 or greater.', { exit: 1 });
+      }
+      if (flags.batchSize < 1) {
+        this.error('--batchSize must be 1 or greater.', { exit: 1 });
+      }
+      if (flags.resumeBatch && flags.resumeBatch < 1) {
+        this.error('--resumeBatch must be 1 or greater.', { exit: 1 });
+      }
+    }
+  }
+
+  /**
+   * Runs batch processing mode
+   * @private
+   * @param flags - The parsed flags object
+   * @param args - The parsed arguments object
+   * @param baseOptions - Base options for prebidExplorer
+   */
+  private async _runBatchMode(
+    flags: Interfaces.InferredFlags<typeof Scan.flags>,
+    args: Interfaces.InferredArgs<typeof Scan.args>,
+    baseOptions: PrebidExplorerOptions
+  ): Promise<void> {
+    const logger = loggerModule.instance;
+    const startUrl = flags.startUrl!;
+    const totalUrls = flags.totalUrls!;
+    const batchSize = flags.batchSize;
+    const endUrl = startUrl + totalUrls - 1;
+    const totalBatches = Math.ceil(totalUrls / batchSize);
+    const resumeFromBatch = flags.resumeBatch || 1;
+
+    // Batch progress tracking
+    const progressFile = `batch-progress-${startUrl}-${endUrl}.json`;
+    let batchProgress: any = { completedBatches: [], failedBatches: [], startTime: new Date().toISOString() };
+    
+    // Load existing progress if resuming
+    try {
+      const fs = await import('fs');
+      if (fs.existsSync(progressFile)) {
+        batchProgress = JSON.parse(fs.readFileSync(progressFile, 'utf8'));
+      }
+    } catch (e) {
+      // Start fresh if can't load progress
+    }
+
+    logger.info('========================================');
+    logger.info('BATCH PROCESSING MODE');
+    logger.info('========================================');
+    logger.info(`📊 Total URLs to process: ${totalUrls.toLocaleString()}`);
+    logger.info(`📍 Starting from URL: ${startUrl.toLocaleString()}`);
+    logger.info(`📍 Ending at URL: ${endUrl.toLocaleString()}`);
+    logger.info(`📦 Batch size: ${batchSize.toLocaleString()}`);
+    logger.info(`🔢 Total batches: ${totalBatches}`);
+    if (resumeFromBatch > 1) {
+      logger.info(`▶️  Resuming from batch: ${resumeFromBatch}`);
+    }
+    logger.info('========================================');
+
+    let successfulBatches = 0;
+    let failedBatches = 0;
+
+    for (let batchNum = resumeFromBatch; batchNum <= totalBatches; batchNum++) {
+      const batchStartUrl = startUrl + (batchNum - 1) * batchSize;
+      const batchEndUrl = Math.min(batchStartUrl + batchSize - 1, endUrl);
+      const range = `${batchStartUrl}-${batchEndUrl}`;
+      
+      logger.info(`\n🔄 Processing batch ${batchNum}/${totalBatches}: URLs ${range}`);
+      logger.info(`⏰ Started at: ${new Date().toLocaleTimeString()}`);
+      logger.info(`📊 Batch progress: ${((batchNum - 1) / totalBatches * 100).toFixed(1)}% complete`);
+      logger.info(`📁 Log directory: ${`${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`}`);
+      
+      // Show estimated completion based on average batch time
+      if (batchProgress.completedBatches.length > 0) {
+        const avgDuration = batchProgress.completedBatches.reduce((sum: number, b: any) => sum + b.duration, 0) / batchProgress.completedBatches.length;
+        const remainingBatches = totalBatches - batchNum + 1;
+        const estimatedMinutes = Math.ceil((avgDuration * remainingBatches) / 60);
+        logger.info(`⏳ Estimated time remaining: ~${estimatedMinutes} minutes`);
+      }
+
+      // Create batch-specific options
+      const batchOptions: PrebidExplorerOptions = {
+        ...baseOptions,
+        range: range,
+        logDir: `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`,
+      };
+
+      const batchStartTime = Date.now();
+      
+      try {
+        await prebidExplorer(batchOptions);
+        const batchDuration = (Date.now() - batchStartTime) / 1000;
+        
+        logger.info(`✅ Batch ${batchNum} completed successfully in ${batchDuration.toFixed(1)}s`);
+        logger.info(`📊 Overall progress: ${batchNum}/${totalBatches} batches (${(batchNum / totalBatches * 100).toFixed(1)}%)`);
+        successfulBatches++;
+        
+        // Update progress with comprehensive statistics
+        batchProgress.completedBatches.push({
+          batchNumber: batchNum,
+          range: range,
+          completedAt: new Date().toISOString(),
+          duration: batchDuration,
+          statistics: {
+            note: 'Detailed statistics available in individual batch logs'
+          }
+        });
+        
+      } catch (error) {
+        const batchDuration = (Date.now() - batchStartTime) / 1000;
+        
+        logger.error(`❌ Batch ${batchNum} failed after ${batchDuration.toFixed(1)}s:`, error);
+        failedBatches++;
+        
+        // Update progress
+        batchProgress.failedBatches.push({
+          batchNumber: batchNum,
+          range: range,
+          failedAt: new Date().toISOString(),
+          duration: batchDuration,
+          error: error instanceof Error ? error.message : String(error)
+        });
+        
+        // Continue with next batch instead of stopping
+        logger.warn(`⏭️  Continuing with next batch...`);
+      }
+
+      // Save progress after each batch
+      try {
+        const fs = await import('fs');
+        fs.writeFileSync(progressFile, JSON.stringify(batchProgress, null, 2));
+      } catch (e) {
+        logger.warn('Could not save batch progress:', e);
+      }
+
+      // Brief pause between batches to avoid overwhelming the system
+      if (batchNum < totalBatches) {
+        logger.info('⏸️  Pausing 5 seconds before next batch...');
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+
+    // Collect comprehensive statistics from all batches
+    let totalUrlsInRange = totalUrls;
+    let totalUrlsProcessed = 0;
+    let totalUrlsSkipped = 0;
+    let totalSuccessfulExtractions = 0;
+    let totalErrors = 0;
+    let totalNoAdTech = 0;
+    
+    // Parse log files to gather detailed statistics
+    for (let batchNum = 1; batchNum <= successfulBatches; batchNum++) {
+      const logDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
+      const logFile = `${logDir}/app.log`;
+      
+      try {
+        const fs = await import('fs');
+        if (fs.existsSync(logFile)) {
+          const logContent = fs.readFileSync(logFile, 'utf8');
+          
+          // Extract statistics from log content
+          const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
+          const skippedMatch = logContent.match(/⏭️  URLs skipped \(already processed\): (\d+)/);
+          const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
+          const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
+          const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
+          
+          if (processedMatch) totalUrlsProcessed += parseInt(processedMatch[1]);
+          if (skippedMatch) totalUrlsSkipped += parseInt(skippedMatch[1]);
+          if (successMatch) totalSuccessfulExtractions += parseInt(successMatch[1]);
+          if (errorMatch) totalErrors += parseInt(errorMatch[1]);
+          if (noAdTechMatch) totalNoAdTech += parseInt(noAdTechMatch[1]);
+        }
+      } catch (e) {
+        logger.warn(`Could not parse statistics from batch ${batchNum} logs`);
+      }
+    }
+
+    // Final batch summary
+    const totalTime = new Date().getTime() - new Date(batchProgress.startTime).getTime();
+    const totalMinutes = Math.floor(totalTime / (1000 * 60));
+    const totalSeconds = Math.floor((totalTime % (1000 * 60)) / 1000);
+
+    logger.info('\n========================================');
+    logger.info('BATCH PROCESSING COMPLETE');
+    logger.info('========================================');
+    logger.info(`📦 Total batches processed: ${totalBatches}`);
+    logger.info(`✅ Successful batches: ${successfulBatches}`);
+    logger.info(`❌ Failed batches: ${failedBatches}`);
+    logger.info(`⏱️  Total time: ${totalMinutes}m ${totalSeconds}s`);
+    logger.info(`📊 Success rate: ${((successfulBatches / totalBatches) * 100).toFixed(1)}%`);
+    logger.info(`🎯 URL range processed: ${startUrl.toLocaleString()}-${endUrl.toLocaleString()} (${totalUrls.toLocaleString()} URLs)`);
+    
+    // Comprehensive statistics summary
+    logger.info('');
+    logger.info('📊 COMPREHENSIVE STATISTICS:');
+    logger.info(`   📋 Total URLs in range: ${totalUrlsInRange.toLocaleString()}`);
+    logger.info(`   🔄 URLs actually processed: ${totalUrlsProcessed.toLocaleString()}`);
+    if (totalUrlsSkipped > 0) {
+      logger.info(`   ⏭️  URLs skipped (previously processed): ${totalUrlsSkipped.toLocaleString()}`);
+    }
+    logger.info(`   🎯 Successful data extractions: ${totalSuccessfulExtractions.toLocaleString()}`);
+    logger.info(`   ⚠️  Errors encountered: ${totalErrors.toLocaleString()}`);
+    logger.info(`   🚫 No ad tech found: ${totalNoAdTech.toLocaleString()}`);
+    
+    // Calculate success rates
+    if (totalUrlsProcessed > 0) {
+      const extractionRate = ((totalSuccessfulExtractions / totalUrlsProcessed) * 100).toFixed(1);
+      const errorRate = ((totalErrors / totalUrlsProcessed) * 100).toFixed(1);
+      const noAdTechRate = ((totalNoAdTech / totalUrlsProcessed) * 100).toFixed(1);
+      
+      logger.info('');
+      logger.info('📈 SUCCESS RATES:');
+      logger.info(`   🎯 Data extraction rate: ${extractionRate}%`);
+      logger.info(`   ⚠️  Error rate: ${errorRate}%`);
+      logger.info(`   🚫 No ad tech rate: ${noAdTechRate}%`);
+    }
+    
+    // Add information about data storage and next steps
+    logger.info('');
+    logger.info('📁 DATA STORAGE:');
+    logger.info('   • Successful extractions: store/Jun-2025/ directory');
+    logger.info('   • Error categorization: errors/ directory');
+    logger.info('   • Processing history: data/url-tracker.db');
+    logger.info('   • Batch progress: batch-progress-*.json files');
+    
+    // Next steps and recommendations
+    logger.info('');
+    if (successfulBatches === totalBatches && failedBatches === 0) {
+      logger.info('🎉 ALL BATCHES COMPLETED SUCCESSFULLY!');
+      logger.info('');
+      logger.info('💡 NEXT SUGGESTED ACTIONS:');
+      const nextStart = endUrl + 1;
+      const nextEnd = endUrl + totalUrls;
+      logger.info(`   • Process next range: --startUrl=${nextStart} --totalUrls=${totalUrls} --batchSize=${batchSize}`);
+      if (totalSuccessfulExtractions > 0) {
+        logger.info(`   • Review extracted data: ls -la store/Jun-2025/`);
+      }
+      if (totalErrors > 0) {
+        logger.info(`   • Investigate errors: cat errors/error_processing.txt`);
+      }
+    } else if (failedBatches > 0) {
+      logger.info('⚠️  SOME BATCHES FAILED');
+      logger.info('');
+      logger.info('🔧 TO RETRY FAILED BATCHES:');
+      batchProgress.failedBatches.forEach((failed: any) => {
+        logger.info(`   node ./bin/run.js scan ${args.inputFile || ''} --range "${failed.range}" --skipProcessed --chunkSize ${flags.chunkSize} --headless --logDir logs-retry-${failed.batchNumber}`);
+      });
+    }
+    
+    // Data verification suggestions
+    if (totalSuccessfulExtractions === 0 && totalUrlsProcessed === 0 && totalUrlsSkipped === totalUrls) {
+      logger.info('');
+      logger.info('📝 ALL URLS WERE PREVIOUSLY PROCESSED:');
+      logger.info('   • This range has been fully processed before');
+      logger.info('   • Use different range to process new URLs');
+      logger.info('   • Or use --resetTracking to reprocess this range');
+    } else if (totalSuccessfulExtractions === 0) {
+      logger.info('');
+      logger.info('📝 NO DATA EXTRACTED:');
+      logger.info('   • Check error logs for issues');
+      logger.info('   • Most URLs may not have ad technology');
+      logger.info('   • Verify URL format and accessibility');
+    }
+    
+    logger.info('');
+    logger.info(`📁 Progress saved to: ${progressFile}`);
+    logger.info('========================================');
+  }
+
+  /**
    * Executes the scan command.
    * This method orchestrates the scanning process by:
    * 1. Parsing command-line arguments and flags.
    * 2. Initializing the logger using the `logDir` flag.
    * 3. Preparing options for the `prebidExplorer` function.
-   * 4. Invoking `prebidExplorer` to perform the scan.
+   * 4. Invoking `prebidExplorer` to perform the scan (or batch processing).
    * 5. Handling successful completion or errors, logging appropriately, and exiting.
    *
    * @async
@@ -130,6 +417,9 @@ export default class Scan extends Command {
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(Scan);
 
+    // Validate batch mode parameters if enabled
+    this._validateBatchMode(flags);
+
     // Initialize logger here so it's available for all subsequent operations, including option processing.
     // Note: loggerModule.instance will be set by initializeLogger.
     initializeLogger(flags.logDir, flags.verbose); // Pass the verbose flag
@@ -138,22 +428,42 @@ export default class Scan extends Command {
     const options = this._getPrebidExplorerOptions(flags);
     this._getInputSourceOptions(args, flags, options); // This method might call this.error and exit
 
-    logger.info(`Starting Prebid scan with options:`);
-    // Log the options (excluding potentially sensitive puppeteerLaunchOptions if necessary in future)
-    const loggableOptions = { ...options };
-    if (loggableOptions.puppeteerLaunchOptions) {
-      // For brevity or security, you might choose to summarize or exclude puppeteerLaunchOptions
-      loggableOptions.puppeteerLaunchOptions = {
-        args: loggableOptions.puppeteerLaunchOptions.args,
-        headless: loggableOptions.puppeteerLaunchOptions.headless,
-      };
-    }
-    logger.info(JSON.stringify(loggableOptions, null, 2));
+    // Handle batch mode vs single scan mode
+    if (flags.batchMode) {
+      logger.info(`Starting Prebid batch scan with options:`);
+      const loggableOptions = { ...options };
+      if (loggableOptions.puppeteerLaunchOptions) {
+        loggableOptions.puppeteerLaunchOptions = {
+          args: loggableOptions.puppeteerLaunchOptions.args,
+          headless: loggableOptions.puppeteerLaunchOptions.headless,
+        };
+      }
+      logger.info(JSON.stringify(loggableOptions, null, 2));
 
-    try {
-      await prebidExplorer(options);
-      this.log('Prebid scan completed successfully.');
-    } catch (error: unknown) {
+      try {
+        await this._runBatchMode(flags, args, options);
+        this.log('Batch processing completed successfully.');
+      } catch (error: unknown) {
+        this.error(`Batch processing failed: ${error instanceof Error ? error.message : String(error)}`, { exit: 1 });
+      }
+    } else {
+      // Original single scan mode
+      logger.info(`Starting Prebid scan with options:`);
+      // Log the options (excluding potentially sensitive puppeteerLaunchOptions if necessary in future)
+      const loggableOptions = { ...options };
+      if (loggableOptions.puppeteerLaunchOptions) {
+        // For brevity or security, you might choose to summarize or exclude puppeteerLaunchOptions
+        loggableOptions.puppeteerLaunchOptions = {
+          args: loggableOptions.puppeteerLaunchOptions.args,
+          headless: loggableOptions.puppeteerLaunchOptions.headless,
+        };
+      }
+      logger.info(JSON.stringify(loggableOptions, null, 2));
+
+      try {
+        await prebidExplorer(options);
+        this.log('Prebid scan completed successfully.');
+      } catch (error: unknown) {
       // Logger should already be initialized here.
       let userMessage = 'An unexpected error occurred during the Prebid scan.';
       let suggestions = ['Check logs for more details.'];
@@ -198,6 +508,7 @@ export default class Scan extends Command {
         exit: 1,
         suggestions,
       });
+      }
     }
   }
 }

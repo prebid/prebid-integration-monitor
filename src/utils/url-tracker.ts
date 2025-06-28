@@ -375,6 +375,131 @@ export class UrlTracker {
   }
 
   /**
+   * Analyze URL range to check processing status
+   * @param startIndex Starting index (0-based)
+   * @param endIndex Ending index (0-based, exclusive)
+   * @param allUrls Array of all URLs to analyze
+   * @returns Range analysis with processing statistics
+   */
+  public analyzeUrlRange(startIndex: number, endIndex: number, allUrls: string[]): {
+    totalInRange: number;
+    processedCount: number;
+    unprocessedCount: number;
+    processedPercentage: number;
+    isFullyProcessed: boolean;
+    nextUnprocessedIndex?: number;
+  } {
+    const rangeUrls = allUrls.slice(startIndex, endIndex);
+    const processedUrls = rangeUrls.filter(url => this.isUrlProcessed(url));
+    
+    const totalInRange = rangeUrls.length;
+    const processedCount = processedUrls.length;
+    const unprocessedCount = totalInRange - processedCount;
+    const processedPercentage = totalInRange > 0 ? (processedCount / totalInRange) * 100 : 0;
+    const isFullyProcessed = unprocessedCount === 0;
+    
+    // Find next unprocessed URL index in the full array
+    let nextUnprocessedIndex: number | undefined;
+    if (!isFullyProcessed) {
+      for (let i = startIndex; i < endIndex; i++) {
+        if (!this.isUrlProcessed(allUrls[i])) {
+          nextUnprocessedIndex = i;
+          break;
+        }
+      }
+    }
+    
+    return {
+      totalInRange,
+      processedCount,
+      unprocessedCount,
+      processedPercentage,
+      isFullyProcessed,
+      nextUnprocessedIndex
+    };
+  }
+
+  /**
+   * Find optimal next range for processing
+   * @param allUrls Array of all URLs
+   * @param batchSize Size of batches to suggest
+   * @param maxSuggestions Maximum number of range suggestions to return
+   * @returns Array of suggested ranges with their processing status
+   */
+  public suggestNextRanges(allUrls: string[], batchSize: number, maxSuggestions: number = 3): Array<{
+    startIndex: number;
+    endIndex: number;
+    startUrl: number; // 1-based
+    endUrl: number; // 1-based  
+    totalUrls: number;
+    estimatedUnprocessed: number;
+    efficiency: number; // percentage of unprocessed URLs in range
+  }> {
+    const suggestions: Array<{
+      startIndex: number;
+      endIndex: number;
+      startUrl: number;
+      endUrl: number;
+      totalUrls: number;
+      estimatedUnprocessed: number;
+      efficiency: number;
+    }> = [];
+
+    // Sample ranges to find gaps efficiently (don't check every single URL)
+    const sampleSize = Math.min(1000, Math.floor(allUrls.length / 100)); // Sample 1% or max 1000 URLs
+    const step = Math.max(1, Math.floor(allUrls.length / sampleSize));
+    
+    for (let i = 0; i < allUrls.length && suggestions.length < maxSuggestions; i += batchSize) {
+      const endIndex = Math.min(i + batchSize, allUrls.length);
+      
+      // Sample URLs in this range to estimate efficiency
+      let sampledProcessed = 0;
+      let sampledTotal = 0;
+      
+      for (let j = i; j < endIndex; j += step) {
+        if (this.isUrlProcessed(allUrls[j])) {
+          sampledProcessed++;
+        }
+        sampledTotal++;
+      }
+      
+      const estimatedProcessedPercentage = sampledTotal > 0 ? (sampledProcessed / sampledTotal) * 100 : 0;
+      const efficiency = 100 - estimatedProcessedPercentage;
+      const estimatedUnprocessed = Math.round((batchSize * efficiency) / 100);
+      
+      // Only suggest ranges with significant unprocessed URLs
+      if (efficiency > 20) { // At least 20% unprocessed
+        suggestions.push({
+          startIndex: i,
+          endIndex,
+          startUrl: i + 1, // Convert to 1-based
+          endUrl: endIndex, // 1-based inclusive
+          totalUrls: endIndex - i,
+          estimatedUnprocessed,
+          efficiency
+        });
+      }
+    }
+    
+    // Sort by efficiency (most unprocessed first)
+    return suggestions.sort((a, b) => b.efficiency - a.efficiency);
+  }
+
+  /**
+   * Check if a range of URLs is worth processing
+   * @param startIndex Starting index (0-based)
+   * @param endIndex Ending index (0-based, exclusive)
+   * @param allUrls Array of all URLs
+   * @param minEfficiency Minimum percentage of unprocessed URLs required (default: 10%)
+   * @returns true if range has enough unprocessed URLs to be worth processing
+   */
+  public isRangeWorthProcessing(startIndex: number, endIndex: number, allUrls: string[], minEfficiency: number = 10): boolean {
+    const analysis = this.analyzeUrlRange(startIndex, endIndex, allUrls);
+    const efficiency = (analysis.unprocessedCount / analysis.totalInRange) * 100;
+    return efficiency >= minEfficiency;
+  }
+
+  /**
    * Close database connection
    */
   public close(): void {

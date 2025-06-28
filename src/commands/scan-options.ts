@@ -70,4 +70,39 @@ export const scanFlags = {
       'Reset the URL tracking database before starting. Clears all previously tracked URLs.',
     default: false,
   }),
+  prefilterProcessed: Flags.boolean({
+    description:
+      'Check database BEFORE loading URLs to skip entirely processed ranges. More efficient than --skipProcessed for large lists.',
+    default: false,
+  }),
+  forceReprocess: Flags.boolean({
+    description:
+      'Force reprocessing of URLs even if they were previously processed. Explicit alternative to --resetTracking.',
+    default: false,
+  }),
+  batchMode: Flags.boolean({
+    description:
+      'Enable batch processing mode. Processes URLs in multiple batches automatically.',
+    default: false,
+  }),
+  batchSize: Flags.integer({
+    description:
+      'Size of each batch when using --batchMode. Number of URLs to process in each batch.',
+    default: 250,
+  }),
+  totalUrls: Flags.integer({
+    description:
+      'Total number of URLs to process when using --batchMode. Must be used with --startUrl.',
+    required: false,
+  }),
+  startUrl: Flags.integer({
+    description:
+      'Starting URL number (1-based) when using --batchMode. Must be used with --totalUrls.',
+    required: false,
+  }),
+  resumeBatch: Flags.integer({
+    description:
+      'Resume batch processing from a specific batch number. Use with --batchMode.',
+    required: false,
+  }),
 };

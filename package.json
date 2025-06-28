@@ -15,7 +15,11 @@
     "prebid:scan": "node ./bin/run.js scan",
     "docs:generate": "typedoc --options typedoc.json",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "sync-agent-docs": "node scripts/sync-agent-docs.js",
+    "validate-docs": "node scripts/sync-agent-docs.js --validate",
+    "setup-git-hook": "node scripts/sync-agent-docs.js --setup-hook",
+    "docs-status": "node scripts/sync-agent-docs.js && echo 'Documentation sync complete'"
   },
   "repository": {
     "type": "git",

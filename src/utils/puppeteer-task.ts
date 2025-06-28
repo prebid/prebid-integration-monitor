@@ -327,6 +327,203 @@ export async function triggerDynamicContent(page: Page, logger?: WinstonLogger):
 }
 
 /**
+ * Waits for DOM to stabilize and checks for frame attachment issues
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ * @param maxWaitMs - Maximum time to wait for stability
+ * @returns Promise that resolves when DOM is stable
+ */
+export async function waitForDOMStability(
+  page: Page, 
+  logger?: WinstonLogger, 
+  maxWaitMs: number = 3000
+): Promise<void> {
+  try {
+    logger?.debug('Waiting for DOM stability...');
+    
+    // Wait for page to be fully loaded and stable
+    await page.evaluate((timeout) => {
+      return new Promise<void>((resolve) => {
+        let lastMutationTime = Date.now();
+        let stabilityCheckInterval: NodeJS.Timeout;
+        
+        // Check for DOM stability
+        const checkStability = () => {
+          const now = Date.now();
+          // If no mutations for 1 second, consider stable
+          if (now - lastMutationTime >= 1000) {
+            clearInterval(stabilityCheckInterval);
+            resolve();
+          }
+        };
+        
+        // Set up mutation observer to track DOM changes
+        const observer = new MutationObserver(() => {
+          lastMutationTime = Date.now();
+        });
+        
+        // Observe changes to the entire document
+        observer.observe(document.body || document.documentElement, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+        
+        // Start checking for stability
+        stabilityCheckInterval = setInterval(checkStability, 200);
+        
+        // Timeout after specified time
+        setTimeout(() => {
+          observer.disconnect();
+          clearInterval(stabilityCheckInterval);
+          resolve();
+        }, timeout);
+      });
+    }, maxWaitMs);
+    
+    logger?.debug('DOM stability check completed');
+  } catch (error) {
+    logger?.debug('Error during DOM stability check:', error);
+    // Don't throw - this is best effort
+  }
+}
+
+/**
+ * Frame-safe data extraction with error handling for detached frames
+ * @param page - The Puppeteer page instance
+ * @param logger - Optional logger for debugging
+ * @param maxRetries - Maximum number of retry attempts
+ * @returns Promise resolving to extracted page data
+ */
+export async function extractDataSafely(
+  page: Page, 
+  logger?: WinstonLogger, 
+  maxRetries: number = 2
+): Promise<any> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+    try {
+      logger?.debug(`Data extraction attempt ${attempt}`);
+      
+      // Import the constants we need
+      const { PBJS_VERSION_WAIT_TIMEOUT_MS, PBJS_VERSION_WAIT_INTERVAL_MS } = await import('../config/app-config.js');
+      
+      const extractedPageData = await page.evaluate(
+        async (pbjsTimeoutMs, pbjsIntervalMs) => {
+          // Define a type for the window object to avoid using 'any' repeatedly
+          interface CustomWindow extends Window {
+            apstag?: unknown; // Amazon Publisher Services UAM tag
+            googletag?: unknown; // Google Publisher Tag
+            ats?: unknown; // LiveRamp ATS.js
+            _pbjsGlobals?: string[]; // Standard Prebid.js global variable names array
+            [key: string]: any; // Index signature for dynamic access to Prebid instances (e.g., window['pbjs'])
+          }
+          
+          const customWindow = window as CustomWindow;
+          const data: any = {
+            libraries: [],
+            date: new Date().toISOString().slice(0, 10),
+            prebidInstances: [],
+          };
+
+          // Detect other libraries with error handling
+          try {
+            if (customWindow.apstag) data.libraries.push('apstag');
+            if (customWindow.googletag) data.libraries.push('googletag');
+            if (customWindow.ats) data.libraries.push('ats');
+          } catch (e) {
+            // Ignore individual library detection errors
+          }
+
+          // Polling function for a single Prebid global variable with enhanced error handling
+          const getPbjsInstanceData = async (globalVarName: string) => {
+            let elapsedTime = 0;
+            
+            while (elapsedTime < pbjsTimeoutMs) {
+              try {
+                const pbjsInstance = customWindow[globalVarName];
+                
+                if (
+                  pbjsInstance &&
+                  typeof pbjsInstance.version === 'string' &&
+                  pbjsInstance.version.length > 0 &&
+                  Array.isArray(pbjsInstance.installedModules)
+                ) {
+                  return {
+                    globalVarName: globalVarName,
+                    version: pbjsInstance.version,
+                    modules: pbjsInstance.installedModules.map(String),
+                  };
+                }
+              } catch (e) {
+                // If we get an error accessing the instance, it might be a frame issue
+                // Continue polling in case it becomes accessible again
+              }
+              
+              await new Promise((resolve) => setTimeout(resolve, pbjsIntervalMs));
+              elapsedTime += pbjsIntervalMs;
+            }
+            return null;
+          };
+
+          // Check for Prebid.js instances if _pbjsGlobals array exists
+          try {
+            if (
+              customWindow._pbjsGlobals &&
+              Array.isArray(customWindow._pbjsGlobals)
+            ) {
+              for (const globalVarName of customWindow._pbjsGlobals) {
+                try {
+                  const instanceData = await getPbjsInstanceData(globalVarName);
+                  if (instanceData) {
+                    data.prebidInstances.push(instanceData);
+                  }
+                } catch (e) {
+                  // Skip this instance if there's an error
+                  continue;
+                }
+              }
+            }
+          } catch (e) {
+            // If we can't access _pbjsGlobals, that's okay
+          }
+          
+          return data;
+        },
+        PBJS_VERSION_WAIT_TIMEOUT_MS,
+        PBJS_VERSION_WAIT_INTERVAL_MS
+      );
+      
+      logger?.debug(`Data extraction attempt ${attempt} succeeded`);
+      return extractedPageData;
+      
+    } catch (error) {
+      lastError = error as Error;
+      logger?.debug(`Data extraction attempt ${attempt} failed:`, error);
+      
+      // Check if this is a detached frame error that we can retry
+      if (error instanceof Error && error.message.includes('detached Frame')) {
+        if (attempt <= maxRetries) {
+          logger?.debug(`Detached frame error detected, retrying in ${attempt * 500}ms...`);
+          await new Promise(resolve => setTimeout(resolve, attempt * 500));
+          
+          // Wait for DOM to stabilize before retry
+          await waitForDOMStability(page, logger, 2000);
+          continue;
+        }
+      } else {
+        // For non-frame errors, don't retry
+        throw error;
+      }
+    }
+  }
+  
+  // If we get here, all retries failed
+  throw lastError || new Error('Data extraction failed after all retries');
+}
+
+/**
  * Processes a single web page using Puppeteer to extract Prebid.js configurations
  * and other specified ad technology library information.
  *
@@ -384,76 +581,12 @@ export const processPageTask = async ({
     
     // Trigger dynamic content loading (lazy loading, etc.)
     await triggerDynamicContent(page, logger);
+    
+    // Wait for DOM to stabilize before data extraction
+    await waitForDOMStability(page, logger);
 
-    // Define a type for the window object to avoid using 'any' repeatedly
-    interface CustomWindow extends Window {
-      apstag?: unknown; // Amazon Publisher Services UAM tag
-      googletag?: unknown; // Google Publisher Tag
-      ats?: unknown; // LiveRamp ATS.js
-      _pbjsGlobals?: string[]; // Standard Prebid.js global variable names array
-      [key: string]: any; // Index signature for dynamic access to Prebid instances (e.g., window['pbjs'])
-    }
-
-    const extractedPageData: PageData = await page.evaluate(
-      // Parameters pbjsTimeoutMs and pbjsIntervalMs are passed from the outer scope
-      async (pbjsTimeoutMs, pbjsIntervalMs): Promise<PageData> => {
-        const customWindow = window as CustomWindow; // Cast to our extended window type
-        const data: Partial<PageData> = {
-          libraries: [],
-          date: new Date().toISOString().slice(0, 10),
-          prebidInstances: [],
-        };
-
-        // Detect other libraries
-        if (customWindow.apstag) data.libraries!.push('apstag');
-        if (customWindow.googletag) data.libraries!.push('googletag');
-        if (customWindow.ats) data.libraries!.push('ats');
-
-        // Polling function for a single Prebid global variable
-        const getPbjsInstanceData = async (globalVarName: string) => {
-          let elapsedTime = 0;
-          // Poll for the Prebid.js instance until timeout or found
-          while (elapsedTime < pbjsTimeoutMs) {
-            // Use passed-in pbjsTimeoutMs
-            const pbjsInstance = customWindow[globalVarName];
-            // Check if Prebid.js instance and its properties are valid
-            if (
-              pbjsInstance &&
-              typeof pbjsInstance.version === 'string' &&
-              pbjsInstance.version.length > 0 && // Ensure version is not an empty string
-              Array.isArray(pbjsInstance.installedModules)
-            ) {
-              return {
-                globalVarName: globalVarName,
-                version: pbjsInstance.version,
-                modules: pbjsInstance.installedModules.map(String), // Ensure modules are strings
-              };
-            }
-            // Wait for the defined interval before checking again
-            await new Promise((resolve) => setTimeout(resolve, pbjsIntervalMs)); // Use passed-in pbjsIntervalMs
-            elapsedTime += pbjsIntervalMs; // Increment elapsed time
-          }
-          return null; // Timeout or instance not found/valid
-        };
-
-        // Check for Prebid.js instances if _pbjsGlobals array exists
-        if (
-          customWindow._pbjsGlobals &&
-          Array.isArray(customWindow._pbjsGlobals)
-        ) {
-          for (const globalVarName of customWindow._pbjsGlobals) {
-            const instanceData = await getPbjsInstanceData(globalVarName);
-            if (instanceData) {
-              data.prebidInstances!.push(instanceData);
-            }
-          }
-        }
-        // Cast to PageData. This assumes that if prebidInstances is populated, it will be correctly structured.
-        return data as PageData;
-      },
-      PBJS_VERSION_WAIT_TIMEOUT_MS, // Pass the constant from app-config
-      PBJS_VERSION_WAIT_INTERVAL_MS // Pass the constant from app-config
-    );
+    // Use frame-safe data extraction with retry logic for detached frame errors
+    const extractedPageData: PageData = await extractDataSafely(page, logger) as PageData;
 
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data
 
@@ -483,6 +616,9 @@ export const processPageTask = async ({
     const netErrorMatch = originalMessage.match(/net::([A-Z_]+)/);
     if (netErrorMatch && netErrorMatch[1]) {
       errorCode = netErrorMatch[1];
+    } else if (originalMessage.includes('detached Frame')) {
+      // Frame detachment errors (should be rare now with our retry logic)
+      errorCode = 'DETACHED_FRAME';
     } else if (originalMessage.toLowerCase().includes('timeout')) {
       errorCode = 'TIMEOUT';
     } else if (originalMessage.toLowerCase().includes('navigation failed')) {
@@ -491,6 +627,12 @@ export const processPageTask = async ({
     } else if (pageError.name === 'TimeoutError') {
       // Puppeteer's own TimeoutError
       errorCode = 'PUPPETEER_TIMEOUT';
+    } else if (originalMessage.includes('Protocol error')) {
+      // Chrome DevTools protocol errors
+      errorCode = 'PROTOCOL_ERROR';
+    } else if (originalMessage.includes('Session closed')) {
+      // Browser session closed unexpectedly
+      errorCode = 'SESSION_CLOSED';
     }
 
     logger.error(`Error processing ${trimmedUrl}: ${originalMessage}`, {
