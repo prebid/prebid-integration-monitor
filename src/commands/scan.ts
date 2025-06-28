@@ -34,6 +34,8 @@ export default class Scan extends Command {
     '<%= config.bin %> <%= command.id %> urls.txt --puppeteerType=cluster --concurrency=10',
     '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/owner/repo/blob/main/urls.txt --numUrls 50',
     '<%= config.bin %> <%= command.id %> urls.csv --range="1-100" --chunkSize=20 --outputDir=./scan_results --logDir=./scan_logs',
+    '<%= config.bin %> <%= command.id %> --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --skipProcessed',
+    '<%= config.bin %> <%= command.id %> urls.txt --skipProcessed --resetTracking',
   ];
   /**
    * @property {object} flags - Defines the command-line flags accepted by this command.
@@ -62,6 +64,8 @@ export default class Scan extends Command {
       numUrls: flags.numUrls,
       range: flags.range,
       chunkSize: flags.chunkSize,
+      skipProcessed: flags.skipProcessed,
+      resetTracking: flags.resetTracking,
       puppeteerLaunchOptions: {
         headless: flags.headless, // Ensure headless state is consistent
         args: ['--no-sandbox', '--disable-setuid-sandbox'], // Default args for broader compatibility

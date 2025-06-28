@@ -5,12 +5,13 @@
  * The logger is configured to log to the console and to files (app.log, error.log).
  * It also integrates with OpenTelemetry for tracing.
  */
-import winston from 'winston';
+import winston, { transports } from 'winston';
+import TransportStream from 'winston-transport';
 import fs from 'fs';
 import path from 'path';
 import { trace } from '@opentelemetry/api';
 let logger;
-let isVerbose = false; // Store verbose state at module level
+export let isVerbose = false; // Store verbose state at module level and export for testing
 /**
  * A Winston log format that enriches the log `info` object with `trace_id` and `span_id`
  * from an active OpenTelemetry span, if one exists.
@@ -60,22 +61,26 @@ function formatSplatMetadata(splat) {
  * @param {Logform.TransformableInfo} info - The log information object.
  * @returns {string} The formatted log message.
  */
-function formatConsoleLogMessage(info) {
+export function formatConsoleLogMessage(info) {
     // Check if this is an error log and if verbose mode is off
-    if ((info.level.includes('error') || info.stack) &&
-        !isVerbose) {
+    if ((info.level.includes('error') || info.stack) && !isVerbose) {
         let originalMessage = typeof info.message === 'string' ? info.message : String(info.message);
         const constructorName = info.constructor?.name; // Safely access constructor name
         // Attempt to remove Winston's default error prefix if present
         // e.g. "Error: Actual error message" -> "Actual error message"
-        if (typeof constructorName === 'string' && originalMessage.startsWith(`${constructorName}: `)) {
+        if (typeof constructorName === 'string' &&
+            originalMessage.startsWith(`${constructorName}: `)) {
             originalMessage = originalMessage.substring(constructorName.length + 2);
         }
-        else if (typeof info.stack === 'string' && originalMessage === (typeof info.name === 'string' ? info.name : String(info.name))) {
+        else if (typeof info.stack === 'string' &&
+            originalMessage ===
+                (typeof info.name === 'string' ? info.name : String(info.name))) {
             // If info.message is just the error name (e.g. "Error"),
             // and stack is present, try to get a better message from stack.
             const stackLines = info.stack.split('\n');
-            if (stackLines.length > 0 && typeof stackLines[0] === 'string' && !stackLines[0].startsWith('    at')) {
+            if (stackLines.length > 0 &&
+                typeof stackLines[0] === 'string' &&
+                !stackLines[0].startsWith('    at')) {
                 originalMessage = stackLines[0];
                 const nameStr = typeof info.name === 'string' ? info.name : String(info.name);
                 // Remove potential error name prefix from stack's first line
@@ -84,7 +89,9 @@ function formatConsoleLogMessage(info) {
                 }
             }
         }
-        const atIndex = typeof originalMessage === 'string' ? originalMessage.indexOf(' at ') : -1;
+        const atIndex = typeof originalMessage === 'string'
+            ? originalMessage.indexOf(' at ')
+            : -1;
         const truncatedMessage = atIndex !== -1 && typeof originalMessage === 'string'
             ? originalMessage.substring(0, atIndex)
             : originalMessage;
@@ -111,15 +118,22 @@ function formatConsoleLogMessage(info) {
     }
     // Default formatting for verbose mode or non-error messages
     let message = `${info.timestamp} ${info.level}: ${typeof info.message === 'string' ? info.message : String(info.message)}`;
-    if (isVerbose && typeof info.stack === 'string') { // Ensure stack is only added in verbose for errors
+    if (isVerbose && typeof info.stack === 'string') {
+        // Ensure stack is only added in verbose for errors
         message += `\n${info.stack}`;
     }
-    else if (!isVerbose && typeof info.stack === 'string' && info.level && !info.level.includes('error')) {
+    else if (!isVerbose &&
+        typeof info.stack === 'string' &&
+        info.level &&
+        !info.level.includes('error')) {
         // If not verbose, and stack is present, but it's not an error log (e.g. a custom debug log with stack)
         // we might not want to print the stack. This depends on desired behavior.
         // For now, let's assume non-error logs don't print stack unless verbose.
     }
-    else if (isVerbose && !info.stack && info.level && info.level.includes('error')) {
+    else if (isVerbose &&
+        !info.stack &&
+        info.level &&
+        info.level.includes('error')) {
         // If verbose, it's an error, but no stack - message is already info.message
     }
     const activeSpan = trace.getActiveSpan();
@@ -152,35 +166,62 @@ function formatConsoleLogMessage(info) {
  * @throws {Error} If an error occurs during logger initialization.
  * @sideEffects Creates the log directory if it doesn't exist.
  */
-export function initializeLogger(logDir, verboseFlag = false) {
-    isVerbose = verboseFlag; // Store the verbose flag
-    if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
+// Define a simple mock transport for testing
+export class MockTransport extends TransportStream {
+    messages = [];
+    constructor(opts) {
+        super(opts);
     }
-    logger = winston.createLogger({
-        levels: winston.config.npm.levels,
-        format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.errors({ stack: true }), winston.format.splat()),
-        transports: [
-            new winston.transports.Console({
-                level: process.env.LOG_LEVEL_CONSOLE || 'info', // Reverted: Level is now fixed
-                format: winston.format.combine(winston.format.colorize(), // colorize must come before printf
-                winston.format.printf(formatConsoleLogMessage)),
+    log(info, callback) {
+        setImmediate(() => {
+            this.emit('logged', info);
+        });
+        this.messages.push(info);
+        callback();
+    }
+}
+export function initializeLogger(logDir, verboseFlag = false, testTransports = null) {
+    isVerbose = verboseFlag; // Store the verbose flag (already exported)
+    let effectiveTransports;
+    if (testTransports) {
+        effectiveTransports = testTransports;
+    }
+    else {
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+        effectiveTransports = [
+            new transports.Console({
+                level: process.env.LOG_LEVEL_CONSOLE || 'info',
+                format: winston.format.combine(winston.format.colorize(), winston.format.printf(formatConsoleLogMessage)),
             }),
-            new winston.transports.File({
+            new transports.File({
                 filename: path.join(logDir, 'app.log'),
                 level: process.env.LOG_LEVEL_APP || 'info',
                 format: winston.format.combine(openTelemetryFormat(), winston.format.json()),
             }),
-            new winston.transports.File({
+            new transports.File({
                 filename: path.join(logDir, 'error.log'),
                 level: 'error',
                 format: winston.format.combine(openTelemetryFormat(), winston.format.json()),
             }),
-        ],
+        ];
+    }
+    logger = winston.createLogger({
+        levels: winston.config.npm.levels,
+        format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.errors({ stack: true }), winston.format.splat()),
+        transports: effectiveTransports,
         exitOnError: false,
     });
-    logger.info(`Logger initialized successfully. Log directory: ${logDir}, Verbose: ${isVerbose}`);
+    // Avoid logging this during test transport initialization if it's too noisy
+    if (!testTransports) {
+        logger.info(`Logger initialized successfully. Log directory: ${logDir}, Verbose: ${isVerbose}`);
+    }
     return logger;
+}
+// Setter for isVerbose for testing purposes
+export function setTestIsVerbose(value) {
+    isVerbose = value;
 }
 export default {
     /**

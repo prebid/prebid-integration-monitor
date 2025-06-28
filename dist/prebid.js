@@ -19,12 +19,14 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 // Using namespace import and attempting to access .default for CJS interop
 import * as BlockResourcesModule from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
+import * as path from 'path';
 // Import functions from new modules
 import { processFileContent, fetchUrlsFromGitHub, loadFileContents, } from './utils/url-loader.js';
 import { processPageTask, // The core function for processing a single page
 // TaskResult and PageData are now imported from common/types
  } from './utils/puppeteer-task.js';
 import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, } from './utils/results-handler.js';
+import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -69,6 +71,22 @@ const puppeteer = addExtra(puppeteerVanilla // Changed from unknown to any
 export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir); // Initialize the global logger
     logger.info('Starting Prebid Explorer with options:', options);
+    // Initialize URL tracker for deduplication
+    const urlTracker = getUrlTracker(logger);
+    // Reset tracking if requested
+    if (options.resetTracking) {
+        logger.info('Resetting URL tracking database...');
+        urlTracker.resetTracking();
+    }
+    // Import existing results if skip-processed is enabled and database is empty
+    if (options.skipProcessed) {
+        const stats = urlTracker.getStats();
+        if (Object.keys(stats).length === 0) {
+            logger.info('URL tracking database is empty. Importing existing results...');
+            await urlTracker.importExistingResults(path.join(process.cwd(), 'store'));
+        }
+        logger.info('URL tracker statistics:', stats);
+    }
     // Apply puppeteer-extra stealth plugin to help avoid bot detection
     // Cast puppeteer to any before calling use
     puppeteer.use(StealthPlugin()); // Changed cast
@@ -192,6 +210,18 @@ export async function prebidExplorer(options) {
     logger.info(`Total URLs to process after range check: ${allUrls.length}`, {
         firstFew: allUrls.slice(0, 5),
     });
+    // Filter out already processed URLs if skip-processed is enabled
+    if (options.skipProcessed) {
+        logger.info('Filtering out previously processed URLs...');
+        const originalCount = allUrls.length;
+        allUrls = urlTracker.filterUnprocessedUrls(allUrls);
+        logger.info(`URL filtering complete: ${originalCount} total, ${allUrls.length} unprocessed, ${originalCount - allUrls.length} skipped`);
+        if (allUrls.length === 0) {
+            logger.info('All URLs have been previously processed. Exiting.');
+            closeUrlTracker();
+            return;
+        }
+    }
     /** @type {string[]} URLs to be processed after applying range and other filters. */
     const urlsToProcess = allUrls; // This now contains potentially ranged URLs
     // Define the core processing task (used by both vanilla and cluster)
@@ -377,6 +407,11 @@ export async function prebidExplorer(options) {
     }
     // Use functions from results-handler.ts
     const successfulResults = processAndLogTaskResults(taskResults, logger);
+    // Update URL tracker with results if skip-processed is enabled
+    if (options.skipProcessed) {
+        urlTracker.updateFromTaskResults(taskResults);
+        logger.info('Updated URL tracking database with scan results');
+    }
     // Write results to store directory by default
     writeResultsToStoreFile(successfulResults, process.cwd(), logger);
     // Append URLs to error files based on task results
@@ -385,4 +420,6 @@ export async function prebidExplorer(options) {
     if (urlSourceType === 'InputFile' && options.inputFile) {
         updateInputFile(options.inputFile, urlsToProcess, taskResults, logger);
     }
+    // Close URL tracker connection
+    closeUrlTracker();
 }

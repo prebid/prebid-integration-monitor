@@ -60,4 +60,14 @@ export const scanFlags = {
       'Enable verbose output, including full error messages and stack traces.',
     default: false,
   }),
+  skipProcessed: Flags.boolean({
+    description:
+      'Skip URLs that have been previously processed successfully. Uses SQLite database to track processed URLs.',
+    default: false,
+  }),
+  resetTracking: Flags.boolean({
+    description:
+      'Reset the URL tracking database before starting. Clears all previously tracked URLs.',
+    default: false,
+  }),
 };
