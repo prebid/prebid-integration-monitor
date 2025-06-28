@@ -1,8 +1,8 @@
 # AI Agent Instructions - Prebid Integration Monitor
 
-## Universal Agent Guidelines
+## Project: Prebid Integration Monitor
 
-This document provides instructions for AI agents (Claude, Gemini, GPT, etc.) working with this codebase.
+This document provides instructions for AI agents (Claude, Gemini, GPT, etc.) to effectively work with this codebase.
 
 ## 🚨 CRITICAL: Always Build After TypeScript Changes
 
@@ -50,26 +50,23 @@ src/
     └── types.ts             # Shared TypeScript types
 ```
 
-## Flag Categories
+## Flag Reference
 
-### Core Processing:
-- `--puppeteerType` - vanilla|cluster
-- `--concurrency` - Number of parallel browsers
-- `--headless` - Browser visibility (default: true)
-
-### URL Management:
-- `--githubRepo` - Process URLs from GitHub repository
-- `--range` - Specific URL range (e.g., "1-1000")
-- `--skipProcessed` - Skip already processed URLs
-- `--prefilterProcessed` - ⭐ NEW: Check efficiency before processing
-- `--forceReprocess` - ⭐ NEW: Reprocess regardless of previous status
+### Smart Processing Flags:
+- `--prefilterProcessed` - Analyze ranges before processing
+- `--forceReprocess` - Explicitly reprocess URLs regardless of previous status
 
 ### Batch Processing:
-- `--batchMode` - Enable automatic batch processing
-- `--startUrl` - Starting URL number (1-based)
-- `--totalUrls` - Total URLs to process
-- `--batchSize` - URLs per batch (default: 250)
-- `--resumeBatch` - Resume from specific batch number
+- `--batchMode` - Enable batch processing
+- `--startUrl=N` - Starting URL number (1-based)
+- `--totalUrls=N` - Total URLs to process
+- `--batchSize=N` - URLs per batch
+- `--resumeBatch=N` - Resume from specific batch
+
+### URL Management:
+- `--skipProcessed` - Skip already processed URLs
+- `--resetTracking` - Clear tracking database
+- `--range="start-end"` - Process specific URL range
 
 ## Data Storage Locations
 
@@ -154,7 +151,18 @@ node ./bin/run.js scan --resetTracking ...
 ✅ Appropriate log messages appear  
 ✅ Database files created/updated  
 ✅ Batch progress files generated  
-✅ Output files created in `store/` directory  
+✅ Output files created in `store/` directory
+
+## AI agents (Claude, Gemini, GPT, etc.) Best Practices
+
+1. **Always build after TypeScript changes**: `npm run build`
+2. **Test with small datasets first**: Use `--range "1-5"` for initial testing
+3. **Provide single-line commands**: Avoid line breaks in command examples
+4. **Check help output**: Verify new flags are available before testing
+5. **Monitor log output**: Watch for processing statistics and suggestions
+6. **Use appropriate batch sizes**: 250-1000 for production, 10-50 for testing
+
+Remember: The system now intelligently suggests optimal ranges when current ranges are fully processed!
 
 ## Agent Best Practices
 
@@ -165,4 +173,14 @@ node ./bin/run.js scan --resetTracking ...
 5. **Monitor log output**: Watch for processing statistics and suggestions
 6. **Use appropriate batch sizes**: 250-1000 for production, 10-50 for testing
 
-Remember: The system now intelligently suggests optimal ranges when current ranges are fully processed!
+## Testing Checklist for AI Agents
+
+When implementing new features:
+
+- [ ] TypeScript compiles without errors (`npm run build`)
+- [ ] New flags appear in `--help` output
+- [ ] Small range test works (`--range "1-5"`)
+- [ ] Log messages are appropriate
+- [ ] Database updates correctly
+- [ ] Output files created as expected
+- [ ] Error handling works properly

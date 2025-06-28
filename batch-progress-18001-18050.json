@@ -1,0 +1,87 @@
+{
+  "completedBatches": [
+    {
+      "batchNumber": 1,
+      "range": "18001-18025",
+      "completedAt": "2025-06-28T17:34:20.633Z",
+      "duration": 0.43,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 2,
+      "range": "18026-18050",
+      "completedAt": "2025-06-28T17:34:25.882Z",
+      "duration": 0.247,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 1,
+      "range": "18001-18025",
+      "completedAt": "2025-06-28T17:35:50.894Z",
+      "duration": 0.279,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 2,
+      "range": "18026-18050",
+      "completedAt": "2025-06-28T17:35:56.164Z",
+      "duration": 0.267,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 1,
+      "range": "18001-18025",
+      "completedAt": "2025-06-28T17:41:11.678Z",
+      "duration": 60.147,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 1,
+      "range": "18001-18025",
+      "completedAt": "2025-06-28T17:55:18.237Z",
+      "duration": 0.373,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 2,
+      "range": "18026-18050",
+      "completedAt": "2025-06-28T17:55:23.427Z",
+      "duration": 0.187,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 1,
+      "range": "18001-18025",
+      "completedAt": "2025-06-28T18:00:17.840Z",
+      "duration": 0.227,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    },
+    {
+      "batchNumber": 2,
+      "range": "18026-18050",
+      "completedAt": "2025-06-28T18:00:23.151Z",
+      "duration": 0.31,
+      "statistics": {
+        "note": "Detailed statistics available in individual batch logs"
+      }
+    }
+  ],
+  "failedBatches": [],
+  "startTime": "2025-06-28T17:34:20.193Z"
+}

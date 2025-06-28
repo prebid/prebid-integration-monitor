@@ -29,6 +29,7 @@ import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, 
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
 import { filterValidUrls } from './utils/domain-validator.js';
 import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
+import { initializeTelemetry, URLLoadingTracer, URLFilteringTracer } from './utils/telemetry.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -72,6 +73,7 @@ const puppeteer = addExtra(puppeteerVanilla // Changed from unknown to any
  */
 export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir); // Initialize the global logger
+    initializeTelemetry('prebid-integration-monitor');
     logger.info('Starting Prebid Explorer with options:', options);
     // Initialize URL tracker for deduplication
     const urlTracker = getUrlTracker(logger);
@@ -131,9 +133,22 @@ export async function prebidExplorer(options) {
     /** @type {string} String to identify the source of URLs (e.g., 'GitHub', 'InputFile'). */
     let urlSourceType = ''; // To track the source for logging and file updates
     // Determine the source of URLs (GitHub or local file) and fetch them.
+    const urlLoadingTracer = new URLLoadingTracer(options.githubRepo || options.inputFile || 'unknown', logger);
     if (options.githubRepo) {
         urlSourceType = 'GitHub';
-        allUrls = await fetchUrlsFromGitHub(options.githubRepo, options.numUrls, logger);
+        // Parse range for optimization
+        let rangeOptions;
+        if (options.range) {
+            const [startStr, endStr] = options.range.split('-');
+            rangeOptions = {
+                startRange: startStr ? parseInt(startStr, 10) : undefined,
+                endRange: endStr ? parseInt(endStr, 10) : undefined
+            };
+            logger.info(`Using optimized range processing: ${options.range}`);
+        }
+        const urlLimit = options.range ? undefined : options.numUrls;
+        allUrls = await fetchUrlsFromGitHub(options.githubRepo, urlLimit, logger, rangeOptions);
+        urlLoadingTracer.recordUrlCount(allUrls.length, 'github_fetch');
         if (allUrls.length > 0) {
             logger.info(`Successfully loaded ${allUrls.length} URLs from GitHub repository: ${options.githubRepo}`);
         }
@@ -150,6 +165,7 @@ export async function prebidExplorer(options) {
                 'unknown';
             logger.info(`Processing local file: ${options.inputFile} (detected type: ${fileType})`);
             allUrls = await processFileContent(options.inputFile, fileContent, logger);
+            urlLoadingTracer.recordUrlCount(allUrls.length, 'file_processing');
             if (allUrls.length > 0) {
                 logger.info(`Successfully loaded ${allUrls.length} URLs from local ${fileType.toUpperCase()} file: ${options.inputFile}`);
             }
@@ -172,14 +188,17 @@ export async function prebidExplorer(options) {
     }
     // Exit if no URLs were found from the specified source.
     if (allUrls.length === 0) {
+        urlLoadingTracer.finish(0);
         logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
         return;
     }
+    urlLoadingTracer.finish(allUrls.length);
     logger.info(`Initial total URLs found: ${allUrls.length}`, {
         firstFew: allUrls.slice(0, 5),
     });
     // 1. URL Range Logic
     // Apply URL range filtering if specified in options.
+    const filteringTracer = new URLFilteringTracer(allUrls.length, logger);
     if (options.range) {
         logger.info(`Applying range: ${options.range}`);
         const originalUrlCount = allUrls.length;
@@ -204,6 +223,7 @@ export async function prebidExplorer(options) {
             }
             else {
                 allUrls = allUrls.slice(start, end); // end is exclusive for slice, matches 0-based end index
+                filteringTracer.recordRangeFiltering(originalUrlCount, allUrls.length, options.range);
                 logger.info(`Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`);
             }
         }
@@ -275,9 +295,26 @@ export async function prebidExplorer(options) {
         const originalCount = allUrls.length;
         allUrls = urlTracker.filterUnprocessedUrls(allUrls);
         urlsSkippedProcessed = originalCount - allUrls.length;
+        filteringTracer.recordProcessedFiltering(originalCount, allUrls.length, urlsSkippedProcessed);
         logger.info(`URL filtering complete: ${originalCount} total, ${allUrls.length} unprocessed, ${urlsSkippedProcessed} skipped`);
         if (allUrls.length === 0) {
-            logger.info('All URLs have been previously processed. Exiting.');
+            logger.info('All URLs have been previously processed.');
+            // Log summary even when exiting early
+            const originalUrlCount = originalCount;
+            const skippedUrlCount = urlsSkippedProcessed;
+            const processedUrlCount = 0;
+            logger.info('========================================');
+            logger.info('SCAN SUMMARY');
+            logger.info('========================================');
+            if (options.range) {
+                logger.info(`📋 URL range processed: ${options.range}`);
+            }
+            logger.info(`📊 Total URLs in range: ${originalUrlCount}`);
+            logger.info(`🔄 URLs actually processed: ${processedUrlCount}`);
+            logger.info(`⏭️  URLs skipped (already processed): ${skippedUrlCount}`);
+            logger.info(`💡 All URLs in this range were previously processed.`);
+            logger.info(`   Use --forceReprocess to reprocess them anyway.`);
+            logger.info('========================================');
             closeUrlTracker();
             return;
         }
@@ -286,12 +323,15 @@ export async function prebidExplorer(options) {
     logger.info('Pre-filtering URLs for domain validity...');
     const preFilterCount = allUrls.length;
     allUrls = await filterValidUrls(allUrls, logger, false); // Pattern-only validation for speed
+    filteringTracer.recordDomainFiltering(preFilterCount, allUrls.length);
     logger.info(`Domain pre-filtering complete: ${preFilterCount} total, ${allUrls.length} valid, ${preFilterCount - allUrls.length} filtered out`);
     if (allUrls.length === 0) {
+        filteringTracer.finish(0);
         logger.warn('No valid URLs remaining after domain filtering. Exiting.');
         closeUrlTracker();
         return;
     }
+    filteringTracer.finish(allUrls.length);
     /** @type {string[]} URLs to be processed after applying range and other filters. */
     const urlsToProcess = allUrls; // This now contains potentially ranged URLs
     // Define the core processing task (used by both vanilla and cluster)
@@ -525,6 +565,15 @@ export async function prebidExplorer(options) {
     const originalUrlCount = allUrls.length + (preFilterCount - allUrls.length) + urlsSkippedProcessed; // Total before any filtering
     const skippedUrlCount = urlsSkippedProcessed;
     const processedUrlCount = taskResults.length;
+    // Debug logging to understand what's happening
+    logger.debug('Processing summary calculation:', {
+        'allUrls.length': allUrls.length,
+        'preFilterCount': preFilterCount,
+        'urlsSkippedProcessed': urlsSkippedProcessed,
+        'originalUrlCount': originalUrlCount,
+        'processedUrlCount': processedUrlCount,
+        'taskResults.length': taskResults.length
+    });
     const successfulExtractions = successfulResults.length;
     const errorCount = taskResults.filter(r => r.type === 'error').length;
     const noDataCount = taskResults.filter(r => r.type === 'no_data').length;
@@ -551,8 +600,14 @@ export async function prebidExplorer(options) {
     }
     logger.info(`📊 Total URLs in range: ${originalUrlCount}`);
     logger.info(`🔄 URLs actually processed: ${processedUrlCount}`);
-    if (options.skipProcessed && skippedUrlCount > 0) {
+    // Always show skipped count when using skipProcessed, even if 0
+    if (options.skipProcessed) {
         logger.info(`⏭️  URLs skipped (already processed): ${skippedUrlCount}`);
+        // Add helpful context when all URLs are skipped
+        if (skippedUrlCount > 0 && processedUrlCount === 0) {
+            logger.info(`💡 All URLs in this range were previously processed.`);
+            logger.info(`   Use --forceReprocess to reprocess them anyway.`);
+        }
     }
     logger.info(`🎯 Successful data extractions: ${successfulExtractions}`);
     logger.info(`⚠️  Errors encountered: ${errorCount}`);

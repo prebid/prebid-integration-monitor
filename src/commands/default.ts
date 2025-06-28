@@ -1,5 +1,5 @@
 import { Command, Flags } from '@oclif/core';
-import { initTracer } from '../tracer.js';
+import { initializeTelemetry } from '../utils/telemetry.js';
 import { initializeLogger } from '../utils/logger.js'; // Import loggerModule
 import type { Logger as WinstonLogger } from 'winston';
 import { executeMonitoringLogic } from '../services/monitoring-service.js';
@@ -57,8 +57,8 @@ export default class Default extends Command {
     );
 
     try {
-      // Initialize the tracer as the first step
-      initTracer();
+      // Initialize the telemetry as the first step
+      initializeTelemetry('prebid-integration-monitor');
       logger.info('Default oclif command starting...');
 
       // Call the refactored monitoring logic

@@ -81,8 +81,12 @@ export class UrlTracker {
     this.db = new Database(this.config.dbPath);
     this.logger.info(`Initialized URL tracker database: ${this.config.dbPath}`);
 
-    // Enable WAL mode for better concurrent access
+    // Enable WAL mode for better concurrent access and performance
     this.db.pragma('journal_mode = WAL');
+    this.db.pragma('synchronous = NORMAL'); // Better performance while maintaining durability
+    this.db.pragma('cache_size = 10000'); // 10MB cache
+    this.db.pragma('temp_store = MEMORY'); // Store temp tables in memory
+    this.db.pragma('mmap_size = 268435456'); // 256MB memory mapping
     
     // Create table with optimized schema
     this.db.exec(`
@@ -96,9 +100,17 @@ export class UrlTracker {
         updated_at TEXT DEFAULT (datetime('now'))
       );
       
+      -- Primary indexes for fast lookups
       CREATE INDEX IF NOT EXISTS idx_status ON processed_urls(status);
       CREATE INDEX IF NOT EXISTS idx_timestamp ON processed_urls(timestamp);
       CREATE INDEX IF NOT EXISTS idx_retry ON processed_urls(retry_count);
+      
+      -- Composite indexes for complex queries
+      CREATE INDEX IF NOT EXISTS idx_status_timestamp ON processed_urls(status, timestamp);
+      CREATE INDEX IF NOT EXISTS idx_status_retry ON processed_urls(status, retry_count);
+      
+      -- Analyze table for query optimizer
+      ANALYZE processed_urls;
     `);
 
     this.logger.info('URL tracker database schema initialized');
@@ -329,6 +341,108 @@ export class UrlTracker {
       this.logger.info(`Successfully imported ${importCount} existing results`);
     } catch (error) {
       this.logger.error('Error importing existing results', { error });
+    }
+  }
+
+  /**
+   * Perform database maintenance operations for optimal performance
+   * @param options Maintenance options
+   */
+  public performMaintenance(options: { 
+    vacuum?: boolean; 
+    analyze?: boolean; 
+    reindex?: boolean;
+    cleanupOld?: boolean;
+    olderThanDays?: number;
+  } = {}): void {
+    try {
+      this.logger.info('Starting database maintenance operations...');
+      const startTime = Date.now();
+
+      // Clean up old records if requested
+      if (options.cleanupOld) {
+        const daysThreshold = options.olderThanDays || 90;
+        const cleanupStmt = this.db.prepare(`
+          DELETE FROM processed_urls 
+          WHERE created_at < datetime('now', '-${daysThreshold} days')
+          AND status IN ('error', 'retry')
+        `);
+        const cleanupResult = cleanupStmt.run();
+        this.logger.info(`Cleaned up ${cleanupResult.changes} old records older than ${daysThreshold} days`);
+      }
+
+      // Re-analyze tables for query optimizer
+      if (options.analyze !== false) {
+        this.db.exec('ANALYZE processed_urls;');
+        this.logger.info('Table analysis completed');
+      }
+
+      // Reindex tables if requested
+      if (options.reindex) {
+        this.db.exec('REINDEX;');
+        this.logger.info('Database reindexing completed');
+      }
+
+      // Vacuum database if requested
+      if (options.vacuum) {
+        this.db.exec('VACUUM;');
+        this.logger.info('Database vacuum completed');
+      }
+
+      const duration = Date.now() - startTime;
+      this.logger.info(`Database maintenance completed in ${duration}ms`);
+    } catch (error) {
+      this.logger.error('Error during database maintenance', { error });
+    }
+  }
+
+  /**
+   * Get database performance statistics
+   */
+  public getDatabaseStats(): { 
+    size: number; 
+    pageCount: number; 
+    pageSize: number; 
+    indexCount: number;
+    walSize?: number;
+  } {
+    try {
+      const stats = {
+        size: 0,
+        pageCount: 0,
+        pageSize: 0,
+        indexCount: 0,
+        walSize: 0
+      };
+
+      // Get basic database info
+      const pageCountResult = this.db.pragma('page_count', { simple: true }) as number;
+      const pageSizeResult = this.db.pragma('page_size', { simple: true }) as number;
+      
+      stats.pageCount = pageCountResult;
+      stats.pageSize = pageSizeResult;
+      stats.size = pageCountResult * pageSizeResult;
+
+      // Get index count
+      const indexResult = this.db.prepare(`
+        SELECT COUNT(*) as count FROM sqlite_master WHERE type = 'index'
+      `).get() as { count: number };
+      stats.indexCount = indexResult.count;
+
+      // Get WAL file size if it exists
+      try {
+        const walPath = this.config.dbPath + '-wal';
+        if (fs.existsSync(walPath)) {
+          stats.walSize = fs.statSync(walPath).size;
+        }
+      } catch (e) {
+        // WAL file might not exist
+      }
+
+      return stats;
+    } catch (error) {
+      this.logger.error('Error getting database stats', { error });
+      return { size: 0, pageCount: 0, pageSize: 0, indexCount: 0 };
     }
   }
 

@@ -2,79 +2,167 @@
 
 ## Project: Prebid Integration Monitor
 
-This document provides specific instructions for Google's Gemini AI to work effectively with this TypeScript/Node.js codebase.
+This document provides instructions for Google's Gemini AI to effectively work with this codebase.
 
-## 🔧 Essential Build Step
+## 🚨 CRITICAL: Always Build After TypeScript Changes
 
-**CRITICAL:** After any TypeScript (.ts) file modifications, always run:
+**NEVER skip this step when modifying .ts files:**
 ```bash
 npm run build
 ```
 
-This compiles TypeScript to JavaScript and updates the CLI flags. Skip this step and new features won't work!
+## Quick Testing Protocol
 
-## 🧪 Testing Protocol for New Features
-
-### Step 1: Verify CLI Compilation
+### 1. Verify CLI Changes Work
 ```bash
-# Check that new flags appear in help
+# Check if new flags appear
 node ./bin/run.js scan --help
+
+# Test new functionality with small dataset
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --range "1-5" --headless
 ```
 
-### Step 2: Test New Functionality
+### 2. Standard Test Commands
 ```bash
-# Test with minimal data first
-node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --range "1-5" --prefilterProcessed
+# Basic functionality test
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --range "1-10" --skipProcessed
+
+# Batch processing test  
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --batchMode --startUrl=1 --totalUrls=100 --batchSize=25
+
+# Pre-filtering test (new feature)
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --prefilterProcessed --range "1-100"
 ```
 
-### Step 3: Validate Integration
+## Architecture Overview
+
+```
+src/
+├── commands/
+│   ├── scan.ts              # Main CLI command logic
+│   └── scan-options.ts      # Flag definitions (EDIT HERE for new flags)
+├── prebid.ts                # Core processing engine  
+├── utils/
+│   ├── url-tracker.ts       # SQLite database for URL deduplication
+│   ├── puppeteer-task.ts    # Individual page processing
+│   └── results-handler.ts   # Output file management
+└── common/
+    └── types.ts             # Shared TypeScript types
+```
+
+## Flag Reference
+
+### Smart Processing Flags:
+- `--prefilterProcessed` - Analyze ranges before processing
+- `--forceReprocess` - Explicitly reprocess URLs regardless of previous status
+
+### Batch Processing:
+- `--batchMode` - Enable batch processing
+- `--startUrl=N` - Starting URL number (1-based)
+- `--totalUrls=N` - Total URLs to process
+- `--batchSize=N` - URLs per batch
+- `--resumeBatch=N` - Resume from specific batch
+
+### URL Management:
+- `--skipProcessed` - Skip already processed URLs
+- `--resetTracking` - Clear tracking database
+- `--range="start-end"` - Process specific URL range
+
+## Data Storage Locations
+
+```
+project-root/
+├── data/
+│   └── url-tracker.db           # SQLite database for processed URLs
+├── store/
+│   └── Jun-2025/
+│       └── YYYY-MM-DD.json      # Daily successful extractions
+├── errors/
+│   ├── no_prebid.txt            # URLs with no ad tech
+│   ├── error_processing.txt     # Processing errors
+│   └── navigation_errors.txt    # Navigation failures
+├── batch-progress-*.json        # Batch processing state
+└── logs-*/                      # Batch-specific log directories
+```
+
+## Common Commands for Copy-Paste
+
+### Resume Batch Processing:
 ```bash
-# Test batch processing with new flags
-node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --batchMode --startUrl=1 --totalUrls=50 --batchSize=10 --prefilterProcessed
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --batchMode --startUrl=10001 --totalUrls=5000 --batchSize=250 --resumeBatch=6 --skipProcessed --prefilterProcessed --logDir=logs
 ```
 
-## 📁 Project Structure for Gemini
-
-### Key Files to Understand:
-```
-src/commands/scan-options.ts  → CLI flag definitions (add new flags here)
-src/commands/scan.ts          → CLI command implementation  
-src/prebid.ts                 → Core processing logic
-src/utils/url-tracker.ts      → Database operations
-```
-
-### Data Flow:
-1. **CLI** (scan-options.ts) → Parse flags
-2. **Command** (scan.ts) → Orchestrate processing 
-3. **Core** (prebid.ts) → Load URLs, apply filters, process
-4. **Tracker** (url-tracker.ts) → Track processed URLs in SQLite
-5. **Output** → JSON files in store/, error files in errors/
-
-## 🚀 Smart Processing Features (New)
-
-### Pre-filtering URLs:
-```bash
-# Check range efficiency before processing
-node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --prefilterProcessed --range "10001-15000"
-```
-
-### Force Reprocessing:
-```bash
-# Explicitly reprocess URLs regardless of previous status
-node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --forceReprocess --range "1-100"
-```
-
-## 📊 Batch Processing Commands
-
-### Start New Batch:
+### Start New Range:
 ```bash
 node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --batchMode --startUrl=15001 --totalUrls=3000 --batchSize=250 --skipProcessed --prefilterProcessed --logDir=logs
 ```
 
-### Resume Existing Batch:
+### Check Range Efficiency:
 ```bash
-node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --batchMode --startUrl=10001 --totalUrls=5000 --batchSize=250 --resumeBatch=6 --skipProcessed --logDir=logs
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --prefilterProcessed --range "20001-25000"
 ```
+
+### Force Reprocess Range:
+```bash
+node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --forceReprocess --range "1-1000" --batchSize=100
+```
+
+## Troubleshooting Guide
+
+### "Flag doesn't exist" error:
+1. Run `npm run build`
+2. Check `src/commands/scan-options.ts` for flag definition
+3. Verify flag is added to `src/commands/scan.ts` options mapping
+
+### "0 URLs processed" issue:
+- Use `--prefilterProcessed` to check range efficiency first
+- Consider using `--forceReprocess` if you want to reprocess
+- Check suggestions for next optimal ranges
+
+### Database issues:
+```bash
+# Reset database
+rm data/url-tracker.db
+
+# Or use flag
+node ./bin/run.js scan --resetTracking ...
+```
+
+### Resume batch processing:
+1. Check `batch-progress-*.json` for last completed batch
+2. Use `--resumeBatch=N` where N is next batch to process
+
+## Performance Optimization
+
+### For Large Domain Lists:
+1. Use `--prefilterProcessed` to avoid loading already-processed ranges
+2. Use appropriate `--batchSize` (250-1000 for top domains)
+3. Consider `--puppeteerType=cluster` with `--concurrency=3-10`
+
+### For Testing:
+1. Always use small ranges first (`--range "1-10"`)
+2. Use `--headless` for faster processing
+3. Check `--help` output after any changes
+
+## Success Indicators
+
+✅ New flags appear in `--help` output  
+✅ Commands execute without unknown flag errors  
+✅ Appropriate log messages appear  
+✅ Database files created/updated  
+✅ Batch progress files generated  
+✅ Output files created in `store/` directory
+
+## Google's Gemini AI Best Practices
+
+1. **Always build after TypeScript changes**: `npm run build`
+2. **Test with small datasets first**: Use `--range "1-5"` for initial testing
+3. **Provide single-line commands**: Avoid line breaks in command examples
+4. **Check help output**: Verify new flags are available before testing
+5. **Monitor log output**: Watch for processing statistics and suggestions
+6. **Use appropriate batch sizes**: 250-1000 for production, 10-50 for testing
+
+Remember: The system now intelligently suggests optimal ranges when current ranges are fully processed!
 
 ## 🛠️ Development Workflow for Gemini
 
@@ -99,52 +187,6 @@ node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains
 **Cause:** All URLs in range already processed
 **Solution:** Use `--prefilterProcessed` to check efficiency first
 
-## 📈 Performance Optimization Guide
-
-### For Large Datasets:
-- Use `--prefilterProcessed` to skip fully-processed ranges
-- Use `--batchSize=250-1000` for top domain lists
-- Use `--concurrency=3-10` with cluster mode
-
-### For Testing:
-- Always start with `--range "1-10"`
-- Use `--headless` for faster processing
-- Monitor log output for processing statistics
-
-## 🔍 Debugging Commands
-
-### Check Database Status:
-```bash
-# View database statistics
-sqlite3 data/url-tracker.db "SELECT status, COUNT(*) FROM processed_urls GROUP BY status;"
-```
-
-### Check Processing Results:
-```bash
-# View recent output files
-ls -la store/Jun-2025/
-cat errors/no_prebid.txt | tail -10
-```
-
-### Batch Progress:
-```bash
-# Check batch progress files
-ls -la batch-progress-*.json
-cat batch-progress-10001-15000.json
-```
-
-## 🎯 Testing Checklist for Gemini
-
-When implementing new features:
-
-- [ ] TypeScript compiles without errors (`npm run build`)
-- [ ] New flags appear in `--help` output
-- [ ] Small range test works (`--range "1-5"`)
-- [ ] Log messages are appropriate
-- [ ] Database updates correctly
-- [ ] Output files created as expected
-- [ ] Error handling works properly
-
 ## 💡 Gemini-Specific Tips
 
 1. **Code Generation:** When generating TypeScript, ensure proper type definitions
@@ -152,13 +194,3 @@ When implementing new features:
 3. **Error Handling:** Wrap database operations in try-catch blocks
 4. **Logging:** Use structured logging with appropriate log levels
 5. **Testing:** Provide concrete test commands with actual URLs
-
-## 🚀 Current Smart Features
-
-The system now includes:
-- **Intelligent range analysis** - Check processing efficiency before loading URLs
-- **Smart suggestions** - Automatically suggest optimal next ranges
-- **Force reprocessing** - Explicit reprocessing without database clearing
-- **Comprehensive batch statistics** - Detailed progress tracking and reporting
-
-Use `--prefilterProcessed` to leverage these smart features for optimal performance!

@@ -3,6 +3,7 @@ import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js';
 import { scanArgs, scanFlags } from './scan-options.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import initializeLogger
 import { AppError } from '../common/AppError.js';
+import { BatchProcessingTracer } from '../utils/telemetry.js';
 
 /**
  * @class Scan
@@ -218,14 +219,77 @@ export default class Scan extends Command {
         logDir: `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`,
       };
 
+      const batchTracer = new BatchProcessingTracer(batchNum, range, logger);
       const batchStartTime = Date.now();
       
       try {
-        await prebidExplorer(batchOptions);
+        const batchResult = await prebidExplorer(batchOptions);
         const batchDuration = (Date.now() - batchStartTime) / 1000;
         
+        // Extract batch statistics from prebidExplorer result if available
+        // For now, we'll parse from the most recent log file
+        let batchStats = {
+          urlsProcessed: 0,
+          urlsSkipped: 0,
+          successfulExtractions: 0,
+          errors: 0,
+          noAdTech: 0
+        };
+        
+        // Try to read stats from the batch log file
+        try {
+          const fs = await import('fs');
+          const batchLogDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
+          const logFile = `${batchLogDir}/app.log`;
+          
+          if (fs.existsSync(logFile)) {
+            const logContent = fs.readFileSync(logFile, 'utf8');
+            
+            const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
+            const skippedMatch = logContent.match(/⏭️  URLs skipped \(already processed\): (\d+)/);
+            const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
+            const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
+            const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
+            
+            if (processedMatch) batchStats.urlsProcessed = parseInt(processedMatch[1]);
+            if (skippedMatch) batchStats.urlsSkipped = parseInt(skippedMatch[1]);
+            if (successMatch) batchStats.successfulExtractions = parseInt(successMatch[1]);
+            if (errorMatch) batchStats.errors = parseInt(errorMatch[1]);
+            if (noAdTechMatch) batchStats.noAdTech = parseInt(noAdTechMatch[1]);
+            
+            // Debug: log what we found
+            logger.debug(`Batch ${batchNum} log parsing results:`, {
+              processedMatch: processedMatch?.[1],
+              skippedMatch: skippedMatch?.[1],
+              batchStats
+            });
+          } else {
+            logger.debug(`Batch ${batchNum} log file not found: ${logFile}`);
+          }
+        } catch (e) {
+          logger.debug(`Error reading batch ${batchNum} logs:`, e);
+        }
+        
         logger.info(`✅ Batch ${batchNum} completed successfully in ${batchDuration.toFixed(1)}s`);
+        
+        // Show batch-specific results immediately
+        if (batchStats.urlsSkipped > 0) {
+          logger.info(`   ⏭️  ${batchStats.urlsSkipped} URLs already processed (skipped)`);
+        }
+        if (batchStats.urlsProcessed > 0) {
+          logger.info(`   🔄 ${batchStats.urlsProcessed} URLs newly processed`);
+          if (batchStats.successfulExtractions > 0) {
+            logger.info(`   🎯 ${batchStats.successfulExtractions} successful extractions`);
+          }
+        } else if (batchStats.urlsSkipped === 0) {
+          logger.warn(`   ⚠️  No URLs processed or skipped in this batch - check range validity`);
+        }
+        
         logger.info(`📊 Overall progress: ${batchNum}/${totalBatches} batches (${(batchNum / totalBatches * 100).toFixed(1)}%)`);
+        
+        batchTracer.recordUrlCounts(batchStats.urlsProcessed, batchStats.urlsSkipped, 
+          batchStats.successfulExtractions, batchStats.errors);
+        batchTracer.finish(true);
         successfulBatches++;
         
         // Update progress with comprehensive statistics
@@ -243,6 +307,8 @@ export default class Scan extends Command {
         const batchDuration = (Date.now() - batchStartTime) / 1000;
         
         logger.error(`❌ Batch ${batchNum} failed after ${batchDuration.toFixed(1)}s:`, error);
+        batchTracer.recordError(error instanceof Error ? error : new Error(String(error)));
+        batchTracer.finish(false);
         failedBatches++;
         
         // Update progress
@@ -324,19 +390,34 @@ export default class Scan extends Command {
     logger.info(`📊 Success rate: ${((successfulBatches / totalBatches) * 100).toFixed(1)}%`);
     logger.info(`🎯 URL range processed: ${startUrl.toLocaleString()}-${endUrl.toLocaleString()} (${totalUrls.toLocaleString()} URLs)`);
     
-    // Comprehensive statistics summary
+    // Comprehensive statistics summary with clear messaging
     logger.info('');
     logger.info('📊 COMPREHENSIVE STATISTICS:');
     logger.info(`   📋 Total URLs in range: ${totalUrlsInRange.toLocaleString()}`);
     logger.info(`   🔄 URLs actually processed: ${totalUrlsProcessed.toLocaleString()}`);
+    
     if (totalUrlsSkipped > 0) {
       logger.info(`   ⏭️  URLs skipped (previously processed): ${totalUrlsSkipped.toLocaleString()}`);
+      
+      // Add clear explanation when most/all URLs were skipped
+      const skipPercentage = ((totalUrlsSkipped / totalUrlsInRange) * 100).toFixed(1);
+      if (totalUrlsSkipped === totalUrlsInRange) {
+        logger.info('');
+        logger.info('🎯 IMPORTANT: ALL URLs in this range were already processed!');
+        logger.info('   This is why you see 0 newly processed URLs.');
+        logger.info('   The system skipped all URLs to avoid duplicate work.');
+      } else if (parseFloat(skipPercentage) > 80) {
+        logger.info('');
+        logger.info(`⚠️  HIGH SKIP RATE: ${skipPercentage}% of URLs were already processed`);
+        logger.info('   Consider using a different range for better efficiency.');
+      }
     }
+    
     logger.info(`   🎯 Successful data extractions: ${totalSuccessfulExtractions.toLocaleString()}`);
     logger.info(`   ⚠️  Errors encountered: ${totalErrors.toLocaleString()}`);
     logger.info(`   🚫 No ad tech found: ${totalNoAdTech.toLocaleString()}`);
     
-    // Calculate success rates
+    // Calculate success rates only if URLs were actually processed
     if (totalUrlsProcessed > 0) {
       const extractionRate = ((totalSuccessfulExtractions / totalUrlsProcessed) * 100).toFixed(1);
       const errorRate = ((totalErrors / totalUrlsProcessed) * 100).toFixed(1);
@@ -347,6 +428,11 @@ export default class Scan extends Command {
       logger.info(`   🎯 Data extraction rate: ${extractionRate}%`);
       logger.info(`   ⚠️  Error rate: ${errorRate}%`);
       logger.info(`   🚫 No ad tech rate: ${noAdTechRate}%`);
+    } else if (totalUrlsSkipped > 0) {
+      logger.info('');
+      logger.info('📈 NO NEW PROCESSING OCCURRED:');
+      logger.info('   All URLs in this range were previously processed.');
+      logger.info('   Use --forceReprocess to reprocess, or choose a new range.');
     }
     
     // Add information about data storage and next steps
@@ -364,7 +450,6 @@ export default class Scan extends Command {
       logger.info('');
       logger.info('💡 NEXT SUGGESTED ACTIONS:');
       const nextStart = endUrl + 1;
-      const nextEnd = endUrl + totalUrls;
       logger.info(`   • Process next range: --startUrl=${nextStart} --totalUrls=${totalUrls} --batchSize=${batchSize}`);
       if (totalSuccessfulExtractions > 0) {
         logger.info(`   • Review extracted data: ls -la store/Jun-2025/`);

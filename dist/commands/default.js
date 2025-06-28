@@ -1,5 +1,5 @@
 import { Command, Flags } from '@oclif/core';
-import { initTracer } from '../tracer.js';
+import { initializeTelemetry } from '../utils/telemetry.js';
 import { initializeLogger } from '../utils/logger.js'; // Import loggerModule
 import { executeMonitoringLogic } from '../services/monitoring-service.js';
 import { AppError } from '../common/AppError.js'; // Import AppError
@@ -48,8 +48,8 @@ export default class Default extends Command {
         // Example test log - consider removing or making conditional for production builds.
         logger.info('TEST_CONSOLE_OUTPUT: This is a test message from default command.');
         try {
-            // Initialize the tracer as the first step
-            initTracer();
+            // Initialize the telemetry as the first step
+            initializeTelemetry('prebid-integration-monitor');
             logger.info('Default oclif command starting...');
             // Call the refactored monitoring logic
             await executeMonitoringLogic(logger, this.log);
