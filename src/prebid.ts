@@ -120,6 +120,12 @@ export interface PrebidExplorerOptions {
    * Defaults to false.
    */
   forceReprocess?: boolean;
+  /**
+   * Whether to enable discovery mode to detect unknown ad tech libraries.
+   * When enabled, captures unrecognized global variables that match ad tech patterns.
+   * Defaults to false.
+   */
+  discoveryMode?: boolean;
 }
 
 let logger: WinstonLogger; // Global logger instance, initialized within prebidExplorer.
@@ -547,7 +553,7 @@ export async function prebidExplorer(
       // Process the current chunk using either 'cluster' or 'vanilla' Puppeteer mode.
       if (options.puppeteerType === 'cluster') {
         const cluster: Cluster<
-          { url: string; logger: WinstonLogger },
+          { url: string; logger: WinstonLogger; discoveryMode?: boolean },
           TaskResult
         > = await Cluster.launch({
           concurrency: Cluster.CONCURRENCY_CONTEXT,
@@ -557,9 +563,12 @@ export async function prebidExplorer(
           puppeteerOptions: basePuppeteerOptions,
         });
 
-        // Register a wrapper task that properly calls processPageTask
+        // Register a wrapper task that properly calls processPageTask and collects results
         await cluster.task(async ({ page, data }) => {
-          return await processPageTask({ page, data });
+          const result = await processPageTask({ page, data });
+          // Push result directly to taskResults array since cluster.queue doesn't return values
+          taskResults.push(result);
+          return result;
         });
 
         try {
@@ -567,58 +576,14 @@ export async function prebidExplorer(
             .filter((url) => url)
             .map((url) => {
               processedUrls.add(url); // Add to global processedUrls as it's queued
-              return cluster.queue({ url, logger }); // Pass url and logger
+              return cluster.queue({ url, logger, discoveryMode: options.discoveryMode }); // Pass url, logger, and discoveryMode
               // No specific .then or .catch here, as results are collected from settledChunkResults
               // Error handling for queueing itself might be needed if cluster.queue can throw directly
               // However, task errors are handled by processPageTask and returned as TaskResultError.
             });
           // Wait for all promises in the chunk to settle
-          const settledChunkResults = await Promise.allSettled(chunkPromises);
-
-          settledChunkResults.forEach((settledResult, index) => {
-            if (settledResult.status === 'fulfilled') {
-              // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
-              // processPageTask is expected to always return a TaskResult.
-              if (typeof settledResult.value !== 'undefined' && settledResult.value !== null) {
-                // Validate TaskResult structure
-                if (settledResult.value && typeof settledResult.value === 'object' && 'type' in settledResult.value) {
-                  taskResults.push(settledResult.value);
-                } else {
-                  logger.warn(
-                    `A task from cluster.queue (chunked) fulfilled with invalid TaskResult structure.`,
-                    { 
-                      chunkIndex: index,
-                      value: settledResult.value,
-                      valueType: typeof settledResult.value
-                    }
-                  );
-                }
-              } else {
-                // This case might occur if a task somehow resolves with no value,
-                // though processPageTask is expected to always return a TaskResult.
-                logger.warn(
-                  'A task from cluster.queue (chunked) fulfilled but with undefined/null value.',
-                  { 
-                    chunkIndex: index,
-                    valueType: typeof settledResult.value
-                  }
-                );
-              }
-            } else if (settledResult.status === 'rejected') {
-              // This typically means an error occurred before processPageTask could even run or return a TaskResultError
-              // (e.g., an issue with Puppeteer itself or the cluster queue mechanism for that specific task).
-              // It's important to log this, as it might not be captured by processPageTask's own error handling.
-              logger.error(
-                `A promise from cluster.queue (chunk ${chunkNumber}) was rejected. This is unexpected if processPageTask is robust.`,
-                { reason: settledResult.reason }
-              );
-              // Optionally, create a TaskResultError here if the URL can be reliably determined.
-              // const urlFromRejectedPromise = ... (this might be tricky to get reliably from the settledResult.reason)
-              // if (urlFromRejectedPromise) {
-              //     taskResults.push({ type: 'error', url: urlFromRejectedPromise, error: 'PROMISE_REJECTED_IN_QUEUE' });
-              // }
-            }
-          });
+          await Promise.allSettled(chunkPromises);
+          // Results are now collected directly in the cluster task handler
           await cluster.idle();
           await cluster.close();
         } catch (error: unknown) {
@@ -642,7 +607,7 @@ export async function prebidExplorer(
               // Call the imported processPageTask directly
               const result = await processPageTask({
                 page,
-                data: { url, logger },
+                data: { url, logger, discoveryMode: options.discoveryMode },
               });
               taskResults.push(result);
               await page.close();
@@ -669,7 +634,7 @@ export async function prebidExplorer(
     );
     if (options.puppeteerType === 'cluster') {
       const cluster: Cluster<
-        { url: string; logger: WinstonLogger },
+        { url: string; logger: WinstonLogger; discoveryMode?: boolean },
         TaskResult
       > = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_CONTEXT,
@@ -679,9 +644,12 @@ export async function prebidExplorer(
         puppeteerOptions: basePuppeteerOptions,
       });
 
-      // Register a wrapper task that properly calls processPageTask
+      // Register a wrapper task that properly calls processPageTask and collects results
       await cluster.task(async ({ page, data }) => {
-        return await processPageTask({ page, data });
+        const result = await processPageTask({ page, data });
+        // Push result directly to taskResults array since cluster.queue doesn't return values
+        taskResults.push(result);
+        return result;
       });
 
       try {
@@ -689,47 +657,10 @@ export async function prebidExplorer(
           .filter((url) => url)
           .map((url) => {
             processedUrls.add(url);
-            return cluster.queue({ url, logger });
+            return cluster.queue({ url, logger, discoveryMode: options.discoveryMode });
           });
-        const settledResults = await Promise.allSettled(promises);
-        settledResults.forEach((settledResult, index) => {
-          if (settledResult.status === 'fulfilled') {
-            // Ensure that settledResult.value is not undefined (e.g. void) before pushing.
-            if (typeof settledResult.value !== 'undefined' && settledResult.value !== null) {
-              // Validate TaskResult structure
-              if (settledResult.value && typeof settledResult.value === 'object' && 'type' in settledResult.value) {
-                taskResults.push(settledResult.value);
-              } else {
-                logger.warn(
-                  `A task from cluster.queue (non-chunked) fulfilled with invalid TaskResult structure.`,
-                  { 
-                    index: index,
-                    value: settledResult.value,
-                    valueType: typeof settledResult.value
-                  }
-                );
-              }
-            } else {
-              logger.warn(
-                'A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.',
-                { 
-                  index: index,
-                  valueType: typeof settledResult.value
-                }
-              );
-            }
-          } else if (settledResult.status === 'rejected') {
-            logger.error(
-              'A promise from cluster.queue (non-chunked) was rejected. This is unexpected if processPageTask is robust.',
-              { reason: settledResult.reason }
-            );
-            // Optionally, create a TaskResultError here
-            // const urlFromRejectedPromise = ...
-            // if (urlFromRejectedPromise) {
-            //     taskResults.push({ type: 'error', url: urlFromRejectedPromise, error: 'PROMISE_REJECTED_IN_QUEUE' });
-            // }
-          }
-        });
+        await Promise.allSettled(promises);
+        // Results are now collected directly in the cluster task handler
         await cluster.idle();
         await cluster.close();
       } catch (error: unknown) {
@@ -752,7 +683,7 @@ export async function prebidExplorer(
             const page = await browser.newPage();
             const result = await processPageTask({
               page,
-              data: { url, logger },
+              data: { url, logger, discoveryMode: options.discoveryMode },
             });
             taskResults.push(result);
             await page.close();

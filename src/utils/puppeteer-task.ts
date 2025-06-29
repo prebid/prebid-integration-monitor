@@ -305,29 +305,8 @@ async function performPostNavigationChecks(page: Page, originalUrl: string, logg
   // Dismiss popups that might interfere with content detection
   await dismissPopups(page, logger);
   
-  // Check for problematic redirects or error pages
+  // Only check for domain parking redirects, not page content
   const currentUrl = page.url();
-  const pageTitle = await page.title().catch(() => '');
-  const pageContent = await page.content().catch(() => '');
-  
-  // Enhanced error page detection
-  const errorIndicators = [
-    'parked-content', 'domain parked', 'this domain may be for sale',
-    'page not found', '404', 'server error', '500', 'access denied',
-    'site temporarily unavailable', 'under construction'
-  ];
-  
-  const hasErrorIndicator = errorIndicators.some(indicator => 
-    pageTitle.toLowerCase().includes(indicator) || 
-    pageContent.toLowerCase().includes(indicator) ||
-    currentUrl.toLowerCase().includes(indicator)
-  );
-  
-  if (hasErrorIndicator) {
-    const error = new Error(`Page appears to be unavailable or redirected to error page (${pageTitle})`);
-    (error as any).detailedError = detectErrorType(error, ProcessingPhase.PAGE_LOAD, originalUrl);
-    throw error;
-  }
   
   // Check for major redirects that might indicate issues
   const originalDomain = new URL(originalUrl).hostname;
@@ -622,7 +601,8 @@ export async function waitForDOMStability(
 export async function extractDataSafely(
   page: Page, 
   logger?: WinstonLogger, 
-  maxRetries: number = 2
+  maxRetries: number = 2,
+  discoveryMode: boolean = false
 ): Promise<any> {
   let lastError: Error | null = null;
   
@@ -634,28 +614,100 @@ export async function extractDataSafely(
       const { PBJS_VERSION_WAIT_TIMEOUT_MS, PBJS_VERSION_WAIT_INTERVAL_MS } = await import('../config/app-config.js');
       
       const extractedPageData = await page.evaluate(
-        async (pbjsTimeoutMs, pbjsIntervalMs) => {
+        async (pbjsTimeoutMs, pbjsIntervalMs, discoveryMode) => {
           // Define a type for the window object to avoid using 'any' repeatedly
           interface CustomWindow extends Window {
             apstag?: unknown; // Amazon Publisher Services UAM tag
             googletag?: unknown; // Google Publisher Tag
             ats?: unknown; // LiveRamp ATS.js
             _pbjsGlobals?: string[]; // Standard Prebid.js global variable names array
+            // Additional ad tech libraries
+            Criteo?: unknown; // Criteo
+            IX?: unknown; // Index Exchange
+            PubMatic?: unknown; // PubMatic
+            openx?: unknown; // OpenX
+            rubicon?: unknown; // Rubicon/Magnite
+            sovrn?: unknown; // Sovrn
+            triplelift?: unknown; // TripleLift
+            smartadserver?: unknown; // Smart AdServer
+            xandr?: unknown; // Xandr/AppNexus
+            // Identity solutions
+            __uid2?: unknown; // The Trade Desk UID 2.0
+            __uid2_advertising_token?: string; // UID 2.0 token
+            ID5?: unknown; // ID5 Universal ID
+            parrable?: unknown; // Parrable ID
+            // Customer Data Platforms
+            tealiumCDH?: unknown; // Tealium
+            analytics?: any; // Segment (often uses window.analytics)
+            _satellite?: unknown; // Adobe Launch/DTM
+            utag?: unknown; // Tealium Universal Tag
             [key: string]: any; // Index signature for dynamic access to Prebid instances (e.g., window['pbjs'])
           }
           
           const customWindow = window as CustomWindow;
           const data: any = {
             libraries: [],
+            identitySolutions: [],
+            cdpPlatforms: [],
+            unknownAdTech: [],
             date: new Date().toISOString().slice(0, 10),
             prebidInstances: [],
           };
 
-          // Detect other libraries with error handling
+          // Detect ad tech libraries with error handling
           try {
+            // Core ad tech
             if (customWindow.apstag) data.libraries.push('apstag');
             if (customWindow.googletag) data.libraries.push('googletag');
             if (customWindow.ats) data.libraries.push('ats');
+            
+            // Additional ad tech libraries
+            if (customWindow.Criteo) data.libraries.push('Criteo');
+            if (customWindow.IX) data.libraries.push('IndexExchange');
+            if (customWindow.PubMatic) data.libraries.push('PubMatic');
+            if (customWindow.openx) data.libraries.push('OpenX');
+            if (customWindow.rubicon) data.libraries.push('Rubicon');
+            if (customWindow.sovrn) data.libraries.push('Sovrn');
+            if (customWindow.triplelift) data.libraries.push('TripleLift');
+            if (customWindow.smartadserver) data.libraries.push('SmartAdServer');
+            if (customWindow.xandr) data.libraries.push('Xandr');
+            
+            // Identity solutions
+            if (customWindow.__uid2 || customWindow.__uid2_advertising_token) data.identitySolutions.push('UID2.0');
+            if (customWindow.ID5) data.identitySolutions.push('ID5');
+            if (customWindow.parrable) data.identitySolutions.push('Parrable');
+            
+            // Customer Data Platforms
+            if (customWindow.tealiumCDH || customWindow.utag) data.cdpPlatforms.push('Tealium');
+            if (customWindow.analytics && typeof customWindow.analytics.track === 'function') data.cdpPlatforms.push('Segment');
+            if (customWindow._satellite) data.cdpPlatforms.push('Adobe');
+            
+            // Discovery mode: Find potential unknown ad tech (only if enabled)
+            if (discoveryMode) {
+              const adTechPatterns = ['bid', 'ad', 'ssp', 'dsp', 'rtb', 'programmatic', 'auction', 'impression'];
+              const knownVars = ['apstag', 'googletag', 'ats', 'Criteo', 'IX', 'PubMatic', 'openx', 'rubicon', 'sovrn', 'triplelift', 'smartadserver', 'xandr', '__uid2', 'ID5', 'parrable'];
+              
+              for (const key in customWindow) {
+                if (knownVars.includes(key) || key.startsWith('_pbjs')) continue;
+                
+                const keyLower = key.toLowerCase();
+                if (adTechPatterns.some(pattern => keyLower.includes(pattern))) {
+                  try {
+                    const value = customWindow[key];
+                    if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Element)) {
+                      data.unknownAdTech.push({
+                        variable: key,
+                        hasVersion: 'version' in value,
+                        hasFunctions: Object.keys(value).some(k => typeof value[k] === 'function'),
+                        properties: Object.keys(value).slice(0, 5) // First 5 properties for analysis
+                      });
+                    }
+                  } catch (e) {
+                    // Skip if we can't access the property
+                  }
+                }
+              }
+            }
           } catch (e) {
             // Ignore individual library detection errors
           }
@@ -755,7 +807,8 @@ export async function extractDataSafely(
           return data;
         },
         PBJS_VERSION_WAIT_TIMEOUT_MS,
-        PBJS_VERSION_WAIT_INTERVAL_MS
+        PBJS_VERSION_WAIT_INTERVAL_MS,
+        discoveryMode
       );
       
       logger?.debug(`Data extraction attempt ${attempt} succeeded`);
@@ -847,10 +900,10 @@ export async function extractDataSafely(
  */
 export const processPageTask = async ({
   page,
-  data: { url, logger },
+  data: { url, logger, discoveryMode = false },
 }: {
   page: Page;
-  data: { url: string; logger: WinstonLogger };
+  data: { url: string; logger: WinstonLogger; discoveryMode?: boolean };
 }): Promise<TaskResult> => {
   const trimmedUrl: string = url.trim(); // Ensure URL is trimmed before processing
   logger.info(`Attempting to process URL: ${trimmedUrl}`);
@@ -867,7 +920,7 @@ export const processPageTask = async ({
     await waitForDOMStability(page, logger);
 
     // Use frame-safe data extraction with retry logic for detached frame errors
-    const extractedPageData: PageData = await extractDataSafely(page, logger) as PageData;
+    const extractedPageData: PageData = await extractDataSafely(page, logger, 2, discoveryMode) as PageData;
 
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data
 

@@ -1,3 +1,5 @@
 # SSL/Certificate Errors
 # Invalid certificates, expired certs, SSL protocol errors
 # Format: [timestamp] | Category: ssl/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+[2025-06-29T22:22:29.736Z] | Category: ssl/certificate | Phase: data_extraction | Code: CERTIFICATE_NAME_MISMATCH | URL: https://glitzplusent.com | Message: net::ERR_CERT_COMMON_NAME_INVALID at https://glitzplusent.com
+[2025-06-29T22:23:17.320Z] | Category: ssl/certificate | Phase: data_extraction | Code: CERTIFICATE_NAME_MISMATCH | URL: https://url2.com | Message: net::ERR_CERT_COMMON_NAME_INVALID at https://url2.com

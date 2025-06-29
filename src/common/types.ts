@@ -50,6 +50,26 @@ export interface PageData {
    */
   libraries: string[];
   /**
+   * An array of detected identity solutions (UID2.0, ID5, Parrable, etc).
+   * @example ["UID2.0", "ID5"]
+   */
+  identitySolutions?: string[];
+  /**
+   * An array of detected Customer Data Platforms.
+   * @example ["Tealium", "Segment", "Adobe"]
+   */
+  cdpPlatforms?: string[];
+  /**
+   * Unknown ad tech discovered in discovery mode.
+   * Contains variable names and properties for further analysis.
+   */
+  unknownAdTech?: Array<{
+    variable: string;
+    hasVersion: boolean;
+    hasFunctions: boolean;
+    properties: string[];
+  }>;
+  /**
    * The date the page was scanned, formatted as YYYY-MM-DD.
    * @example "2023-10-26"
    */

@@ -1,3 +1,13 @@
 # Navigation Errors
 # DNS resolution failures, connection refused, network issues
 # Format: [timestamp] | Category: network/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+[2025-06-29T22:21:53.190Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://default-test.example.com | Message: net::ERR_NAME_NOT_RESOLVED at https://default-test.example.com
+[2025-06-29T22:21:57.726Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://custom-test.example.com | Message: net::ERR_NAME_NOT_RESOLVED at https://custom-test.example.com
+[2025-06-29T22:22:28.092Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://billyloc.com | Message: net::ERR_NAME_NOT_RESOLVED at https://billyloc.com
+[2025-06-29T22:22:28.454Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://igemtv.com | Message: net::ERR_NAME_NOT_RESOLVED at https://igemtv.com
+[2025-06-29T22:22:28.580Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://amazingprank.com | Message: net::ERR_NAME_NOT_RESOLVED at https://amazingprank.com
+[2025-06-29T22:22:29.279Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://irtv24.info | Message: net::ERR_NAME_NOT_RESOLVED at https://irtv24.info
+[2025-06-29T22:22:29.609Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://my-forums.org | Message: net::ERR_NAME_NOT_RESOLVED at https://my-forums.org
+[2025-06-29T22:23:17.149Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://url4.com | Message: net::ERR_NAME_NOT_RESOLVED at https://url4.com
+[2025-06-29T22:24:09.110Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://default-test.example.com | Message: net::ERR_NAME_NOT_RESOLVED at https://default-test.example.com
+[2025-06-29T22:24:10.576Z] | Category: network/dns | Phase: data_extraction | Code: DNS_RESOLUTION_FAILED | URL: https://custom-test.example.com | Message: net::ERR_NAME_NOT_RESOLVED at https://custom-test.example.com

@@ -2175,9 +2175,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     ); // Specific output for this suite
 
     // Define common paths for this suite
-    const testInputActualTxt = path.join(projectRoot, 'test_input_actual.txt');
-    const testInputActualCsv = path.join(projectRoot, 'test_input_actual.csv');
-    const testInputActualJson = path.join(
+    const localTestInputActualTxt = path.join(projectRoot, 'test_input_actual.txt');
+    const localTestInputActualCsv = path.join(projectRoot, 'test_input_actual.csv');
+    const localTestInputActualJson = path.join(
       projectRoot,
       'test_input_actual.json'
     );
@@ -2195,10 +2195,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
 
     const localFileInputTestPaths = [
       testFailedUrlsInputPath,
-      testInputActualTxt,
-      testInputActualCsv,
-      testInputActualJson,
-      testOutputDirPath, // Uses the global testOutputDirPath
+      localTestInputActualTxt,
+      localTestInputActualCsv,
+      localTestInputActualJson,
+      localTestOutputDirPath, // Uses the local testOutputDirPath
     ];
 
     beforeEach(() => {
@@ -2276,7 +2276,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `${testFailedUrlsInputPath} updated.`
           );
         },
-        generalScanTestTimeout * 2
+        testTimeout * 3
       ); // Allow more time due to multiple URLs and potential timeouts
 
       /**
@@ -2295,9 +2295,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             'http://txt-example1.com',
             'https://txt-example2.com/path',
           ];
-          createInputFile(testInputActualTxt, urls);
+          createInputFile(localTestInputActualTxt, urls);
 
-          const command = `${cliCommand} ${testInputActualTxt}`;
+          const command = `${cliCommand} ${localTestInputActualTxt}`;
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2305,21 +2305,21 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualTxt}`
+            `Using input file: ${localTestInputActualTxt}`
           );
           // The message from prebid.ts is "Successfully loaded X URLs from local TXT file: path/to/file.txt"
           // However, the initial log from scan.ts uses the file type from extension.
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualTxt} (detected type: txt)`
+            `Processing local file: ${localTestInputActualTxt} (detected type: txt)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${urls.length} URLs from local TXT file: ${testInputActualTxt}`
+            `Successfully loaded ${urls.length} URLs from local TXT file: ${localTestInputActualTxt}`
           );
           expect(result.stdout).toContain(
             `Total URLs to process after range check: ${urls.length}`
           );
 
-          const inputFileContent = fs.readFileSync(testInputActualTxt, 'utf-8');
+          const inputFileContent = fs.readFileSync(localTestInputActualTxt, 'utf-8');
           expect(inputFileContent.trim()).toBe(
             '',
             'TXT input file should be empty after processing'
@@ -2355,10 +2355,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             'ftp://ignored.com',
             '  http://csv-example3.com/withspace  ', // Test trimming
           ].join('\n');
-          fs.writeFileSync(testInputActualCsv, csvContent);
+          fs.writeFileSync(localTestInputActualCsv, csvContent);
           const expectedValidUrls = 3;
 
-          const command = `${cliCommand} ${testInputActualCsv}`;
+          const command = `${cliCommand} ${localTestInputActualCsv}`;
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2366,28 +2366,28 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualCsv}`
+            `Using input file: ${localTestInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualCsv} (detected type: csv)`
+            `Processing local file: ${localTestInputActualCsv} (detected type: csv)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${expectedValidUrls} URLs from local CSV file: ${testInputActualCsv}`
+            `Successfully loaded ${expectedValidUrls} URLs from local CSV file: ${localTestInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Skipping invalid or non-HTTP/S URL from CSV content in ${testInputActualCsv}: "not_a_url"`
+            `Skipping invalid or non-HTTP/S URL from CSV content in ${localTestInputActualCsv}: "not_a_url"`
           );
           expect(result.stdout).toContain(
-            `Skipping invalid or non-HTTP/S URL from CSV content in ${testInputActualCsv}: "ftp://ignored.com"`
+            `Skipping invalid or non-HTTP/S URL from CSV content in ${localTestInputActualCsv}: "ftp://ignored.com"`
           );
           expect(result.stdout).toContain(
             `Total URLs to process after range check: ${expectedValidUrls}`
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original CSV input file: ${testInputActualCsv}`
+            `Skipping modification of original CSV input file: ${localTestInputActualCsv}`
           );
 
-          const inputFileContent = fs.readFileSync(testInputActualCsv, 'utf-8');
+          const inputFileContent = fs.readFileSync(localTestInputActualCsv, 'utf-8');
           expect(inputFileContent.trim()).toBe(
             csvContent.trim(),
             'CSV input file should NOT be empty after processing'
@@ -2416,9 +2416,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             'http://json-array1.com',
             'https://json-array2.com/path',
           ];
-          fs.writeFileSync(testInputActualJson, JSON.stringify(urls));
+          fs.writeFileSync(localTestInputActualJson, JSON.stringify(urls));
 
-          const command = `${cliCommand} ${testInputActualJson}`;
+          const command = `${cliCommand} ${localTestInputActualJson}`;
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2426,20 +2426,20 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualJson}`
+            `Using input file: ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualJson} (detected type: json)`
+            `Processing local file: ${localTestInputActualJson} (detected type: json)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${urls.length} URLs from local JSON file: ${testInputActualJson}`
+            `Successfully loaded ${urls.length} URLs from local JSON file: ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
             `Total URLs to process after range check: ${urls.length}`
           );
 
           const inputFileContent = fs.readFileSync(
-            testInputActualJson,
+            localTestInputActualJson,
             'utf-8'
           );
           expect(inputFileContent.trim()).toBe(
@@ -2447,7 +2447,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             'JSON input file should NOT be empty after processing'
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original JSON input file: ${testInputActualJson}`
+            `Skipping modification of original JSON input file: ${localTestInputActualJson}`
           );
         },
         testTimeout
@@ -2480,12 +2480,12 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             ], // Added another for 5 total
           };
           fs.writeFileSync(
-            testInputActualJson,
+            localTestInputActualJson,
             JSON.stringify(jsonObj, null, 2)
           );
           const expectedValidUrls = 5; // json-obj1, json-obj2, json-obj3, json-obj-in-array, another-in-array
 
-          const command = `${cliCommand} ${testInputActualJson}`;
+          const command = `${cliCommand} ${localTestInputActualJson}`;
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2493,23 +2493,23 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualJson}`
+            `Using input file: ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualJson} (detected type: json)`
+            `Processing local file: ${localTestInputActualJson} (detected type: json)`
           );
           expect(result.stdout).toContain(
-            `Extracted ${expectedValidUrls} URLs from parsed JSON structure in ${testInputActualJson}`
+            `Extracted ${expectedValidUrls} URLs from parsed JSON structure in ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${expectedValidUrls} URLs from local JSON file: ${testInputActualJson}`
+            `Successfully loaded ${expectedValidUrls} URLs from local JSON file: ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
             `Total URLs to process after range check: ${expectedValidUrls}`
           );
 
           const inputFileContent = fs.readFileSync(
-            testInputActualJson,
+            localTestInputActualJson,
             'utf-8'
           );
           expect(inputFileContent.trim()).toBe(
@@ -2517,7 +2517,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             'JSON input file should NOT be empty after processing'
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original JSON input file: ${testInputActualJson}`
+            `Skipping modification of original JSON input file: ${localTestInputActualJson}`
           );
         },
         testTimeout
@@ -2540,9 +2540,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         async () => {
           // Malformed JSON: missing quotes around 'url' key, but contains a fallback URL in the text
           const malformedJsonContent = `{"name": "test", url: "http://malformed-key.com", "fallback": "https://fallback-in-malformed.com"}`;
-          fs.writeFileSync(testInputActualJson, malformedJsonContent);
+          fs.writeFileSync(localTestInputActualJson, malformedJsonContent);
 
-          const command = `${cliCommand} ${testInputActualJson}`;
+          const command = `${cliCommand} ${localTestInputActualJson}`;
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2550,24 +2550,24 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualJson}`
+            `Using input file: ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualJson} (detected type: json)`
+            `Processing local file: ${localTestInputActualJson} (detected type: json)`
           );
           expect(result.stdout).toContain(
-            `Failed to parse JSON from ${testInputActualJson}. Falling back to regex scan of raw content.`
+            `Failed to parse JSON from ${localTestInputActualJson}. Falling back to regex scan of raw content.`
           );
           // Regex scan is expected to find both "http://malformed-key.com" and "https://fallback-in-malformed.com"
           expect(result.stdout).toContain(
-            `Successfully loaded 2 URLs from local JSON file: ${testInputActualJson}`
+            `Successfully loaded 2 URLs from local JSON file: ${localTestInputActualJson}`
           );
           expect(result.stdout).toContain(
             `Total URLs to process after range check: 2`
           );
 
           const inputFileContent = fs.readFileSync(
-            testInputActualJson,
+            localTestInputActualJson,
             'utf-8'
           );
           expect(inputFileContent.trim()).toBe(
@@ -2575,7 +2575,7 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             'Malformed JSON input file should NOT be empty after processing'
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original JSON input file: ${testInputActualJson}`
+            `Skipping modification of original JSON input file: ${localTestInputActualJson}`
           );
         },
         testTimeout
@@ -2596,9 +2596,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         'should use inputFile (txt) if --githubRepo is not provided',
         async () => {
           const urls = ['http://default-txt.com'];
-          createInputFile(testInputActualTxt, urls);
+          createInputFile(localTestInputActualTxt, urls);
 
-          const command = `${cliCommand} ${testInputActualTxt}`;
+          const command = `${cliCommand} ${localTestInputActualTxt}`;
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2606,10 +2606,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualTxt}`
+            `Using input file: ${localTestInputActualTxt}`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${urls.length} URLs from local TXT file: ${testInputActualTxt}`
+            `Successfully loaded ${urls.length} URLs from local TXT file: ${localTestInputActualTxt}`
           );
           expect(result.stdout).not.toContain(
             'Fetching URLs from GitHub repository'
@@ -2636,9 +2636,9 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
         async () => {
           const csvUrls = ['http://local-csv-via-inputfile.com'];
           const csvContent = `url_header\n${csvUrls[0]}`;
-          fs.writeFileSync(testInputActualCsv, csvContent);
+          fs.writeFileSync(localTestInputActualCsv, csvContent);
 
-          const command = `${cliCommand} ${testInputActualCsv}`; // testInputActualCsv is the inputFile
+          const command = `${cliCommand} ${localTestInputActualCsv}`; // localTestInputActualCsv is the inputFile
           const result = await executeCommand(command, projectRoot);
 
           expect(result.code).toBe(
@@ -2646,19 +2646,19 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Command failed. Stderr: ${result.stderr} Stdout: ${result.stdout}`
           );
           expect(result.stdout).toContain(
-            `Using input file: ${testInputActualCsv}`
+            `Using input file: ${localTestInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Processing local file: ${testInputActualCsv} (detected type: csv)`
+            `Processing local file: ${localTestInputActualCsv} (detected type: csv)`
           );
           expect(result.stdout).toContain(
-            `Successfully loaded ${csvUrls.length} URLs from local CSV file: ${testInputActualCsv}`
+            `Successfully loaded ${csvUrls.length} URLs from local CSV file: ${localTestInputActualCsv}`
           );
           expect(result.stdout).toContain(
-            `Skipping modification of original CSV input file: ${testInputActualCsv}`
+            `Skipping modification of original CSV input file: ${localTestInputActualCsv}`
           );
 
-          const csvFileContent = fs.readFileSync(testInputActualCsv, 'utf-8');
+          const csvFileContent = fs.readFileSync(localTestInputActualCsv, 'utf-8');
           expect(csvFileContent.trim()).toBe(
             csvContent.trim(),
             'CSV file used as inputFile should not be emptied.'

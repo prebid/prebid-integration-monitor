@@ -7,32 +7,23 @@ import * as path from 'path';
 
 // Mock dependencies
 vi.mock('fs');
+// Create mocks outside the vi.mock call
+const mockDb = {
+  pragma: vi.fn(),
+  exec: vi.fn(),
+  prepare: vi.fn(),
+  close: vi.fn(),
+};
+
+const mockStatement = {
+  run: vi.fn(),
+  get: vi.fn(),
+  all: vi.fn(),
+};
+
 vi.mock('better-sqlite3', () => {
-  const mockDb = {
-    pragma: vi.fn(),
-    exec: vi.fn(),
-    prepare: vi.fn(),
-    close: vi.fn(),
-  };
-
-  const mockStatement = {
-    run: vi.fn(),
-    get: vi.fn(),
-    all: vi.fn(),
-  };
-
-  // Mock the default export (Database constructor)
-  const MockDatabase = vi.fn(() => mockDb);
-  
-  // Attach the mock objects to the constructor for access in tests
-  MockDatabase.mockDb = mockDb;
-  MockDatabase.mockStatement = mockStatement;
-  
-  // Make prepare return the mock statement
-  mockDb.prepare.mockReturnValue(mockStatement);
-  
   return {
-    default: MockDatabase,
+    default: vi.fn(() => mockDb),
   };
 });
 
@@ -47,17 +38,13 @@ const createMockLogger = (): WinstonLogger => ({
 describe('UrlTracker', () => {
   let mockLogger: WinstonLogger;
   let urlTracker: UrlTracker;
-  let mockDb: any;
-  let mockStatement: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogger = createMockLogger();
     
-    // Get mock instances from the mocked module
-    const Database = require('better-sqlite3').default;
-    mockDb = Database.mockDb;
-    mockStatement = Database.mockStatement;
+    // Setup mock to return statement
+    mockDb.prepare.mockReturnValue(mockStatement);
     
     // Mock fs.existsSync and fs.mkdirSync
     vi.mocked(fs.existsSync).mockReturnValue(false);

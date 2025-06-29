@@ -66,6 +66,7 @@ export default class Scan extends Command {
             resetTracking: flags.resetTracking,
             prefilterProcessed: flags.prefilterProcessed,
             forceReprocess: flags.forceReprocess,
+            discoveryMode: flags.discoveryMode,
             puppeteerLaunchOptions: {
                 headless: flags.headless, // Ensure headless state is consistent
                 args: ['--no-sandbox', '--disable-setuid-sandbox'], // Default args for broader compatibility

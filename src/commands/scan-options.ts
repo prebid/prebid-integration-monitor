@@ -105,4 +105,9 @@ export const scanFlags = {
       'Resume batch processing from a specific batch number. Use with --batchMode.',
     required: false,
   }),
+  discoveryMode: Flags.boolean({
+    description:
+      'Enable discovery mode to detect unknown ad tech libraries and identity solutions. Captures unrecognized global variables that match ad tech patterns.',
+    default: false,
+  }),
 };

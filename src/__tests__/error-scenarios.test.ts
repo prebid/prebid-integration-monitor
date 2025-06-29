@@ -29,11 +29,17 @@ vi.mock('../utils/domain-validator.js', () => ({
 }));
 
 vi.mock('../utils/results-handler.js', () => ({
-  processAndLogTaskResults: vi.fn((results) => results.filter(r => r.type === 'success')),
+  processAndLogTaskResults: vi.fn((results) => {
+    // Transform TaskResult[] to PageData[]
+    return results
+      .filter(r => r.type === 'success')
+      .map(r => r.data);
+  }),
   writeResultsToStoreFile: vi.fn(),
   appendNoPrebidUrls: vi.fn(),
   appendErrorUrls: vi.fn(),
   updateInputFile: vi.fn(),
+  createErrorFileHeaders: vi.fn(),
 }));
 
 vi.mock('puppeteer', () => ({
@@ -219,7 +225,9 @@ describe('Error Scenario Tests', () => {
         expect(errorCodes).toContain('ERR_NAME_NOT_RESOLVED');
         expect(errorCodes).toContain('PUPPETEER_TIMEOUT');
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -273,7 +281,9 @@ describe('Error Scenario Tests', () => {
         expect(errorCodes).toContain('ERR_CERT_AUTHORITY_INVALID');
         expect(errorCodes).toContain('PROTOCOL_ERROR');
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -322,7 +332,9 @@ describe('Error Scenario Tests', () => {
         expect(errorCodes).toContain('UNKNOWN_PROCESSING_ERROR'); // JS error
         expect(errorCodes).toContain('DETACHED_FRAME'); // Frame error
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -414,7 +426,9 @@ describe('Error Scenario Tests', () => {
         expect(errorCount).toBe(2);   // cluster-error1, cluster-error2
         expect(noDataCount).toBe(1);  // cluster-nodata
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -474,7 +488,9 @@ describe('Error Scenario Tests', () => {
         const errorResult = results.find(r => r.type === 'error') as TaskResultError;
         expect(errorResult.error.code).toBe('PROCESSING_ERROR');
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -534,7 +550,9 @@ describe('Error Scenario Tests', () => {
         expect(successCount).toBe(2);
         expect(errorCount).toBe(1);
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -580,7 +598,9 @@ describe('Error Scenario Tests', () => {
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -641,7 +661,9 @@ describe('Error Scenario Tests', () => {
           'https://final-valid.com'
         ]);
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -781,7 +803,9 @@ describe('Error Scenario Tests', () => {
         expect(errorCount).toBe(3);   // dns-error, timeout-error, cert-error
         expect(noDataCount).toBe(1);  // no-data
         
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       // Mock URL tracker to verify error tracking

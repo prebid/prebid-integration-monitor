@@ -29,11 +29,17 @@ vi.mock('../utils/domain-validator.js', () => ({
 }));
 
 vi.mock('../utils/results-handler.js', () => ({
-  processAndLogTaskResults: vi.fn((results) => results.filter(r => r.type === 'success')),
+  processAndLogTaskResults: vi.fn((results) => {
+    // Transform TaskResult[] to PageData[]
+    return results
+      .filter(r => r.type === 'success')
+      .map(r => r.data);
+  }),
   writeResultsToStoreFile: vi.fn(),
   appendNoPrebidUrls: vi.fn(),
   appendErrorUrls: vi.fn(),
   updateInputFile: vi.fn(),
+  createErrorFileHeaders: vi.fn(),
 }));
 
 vi.mock('puppeteer', () => ({
@@ -214,7 +220,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       let capturedResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         capturedResults = [...results];
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -366,7 +374,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -421,7 +431,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
       
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -471,7 +483,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         expect(results).toHaveLength(finalUrls.length);
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -582,7 +596,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       let capturedResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         capturedResults = [...results];
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -626,7 +642,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
       
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -672,7 +690,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
       
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       const startTime = Date.now();
@@ -716,7 +736,9 @@ describe('Progress Tracking and Statistics Tests', () => {
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
       
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
-        return results.filter(r => r.type === 'success');
+        return results
+          .filter(r => r.type === 'success')
+          .map(r => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
