@@ -10,6 +10,7 @@ import * as path from 'path'; // Import path module for robust file path operati
 import type { Logger as WinstonLogger } from 'winston';
 // Import shared types from the new common location
 import type { TaskResult, PageData } from '../common/types.js';
+import { categorizeErrorForFile, formatDetailedError } from './error-types.js';
 
 /**
  * Processes an array of {@link TaskResult} objects. It logs the outcome of each task
@@ -74,11 +75,23 @@ export function processAndLogTaskResults(
         );
         break;
       case 'error':
-        // Log structured error details
-        logger.error(
-          `ERROR: Processing failed for ${taskResult.url} - Code: ${taskResult.error.code}, Msg: ${taskResult.error.message}`,
-          { url: taskResult.url, errorDetails: taskResult.error } // errorDetails will contain code, message, and stack
-        );
+        // Log structured error details with enhanced categorization if available
+        const detailedError = taskResult.error.detailedError;
+        if (detailedError) {
+          logger.error(
+            `ERROR: Processing failed for ${taskResult.url} - Category: ${detailedError.category}/${detailedError.subCategory}, Code: ${detailedError.code}, Phase: ${detailedError.phase}`,
+            { 
+              url: taskResult.url, 
+              errorDetails: taskResult.error,
+              detailedError: detailedError 
+            }
+          );
+        } else {
+          logger.error(
+            `ERROR: Processing failed for ${taskResult.url} - Code: ${taskResult.error.code}, Msg: ${taskResult.error.message}`,
+            { url: taskResult.url, errorDetails: taskResult.error }
+          );
+        }
         break;
       default:
         // This path should ideally be unreachable if 'type' is always a valid TaskResultType.
@@ -289,9 +302,16 @@ export function appendNoPrebidUrls(
 }
 
 /**
- * Appends URLs to appropriate error files based on error types.
- * URLs with name resolution errors (ERR_NAME_NOT_RESOLVED) go to navigation_errors.txt,
- * other errors go to error_processing.txt.
+ * Appends URLs to appropriate error files based on detailed error categorization.
+ * Errors are distributed to specific files based on their category and error code:
+ * - navigation_errors.txt: DNS and connection errors
+ * - ssl_errors.txt: Certificate and SSL protocol errors
+ * - timeout_errors.txt: Various timeout conditions
+ * - access_errors.txt: Authentication, rate limiting, bot detection
+ * - content_errors.txt: HTTP errors, page availability issues
+ * - browser_errors.txt: Puppeteer/browser-specific errors
+ * - extraction_errors.txt: JavaScript evaluation errors
+ * - error_processing.txt: Unknown or uncategorized errors
  *
  * @param {TaskResult[]} taskResults - An array of task results to process
  * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages
@@ -308,23 +328,42 @@ export function appendErrorUrls(
     return;
   }
 
-  const navigationErrors: string[] = [];
-  const processingErrors: string[] = [];
+  // Group errors by their target file
+  const errorFileMap: Map<string, string[]> = new Map();
 
   for (const result of errorResults) {
     const errorResult = result as any;
     const url = errorResult.url;
-    const errorCode = errorResult.error?.code || '';
-    const errorMessage = errorResult.error?.message || '';
+    const error = errorResult.error;
+    const detailedError = error?.detailedError;
 
-    if (errorCode.includes('ERR_NAME_NOT_RESOLVED')) {
-      navigationErrors.push(`${url},${errorCode}`);
+    let logEntry: string;
+    let targetFile: string;
+
+    if (detailedError) {
+      // Use detailed error categorization
+      logEntry = formatDetailedError(detailedError);
+      targetFile = categorizeErrorForFile(detailedError);
     } else {
-      // Format: timestamp | URL | Message | Error
+      // Fallback to basic error handling for backward compatibility
+      const errorCode = error?.code || 'UNKNOWN';
+      const errorMessage = error?.message || 'Unknown error';
       const timestamp = new Date().toISOString();
-      const logEntry = `${timestamp} | URL: ${url} | Message: ${errorMessage} | Error: ${errorCode}`;
-      processingErrors.push(logEntry);
+      
+      if (errorCode.includes('ERR_NAME_NOT_RESOLVED')) {
+        logEntry = `${url},${errorCode}`;
+        targetFile = 'navigation_errors.txt';
+      } else {
+        logEntry = `${timestamp} | URL: ${url} | Message: ${errorMessage} | Error: ${errorCode}`;
+        targetFile = 'error_processing.txt';
+      }
     }
+
+    // Add to appropriate error file group
+    if (!errorFileMap.has(targetFile)) {
+      errorFileMap.set(targetFile, []);
+    }
+    errorFileMap.get(targetFile)!.push(logEntry);
   }
 
   try {
@@ -336,31 +375,94 @@ export function appendErrorUrls(
       logger.info(`Created errors directory: ${errorsDir}`);
     }
 
-    // Append navigation errors (name not resolved)
-    if (navigationErrors.length > 0) {
-      const navigationErrorsPath = path.join(
-        errorsDir,
-        'navigation_errors.txt'
-      );
-      const navigationContent = navigationErrors.join('\n') + '\n';
-      fs.appendFileSync(navigationErrorsPath, navigationContent, 'utf8');
-      logger.info(
-        `Appended ${navigationErrors.length} URLs to navigation_errors.txt`
-      );
-    }
-
-    // Append processing errors
-    if (processingErrors.length > 0) {
-      const processingErrorsPath = path.join(errorsDir, 'error_processing.txt');
-      const processingContent = processingErrors.join('\n') + '\n';
-      fs.appendFileSync(processingErrorsPath, processingContent, 'utf8');
-      logger.info(
-        `Appended ${processingErrors.length} URLs to error_processing.txt`
-      );
+    // Write to each error file
+    for (const [filename, errors] of errorFileMap.entries()) {
+      if (errors.length > 0) {
+        const errorFilePath = path.join(errorsDir, filename);
+        const content = errors.join('\n') + '\n';
+        fs.appendFileSync(errorFilePath, content, 'utf8');
+        logger.info(
+          `Appended ${errors.length} errors to ${filename}`
+        );
+      }
     }
   } catch (e: unknown) {
     const err = e as Error;
     logger.error('Failed to append URLs to error files', {
+      errorName: err.name,
+      errorMessage: err.message,
+      stack: err.stack,
+    });
+  }
+}
+
+/**
+ * Creates header files for each error type to explain the format and content.
+ * This function should be called once when initializing the error directory structure.
+ *
+ * @param {WinstonLogger} logger - An instance of WinstonLogger for logging messages
+ */
+export function createErrorFileHeaders(logger: WinstonLogger): void {
+  const errorsDir = path.join(process.cwd(), 'errors');
+  
+  // Define headers for each error file type
+  const errorFileHeaders: Record<string, string> = {
+    'navigation_errors.txt': `# Navigation Errors
+# DNS resolution failures, connection refused, network issues
+# Format: [timestamp] | Category: network/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'ssl_errors.txt': `# SSL/Certificate Errors
+# Invalid certificates, expired certs, SSL protocol errors
+# Format: [timestamp] | Category: ssl/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'timeout_errors.txt': `# Timeout Errors
+# Navigation timeouts, operation timeouts, element wait timeouts
+# Format: [timestamp] | Category: timeout/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'access_errors.txt': `# Access Control Errors
+# Authentication failures, rate limiting, bot detection, CDN protection
+# Format: [timestamp] | Category: access/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'content_errors.txt': `# Content Errors
+# 404 not found, 500 server errors, page unavailable
+# Format: [timestamp] | Category: content/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'browser_errors.txt': `# Browser/Puppeteer Errors
+# Session closed, protocol errors, browser crashes
+# Format: [timestamp] | Category: browser/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'extraction_errors.txt': `# Data Extraction Errors
+# JavaScript evaluation failures, property access errors
+# Format: [timestamp] | Category: extraction/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+`,
+    'error_processing.txt': `# General Processing Errors
+# Unknown or uncategorized errors
+# Format: [timestamp] | URL: <url> | Message: <msg> | Error: <code>
+`,
+    'no_prebid.txt': `# Sites Without Prebid
+# URLs that were successfully processed but had no Prebid.js or ad tech detected
+# Format: <url>
+`
+  };
+
+  try {
+    // Ensure errors directory exists
+    if (!fs.existsSync(errorsDir)) {
+      fs.mkdirSync(errorsDir, { recursive: true });
+      logger.info(`Created errors directory: ${errorsDir}`);
+    }
+
+    // Create header files if they don't exist
+    for (const [filename, header] of Object.entries(errorFileHeaders)) {
+      const filePath = path.join(errorsDir, filename);
+      if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, header, 'utf8');
+        logger.info(`Created error file with header: ${filename}`);
+      }
+    }
+  } catch (e: unknown) {
+    const err = e as Error;
+    logger.error('Failed to create error file headers', {
       errorName: err.name,
       errorMessage: err.message,
       stack: err.stack,

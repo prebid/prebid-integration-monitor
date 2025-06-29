@@ -1,0 +1,3 @@
+# SSL/Certificate Errors
+# Invalid certificates, expired certs, SSL protocol errors
+# Format: [timestamp] | Category: ssl/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>

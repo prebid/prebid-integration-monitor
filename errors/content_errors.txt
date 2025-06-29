@@ -1,0 +1,6 @@
+# Content Errors
+# 404 not found, 500 server errors, page unavailable
+# Format: [timestamp] | Category: content/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+[2025-06-29T03:48:51.140Z] | Category: content/availability | Phase: data_extraction | Code: PAGE_UNAVAILABLE | URL: https://google.com | Message: Page appears to be unavailable or redirected to error page (Google) | Metadata: {"pageTitle":"Google"}
+[2025-06-29T03:48:56.001Z] | Category: content/availability | Phase: data_extraction | Code: PAGE_UNAVAILABLE | URL: https://youtube.com | Message: Page appears to be unavailable or redirected to error page (YouTube) | Metadata: {"pageTitle":"YouTube"}
+[2025-06-29T03:48:59.089Z] | Category: content/availability | Phase: data_extraction | Code: PAGE_UNAVAILABLE | URL: https://facebook.com | Message: Page appears to be unavailable or redirected to error page (Facebook - log in or sign up) | Metadata: {"pageTitle":"Facebook - log in or sign up"}

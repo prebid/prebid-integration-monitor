@@ -43,6 +43,7 @@ import {
   appendNoPrebidUrls,
   appendErrorUrls,
   updateInputFile,
+  createErrorFileHeaders,
 } from './utils/results-handler.js';
 
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
@@ -172,6 +173,9 @@ export async function prebidExplorer(
   initializeTelemetry('prebid-integration-monitor');
 
   logger.info('Starting Prebid Explorer with options:', options);
+  
+  // Initialize error file headers for better organization
+  createErrorFileHeaders(logger);
 
   // Initialize URL tracker for deduplication
   const urlTracker = getUrlTracker(logger);

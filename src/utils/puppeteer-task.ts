@@ -18,6 +18,7 @@ import {
   PBJS_VERSION_WAIT_INTERVAL_MS,
 } from '../config/app-config.js';
 import { createAuthenticUserAgent } from './user-agent.js';
+import { ProcessingPhase, detectErrorType, DetailedError } from './error-types.js';
 
 /**
  * Configures a given Puppeteer {@link Page} instance with standard settings
@@ -249,10 +250,20 @@ export async function navigateWithRetry(
       
     } catch (error) {
       lastError = error as Error;
-      logger?.debug(`Navigation attempt ${attempt} failed for ${url}:`, error);
+      const detailedError = detectErrorType(lastError, ProcessingPhase.NAVIGATION, url, attempt);
+      
+      logger?.debug(`Navigation attempt ${attempt} failed for ${url}:`, {
+        error: error,
+        category: detailedError.category,
+        subCategory: detailedError.subCategory,
+        code: detailedError.code,
+        metadata: detailedError.metadata
+      });
       
       // Enhanced error classification for smarter retries
       if (!shouldRetryNavigation(error as Error, attempt, maxRetries)) {
+        // Attach detailed error info before throwing
+        (error as any).detailedError = detailedError;
         throw error;
       }
       
@@ -268,7 +279,17 @@ export async function navigateWithRetry(
   }
   
   // If we get here, all retries failed
-  throw lastError || new Error(`Failed to navigate to ${url} after ${maxRetries + 1} attempts`);
+  if (lastError) {
+    // Ensure the last error has detailed error information
+    if (!(lastError as any).detailedError) {
+      (lastError as any).detailedError = detectErrorType(lastError, ProcessingPhase.NAVIGATION, url, maxRetries + 1);
+    }
+    throw lastError;
+  } else {
+    const finalError = new Error(`Failed to navigate to ${url} after ${maxRetries + 1} attempts`);
+    (finalError as any).detailedError = detectErrorType(finalError, ProcessingPhase.NAVIGATION, url, maxRetries + 1);
+    throw finalError;
+  }
 }
 
 /**
@@ -303,7 +324,9 @@ async function performPostNavigationChecks(page: Page, originalUrl: string, logg
   );
   
   if (hasErrorIndicator) {
-    throw new Error(`Page appears to be unavailable or redirected to error page (${pageTitle})`);
+    const error = new Error(`Page appears to be unavailable or redirected to error page (${pageTitle})`);
+    (error as any).detailedError = detectErrorType(error, ProcessingPhase.PAGE_LOAD, originalUrl);
+    throw error;
   }
   
   // Check for major redirects that might indicate issues
@@ -316,7 +339,9 @@ async function performPostNavigationChecks(page: Page, originalUrl: string, logg
     // Common problematic redirect patterns
     const problematicDomains = ['parking', 'sedo.com', 'godaddy.com', 'namecheap.com'];
     if (problematicDomains.some(domain => currentDomain.includes(domain))) {
-      throw new Error(`Redirected to problematic domain: ${currentDomain}`);
+      const error = new Error(`Redirected to problematic domain: ${currentDomain}`);
+      (error as any).detailedError = detectErrorType(error, ProcessingPhase.PAGE_LOAD, originalUrl);
+      throw error;
     }
   }
 }
@@ -738,7 +763,15 @@ export async function extractDataSafely(
       
     } catch (error) {
       lastError = error as Error;
-      logger?.debug(`Data extraction attempt ${attempt} failed:`, error);
+      const detailedError = detectErrorType(lastError, ProcessingPhase.DATA_EXTRACTION, page.url(), attempt);
+      
+      logger?.debug(`Data extraction attempt ${attempt} failed:`, {
+        error: error,
+        category: detailedError.category,
+        subCategory: detailedError.subCategory,
+        code: detailedError.code,
+        metadata: detailedError.metadata
+      });
       
       // Check if this is a detached frame error that we can retry
       if (error instanceof Error && error.message.includes('detached Frame')) {
@@ -752,13 +785,23 @@ export async function extractDataSafely(
         }
       } else {
         // For non-frame errors, don't retry
+        (error as any).detailedError = detailedError;
         throw error;
       }
     }
   }
   
   // If we get here, all retries failed
-  throw lastError || new Error('Data extraction failed after all retries');
+  if (lastError) {
+    if (!(lastError as any).detailedError) {
+      (lastError as any).detailedError = detectErrorType(lastError, ProcessingPhase.DATA_EXTRACTION, page.url(), maxRetries + 1);
+    }
+    throw lastError;
+  } else {
+    const finalError = new Error('Data extraction failed after all retries');
+    (finalError as any).detailedError = detectErrorType(finalError, ProcessingPhase.DATA_EXTRACTION, page.url(), maxRetries + 1);
+    throw finalError;
+  }
 }
 
 /**
@@ -845,37 +888,18 @@ export const processPageTask = async ({
       return { type: 'no_data', url: trimmedUrl };
     }
   } catch (e: unknown) {
-    const pageError = e as Error; // Keep original error for stack
-    let errorCode = 'UNKNOWN_PROCESSING_ERROR';
-    const originalMessage =
-      pageError.message || 'Unknown error during page processing';
-
-    // Attempt to extract a more specific error code
-    const netErrorMatch = originalMessage.match(/net::([A-Z_]+)/);
-    if (netErrorMatch && netErrorMatch[1]) {
-      errorCode = netErrorMatch[1];
-    } else if (originalMessage.includes('detached Frame')) {
-      // Frame detachment errors (should be rare now with our retry logic)
-      errorCode = 'DETACHED_FRAME';
-    } else if (originalMessage.toLowerCase().includes('timeout')) {
-      errorCode = 'TIMEOUT';
-    } else if (originalMessage.toLowerCase().includes('navigation failed')) {
-      // More generic navigation error
-      errorCode = 'NAVIGATION_FAILED';
-    } else if (pageError.name === 'TimeoutError') {
-      // Puppeteer's own TimeoutError
-      errorCode = 'PUPPETEER_TIMEOUT';
-    } else if (originalMessage.includes('Protocol error')) {
-      // Chrome DevTools protocol errors
-      errorCode = 'PROTOCOL_ERROR';
-    } else if (originalMessage.includes('Session closed')) {
-      // Browser session closed unexpectedly
-      errorCode = 'SESSION_CLOSED';
-    }
-
-    logger.error(`Error processing ${trimmedUrl}: ${originalMessage}`, {
+    const pageError = e as Error;
+    
+    // Use new detailed error detection system
+    const detailedError = detectErrorType(pageError, ProcessingPhase.DATA_EXTRACTION, trimmedUrl);
+    
+    logger.error(`Error processing ${trimmedUrl}: ${detailedError.message}`, {
       url: trimmedUrl,
-      errorCode,
+      category: detailedError.category,
+      subCategory: detailedError.subCategory,
+      phase: detailedError.phase,
+      errorCode: detailedError.code,
+      metadata: detailedError.metadata,
       originalStack: pageError.stack,
     });
 
@@ -883,9 +907,10 @@ export const processPageTask = async ({
       type: 'error',
       url: trimmedUrl,
       error: {
-        code: errorCode,
-        message: originalMessage,
+        code: detailedError.code,
+        message: detailedError.message,
         stack: pageError.stack,
+        detailedError
       },
     };
   }

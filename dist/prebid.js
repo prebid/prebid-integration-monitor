@@ -25,7 +25,7 @@ import { processFileContent, fetchUrlsFromGitHub, loadFileContents, } from './ut
 import { processPageTask, // The core function for processing a single page
 // TaskResult and PageData are now imported from common/types
  } from './utils/puppeteer-task.js';
-import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, } from './utils/results-handler.js';
+import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, createErrorFileHeaders, } from './utils/results-handler.js';
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
 import { filterValidUrls } from './utils/domain-validator.js';
 import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
@@ -75,6 +75,8 @@ export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir); // Initialize the global logger
     initializeTelemetry('prebid-integration-monitor');
     logger.info('Starting Prebid Explorer with options:', options);
+    // Initialize error file headers for better organization
+    createErrorFileHeaders(logger);
     // Initialize URL tracker for deduplication
     const urlTracker = getUrlTracker(logger);
     // Reset tracking if requested

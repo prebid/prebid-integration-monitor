@@ -5,6 +5,8 @@
  * passed between different parts of the system.
  */
 
+import type { DetailedError } from '../utils/error-types.js';
+
 /**
  * Represents a specific Prebid.js instance found on a web page.
  * Contains details about its global variable name, version, and loaded modules.
@@ -108,6 +110,8 @@ export interface ErrorDetails {
   message: string;
   /** Optional stack trace of the original error, if available. */
   stack?: string;
+  /** Optional detailed error information with enhanced categorization. */
+  detailedError?: DetailedError;
 }
 
 /**
