@@ -4,8 +4,6 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { ClusterHealthMonitor } from '../utils/puppeteer-telemetry.js';
-import { Cluster } from 'puppeteer-cluster';
-import puppeteer from 'puppeteer';
 import winston from 'winston';
 import { EventEmitter } from 'events';
 

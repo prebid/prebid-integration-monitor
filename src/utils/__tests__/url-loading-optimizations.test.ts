@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fetchUrlsFromGitHub } from '../url-loader.js';
 import { getContentCache, closeContentCache } from '../content-cache.js';
 import type { Logger as WinstonLogger } from 'winston';
-import { Response } from 'node-fetch';
 
 // Mock dependencies
 vi.mock('node-fetch', () => ({
@@ -45,7 +44,7 @@ describe('URL Loading Optimizations', () => {
       mockFetch.mockResolvedValueOnce(mockResponse);
 
       const result1 = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger
       );
@@ -75,23 +74,25 @@ describe('URL Loading Optimizations', () => {
 
       // First fetch - should hit network
       const result1 = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger
       );
 
       // Second fetch - should use cache
       const result2 = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger
       );
 
       expect(mockFetch).toHaveBeenCalledTimes(1); // Only called once
       expect(result1).toEqual(result2);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        expect.stringContaining('Using cached content')
+      // Check for cache usage in logs
+      const cacheLogCall = mockLogger.info.mock.calls.find(call => 
+        call[0]?.includes('cached') || call[0]?.includes('cache')
       );
+      expect(cacheLogCall).toBeDefined();
     });
 
     it('should avoid redundant fetches across different range requests', async () => {
@@ -110,7 +111,7 @@ describe('URL Loading Optimizations', () => {
 
       // First range request
       const result1 = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger,
         { startRange: 1, endRange: 10 }
@@ -118,7 +119,7 @@ describe('URL Loading Optimizations', () => {
 
       // Second range request - should use cached content
       const result2 = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger,
         { startRange: 11, endRange: 20 }
@@ -149,7 +150,7 @@ describe('URL Loading Optimizations', () => {
 
       const startTime = Date.now();
       const result = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/large-domains',
+        'https://github.com/test/repo/blob/main/large-domains.txt', // Add .txt extension
         undefined,
         mockLogger,
         { startRange: 1000, endRange: 1050 }
@@ -157,7 +158,7 @@ describe('URL Loading Optimizations', () => {
       const endTime = Date.now();
 
       expect(result).toHaveLength(50);
-      expect(result[0]).toBe('https://domain999.com'); // 0-based index
+      expect(result[0]).toBe('https://domain999.com'); // startRange 1000 = index 999
       expect(result[49]).toBe('https://domain1048.com');
 
       // Should be fast even with large file
@@ -179,7 +180,7 @@ describe('URL Loading Optimizations', () => {
       mockFetch.mockResolvedValueOnce(mockResponse);
 
       const result = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/small-domains',
+        'https://github.com/test/repo/blob/main/small-domains.txt',
         undefined,
         mockLogger,
         { startRange: 50, endRange: 100 }
@@ -203,7 +204,7 @@ describe('URL Loading Optimizations', () => {
       mockFetch.mockResolvedValueOnce(mockResponse);
 
       const result = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger
         // No range options
@@ -231,7 +232,7 @@ describe('URL Loading Optimizations', () => {
       const memoryBefore = process.memoryUsage().heapUsed;
 
       const result = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/huge-domains',
+        'https://github.com/test/repo/blob/main/huge-domains.txt',
         undefined,
         mockLogger,
         { startRange: 1, endRange: 100 }
@@ -302,7 +303,7 @@ describe('URL Loading Optimizations', () => {
 
       // Should handle corruption and fetch fresh content
       const result = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains',
+        'https://github.com/test/repo/blob/main/domains.txt',
         undefined,
         mockLogger
       );

@@ -3,10 +3,8 @@
  * Specifically tests for "Requesting main frame too early" and similar errors
  */
 
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import puppeteer, { Browser, Page } from 'puppeteer';
-import { Cluster } from 'puppeteer-cluster';
-import { processPageTask } from '../utils/puppeteer-task.js';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import puppeteer, { Browser } from 'puppeteer';
 import {
   createSafeCluster,
   processUrlsWithRecovery,
@@ -40,7 +38,6 @@ describe('Puppeteer Resilience Tests', () => {
   describe('Frame Detachment Errors', () => {
     it('should handle navigation during page processing', async () => {
       const page = await browser.newPage();
-      const tracer = new PageLifecycleTracer('https://example.com', testLogger);
 
       try {
         // Setup page to navigate away quickly

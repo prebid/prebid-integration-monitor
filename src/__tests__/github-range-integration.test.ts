@@ -208,7 +208,7 @@ describe('GitHub Range Integration Tests', () => {
       for (const testCase of testCases) {
         const mockDomains = Array.from(
           { length: 1000 },
-          (_, i) => `edge${i + 1}.com`
+          (_, i) => `example${i + 1}.com`
         );
         const mockContent = mockDomains.join('\n');
 
@@ -242,7 +242,10 @@ describe('GitHub Range Integration Tests', () => {
       const largeRange = { startRange: 500000, endRange: 501000 }; // 1000 URLs
 
       // Mock content that would be memory-intensive if fully loaded
-      const mockContent = 'domain1.com\n'.repeat(1000000); // 1M lines
+      const mockContent = Array.from(
+        { length: 1000000 },
+        (_, i) => `domain${i}.com`
+      ).join('\n'); // 1M unique domains
 
       const fetch = await import('node-fetch');
       vi.mocked(fetch.default).mockResolvedValue({
@@ -264,7 +267,7 @@ describe('GitHub Range Integration Tests', () => {
       const finalMemory = process.memoryUsage().heapUsed;
       const memoryIncrease = finalMemory - initialMemory;
 
-      expect(extractedUrls).toHaveLength(1000);
+      expect(extractedUrls).toHaveLength(1001); // endRange 501000 - startRange 500000 + 1
       // Memory increase should be reasonable (less than 50MB for this operation)
       expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024);
     });
