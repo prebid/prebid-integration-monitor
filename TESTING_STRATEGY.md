@@ -1,9 +1,11 @@
 # Comprehensive Testing Strategy for URL Loading Pipeline
 
 ## Overview
+
 This document outlines a comprehensive testing strategy to prevent issues like the ones we just encountered from happening in the future. The goal is to catch problems early through automated testing.
 
 ## Current Issues We Solved
+
 1. **Domain parsing logic not handling files without extensions**
 2. **GitHub URL fetching returning 0 URLs due to parsing logic mismatch**
 3. **Range processing causing timeout issues on large files**
@@ -18,13 +20,25 @@ describe('URL Loading Pipeline', () => {
   describe('processFileContent', () => {
     it('should parse domain files without extensions', async () => {
       const content = 'google.com\nyoutube.com\nfacebook.com';
-      const result = await processFileContent('top-domains', content, mockLogger);
-      expect(result).toEqual(['https://google.com', 'https://youtube.com', 'https://facebook.com']);
+      const result = await processFileContent(
+        'top-domains',
+        content,
+        mockLogger
+      );
+      expect(result).toEqual([
+        'https://google.com',
+        'https://youtube.com',
+        'https://facebook.com',
+      ]);
     });
 
     it('should handle .txt files with schemeless domains', async () => {
       const content = 'example.com\ntest.org';
-      const result = await processFileContent('domains.txt', content, mockLogger);
+      const result = await processFileContent(
+        'domains.txt',
+        content,
+        mockLogger
+      );
       expect(result).toContain('https://example.com');
     });
 
@@ -40,9 +54,12 @@ describe('URL Loading Pipeline', () => {
       // Mock fetch response with domain list
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        text: () => Promise.resolve('google.com\nyoutube.com\nfacebook.com\nbaidu.com\nyahoo.com'),
+        text: () =>
+          Promise.resolve(
+            'google.com\nyoutube.com\nfacebook.com\nbaidu.com\nyahoo.com'
+          ),
         status: 200,
-        headers: { get: () => '100' }
+        headers: { get: () => '100' },
       });
 
       const result = await fetchUrlsFromGitHub(
@@ -52,7 +69,11 @@ describe('URL Loading Pipeline', () => {
         { startRange: 2, endRange: 4 }
       );
 
-      expect(result).toEqual(['https://youtube.com', 'https://facebook.com', 'https://baidu.com']);
+      expect(result).toEqual([
+        'https://youtube.com',
+        'https://facebook.com',
+        'https://baidu.com',
+      ]);
     });
 
     it('should respect numUrls limit when no range specified', async () => {
@@ -60,7 +81,7 @@ describe('URL Loading Pipeline', () => {
         ok: true,
         text: () => Promise.resolve('domain1.com\ndomain2.com\ndomain3.com'),
         status: 200,
-        headers: { get: () => '100' }
+        headers: { get: () => '100' },
       });
 
       const result = await fetchUrlsFromGitHub(
@@ -80,8 +101,11 @@ describe('URL Loading Pipeline', () => {
 ```typescript
 describe('Range Optimization', () => {
   it('should only process requested range to prevent timeouts', async () => {
-    const largeContent = Array.from({ length: 100000 }, (_, i) => `domain${i}.com`).join('\n');
-    
+    const largeContent = Array.from(
+      { length: 100000 },
+      (_, i) => `domain${i}.com`
+    ).join('\n');
+
     const startTime = Date.now();
     const result = await processContentWithRangeOptimization(
       largeContent,
@@ -99,7 +123,7 @@ describe('Range Optimization', () => {
 
   it('should fallback to full processing for small files', async () => {
     const smallContent = 'domain1.com\ndomain2.com\ndomain3.com';
-    
+
     const result = await processContentWithRangeOptimization(
       smallContent,
       'small-domains',
@@ -129,7 +153,7 @@ describe('Batch Processing Integration', () => {
       headless: true,
       monitor: false,
       outputDir: 'test-output',
-      logDir: 'test-logs'
+      logDir: 'test-logs',
     });
 
     // Should complete without timeout
@@ -138,16 +162,17 @@ describe('Batch Processing Integration', () => {
 
   it('should not timeout on large ranges with optimization', async () => {
     const startTime = Date.now();
-    
+
     await prebidExplorer({
-      githubRepo: 'https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains',
+      githubRepo:
+        'https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains',
       range: '50000-50100',
       puppeteerType: 'vanilla',
       concurrency: 1,
       headless: true,
       monitor: false,
       outputDir: 'test-output',
-      logDir: 'test-logs'
+      logDir: 'test-logs',
     });
 
     const duration = Date.now() - startTime;
@@ -178,7 +203,7 @@ describe('Performance Tests', () => {
 
   it('should not load entire file when using range optimization', async () => {
     const memoryBefore = process.memoryUsage().heapUsed;
-    
+
     await fetchUrlsFromGitHub(
       'https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains',
       undefined,
@@ -188,7 +213,7 @@ describe('Performance Tests', () => {
 
     const memoryAfter = process.memoryUsage().heapUsed;
     const memoryIncrease = memoryAfter - memoryBefore;
-    
+
     // Should not load entire ~90k domain list into memory
     expect(memoryIncrease).toBeLessThan(10 * 1024 * 1024); // 10MB max increase
   });
@@ -203,18 +228,21 @@ describe('Performance Tests', () => {
 describe('End-to-End Pipeline Tests', () => {
   it('should process GitHub domain list with batch mode', async () => {
     const command = [
-      'node', './bin/run.js', 'scan',
-      '--githubRepo', 'https://github.com/test/small-domains/blob/main/list',
+      'node',
+      './bin/run.js',
+      'scan',
+      '--githubRepo',
+      'https://github.com/test/small-domains/blob/main/list',
       '--batchMode',
       '--startUrl=1',
       '--totalUrls=20',
       '--batchSize=10',
       '--skipProcessed',
-      '--logDir=test-e2e'
+      '--logDir=test-e2e',
     ];
 
     const result = await runCommand(command, { timeout: 30000 });
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('BATCH PROCESSING COMPLETE');
     expect(result.stdout).not.toContain('tracer is not defined');
@@ -224,7 +252,7 @@ describe('End-to-End Pipeline Tests', () => {
   it('should handle telemetry initialization correctly', async () => {
     const command = ['node', './bin/run.js', 'scan', '--help'];
     const result = await runCommand(command);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.stderr).not.toContain('tracer is not defined');
   });
@@ -244,7 +272,7 @@ describe('Regression Tests', () => {
       ok: true,
       text: () => Promise.resolve(githubContent),
       status: 200,
-      headers: { get: () => '100' }
+      headers: { get: () => '100' },
     });
 
     const result = await fetchUrlsFromGitHub(
@@ -259,13 +287,16 @@ describe('Regression Tests', () => {
 
   it('should not timeout on range requests beyond numUrls limit', async () => {
     // Ensure we don't regress on the numUrls vs range issue
-    const mockContent = Array.from({ length: 1000 }, (_, i) => `domain${i}.com`).join('\n');
-    
+    const mockContent = Array.from(
+      { length: 1000 },
+      (_, i) => `domain${i}.com`
+    ).join('\n');
+
     mockFetch.mockResolvedValueOnce({
       ok: true,
       text: () => Promise.resolve(mockContent),
       status: 200,
-      headers: { get: () => '10000' }
+      headers: { get: () => '10000' },
     });
 
     const result = await fetchUrlsFromGitHub(
@@ -333,23 +364,23 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run unit tests
         run: npm run test:unit
-      
+
       - name: Run regression tests
         run: npm run test:regression
-      
+
       - name: Test GitHub URL parsing
         run: |
           timeout 30s node ./bin/run.js scan \
             --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains \
             --range "1-10" \
             --logDir test-ci
-      
+
       - name: Verify no timeout issues
         run: |
           if grep -q "NO VALID URLS FOUND" test-ci/app.log; then
@@ -365,20 +396,25 @@ jobs:
 ```typescript
 // src/utils/performance-monitor.ts
 export class URLPipelineMonitor {
-  static trackPerformance(operation: string, duration: number, urlCount: number) {
+  static trackPerformance(
+    operation: string,
+    duration: number,
+    urlCount: number
+  ) {
     const metrics = {
       operation,
       duration,
       urlCount,
       urlsPerSecond: urlCount / (duration / 1000),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     // Log performance metrics
     logger.info('Performance metrics', metrics);
-    
+
     // Alert on performance degradation
-    if (metrics.urlsPerSecond < 100) { // Less than 100 URLs/second
+    if (metrics.urlsPerSecond < 100) {
+      // Less than 100 URLs/second
       logger.warn('URL processing performance below threshold', metrics);
     }
   }

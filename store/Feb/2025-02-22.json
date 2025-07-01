@@ -1,16 +1,11 @@
 [
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.winnersodds.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -110,141 +105,127 @@
     "url": "http://www.homeimprove360.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.z-scoretable.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.100viajes1continente.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.howtoanimal.com"
   },
   {
-      "libraries": [
-        "googletag"
-      ],
-      "date": "2025-02-22",
-      "url": "http://www.artefatox.com"
+    "libraries": ["googletag"],
+    "date": "2025-02-22",
+    "url": "http://www.artefatox.com"
   },
   {
-      "libraries": [
-        "apstag",
-        "googletag"
-      ],
-      "date": "2025-02-22",
-      "prebidInstances": [
-        {
-          "globalVarName": "epbjs",
-          "version": "v9.30.0",
-          "modules": [
-            "33acrossBidAdapter",
-            "33acrossIdSystem",
-            "adagioBidAdapter",
-            "adagioRtdProvider",
-            "adkernelBidAdapter",
-            "adtelligentBidAdapter",
-            "adyoulikeBidAdapter",
-            "aidemBidAdapter",
-            "allowActivities",
-            "amxBidAdapter",
-            "amxIdSystem",
-            "appnexusBidAdapter",
-            "atsAnalyticsAdapter",
-            "colossussspBidAdapter",
-            "compassBidAdapter",
-            "concertBidAdapter",
-            "connectIdSystem",
-            "consentManagementGpp",
-            "consentManagementTcf",
-            "consentManagementUsp",
-            "conversantBidAdapter",
-            "criteoBidAdapter",
-            "criteoIdSystem",
-            "currency",
-            "dfpAdServerVideo",
-            "uid2IdSystem_shared",
-            "euidIdSystem",
-            "fpdModule",
-            "gptPreAuction",
-            "gumgumBidAdapter",
-            "hadronIdSystem",
-            "id5IdSystem",
-            "identityLinkIdSystem",
-            "insticatorBidAdapter",
-            "ixBidAdapter",
-            "kargoBidAdapter",
-            "kueezRtbBidAdapter",
-            "liveIntentAnalyticsAdapter",
-            "liveIntentIdSystem",
-            "lotamePanoramaIdSystem",
-            "luponmediaBidAdapter",
-            "medianetBidAdapter",
-            "minutemediaBidAdapter",
-            "nextMillenniumBidAdapter",
-            "oguryBidAdapter",
-            "onetagBidAdapter",
-            "openxBidAdapter",
-            "paapi",
-            "paapiForGpt",
-            "pairIdSystem",
-            "pgamsspBidAdapter",
-            "prebidServerBidAdapter",
-            "priceFloors",
-            "pubProvidedIdSystem",
-            "pubmaticBidAdapter",
-            "pulsepointBidAdapter",
-            "quantcastIdSystem",
-            "resetdigitalBidAdapter",
-            "revcontentBidAdapter",
-            "riseBidAdapter",
-            "rtdModule",
-            "rubiconBidAdapter",
-            "schain",
-            "seedtagBidAdapter",
-            "sharedIdSystem",
-            "sharethroughBidAdapter",
-            "sizeMappingV2",
-            "smaatoBidAdapter",
-            "smartadserverBidAdapter",
-            "smilewantedBidAdapter",
-            "sonobiBidAdapter",
-            "sovrnBidAdapter",
-            "tcfControl",
-            "teadsBidAdapter",
-            "topicsFpdModule",
-            "tripleliftBidAdapter",
-            "ttdBidAdapter",
-            "uid2IdSystem",
-            "undertoneBidAdapter",
-            "unifiedIdSystem",
-            "unrulyBidAdapter",
-            "userId",
-            "vidazooBidAdapter",
-            "videoModule",
-            "videojsVideoProvider",
-            "waardexBidAdapter",
-            "yieldmoBidAdapter"
-          ]
-        }
-      ],
-      "url": "http://www.escribirte.com.ar"
-  },
-  {
-    "libraries": [
-      "apstag",
-      "googletag"
+    "libraries": ["apstag", "googletag"],
+    "date": "2025-02-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "epbjs",
+        "version": "v9.30.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adkernelBidAdapter",
+          "adtelligentBidAdapter",
+          "adyoulikeBidAdapter",
+          "aidemBidAdapter",
+          "allowActivities",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "colossussspBidAdapter",
+          "compassBidAdapter",
+          "concertBidAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "fpdModule",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "luponmediaBidAdapter",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nextMillenniumBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "pgamsspBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "pulsepointBidAdapter",
+          "quantcastIdSystem",
+          "resetdigitalBidAdapter",
+          "revcontentBidAdapter",
+          "riseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videojsVideoProvider",
+          "waardexBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
     ],
+    "url": "http://www.escribirte.com.ar"
+  },
+  {
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -344,44 +325,32 @@
     "url": "http://www.printableinvoicetemplates.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.unemploymentofficelocations.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ingredient-recipes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.edmlife.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.yanantin-alpaca.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.polishandpearls.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -481,9 +450,7 @@
     "url": "http://www.philtimes.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -583,114 +550,82 @@
     "url": "http://www.online-keyboard.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.schnauzerexpert.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.blissfuldomestication.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.digitalbosscreations.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.freewillstoprint.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.alomvilagmagyarorszag.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.desmami.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.paolos.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.materialesdidacticos.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.enchantedaromatics.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gp-training.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ukuio.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thesukan.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sigmastylist.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lausitznews.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.afqttest.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -790,37 +725,27 @@
     "url": "http://www.colorcodepicker.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fontsig.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.allstringed.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hvaclaboratory.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.customsdutyfree.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -920,24 +845,17 @@
     "url": "http://www.subwaymenuprices.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.keepfithealth.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.chilkibopublishing.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -997,52 +915,37 @@
     "url": "http://www.militaryhistoria.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.conversaciones.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pdfkonyvek.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.valentinosnaturals.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mymilitarytimes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.subwaynutritioncalculator.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.find-a-seafood-recipe.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1142,100 +1045,72 @@
     "url": "http://www.sweetiessweeps.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.jazminemedia.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cleanupgeek.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sumppumpproblem.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.engineeringunits.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.creditify.mx"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myskateguide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gearguidepro.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.teachinginkoreanuniversity.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.publicholidays.ca"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.eaglemountainlake.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thebesttimetovisit.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.subway-menu.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cedarcreeklake.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1335,23 +1210,17 @@
     "url": "http://www.printabletimesheets.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mychillirecipes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kahlo.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1451,44 +1320,32 @@
     "url": "http://www.futurecarstalk.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gstadmission.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dailyhistory.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thegenrejunkie.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.puresociology.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.makeyourhomesafer.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1537,80 +1394,57 @@
     "url": "http://www.reporte-de-credito.com.mx"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.great-taste.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.offroadingutv.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.selfhealthpharmacist.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.despairrepair.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hablemosdemitologias.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ccwclasses.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.freeonline.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dawnpatrolgolf.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.enjeuxdemots.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sakurayubi.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1710,9 +1544,7 @@
     "url": "http://www.tadigut.nu"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1812,30 +1644,22 @@
     "url": "http://www.estopwatch.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ideainvestimento.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.openofficetemplates.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lcmgcf.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -1935,10 +1759,7 @@
     "url": "http://www.northernpikefishingtips.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2038,16 +1859,12 @@
     "url": "http://www.heaterguides.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wickedhorror.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2147,17 +1964,12 @@
     "url": "http://www.drivecruise.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.seotrance.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2257,51 +2069,37 @@
     "url": "http://www.rentaroo.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.untoldwanderlust.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.freiberufler.online"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.quotesvibes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.studioveloce.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hotaykiviral.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.infinitycartips.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2401,30 +2199,22 @@
     "url": "http://www.learnancientrome.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.schoolinfo.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.matthewb.id.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.physicaltherapyweb.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2524,9 +2314,7 @@
     "url": "http://www.bubble-shooter.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2626,9 +2414,7 @@
     "url": "http://www.deepbluediving.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2728,23 +2514,17 @@
     "url": "http://www.heiko-evermann.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.iskias.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kitchenfact.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.chiffre-lettre.com"
   },
@@ -2849,30 +2629,22 @@
     "url": "http://www.chuck-norris-jokes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dentist-pro.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.planetrenewed.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thegamerstation.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -2972,51 +2744,37 @@
     "url": "http://www.greenthumbsguide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bstrategyinsights.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.valute.si"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.decibelpeak.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.terravenos.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.worldgurudwaras.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ohmschool.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -3116,24 +2874,17 @@
     "url": "http://www.yarravalleypoint.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.plantscience4u.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.proverbicals.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -3233,37 +2984,27 @@
     "url": "http://www.bikecommuterhero.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.findteamnames.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.vfpress.news"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.petiska.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.vegrecipeskitchen.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -3313,10 +3054,7 @@
     "url": "http://www.zobacz-to.pl"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -3416,129 +3154,92 @@
     "url": "http://www.classclef.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.starlanguageblog.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.allstartwords.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tanfprogram.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.plantednanotanks.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pet-how.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.linuxtopia.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.4lawschool.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ovenwave.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wohnmobil24.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myformosafood.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.petnile.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.freearenas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.enerzine.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.spincyclehub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mcdomenuph.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.namesgreat.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.spotforcars.com"
   },
   {
-    "libraries": [
-      "googletag",
-      "ats"
-    ],
+    "libraries": ["googletag", "ats"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -3813,23 +3514,17 @@
     "url": "http://www.celebsrevealed.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.llworldtour.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.spelldigits.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -3929,38 +3624,27 @@
     "url": "http://www.tearfreetravel.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.energyfollower.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.safesleepsystems.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.todotablasdemultiplicar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.keepingkittens.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4060,17 +3744,12 @@
     "url": "http://www.purposefairy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.freshhandyman.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4099,58 +3778,42 @@
     "url": "http://www.popcreep.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thephotographyprofessor.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.neutrallypolished.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.einwie.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.codingyaar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.1hindi.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fourwheelinsider.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sportsontvusa.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4250,79 +3913,57 @@
     "url": "http://www.thedifferencebetween.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rabbitfoodguide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myrabbitcare.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hetmoederfront.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bellemocha.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.jukebugs.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.calcolobenzina.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.remediosdelaabuela.club"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tips-4-moms.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gujratkhabar.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.acethekitchen.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4422,31 +4063,22 @@
     "url": "http://www.travelbelles.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mindfulnessmemories.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.estimationqs.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.worter-finden.de"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4479,10 +4111,7 @@
     "url": "http://www.thetruckhow.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4582,44 +4211,32 @@
     "url": "http://www.cookingjourneyblog.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.switzerlandbylocals.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.symbole-zeichen.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.missionkiawaaz.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.techpostplus.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fightnomads.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4719,121 +4336,87 @@
     "url": "http://www.getchip.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.slrailwayforum.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cuantoganaria.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.prettymykitchen.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.meaning-of-number.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gospodarzdravlja.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gossipchi.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fromnicolescreations.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.opportunitiesforeveryone.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ghostbrothers.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.roi-du-silence.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.geekybucks.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.droit-compta-gestion.fr"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thetennistime.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tattooconnect.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.quinzeprasnoveblog.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.planetseducation.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -4933,9 +4516,7 @@
     "url": "http://www.sonofchina.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5035,30 +4616,22 @@
     "url": "http://www.positivewordslist.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gisresources.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.heavymachineryworld.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.diagramasuml.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5191,59 +4764,42 @@
     "url": "http://www.dizionario-francese.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lakelbj.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.auntbettysrecipes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mytipcalc.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wormmy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.minimalista.cl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.inveronatoday.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tips-pdf.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5343,24 +4899,17 @@
     "url": "http://www.tipsresult.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.colorare-online.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.paintalways.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5393,9 +4942,7 @@
     "url": "http://www.healingandwellnessforyou.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5495,44 +5042,32 @@
     "url": "http://www.mundochiller.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.homebrewhours.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.trunkoutdoors.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.extrudesign.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.arabic-names.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.frugalmamaproject.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5632,17 +5167,12 @@
     "url": "http://www.humandesign.tools"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.oeuvres-art.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5742,65 +5272,47 @@
     "url": "http://www.bienesonline.ec"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mastertheflames.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.letterofhardship.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rueroyale.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.faithfulmotherhood.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wandernity.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.quizbiology.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.spiritualenergytoday.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.knifepulse.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -5900,17 +5412,12 @@
     "url": "http://www.battle-shout.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.operativestest.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6010,17 +5517,12 @@
     "url": "http://www.drivebestway.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.animeauditor.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6120,23 +5622,17 @@
     "url": "http://www.hometheatrelife.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sportlife.com.mx"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wendyswohnzimmer.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6236,23 +5732,17 @@
     "url": "http://www.tripversed.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rechnersammlung.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.backyardmike.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6275,45 +5765,32 @@
     "url": "http://www.dreamastromeanings.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.personenwaage-online.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.3dpadvisor.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myfreetextures.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dailyopinionpolls.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.365tips.be"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6346,52 +5823,37 @@
     "url": "http://www.femminilestile.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rdvludique.fr"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.catscottishfold.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.carryonsizes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.crazyespresso.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myprogrammingschool.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mictestonline.net"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6491,9 +5953,7 @@
     "url": "http://www.passportwaitingtime.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6593,45 +6053,32 @@
     "url": "http://www.figgeritsanswers.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mycigarsite.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.runfitjourney.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.centralnerdverse.com.br"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.millionairedb.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.perfectanimals.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6731,16 +6178,12 @@
     "url": "http://www.difference.guru"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lifeofdoing.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6840,16 +6283,12 @@
     "url": "http://www.pablopicasso.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.localkittensforsale.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -6949,16 +6388,12 @@
     "url": "http://www.memoriascinematograficas.com.br"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.livingtheoutdoorlife.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7058,73 +6493,52 @@
     "url": "http://www.wingingtheworld.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.yourphotoadvisor.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.appliancesforlife.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hollyeats.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.jenniferstormnelson.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kiekhemgaan.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.homesweetcountrymusic.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sewingworker.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.livebeautyhealth.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.nevadafishreports.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7224,24 +6638,17 @@
     "url": "http://www.milanoexplorer.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.countryinstruments.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.geartrouble.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7341,9 +6748,7 @@
     "url": "http://www.footslide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7443,44 +6848,32 @@
     "url": "http://www.nclark.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.psdtemplatesblog.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.techwhis.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.seamula.top"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.budgetwayfarers.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.chinesefoodsrecipe.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7580,30 +6973,22 @@
     "url": "http://www.procaffenation.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.90sanime.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gardenbirdfeeder.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.totallypurrfect.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7703,16 +7088,12 @@
     "url": "http://www.carsreborn.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.speelkeuze.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7812,16 +7193,12 @@
     "url": "http://www.justdoproperty.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.popculthq.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -7921,52 +7298,37 @@
     "url": "http://www.verificacion-vehicular.com.mx"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cuparoast.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dentalsreview.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.magicalfamilytravelguide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sandiegan.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.emoffgrid.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.raresportbikesforsale.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8066,23 +7428,17 @@
     "url": "http://www.jobapplications.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.koalasoap.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.whatcompetitors.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lightsoutblog.com"
   },
@@ -8187,16 +7543,12 @@
     "url": "http://www.dizionario-spagnolo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kapstadt-entdecken.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8296,10 +7648,7 @@
     "url": "http://www.sportconsumer.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8399,31 +7748,22 @@
     "url": "http://www.truthorfiction.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hodocasce.eu"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.makefill.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aussiegolfer.com.au"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8523,38 +7863,27 @@
     "url": "http://www.apelostudio.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.xtrhorsepower.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.steampunkit.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.inflatablegeek.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.yourfishguide.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8654,59 +7983,42 @@
     "url": "http://www.catnamescity.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gotaylorsville.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.firehousesubsmenus.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.revotrads.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.shinjisverige.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.italofile.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.claradelish.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dwgfree.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8806,52 +8118,37 @@
     "url": "http://www.farmchat.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.livedainik.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tuerkeireiseblog.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sofiabjork.se"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.japanhorizon.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.curiosodatosrandom.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.roamstrong.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -8884,23 +8181,17 @@
     "url": "http://www.moneymarshmallow.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.anderes-wort-fuer.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thinkersvine.com"
   },
   {
-    "libraries": [
-      "apstag"
-    ],
+    "libraries": ["apstag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -9511,51 +8802,37 @@
     "url": "http://www.citygirlmeetsfarmboy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.teilzeitgoettin.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.normasapa.net.co"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.viajasanandres.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.multicalculadoras.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.misistemasolar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.todoefemerides.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -9655,9 +8932,7 @@
     "url": "http://www.periodic-table.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -9757,24 +9032,17 @@
     "url": "http://www.freeonplate.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.buvaukine.lt"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.animalstart.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -9874,23 +9142,17 @@
     "url": "http://www.foodle.gg"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bcfishingjournal.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mywaterearth.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -9990,10 +9252,7 @@
     "url": "http://www.morsetranslate.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10026,9 +9285,7 @@
     "url": "http://www.thebrilliantkitchen.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10128,9 +9385,7 @@
     "url": "http://www.pyseek.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.futbolenvivoecuador.com"
   },
@@ -10235,65 +9490,47 @@
     "url": "http://www.askaphilosopher.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.turkcebilgi.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.resultmama.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.streamrant.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.travail-en-france.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.archivesofadventure.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.totallysmokin.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.nfldraftlounge.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dogtravelbuff.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.grantwritingacad.org"
   },
@@ -10398,10 +9635,7 @@
     "url": "http://www.venezuelahorasabiertas.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10501,16 +9735,12 @@
     "url": "http://www.ufoholic.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.onlinehelpguide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10610,10 +9840,7 @@
     "url": "http://www.celebritysizes.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10713,10 +9940,7 @@
     "url": "http://www.face-symmetry-test.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10816,17 +10040,12 @@
     "url": "http://www.freenduro.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.budgetella.nl"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -10926,10 +10145,7 @@
     "url": "http://www.fermenterskitchen.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11029,30 +10245,22 @@
     "url": "http://www.bibleversestogo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dilc.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.electricalvoice.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.champskick.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11152,58 +10360,42 @@
     "url": "http://www.jokersrevenge.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ketotonics.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.reptilerange.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lightgungamer.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mygardencraft.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mysneakerocean.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.techconsults.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.icefishingacademy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11303,9 +10495,7 @@
     "url": "http://www.gardeningease.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11405,9 +10595,7 @@
     "url": "http://www.schilderpret.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11507,65 +10695,47 @@
     "url": "http://www.daysfromtoday.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.emplois-informatique.fr"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.smallspacepros.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sentencehouse.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.westwalesfamilylife.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.homedecorchat.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.svsilkap.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.souls-space.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.essaysmith.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11665,65 +10835,47 @@
     "url": "http://www.mentalhealthgeneral.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.enkontrar.es"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.appwalkthrough.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.whatismyagetoday.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.visahelpuk.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bakesync.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hipsthetic.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tynick.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pmbypm.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -11823,17 +10975,12 @@
     "url": "http://www.bienesonline.uy"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.state-st.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12033,30 +11180,22 @@
     "url": "http://www.getpixie.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mydronelab.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.spectrums2.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.whatsabyte.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12156,9 +11295,7 @@
     "url": "http://www.learnaboutpet.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12258,9 +11395,7 @@
     "url": "http://www.iowa-demographics.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12360,9 +11495,7 @@
     "url": "http://www.indoorvegetablegrower.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12462,10 +11595,7 @@
     "url": "http://www.darjeeling-tourism.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12498,10 +11628,7 @@
     "url": "http://www.upgradedvehicle.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12534,9 +11661,7 @@
     "url": "http://www.recipeslena.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12636,9 +11761,7 @@
     "url": "http://www.reflexology-map.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.travelworldonline.de"
   },
@@ -12743,16 +11866,12 @@
     "url": "http://www.dizionario-tedesco.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.castrumtocastle.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12852,9 +11971,7 @@
     "url": "http://www.runas.lol"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -12954,16 +12071,12 @@
     "url": "http://www.showerdrape.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.simplyrelationships.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13063,58 +12176,42 @@
     "url": "http://www.birdvenue.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sparkyfrenzy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lakewhitneyhub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cashforkat.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.d-kickboard.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.forexpenguin.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.goddesslikebody.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thejetlagjourney.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13214,9 +12311,7 @@
     "url": "http://www.backyardworkspace.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13316,9 +12411,7 @@
     "url": "http://www.tikitakatoe.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13418,17 +12511,12 @@
     "url": "http://www.applied-grammar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pouces-en-cm.fr"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13528,23 +12616,17 @@
     "url": "http://www.ybierling.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.futurespaceworld.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.allaboutcad.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13644,31 +12726,22 @@
     "url": "http://www.videovinci.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mycleannails.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.becasparalatinos.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.phscholarships.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13768,23 +12841,17 @@
     "url": "http://www.marathimol.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.girlraisedinthesouth.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.globnem.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -13884,38 +12951,27 @@
     "url": "http://www.emotikonyznaczenie.pl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.brugestourisme.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.photosavi.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.crumpetsa.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.veggiesgrow.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14015,45 +13071,32 @@
     "url": "http://www.strangeandcreepy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.animegeeksjp.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.networthboss.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.visitupbologna.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.todonumerosromanos.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.holistikqueen.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14153,16 +13196,12 @@
     "url": "http://www.volleyball.com.ng"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.techlistic.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14262,9 +13301,7 @@
     "url": "http://www.quordlegame.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14364,16 +13401,12 @@
     "url": "http://www.powersadvisor.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thedairydish.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14473,16 +13506,12 @@
     "url": "http://www.indiana-demographics.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hablemosdereligion.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14582,23 +13611,17 @@
     "url": "http://www.digitalhow.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.saudiarabiaofw.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.traveltrailerslv.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14698,9 +13721,7 @@
     "url": "http://www.cultura10.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14800,23 +13821,17 @@
     "url": "http://www.horasabiertas.es"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pakalerts.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rollerderbyroster.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -14916,9 +13931,7 @@
     "url": "http://www.worldtravelchef.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15018,9 +14031,7 @@
     "url": "http://www.generation95.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15120,10 +14131,7 @@
     "url": "http://www.sfconservatoryofdance.org"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15156,10 +14164,7 @@
     "url": "http://www.backyardmastery.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15259,23 +14264,17 @@
     "url": "http://www.mostajaab.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kadrywpraktyce.pl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.zodiacshine.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.serietvdavedere.com"
   },
@@ -15380,30 +14379,22 @@
     "url": "http://www.thetemples.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.shweiki.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tropicalfoodgarden.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.informaticappunti.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15503,58 +14494,42 @@
     "url": "http://www.hummingbirdhobbyist.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.intheyard.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.askthebuilder.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.getandroidstuff.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fvml.com.br"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bengaluruprayana.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.carnivorousplantstips.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aussiemob.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15654,52 +14629,37 @@
     "url": "http://www.earthtripper.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.allapplication.xyz"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.adrinerja.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sundiatapost.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bugmasterpestcontrol.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.envelopesizes.info"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.christinhasfernweh.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15799,30 +14759,22 @@
     "url": "http://www.justrandomthings.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.get-itsolutions.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.espacevillegiature.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.10differences.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -15922,23 +14874,17 @@
     "url": "http://www.technize.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.foodpowa.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.visitcherrygrove.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thebestjapan.com"
   },
@@ -16043,9 +14989,7 @@
     "url": "http://www.triviacountry.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16145,9 +15089,7 @@
     "url": "http://www.bigbraincoach.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16247,9 +15189,7 @@
     "url": "http://www.numtoword.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16349,59 +15289,42 @@
     "url": "http://www.boatblissblog.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.segelplanet.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thejetsetterdiaries.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cancunareatravel.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.eatwithyoureyesllc.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.japanyugen.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bolcereales.com.ar"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.actionfiguregeek.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16430,23 +15353,17 @@
     "url": "http://www.fakeinfo.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.offroadtroop.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.onlinejobsreveiws.co.ke"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16546,10 +15463,7 @@
     "url": "http://www.vcloudinfo.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16649,9 +15563,7 @@
     "url": "http://www.wordcalc.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bakabuzz.com"
   },
@@ -16756,16 +15668,12 @@
     "url": "http://www.pressurewashzone.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.suzannesrecipefile.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16865,9 +15773,7 @@
     "url": "http://www.slightlyblue.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -16967,58 +15873,42 @@
     "url": "http://www.ukulelearn.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ipoki.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mattsclassiccameras.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.groundedintheearth.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dandenongrangespoint.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.plantsathome.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.vocenoencceja.com.br"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.auto-lyrics.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17118,16 +16008,12 @@
     "url": "http://www.piger-lesmaths.fr"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.nugevonden.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17311,17 +16197,12 @@
     "url": "http://www.priyotottho.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.synpop.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17421,23 +16302,17 @@
     "url": "http://www.pngtosvg.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.theovenist.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.physique-college.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17537,45 +16412,32 @@
     "url": "http://www.wheel-offset.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.economyscopes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aquariumgravel.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mcneesereels.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.emmarecetas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.shirshendusengupta.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17675,58 +16537,42 @@
     "url": "http://www.englishmaven.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tenisbase.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.como-saber.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.123brocante.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.elrubio.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.localtreeestimates.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.capitalmatters.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.goldendoodles.se"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17826,9 +16672,7 @@
     "url": "http://www.emojilo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -17928,44 +16772,32 @@
     "url": "http://www.smokymtnopry.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tresna.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.skincarelab.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.filipinowealth.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.besttacklebox.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lankatraveldirectory.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18065,31 +16897,22 @@
     "url": "http://www.foodlegame.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.scholarafrika.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.scootersfornewbies.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.oddblocks.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18122,72 +16945,52 @@
     "url": "http://www.jewelrymaterialguide.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.quotenstatus.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wishesnkisses.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tyrepressure.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dejittr.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.calculator-integral.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.belogarden.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.logintotech.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.urbanmamas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.onlineclas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18287,10 +17090,7 @@
     "url": "http://www.corgicare.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18323,9 +17123,7 @@
     "url": "http://www.skilledcooks.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18425,86 +17223,62 @@
     "url": "http://www.safenow.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.coppafeelgarden.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.3tagebart.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thesleepdiary.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.roamingmyplanet.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.vanderelbe.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.beanbagsexpert.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.learnweldingsymbols.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.learncpronline.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.twohundredsitups.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.therowingtutor.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lazyplant.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18604,9 +17378,7 @@
     "url": "http://www.sixfigureinvesting.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18706,16 +17478,12 @@
     "url": "http://www.troskovazivota.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.boxofideas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18815,52 +17583,37 @@
     "url": "http://www.pansymaiden.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.formatsdepapier.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.leyas.es"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rainmeterthemes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.blogdofla.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.topofy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.todonumerosordinales.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -18960,58 +17713,42 @@
     "url": "http://www.kindacode.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ancient-symbols.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.prosperor.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.drugtaper.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.metalgearinformer.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lotustryo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dirtmountainbike.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dsottile.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19111,9 +17848,7 @@
     "url": "http://www.pointspro.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19213,9 +17948,7 @@
     "url": "http://www.test-cps.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19315,10 +18048,7 @@
     "url": "http://www.motofour.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19418,23 +18148,17 @@
     "url": "http://www.typingtutor-online.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.interobservers.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.goyadkin.com"
   },
   {
-    "libraries": [
-      "apstag"
-    ],
+    "libraries": ["apstag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19534,9 +18258,7 @@
     "url": "http://www.distancecalc.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19636,115 +18358,82 @@
     "url": "http://www.bigbikereviews.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.burtontransportinc.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.relationshipfire.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.commoncentshub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.jumpropehub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.talktodogs.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.selections2018.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.minitools.me"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.carguide.ch"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.interestingmag.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.assortedanimals.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.theordinaryadventurer.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tasteefulrecipes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.notsealed.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.scanneranswers.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.keyboardcutter.com"
   },
   {
-    "libraries": [
-      "googletag",
-      "ats"
-    ],
+    "libraries": ["googletag", "ats"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19816,9 +18505,7 @@
     "url": "http://www.akhelp.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -19918,51 +18605,37 @@
     "url": "http://www.wereld-prijzen.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lampslab.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.psicoportal.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.loston66.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.appt.ch"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cricketershub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.melhoresrotas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20062,16 +18735,12 @@
     "url": "http://www.improvecraft.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.microgreenscorner.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20171,17 +18840,12 @@
     "url": "http://www.saunaverse.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.costatropical.net"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20281,9 +18945,7 @@
     "url": "http://www.wheel-sizes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20483,9 +19145,7 @@
     "url": "http://www.gaelictattoosbook.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20585,37 +19245,27 @@
     "url": "http://www.pcsuitehq.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.technikneuheiten.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.jiemahao.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sassycooking.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.birdsdepot.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20715,31 +19365,22 @@
     "url": "http://www.weddingthingz.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pcijourney.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.accordionchords.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.versefortheday.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20839,9 +19480,7 @@
     "url": "http://www.english-for-students.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -20941,30 +19580,22 @@
     "url": "http://www.mathwordle.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.liquidfeatures.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aeroxplorer.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ilovephd.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21064,17 +19695,12 @@
     "url": "http://www.snesmaps.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.shtfdad.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21109,17 +19735,12 @@
     "url": "http://www.building-your-model-railroad.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tombstonetraveltips.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21219,52 +19840,37 @@
     "url": "http://www.ps5forum.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mathspeedtest.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.stonestokilograms.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tonsilstoneremedies.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.therealgardener.ca"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.qualifiedquest.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sbxl.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21364,58 +19970,42 @@
     "url": "http://www.plantedandpicked.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.faithfulhome.com.ng"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.paramvisions.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.interiorredoux.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.actionparksource.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dejuistekooktijd.nl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.teslastir.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.smokeygrillbbq.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21515,16 +20105,12 @@
     "url": "http://www.emojidunyasi.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.grampianspoint.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21624,23 +20210,17 @@
     "url": "http://www.shoesmatrix.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.onlinetextgenerator.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.andreapeacock.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21740,45 +20320,32 @@
     "url": "http://www.scrabblemania.gr"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.csharpsage.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.meebily.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thegroomingexpert.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rewarding-fundraising-ideas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ncertguess.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21826,44 +20393,32 @@
     "url": "http://www.colossalumbrella.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.pepperonpizza.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.combinations.io"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.winchinghub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.compusport.ca"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mobilegaminghub.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -21963,10 +20518,7 @@
     "url": "http://www.oktechmasters.org"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22066,10 +20618,7 @@
     "url": "http://www.slappedham.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22169,9 +20718,7 @@
     "url": "http://www.pioneersmokehouses.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22271,51 +20818,37 @@
     "url": "http://www.assuredfaith.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mkhbr.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.outdoorvancouver.ca"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.amigurum.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.appsforsmarttv.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thetestingsquad.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.alltomtokyo.se"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22415,38 +20948,27 @@
     "url": "http://www.greenbeansnmore.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.masamadre.online"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aircraftplace.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thesallyfield.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.losbloggers.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22546,16 +21068,12 @@
     "url": "http://www.boardofcosmetology.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aratariathome.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22655,44 +21173,32 @@
     "url": "http://www.clooms.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.storingandfreezing.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cosaslearning.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.blueharemagazine.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.maildienste.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.menus.ph"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22792,17 +21298,12 @@
     "url": "http://www.cookchickeneasily.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.katherinelearnsstuff.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -22902,24 +21403,17 @@
     "url": "http://www.hiphop24x7.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.inflationdata.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.zwivel.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23019,37 +21513,27 @@
     "url": "http://www.humoropedia.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.essentialsql.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.recettes-cookeo.fr"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.smallpets101.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.civilwarsaga.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23149,30 +21633,22 @@
     "url": "http://www.ilgiardinocommestibile.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.diyhouseskills.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myriadofdreams.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sabermatematica.com.br"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23272,9 +21748,7 @@
     "url": "http://www.thegoldenretrievernetwork.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23374,9 +21848,7 @@
     "url": "http://www.answerscrib.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23476,24 +21948,17 @@
     "url": "http://www.comparism.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.directpowerdeals.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.futebolaovivobrasil.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23593,143 +22058,102 @@
     "url": "http://www.usconstitution.co"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.optiongray.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thefriendify.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.triptivy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.voicetotext.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.harrypotterdatabase.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.cuantonecesitoparaelfinal.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.airscenty.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.plumbertrainingcenter.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wbbsesolutions.guide"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fixandtroubleshoot.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.materialwelding.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.inflationtool.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.whitesandsandcoolbreezes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sydneypoint.com.au"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myfreeproductsamples.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.britishstudentroom.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.futbolenvivoelsalvador.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.booleanworld.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.icrewplay.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23829,17 +22253,12 @@
     "url": "http://www.whitestarrides.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.healingheartdiseasenaturally.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -23939,9 +22358,7 @@
     "url": "http://www.explore-magazine.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24041,16 +22458,12 @@
     "url": "http://www.weldingsite.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gostokes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24150,9 +22563,7 @@
     "url": "http://www.studyboss.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24252,24 +22663,17 @@
     "url": "http://www.engagement-wishes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.eserviceinfo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.asturnatura.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24369,17 +22773,12 @@
     "url": "http://www.excelweez.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.designconundrum.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24479,10 +22878,7 @@
     "url": "http://www.businesspartnermagazine.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24515,10 +22911,7 @@
     "url": "http://www.novelroutes.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24618,9 +23011,7 @@
     "url": "http://www.helpstvincent.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24720,72 +23111,52 @@
     "url": "http://www.petcreeks.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.spotlegame.co.uk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wikimachine.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.goguilford.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.goswain.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.videoszerkeszto.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.careerload.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.caughtonawhim.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.getfootballnewsgermany.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mallorcafuerkinder.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24885,16 +23256,12 @@
     "url": "http://www.epicwar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.visit-vallarta.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -24922,52 +23289,37 @@
     "url": "http://www.longmontleader.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.coltivazionebiologica.it"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.yougowords.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wicprogram.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hometheaterheroes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.techotopia.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.youthapplications.co.za"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25067,30 +23419,22 @@
     "url": "http://www.cumbrepuebloscop20.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.refrigeratorsolutions.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mytechauthority.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.derechoenzapatillas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25213,93 +23557,67 @@
     "url": "http://www.wutangnamefor.me"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.improvesongwriting.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.trade-seafood.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.michelangelo.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.greengardentribe.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.langkawi-insight.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.emmawilkinsondesigns.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.golfnewsnation.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lenpenzo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.acoupleofsips.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fishcaring.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.divinemarkings.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.hobbygraderc.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25399,16 +23717,12 @@
     "url": "http://www.plsql.co"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.drawcartoonstyle.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25508,16 +23822,12 @@
     "url": "http://www.besterouten.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gcseenglishanalysis.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25617,16 +23927,12 @@
     "url": "http://www.sosbusinesssearch.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bus-timetable.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25726,51 +24032,37 @@
     "url": "http://www.bengaliforum.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.thewandertherapy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.fulfilledmerchant.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.animalsinsider.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.tech-sonar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.superheroquizzes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lakemarion.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -25870,38 +24162,27 @@
     "url": "http://www.photosofsantorini.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.myeuropedays.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.woodburyoutlet.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.breedsofcat.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.filminspector.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26001,9 +24282,7 @@
     "url": "http://www.global-sharepoint.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26103,23 +24382,17 @@
     "url": "http://www.aboutthenetherlands.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wofox.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.printablesfree.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26219,30 +24492,22 @@
     "url": "http://www.wcifly.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.healthyhousekeeper.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.perfect24hours.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.computertipsfree.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26342,23 +24607,17 @@
     "url": "http://www.featheredrealm.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.crystal-guru.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.emilymaydesigns.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26458,44 +24717,32 @@
     "url": "http://www.toolsli.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.justmykitchen.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sillyamerica.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.facturaoboleta.cl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.artesdigitales.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sekodas.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26595,10 +24842,7 @@
     "url": "http://www.calculatorintegral.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26698,58 +24942,42 @@
     "url": "http://www.vlsiverify.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.garagehowto.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.socialgadgetnews.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.opendllfiles.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.markdown.net.br"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.laptopowl.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kobocents.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.americanmorning.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26849,24 +25077,17 @@
     "url": "http://www.polegytravels.pl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kokumber.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.sssinquiries.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -26966,65 +25187,47 @@
     "url": "http://www.treatnheal.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.theperfectplace.co.za"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.petalsandgardens.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.generationalaquatics.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.rorue.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.guppy-fish.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kinda.games"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.seasia-consulting.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gameyum.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27124,31 +25327,22 @@
     "url": "http://www.animeai.app"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.psicomancias.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dogbef.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.top5ver.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27248,9 +25442,7 @@
     "url": "http://www.testwebcams.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27350,23 +25542,17 @@
     "url": "http://www.medicina.icu"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.minify-beautify.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.visitandoeuropa.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27466,9 +25652,7 @@
     "url": "http://www.backdoorprepper.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27568,24 +25752,17 @@
     "url": "http://www.printablebanners.net"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.outdoorgardencare.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.d365a.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27622,23 +25799,17 @@
     "url": "http://www.relationshiptips4u.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.shayariyaar.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mountainbikeslab.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -27724,16 +25895,12 @@
     "url": "http://www.courriersport.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.lyrimint.in"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.textninja.cc"
   },
@@ -27838,30 +26005,22 @@
     "url": "http://www.techcoresolutions.info"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.innaplestoday.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.insoundproof.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.blimey.pro"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.triviaquestionforkids.com"
   },
@@ -27966,51 +26125,37 @@
     "url": "http://www.golfforscher.de"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.alldog.co.il"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.freerecordsregistry.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.dinosaur-heroes.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.blogloaded.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.wordvillasanswers.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.ziiky.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28110,16 +26255,12 @@
     "url": "http://www.starrynova.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mykitchenpoint.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28219,16 +26360,12 @@
     "url": "http://www.prostrikeboats.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.livraison-domicile.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28328,44 +26465,32 @@
     "url": "http://www.dizionario-inglese.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.laautoestima.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.adorecar.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.outdoorskillz.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.mojamonstera.pl"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.yolvemacera.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28465,44 +26590,32 @@
     "url": "http://www.udbetalingsinfo.dk"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.answersforeveryone.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.neverpest.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.survival-and-prepper.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.crispoflife.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.absolutareligion.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28602,23 +26715,17 @@
     "url": "http://www.sothisismywhy.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.beagleowner.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.aboutbackyard.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28718,44 +26825,32 @@
     "url": "http://www.horariosautobuses.es"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.nurselist.ca"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.boatlife365.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.guinnessworldrecords.ae"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.bestdiapersreviews.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.kyawmal.tech"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28855,9 +26950,7 @@
     "url": "http://www.infoneumaticos.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -28957,17 +27050,12 @@
     "url": "http://www.readingandthinking.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.infoik.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -29067,17 +27155,12 @@
     "url": "http://www.constitutionworld.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.gorandolph.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-02-22",
     "prebidInstances": [
       {
@@ -29110,16 +27193,12 @@
     "url": "http://www.thefifthelementlife.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.elsalvadorfutbol.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-02-22",
     "url": "http://www.careforparrots.com"
   }

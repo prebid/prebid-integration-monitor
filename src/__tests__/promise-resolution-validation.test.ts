@@ -48,7 +48,7 @@ describe('Promise Resolution Validation Tests', () => {
 
       // Test task registration
       await mockCluster.task(processPageTask);
-      
+
       expect(mockCluster.task).toHaveBeenCalledWith(processPageTask);
       expect(mockCluster.task).toHaveBeenCalledTimes(1);
     });
@@ -62,8 +62,8 @@ describe('Promise Resolution Validation Tests', () => {
             url: 'https://example.com',
             date: '2025-06-28',
             libraries: [],
-            prebidInstances: []
-          }
+            prebidInstances: [],
+          },
         },
         {
           url: 'https://prebid-test.com',
@@ -72,13 +72,15 @@ describe('Promise Resolution Validation Tests', () => {
             url: 'https://prebid-test.com',
             date: '2025-06-28',
             libraries: ['googletag'],
-            prebidInstances: [{
-              globalVarName: 'pbjs',
-              version: '7.48.0',
-              modules: ['core']
-            }]
-          }
-        }
+            prebidInstances: [
+              {
+                globalVarName: 'pbjs',
+                version: '7.48.0',
+                modules: ['core'],
+              },
+            ],
+          },
+        },
       ];
 
       for (const testCase of testCases) {
@@ -96,7 +98,7 @@ describe('Promise Resolution Validation Tests', () => {
 
         const result = await processPageTask({
           page: mockPage,
-          data: { url: testCase.url, logger: mockLogger }
+          data: { url: testCase.url, logger: mockLogger },
         });
 
         expect(result).toBeDefined();
@@ -108,7 +110,11 @@ describe('Promise Resolution Validation Tests', () => {
     });
 
     it('should simulate cluster.queue() promise resolution issue', async () => {
-      const urls = ['https://test1.com', 'https://test2.com', 'https://test3.com'];
+      const urls = [
+        'https://test1.com',
+        'https://test2.com',
+        'https://test3.com',
+      ];
       const taskResults: TaskResult[] = [];
       const undefinedResults = { count: 0 };
 
@@ -123,7 +129,7 @@ describe('Promise Resolution Validation Tests', () => {
           }
           return Promise.resolve({
             type: 'no_data' as const,
-            url
+            url,
           });
         }),
         idle: vi.fn(),
@@ -145,7 +151,9 @@ describe('Promise Resolution Validation Tests', () => {
           } else {
             undefinedResults.count++;
             // This matches the warning we see in the real application
-            console.warn('A task from cluster.queue fulfilled but with undefined/null value.');
+            console.warn(
+              'A task from cluster.queue fulfilled but with undefined/null value.'
+            );
           }
         }
       });
@@ -173,7 +181,7 @@ describe('Promise Resolution Validation Tests', () => {
 
       // Register the task
       await mockCluster.task(processPageTask);
-      
+
       // Verify the task function was captured
       expect(capturedTaskFunction).toBe(processPageTask);
 
@@ -188,7 +196,7 @@ describe('Promise Resolution Validation Tests', () => {
           url: testUrl,
           date: '2025-06-28',
           libraries: [],
-          prebidInstances: []
+          prebidInstances: [],
         }),
         url: vi.fn().mockReturnValue(testUrl),
         title: vi.fn().mockResolvedValue('Test Page'),
@@ -197,7 +205,7 @@ describe('Promise Resolution Validation Tests', () => {
 
       const result = await capturedTaskFunction({
         page: mockPage,
-        data: { url: testUrl, logger: mockLogger }
+        data: { url: testUrl, logger: mockLogger },
       });
 
       expect(result).toBeDefined();
@@ -216,7 +224,7 @@ describe('Promise Resolution Validation Tests', () => {
       const promises = urls.map(async (url) => {
         return {
           type: 'no_data' as const,
-          url
+          url,
         };
       });
 
@@ -231,7 +239,7 @@ describe('Promise Resolution Validation Tests', () => {
       });
 
       expect(taskResults).toHaveLength(3);
-      expect(taskResults.map(r => r.url)).toEqual(urls);
+      expect(taskResults.map((r) => r.url)).toEqual(urls);
     });
 
     it('should identify forEach vs for-loop differences', async () => {
@@ -243,7 +251,7 @@ describe('Promise Resolution Validation Tests', () => {
         { type: 'no_data' as const, url: 'https://c.com' },
       ];
 
-      const promises = testResults.map(result => Promise.resolve(result));
+      const promises = testResults.map((result) => Promise.resolve(result));
       const settledResults = await Promise.allSettled(promises);
 
       // Test forEach approach (current implementation)
@@ -283,12 +291,15 @@ describe('Promise Resolution Validation Tests', () => {
         { type: 'no_data' as const, url: 'https://also-valid.com' },
       ];
 
-      const promises = testData.map(data => Promise.resolve(data));
+      const promises = testData.map((data) => Promise.resolve(data));
       const settledResults = await Promise.allSettled(promises);
 
       // Strategy 1: typeof check (current implementation)
       settledResults.forEach((settled) => {
-        if (settled.status === 'fulfilled' && typeof settled.value !== 'undefined') {
+        if (
+          settled.status === 'fulfilled' &&
+          typeof settled.value !== 'undefined'
+        ) {
           results1.push(settled.value);
         }
       });
@@ -302,7 +313,11 @@ describe('Promise Resolution Validation Tests', () => {
 
       // Strategy 3: explicit null/undefined check
       settledResults.forEach((settled) => {
-        if (settled.status === 'fulfilled' && settled.value !== undefined && settled.value !== null) {
+        if (
+          settled.status === 'fulfilled' &&
+          settled.value !== undefined &&
+          settled.value !== null
+        ) {
           results3.push(settled.value);
         }
       });
@@ -312,8 +327,14 @@ describe('Promise Resolution Validation Tests', () => {
       expect(results3).toHaveLength(2); // excludes null and undefined
 
       // Strategy 2 and 3 are more robust
-      expect(results2.map(r => r.url)).toEqual(['https://valid.com', 'https://also-valid.com']);
-      expect(results3.map(r => r.url)).toEqual(['https://valid.com', 'https://also-valid.com']);
+      expect(results2.map((r) => r.url)).toEqual([
+        'https://valid.com',
+        'https://also-valid.com',
+      ]);
+      expect(results3.map((r) => r.url)).toEqual([
+        'https://valid.com',
+        'https://also-valid.com',
+      ]);
     });
   });
 
@@ -321,14 +342,18 @@ describe('Promise Resolution Validation Tests', () => {
     it('should simulate exact cluster implementation from prebid.ts', async () => {
       const taskResults: TaskResult[] = [];
       const processedUrls: Set<string> = new Set();
-      const urls = ['https://test1.com', 'https://test2.com', 'https://test3.com'];
+      const urls = [
+        'https://test1.com',
+        'https://test2.com',
+        'https://test3.com',
+      ];
 
       // Mock the exact cluster setup from prebid.ts
       const mockCluster = {
         task: vi.fn(),
         queue: vi.fn().mockImplementation(({ url, logger }) => {
           processedUrls.add(url);
-          
+
           // Simulate the exact problem: cluster.queue returns a promise
           // that resolves to undefined instead of TaskResult
           if (url === 'https://test2.com') {
@@ -339,19 +364,19 @@ describe('Promise Resolution Validation Tests', () => {
                 // but the result not being returned properly
                 const taskResult = {
                   type: 'no_data' as const,
-                  url
+                  url,
                 };
                 // The bug: resolve with undefined instead of taskResult
                 resolve(undefined);
               }, 10);
             });
           }
-          
+
           return new Promise((resolve) => {
             setTimeout(() => {
               resolve({
                 type: 'no_data' as const,
-                url
+                url,
               });
             }, 10);
           });
@@ -369,16 +394,20 @@ describe('Promise Resolution Validation Tests', () => {
         });
 
       const settledResults = await Promise.allSettled(promises);
-      
+
       settledResults.forEach((settledResult) => {
         if (settledResult.status === 'fulfilled') {
           if (typeof settledResult.value !== 'undefined') {
             taskResults.push(settledResult.value);
           } else {
-            console.warn('A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.');
+            console.warn(
+              'A task from cluster.queue (non-chunked) fulfilled but with undefined/null value.'
+            );
           }
         } else if (settledResult.status === 'rejected') {
-          console.error('A promise from cluster.queue (non-chunked) was rejected.');
+          console.error(
+            'A promise from cluster.queue (non-chunked) was rejected.'
+          );
         }
       });
 
@@ -386,9 +415,9 @@ describe('Promise Resolution Validation Tests', () => {
       expect(processedUrls.size).toBe(3); // All URLs were queued
       expect(promises).toHaveLength(3); // All promises created
       expect(taskResults).toHaveLength(2); // But only 2 results captured!
-      
+
       // The missing URL should be test2.com
-      const capturedUrls = taskResults.map(r => r.url);
+      const capturedUrls = taskResults.map((r) => r.url);
       expect(capturedUrls).toContain('https://test1.com');
       expect(capturedUrls).toContain('https://test3.com');
       expect(capturedUrls).not.toContain('https://test2.com');
@@ -396,7 +425,11 @@ describe('Promise Resolution Validation Tests', () => {
 
     it('should test potential fix: better cluster task return handling', async () => {
       const taskResults: TaskResult[] = [];
-      const urls = ['https://test1.com', 'https://test2.com', 'https://test3.com'];
+      const urls = [
+        'https://test1.com',
+        'https://test2.com',
+        'https://test3.com',
+      ];
 
       // Proposed fix: ensure cluster tasks always return proper values
       const mockCluster = {
@@ -413,7 +446,7 @@ describe('Promise Resolution Validation Tests', () => {
               url,
               date: '2025-06-28',
               libraries: [],
-              prebidInstances: []
+              prebidInstances: [],
             }),
             url: vi.fn().mockReturnValue(url),
             title: vi.fn().mockResolvedValue('Test Page'),
@@ -423,7 +456,7 @@ describe('Promise Resolution Validation Tests', () => {
           // Call processPageTask and ensure we return its result
           const result = await processPageTask({
             page: mockPage,
-            data: { url, logger }
+            data: { url, logger },
           });
 
           // The fix: always return the result, never undefined
@@ -438,7 +471,7 @@ describe('Promise Resolution Validation Tests', () => {
       });
 
       const settledResults = await Promise.allSettled(promises);
-      
+
       settledResults.forEach((settledResult) => {
         if (settledResult.status === 'fulfilled') {
           if (typeof settledResult.value !== 'undefined') {
@@ -449,8 +482,8 @@ describe('Promise Resolution Validation Tests', () => {
 
       // With the fix: all results should be captured
       expect(taskResults).toHaveLength(3);
-      expect(taskResults.map(r => r.url)).toEqual(urls);
-      expect(taskResults.every(r => r.type === 'no_data')).toBe(true);
+      expect(taskResults.map((r) => r.url)).toEqual(urls);
+      expect(taskResults.every((r) => r.type === 'no_data')).toBe(true);
     });
   });
 
@@ -463,12 +496,12 @@ describe('Promise Resolution Validation Tests', () => {
             url: 'https://example.com',
             date: '2025-06-28',
             libraries: ['googletag'],
-            prebidInstances: []
-          }
+            prebidInstances: [],
+          },
         },
         {
           type: 'no_data' as const,
-          url: 'https://example.com'
+          url: 'https://example.com',
         },
         {
           type: 'error' as const,
@@ -476,9 +509,9 @@ describe('Promise Resolution Validation Tests', () => {
           error: {
             code: 'TEST_ERROR',
             message: 'Test error',
-            stack: 'test stack'
-          }
-        }
+            stack: 'test stack',
+          },
+        },
       ];
 
       const invalidResults = [
@@ -514,13 +547,15 @@ describe('Promise Resolution Validation Tests', () => {
             url: 'https://example.com',
             date: '2025-06-28',
             libraries: ['googletag'],
-            prebidInstances: [{
-              globalVarName: 'pbjs',
-              version: '7.48.0',
-              modules: ['core']
-            }]
+            prebidInstances: [
+              {
+                globalVarName: 'pbjs',
+                version: '7.48.0',
+                modules: ['core'],
+              },
+            ],
           },
-          expectedType: 'success'
+          expectedType: 'success',
         },
         {
           name: 'no data',
@@ -528,20 +563,20 @@ describe('Promise Resolution Validation Tests', () => {
             url: 'https://example.com',
             date: '2025-06-28',
             libraries: [],
-            prebidInstances: []
+            prebidInstances: [],
           },
-          expectedType: 'no_data'
+          expectedType: 'no_data',
         },
         {
           name: 'navigation error',
           mockError: new Error('net::ERR_NAME_NOT_RESOLVED'),
-          expectedType: 'error'
-        }
+          expectedType: 'error',
+        },
       ];
 
       for (const scenario of testScenarios) {
         const mockPage = {
-          goto: scenario.mockError 
+          goto: scenario.mockError
             ? vi.fn().mockRejectedValue(scenario.mockError)
             : vi.fn().mockResolvedValue(undefined),
           setDefaultTimeout: vi.fn(),
@@ -556,7 +591,7 @@ describe('Promise Resolution Validation Tests', () => {
 
         const result = await processPageTask({
           page: mockPage,
-          data: { url: 'https://example.com', logger: mockLogger }
+          data: { url: 'https://example.com', logger: mockLogger },
         });
 
         // Verify result is never undefined/null and has correct structure
@@ -565,7 +600,7 @@ describe('Promise Resolution Validation Tests', () => {
         expect(result).not.toBe(undefined);
         expect(typeof result).toBe('object');
         expect(result.type).toBe(scenario.expectedType);
-        
+
         // Type-specific validations
         if (result.type === 'success') {
           expect((result as any).data).toBeDefined();

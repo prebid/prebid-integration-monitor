@@ -63,7 +63,9 @@ function formatSplatMetadata(splat: any): string {
  * @param {Logform.TransformableInfo} info - The log information object.
  * @returns {string} The formatted log message.
  */
-export function formatConsoleLogMessage(info: Logform.TransformableInfo): string {
+export function formatConsoleLogMessage(
+  info: Logform.TransformableInfo
+): string {
   // Check if this is an error log and if verbose mode is off
   if ((info.level.includes('error') || info.stack) && !isVerbose) {
     let originalMessage: string =
@@ -250,7 +252,7 @@ export function initializeLogger(
     format: winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.errors({ stack: true }),
-      winston.format.splat(),
+      winston.format.splat()
       // Note: formatConsoleLogMessage is applied per-transport for Console
       // If testTransports are used, they need to handle their own formatting if mimicking Console
     ),

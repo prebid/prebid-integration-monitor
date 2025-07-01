@@ -81,25 +81,29 @@ This executes `node ./bin/run.js`.
 This application includes several performance optimizations for handling large-scale URL processing:
 
 ### Database Performance
+
 - **Advanced Indexing**: Composite indexes on frequently queried columns (status, timestamp, retry_count)
 - **SQLite Optimization**: WAL mode, memory mapping, and optimized pragma settings
 - **Prepared Statements**: All database queries use prepared statements for optimal performance
 - **Maintenance Operations**: Built-in database maintenance including VACUUM, ANALYZE, and cleanup
 
 ### Content Caching
+
 - **Intelligent Caching**: GitHub content is cached to prevent redundant HTTP requests
 - **Memory-Efficient**: LRU + LFU eviction strategy with configurable size limits
 - **Persistent Storage**: Optional file-based caching with TTL support
 - **Cache Statistics**: Real-time cache performance monitoring
 
 ### Range Processing Optimization
+
 - **Selective Loading**: Process only specified URL ranges without loading entire files
 - **Memory Efficient**: Minimal memory footprint even with large domain lists
 - **Fast Processing**: Optimized for sub-second processing of large ranges
 
 ### Performance Benchmarks
+
 - **Database**: 10,000+ URL queries per second
-- **Caching**: 1,000+ cache reads per second, 200+ writes per second  
+- **Caching**: 1,000+ cache reads per second, 200+ writes per second
 - **URL Processing**: 200+ URLs per second processing rate
 - **Memory Usage**: <50MB increase for 50,000 URL datasets
 
@@ -108,18 +112,21 @@ This application includes several performance optimizations for handling large-s
 This application includes advanced optimizations specifically designed to improve Prebid.js detection accuracy and reliability:
 
 #### Enhanced Website Interaction
+
 - **Smart Navigation**: Progressive timeout strategy with intelligent retry logic for different error types
 - **Realistic User Simulation**: Mouse movements, clicks, and event triggers that activate ad tech loading
 - **Dynamic Content Loading**: Intelligent scrolling with pause points to allow ad content to load
 - **Popup Dismissal**: Automatic detection and dismissal of cookie banners, modals, and other blocking elements
 
 #### Advanced Prebid Detection
+
 - **Multi-Stage Detection**: Detects Prebid instances in various initialization states (complete, partial, queue)
 - **Enhanced Polling**: Adaptive polling intervals with frame-safe error handling
 - **Ad Tech Initialization**: Waits for common ad technology signals before attempting detection
 - **Robust Error Handling**: Retries for detached frame errors and other temporary failures
 
 #### Browser Authenticity
+
 - **Realistic Browser Profile**: Authentic user agents, viewport sizes, and browser properties
 - **Anti-Detection**: Removes automation markers and sets realistic hardware characteristics
 - **Enhanced Stealth**: Automatic permission denial and popup blocking for uninterrupted scanning
@@ -127,6 +134,7 @@ This application includes advanced optimizations specifically designed to improv
 ### Configuration Options
 
 #### Database Optimization
+
 ```bash
 # Enable database maintenance
 node ./bin/run.js scan --maintenance --vacuum --analyze
@@ -136,6 +144,7 @@ node ./bin/run.js scan --verbose --logDir=performance-logs
 ```
 
 #### Content Caching
+
 ```bash
 # Cache is automatically enabled for GitHub sources
 # Cache statistics available in verbose logs
@@ -143,6 +152,7 @@ node ./bin/run.js scan --githubRepo URL --verbose
 ```
 
 #### Range Processing
+
 ```bash
 # Process large lists efficiently with ranges
 node ./bin/run.js scan --githubRepo URL --range="10000-20000" --batchMode
@@ -382,6 +392,7 @@ The `inspect` command fetches data from a given URL and stores the HTTP request 
 ## Running Tests
 
 ### Basic Testing
+
 To run the basic test suite using Vitest:
 
 ```bash
@@ -389,6 +400,7 @@ npm test
 ```
 
 ### Comprehensive Validation
+
 To run the complete validation pipeline (recommended before commits):
 
 ```bash
@@ -396,8 +408,9 @@ npm run validate:all
 ```
 
 This runs:
+
 - TypeScript type checking
-- ESLint code linting  
+- ESLint code linting
 - Prettier code formatting
 - Documentation synchronization
 - All unit tests
@@ -421,6 +434,7 @@ npm run test:critical
 ```
 
 ### Pre-commit Validation
+
 Set up automatic validation before commits:
 
 ```bash

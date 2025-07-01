@@ -11,9 +11,12 @@ export const DEFAULT_USER_AGENT =
  * Alternative user agent strings for different platforms
  */
 export const USER_AGENT_STRINGS = {
-  macos: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-  windows: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-  linux: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
+  macos:
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+  windows:
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+  linux:
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
 } as const;
 
 /**
@@ -84,7 +87,7 @@ export const ENHANCED_PUPPETEER_ARGS = [
   '--no-sandbox',
   '--disable-setuid-sandbox',
   '--disable-dev-shm-usage',
-  
+
   // Performance and stability
   '--disable-background-networking',
   '--disable-background-timer-throttling',
@@ -92,7 +95,7 @@ export const ENHANCED_PUPPETEER_ARGS = [
   '--disable-renderer-backgrounding',
   '--disable-features=TranslateUI',
   '--disable-ipc-flooding-protection',
-  
+
   // Security and privacy
   '--disable-client-side-phishing-detection',
   '--disable-default-apps',
@@ -101,26 +104,26 @@ export const ENHANCED_PUPPETEER_ARGS = [
   '--disable-prompt-on-repost',
   '--disable-sync',
   '--disable-web-security',
-  
+
   // Media and notifications
   '--disable-notifications',
   '--disable-permissions-api',
   '--disable-geolocation',
   '--disable-speech-api',
   '--disable-device-discovery-notifications',
-  
+
   // Memory and resource management
   '--memory-pressure-off',
   '--max_old_space_size=4096',
   '--disable-background-networking',
-  
+
   // Graphics and rendering (for headless compatibility)
   '--disable-gpu',
   '--disable-software-rasterizer',
   '--disable-canvas-aa',
   '--disable-2d-canvas-clip-aa',
   '--disable-gl-drawing-for-tests',
-  
+
   // Network and certificates
   '--ignore-certificate-errors',
   '--ignore-ssl-errors',
@@ -128,17 +131,17 @@ export const ENHANCED_PUPPETEER_ARGS = [
   '--ignore-certificate-errors-policy',
   '--disable-extensions-except',
   '--disable-extensions',
-  
+
   // User experience
   '--no-first-run',
   '--no-default-browser-check',
   '--disable-infobars',
   '--disable-session-crashed-bubble',
   '--disable-restore-session-state',
-  
+
   // Additional stability flags
   '--disable-blink-features=AutomationControlled',
-  '--disable-features=VizDisplayCompositor'
+  '--disable-features=VizDisplayCompositor',
 ] as const;
 
 /**

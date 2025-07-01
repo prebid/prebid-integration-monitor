@@ -48,8 +48,23 @@ import {
 
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
 import { filterValidUrls } from './utils/domain-validator.js';
+import {
+  PageLifecycleTracer,
+  ClusterHealthMonitor,
+  withPageTelemetry,
+} from './utils/puppeteer-telemetry.js';
+import { processUrlsWithRecovery } from './utils/cluster-wrapper.js';
+import { processUrlsWithBrowserPool } from './utils/browser-pool.js';
 import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
-import { initializeTelemetry, URLLoadingTracer, URLFilteringTracer } from './utils/telemetry.js';
+import {
+  initializeTelemetry,
+  URLLoadingTracer,
+  URLFilteringTracer,
+} from './utils/telemetry.js';
+import {
+  installProcessErrorHandler,
+  uninstallProcessErrorHandler,
+} from './utils/process-error-handler.js';
 
 /**
  * Defines the configuration options for the `prebidExplorer` function.
@@ -178,14 +193,17 @@ export async function prebidExplorer(
   logger = initializeLogger(options.logDir); // Initialize the global logger
   initializeTelemetry('prebid-integration-monitor');
 
+  // Install global error handlers to catch puppeteer-cluster errors
+  installProcessErrorHandler(logger);
+
   logger.info('Starting Prebid Explorer with options:', options);
-  
+
   // Initialize error file headers for better organization
   createErrorFileHeaders(logger);
 
   // Initialize URL tracker for deduplication
   const urlTracker = getUrlTracker(logger);
-  
+
   // Reset tracking if requested
   if (options.resetTracking) {
     logger.info('Resetting URL tracking database...');
@@ -196,7 +214,9 @@ export async function prebidExplorer(
   if (options.skipProcessed) {
     const stats = urlTracker.getStats();
     if (Object.keys(stats).length === 0) {
-      logger.info('URL tracking database is empty. Importing existing results...');
+      logger.info(
+        'URL tracking database is empty. Importing existing results...'
+      );
       await urlTracker.importExistingResults(path.join(process.cwd(), 'store'));
     }
     logger.info('URL tracker statistics:', stats);
@@ -249,7 +269,7 @@ export async function prebidExplorer(
     headless: options.headless,
     args: [
       ...ENHANCED_PUPPETEER_ARGS, // Use enhanced args for better stability
-      ...(options.puppeteerLaunchOptions?.args || []) // Allow additional custom args
+      ...(options.puppeteerLaunchOptions?.args || []), // Allow additional custom args
     ],
     ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
   };
@@ -264,22 +284,25 @@ export async function prebidExplorer(
   let urlSourceType = ''; // To track the source for logging and file updates
 
   // Determine the source of URLs (GitHub or local file) and fetch them.
-  const urlLoadingTracer = new URLLoadingTracer(options.githubRepo || options.inputFile || 'unknown', logger);
-  
+  const urlLoadingTracer = new URLLoadingTracer(
+    options.githubRepo || options.inputFile || 'unknown',
+    logger
+  );
+
   if (options.githubRepo) {
     urlSourceType = 'GitHub';
-    
+
     // Parse range for optimization
     let rangeOptions: { startRange?: number; endRange?: number } | undefined;
     if (options.range) {
       const [startStr, endStr] = options.range.split('-');
       rangeOptions = {
         startRange: startStr ? parseInt(startStr, 10) : undefined,
-        endRange: endStr ? parseInt(endStr, 10) : undefined
+        endRange: endStr ? parseInt(endStr, 10) : undefined,
       };
       logger.info(`Using optimized range processing: ${options.range}`);
     }
-    
+
     const urlLimit = options.range ? undefined : options.numUrls;
     allUrls = await fetchUrlsFromGitHub(
       options.githubRepo,
@@ -357,7 +380,7 @@ export async function prebidExplorer(
   // Apply URL range filtering if specified in options, but only for non-GitHub sources
   // (GitHub sources already apply range optimization during fetching)
   const filteringTracer = new URLFilteringTracer(allUrls.length, logger);
-  
+
   if (options.range && urlSourceType !== 'GitHub') {
     logger.info(`Applying range: ${options.range}`);
     const originalUrlCount = allUrls.length;
@@ -387,15 +410,25 @@ export async function prebidExplorer(
         allUrls = allUrls.slice(start);
       } else {
         allUrls = allUrls.slice(start, end); // end is exclusive for slice, matches 0-based end index
-        filteringTracer.recordRangeFiltering(originalUrlCount, allUrls.length, options.range);
+        filteringTracer.recordRangeFiltering(
+          originalUrlCount,
+          allUrls.length,
+          options.range
+        );
         logger.info(
           `Applied range: Processing URLs from ${start + 1} to ${Math.min(end, originalUrlCount)} (0-based index ${start} to ${Math.min(end, originalUrlCount) - 1}). Total URLs after range: ${allUrls.length} (out of ${originalUrlCount}).`
         );
       }
     }
   } else if (options.range && urlSourceType === 'GitHub') {
-    logger.info(`Range ${options.range} already applied during GitHub fetch optimization. Skipping duplicate range filtering.`);
-    filteringTracer.recordRangeFiltering(allUrls.length, allUrls.length, options.range);
+    logger.info(
+      `Range ${options.range} already applied during GitHub fetch optimization. Skipping duplicate range filtering.`
+    );
+    filteringTracer.recordRangeFiltering(
+      allUrls.length,
+      allUrls.length,
+      options.range
+    );
   }
 
   if (allUrls.length === 0) {
@@ -411,52 +444,78 @@ export async function prebidExplorer(
   // Pre-filter processed URLs if requested (more efficient for large lists)
   if (options.prefilterProcessed) {
     logger.info('Pre-filtering processed URLs before loading full range...');
-    
+
     // Analyze the current range efficiency
     if (options.range) {
       const [startStr, endStr] = options.range.split('-');
       const start = startStr ? parseInt(startStr, 10) - 1 : 0; // Convert to 0-based
       const end = endStr ? parseInt(endStr, 10) : allUrls.length;
-      
+
       // Reload all URLs temporarily to analyze efficiency
       let fullUrlList: string[] = [];
       if (options.githubRepo) {
-        fullUrlList = await fetchUrlsFromGitHub(options.githubRepo, undefined, logger);
+        fullUrlList = await fetchUrlsFromGitHub(
+          options.githubRepo,
+          undefined,
+          logger
+        );
       } else if (options.inputFile) {
         const fileContent = loadFileContents(options.inputFile, logger);
         if (fileContent) {
-          fullUrlList = await processFileContent(options.inputFile, fileContent, logger);
+          fullUrlList = await processFileContent(
+            options.inputFile,
+            fileContent,
+            logger
+          );
         }
       }
-      
+
       if (fullUrlList.length > 0) {
-        const analysis = urlTracker.analyzeUrlRange(start, Math.min(end, fullUrlList.length), fullUrlList);
-        
+        const analysis = urlTracker.analyzeUrlRange(
+          start,
+          Math.min(end, fullUrlList.length),
+          fullUrlList
+        );
+
         logger.info('Range analysis results:', {
           totalInRange: analysis.totalInRange,
           processedCount: analysis.processedCount,
           unprocessedCount: analysis.unprocessedCount,
-          processedPercentage: analysis.processedPercentage.toFixed(1) + '%'
+          processedPercentage: analysis.processedPercentage.toFixed(1) + '%',
         });
-        
+
         if (analysis.isFullyProcessed) {
-          logger.info('🎯 RANGE FULLY PROCESSED: All URLs in this range have been processed!');
-          
+          logger.info(
+            '🎯 RANGE FULLY PROCESSED: All URLs in this range have been processed!'
+          );
+
           // Suggest next ranges
-          const suggestions = urlTracker.suggestNextRanges(fullUrlList, 1000, 3);
+          const suggestions = urlTracker.suggestNextRanges(
+            fullUrlList,
+            1000,
+            3
+          );
           if (suggestions.length > 0) {
             logger.info('💡 SUGGESTED NEXT RANGES:');
             suggestions.forEach((suggestion, index) => {
-              logger.info(`   ${index + 1}. --range "${suggestion.startUrl}-${suggestion.endUrl}" (~${suggestion.estimatedUnprocessed} unprocessed, ${suggestion.efficiency.toFixed(1)}% efficiency)`);
+              logger.info(
+                `   ${index + 1}. --range "${suggestion.startUrl}-${suggestion.endUrl}" (~${suggestion.estimatedUnprocessed} unprocessed, ${suggestion.efficiency.toFixed(1)}% efficiency)`
+              );
             });
           }
-          
-          logger.info('Use --forceReprocess to reprocess this range, or choose a different range.');
+
+          logger.info(
+            'Use --forceReprocess to reprocess this range, or choose a different range.'
+          );
           closeUrlTracker();
           return;
         } else if (analysis.processedPercentage > 80) {
-          logger.warn(`⚠️  LOW EFFICIENCY: ${analysis.processedPercentage.toFixed(1)}% of URLs already processed`);
-          logger.info('Consider using --forceReprocess or choosing a different range for better efficiency.');
+          logger.warn(
+            `⚠️  LOW EFFICIENCY: ${analysis.processedPercentage.toFixed(1)}% of URLs already processed`
+          );
+          logger.info(
+            'Consider using --forceReprocess or choosing a different range for better efficiency.'
+          );
         }
       }
     }
@@ -464,44 +523,50 @@ export async function prebidExplorer(
 
   // Track URLs skipped due to skip-processed
   let urlsSkippedProcessed = 0;
-  
+
   // Handle different processing modes
   if (options.forceReprocess) {
-    logger.info('🔄 FORCE REPROCESS: Processing all URLs regardless of previous status');
+    logger.info(
+      '🔄 FORCE REPROCESS: Processing all URLs regardless of previous status'
+    );
     // Don't filter anything - process all URLs
   } else if (options.skipProcessed) {
     logger.info('Filtering out previously processed URLs...');
     const originalCount = allUrls.length;
     allUrls = urlTracker.filterUnprocessedUrls(allUrls);
     urlsSkippedProcessed = originalCount - allUrls.length;
-    filteringTracer.recordProcessedFiltering(originalCount, allUrls.length, urlsSkippedProcessed);
+    filteringTracer.recordProcessedFiltering(
+      originalCount,
+      allUrls.length,
+      urlsSkippedProcessed
+    );
     logger.info(
       `URL filtering complete: ${originalCount} total, ${allUrls.length} unprocessed, ${urlsSkippedProcessed} skipped`
     );
-    
+
     if (allUrls.length === 0) {
       logger.info('All URLs have been previously processed.');
-      
+
       // Log summary even when exiting early
       const originalUrlCount = originalCount;
       const skippedUrlCount = urlsSkippedProcessed;
       const processedUrlCount = 0;
-      
+
       logger.info('========================================');
       logger.info('SCAN SUMMARY');
       logger.info('========================================');
-      
+
       if (options.range) {
         logger.info(`📋 URL range processed: ${options.range}`);
       }
-      
+
       logger.info(`📊 Total URLs in range: ${originalUrlCount}`);
       logger.info(`🔄 URLs actually processed: ${processedUrlCount}`);
       logger.info(`⏭️  URLs skipped (already processed): ${skippedUrlCount}`);
       logger.info(`💡 All URLs in this range were previously processed.`);
       logger.info(`   Use --forceReprocess to reprocess them anyway.`);
       logger.info('========================================');
-      
+
       closeUrlTracker();
       return;
     }
@@ -522,7 +587,7 @@ export async function prebidExplorer(
     closeUrlTracker();
     return;
   }
-  
+
   filteringTracer.finish(allUrls.length);
 
   /** @type {string[]} URLs to be processed after applying range and other filters. */
@@ -552,49 +617,74 @@ export async function prebidExplorer(
 
       // Process the current chunk using either 'cluster' or 'vanilla' Puppeteer mode.
       if (options.puppeteerType === 'cluster') {
-        const cluster: Cluster<
-          { url: string; logger: WinstonLogger; discoveryMode?: boolean },
-          TaskResult
-        > = await Cluster.launch({
-          concurrency: Cluster.CONCURRENCY_CONTEXT,
-          maxConcurrency: options.concurrency,
-          monitor: options.monitor,
-          puppeteer,
-          puppeteerOptions: basePuppeteerOptions,
-        });
-
-        // Register a wrapper task that properly calls processPageTask and collects results
-        await cluster.task(async ({ page, data }) => {
-          const result = await processPageTask({ page, data });
-          // Push result directly to taskResults array since cluster.queue doesn't return values
-          taskResults.push(result);
-          return result;
-        });
+        // Use the safer processUrlsWithRecovery for chunked processing too
+        logger.info(
+          `Using enhanced cluster processing with automatic recovery for chunk ${chunkNumber}...`
+        );
 
         try {
-          const chunkPromises = currentChunkUrls
-            .filter((url) => url)
-            .map((url) => {
-              processedUrls.add(url); // Add to global processedUrls as it's queued
-              return cluster.queue({ url, logger, discoveryMode: options.discoveryMode }); // Pass url, logger, and discoveryMode
-              // No specific .then or .catch here, as results are collected from settledChunkResults
-              // Error handling for queueing itself might be needed if cluster.queue can throw directly
-              // However, task errors are handled by processPageTask and returned as TaskResultError.
-            });
-          // Wait for all promises in the chunk to settle
-          await Promise.allSettled(chunkPromises);
-          // Results are now collected directly in the cluster task handler
-          await cluster.idle();
-          await cluster.close();
-        } catch (error: unknown) {
-          logger.error(
-            `An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`,
-            { error }
+          await processUrlsWithRecovery(
+            currentChunkUrls,
+            {
+              concurrency: options.concurrency,
+              maxConcurrency: options.concurrency,
+              monitor: options.monitor,
+              puppeteer,
+              puppeteerOptions: basePuppeteerOptions,
+              logger,
+              maxRetries: 2,
+              onTaskComplete: (result) => {
+                // Track results as they complete
+                taskResults.push(result);
+                const url =
+                  result.type === 'error' || result.type === 'no_data'
+                    ? result.url
+                    : result.data.url;
+                if (url) {
+                  processedUrls.add(url);
+                }
+              },
+            },
+            (processed, total) => {
+              // Progress callback for chunk
+              if (processed % 10 === 0 || processed === total) {
+                logger.info(
+                  `Chunk ${chunkNumber} progress: ${processed}/${total} URLs processed`
+                );
+              }
+            }
           );
-          // Cast cluster to any before calling isClosed and close
-          if (cluster && !(cluster as any).isClosed())
-            // Changed cast
-            await (cluster as any).close(); // Ensure cluster is closed on error
+
+          // Results are already added via onTaskComplete callback
+          // Just ensure all URLs are marked as processed
+          currentChunkUrls.forEach((url) => processedUrls.add(url));
+        } catch (error) {
+          logger.error(
+            `Fatal error in chunk ${chunkNumber} cluster processing:`,
+            error
+          );
+
+          // Add error results for any URLs in this chunk that weren't processed
+          for (const url of currentChunkUrls) {
+            if (
+              !taskResults.some(
+                (r) =>
+                  (r.type === 'error' || r.type === 'no_data'
+                    ? r.url
+                    : r.data?.url) === url
+              )
+            ) {
+              taskResults.push({
+                type: 'error',
+                url: url,
+                error: {
+                  code: 'CHUNK_PROCESSING_ERROR',
+                  message: `Chunk ${chunkNumber} processing failed: ${(error as Error).message}`,
+                  stack: (error as Error).stack,
+                },
+              });
+            }
+          }
         }
       } else {
         // 'vanilla' Puppeteer for the current chunk
@@ -632,7 +722,67 @@ export async function prebidExplorer(
     logger.info(
       `Processing all ${urlsToProcess.length} URLs without chunking.`
     );
-    if (options.puppeteerType === 'cluster') {
+
+    // Use safer cluster processing for better stability
+    if (options.puppeteerType === 'cluster' && urlsToProcess.length > 0) {
+      logger.info(
+        'Using enhanced cluster processing with automatic recovery...'
+      );
+
+      try {
+        const clusterResults = await processUrlsWithRecovery(
+          urlsToProcess,
+          {
+            concurrency: options.concurrency,
+            maxConcurrency: options.concurrency,
+            monitor: options.monitor,
+            puppeteer,
+            puppeteerOptions: basePuppeteerOptions,
+            logger,
+            maxRetries: 2,
+          },
+          (processed, total) => {
+            if (processed % 10 === 0) {
+              logger.info(`Progress: ${processed}/${total} URLs processed`);
+            }
+          }
+        );
+
+        taskResults.push(...clusterResults);
+        urlsToProcess.forEach((url) => processedUrls.add(url));
+      } catch (error) {
+        logger.error(
+          'Cluster processing failed, falling back to browser pool:',
+          error
+        );
+
+        // Fallback to browser pool if cluster fails
+        try {
+          logger.info('Using browser pool as fallback...');
+          const poolResults = await processUrlsWithBrowserPool(
+            urlsToProcess,
+            {
+              concurrency: options.concurrency,
+              puppeteerOptions: basePuppeteerOptions,
+              logger,
+            },
+            (processed, total) => {
+              if (processed % 10 === 0) {
+                logger.info(
+                  `Progress: ${processed}/${total} URLs processed (browser pool)`
+                );
+              }
+            }
+          );
+
+          taskResults.push(...poolResults);
+          urlsToProcess.forEach((url) => processedUrls.add(url));
+        } catch (poolError) {
+          logger.error('Browser pool also failed:', poolError);
+          throw poolError;
+        }
+      }
+    } else if (options.puppeteerType === 'cluster') {
       const cluster: Cluster<
         { url: string; logger: WinstonLogger; discoveryMode?: boolean },
         TaskResult
@@ -644,12 +794,117 @@ export async function prebidExplorer(
         puppeteerOptions: basePuppeteerOptions,
       });
 
+      // Create cluster health monitor
+      const clusterHealthMonitor = new ClusterHealthMonitor(logger);
+      clusterHealthMonitor.startMonitoring(cluster);
+
+      // Register cluster error handlers
+      cluster.on('taskerror', (err, data) => {
+        // Only log debug level for common lifecycle errors
+        if (
+          err.message &&
+          err.message.includes('Requesting main frame too early')
+        ) {
+          logger.debug(
+            `Main frame lifecycle error for ${data.url}: ${err.message}`
+          );
+
+          // Create error result to ensure it's tracked
+          const errorResult: TaskResult = {
+            type: 'error',
+            url: data.url,
+            error: {
+              code: 'PUPPETEER_MAIN_FRAME_ERROR',
+              message: err.message,
+              stack: err.stack,
+            },
+          };
+
+          // Ensure the error is recorded
+          if (
+            !taskResults.some(
+              (r) =>
+                (r.type === 'error' || r.type === 'no_data') &&
+                r.url === data.url
+            )
+          ) {
+            taskResults.push(errorResult);
+          }
+        } else {
+          logger.error(`Cluster task error for ${data.url}:`, err);
+        }
+      });
+
       // Register a wrapper task that properly calls processPageTask and collects results
       await cluster.task(async ({ page, data }) => {
-        const result = await processPageTask({ page, data });
-        // Push result directly to taskResults array since cluster.queue doesn't return values
-        taskResults.push(result);
-        return result;
+        const pageTracer = new PageLifecycleTracer(data.url, logger);
+        const span = pageTracer.startPageProcessing();
+
+        try {
+          // Set aggressive timeouts to prevent hanging
+          await page.setDefaultTimeout(30000); // 30 second timeout
+          await page.setDefaultNavigationTimeout(30000);
+
+          // Setup page event handlers for tracking
+          pageTracer.setupPageEventHandlers(page);
+
+          // Add page error handler to catch frame errors
+          page.on('error', (error) => {
+            if (error.message.includes('Requesting main frame too early')) {
+              logger.debug(
+                `Page lifecycle error for ${data.url}: ${error.message}`
+              );
+              // Don't let this crash the cluster
+              pageTracer.recordEvent('critical_main_frame_error', error);
+            } else {
+              logger.error(`Page error for ${data.url}:`, error);
+            }
+          });
+
+          const result = await processPageTask({ page, data });
+          taskResults.push(result);
+          pageTracer.finish(
+            true,
+            result.type === 'success' ? result.data : undefined
+          );
+          return result;
+        } catch (error: unknown) {
+          const err = error as Error;
+          pageTracer.finishWithError(err);
+
+          // Handle "Requesting main frame too early" error specifically
+          if (
+            err.message &&
+            err.message.includes('Requesting main frame too early')
+          ) {
+            logger.debug(
+              `Puppeteer lifecycle error for ${data.url}: ${err.message}`
+            );
+            const errorResult: TaskResult = {
+              type: 'error',
+              url: data.url,
+              error: {
+                code: 'PUPPETEER_MAIN_FRAME_ERROR',
+                message: err.message,
+                stack: err.stack,
+              },
+            };
+            taskResults.push(errorResult);
+            return errorResult;
+          }
+          // For other errors, also return error result instead of throwing
+          const errorResult: TaskResult = {
+            type: 'error',
+            url: data.url,
+            error: {
+              code: 'UNKNOWN_ERROR',
+              message: err.message,
+              stack: err.stack,
+            },
+          };
+          taskResults.push(errorResult);
+          return errorResult;
+        }
       });
 
       try {
@@ -657,12 +912,43 @@ export async function prebidExplorer(
           .filter((url) => url)
           .map((url) => {
             processedUrls.add(url);
-            return cluster.queue({ url, logger, discoveryMode: options.discoveryMode });
+
+            // Wrap cluster.queue in try-catch to handle queue errors
+            try {
+              return cluster.queue({
+                url,
+                logger,
+                discoveryMode: options.discoveryMode,
+              });
+            } catch (queueError) {
+              logger.error(`Failed to queue URL ${url}:`, queueError);
+              // Create error result for queue failures
+              const errorResult: TaskResult = {
+                type: 'error',
+                url: url,
+                error: {
+                  code: 'QUEUE_ERROR',
+                  message: (queueError as Error).message,
+                  stack: (queueError as Error).stack,
+                },
+              };
+              taskResults.push(errorResult);
+              return Promise.resolve(); // Return resolved promise to continue
+            }
           });
+
         await Promise.allSettled(promises);
+
+        // Check cluster health before closing
+        const healthStatus = clusterHealthMonitor.getHealthStatus();
+        if (!healthStatus.healthy) {
+          logger.warn('Cluster unhealthy at end of processing:', healthStatus);
+        }
+
         // Results are now collected directly in the cluster task handler
         await cluster.idle();
         await cluster.close();
+        clusterHealthMonitor.stopMonitoring();
       } catch (error: unknown) {
         logger.error(
           'An unexpected error occurred during cluster processing orchestration',
@@ -722,27 +1008,31 @@ export async function prebidExplorer(
   }
 
   // Generate comprehensive processing summary
-  const originalUrlCount = allUrls.length + (preFilterCount - allUrls.length) + urlsSkippedProcessed; // Total before any filtering
+  const originalUrlCount =
+    allUrls.length + (preFilterCount - allUrls.length) + urlsSkippedProcessed; // Total before any filtering
   const skippedUrlCount = urlsSkippedProcessed;
   const processedUrlCount = taskResults.length;
-  
+
   // Debug logging to understand what's happening
   logger.debug('Processing summary calculation:', {
     'allUrls.length': allUrls.length,
-    'preFilterCount': preFilterCount,
-    'urlsSkippedProcessed': urlsSkippedProcessed,
-    'originalUrlCount': originalUrlCount,
-    'processedUrlCount': processedUrlCount,
-    'taskResults.length': taskResults.length
+    preFilterCount: preFilterCount,
+    urlsSkippedProcessed: urlsSkippedProcessed,
+    originalUrlCount: originalUrlCount,
+    processedUrlCount: processedUrlCount,
+    'taskResults.length': taskResults.length,
   });
   const successfulExtractions = successfulResults.length;
-  const errorCount = taskResults.filter(r => r.type === 'error').length;
-  const noDataCount = taskResults.filter(r => r.type === 'no_data').length;
-  
+  const errorCount = taskResults.filter((r) => r.type === 'error').length;
+  const noDataCount = taskResults.filter((r) => r.type === 'no_data').length;
+
   // Get final database statistics
   const finalStats = urlTracker.getStats();
-  const totalInDatabase = Object.values(finalStats).reduce((sum, count) => sum + count, 0);
-  
+  const totalInDatabase = Object.values(finalStats).reduce(
+    (sum, count) => sum + count,
+    0
+  );
+
   // Check if output file was created
   const today = new Date().toISOString().slice(0, 10);
   const outputPath = `store/Jun-2025/${today}.json`;
@@ -758,67 +1048,79 @@ export async function prebidExplorer(
   logger.info('========================================');
   logger.info('SCAN SUMMARY');
   logger.info('========================================');
-  
+
   if (options.range) {
     logger.info(`📋 URL range processed: ${options.range}`);
   }
-  
+
   logger.info(`📊 Total URLs in range: ${originalUrlCount}`);
   logger.info(`🔄 URLs actually processed: ${processedUrlCount}`);
-  
+
   // Always show skipped count when using skipProcessed, even if 0
   if (options.skipProcessed) {
     logger.info(`⏭️  URLs skipped (already processed): ${skippedUrlCount}`);
-    
+
     // Add helpful context when all URLs are skipped
     if (skippedUrlCount > 0 && processedUrlCount === 0) {
       logger.info(`💡 All URLs in this range were previously processed.`);
       logger.info(`   Use --forceReprocess to reprocess them anyway.`);
     }
   }
-  
+
   logger.info(`🎯 Successful data extractions: ${successfulExtractions}`);
   logger.info(`⚠️  Errors encountered: ${errorCount}`);
   logger.info(`🚫 No ad tech found: ${noDataCount}`);
-  
+
   if (outputFileCreated) {
     logger.info(`📁 Output file created: ${outputPath}`);
   } else {
     logger.info(`📁 No output file created (no successful extractions)`);
   }
-  
-  logger.info(`💾 Database total: ${totalInDatabase.toLocaleString()} processed URLs`);
-  
+
+  logger.info(
+    `💾 Database total: ${totalInDatabase.toLocaleString()} processed URLs`
+  );
+
   // Add helpful guidance
   if (successfulExtractions === 0 && processedUrlCount === 0) {
     logger.info('');
     logger.info('💡 No data was extracted because:');
     if (skippedUrlCount > 0) {
-      logger.info(`   • ${skippedUrlCount} URLs were already processed (use --resetTracking to reprocess)`);
+      logger.info(
+        `   • ${skippedUrlCount} URLs were already processed (use --resetTracking to reprocess)`
+      );
     }
     if (noDataCount > 0) {
       logger.info(`   • ${noDataCount} URLs had no ad technology detected`);
     }
     if (errorCount > 0) {
-      logger.info(`   • ${errorCount} URLs encountered errors during processing`);
+      logger.info(
+        `   • ${errorCount} URLs encountered errors during processing`
+      );
     }
     if (skippedUrlCount === originalUrlCount) {
-      logger.info('   • All URLs in this range have been previously processed!');
+      logger.info(
+        '   • All URLs in this range have been previously processed!'
+      );
     }
   }
-  
+
   if (options.skipProcessed) {
     logger.info('');
     logger.info('🔧 Options for next run:');
     if (skippedUrlCount === originalUrlCount) {
-      logger.info('   • Process new range (all URLs in current range already done)');
+      logger.info(
+        '   • Process new range (all URLs in current range already done)'
+      );
       if (options.range) {
         const rangeMatch = options.range.match(/(\d+)-(\d+)/);
         if (rangeMatch) {
           const endNum = parseInt(rangeMatch[2]);
           const suggestedStart = endNum + 1;
           const suggestedEnd = endNum + 1000;
-          logger.info(`   • Suggested: --range "${suggestedStart}-${suggestedEnd}"`);
+          logger.info(
+            `   • Suggested: --range "${suggestedStart}-${suggestedEnd}"`
+          );
         }
       }
     } else {
@@ -827,9 +1129,12 @@ export async function prebidExplorer(
     logger.info('   • Reprocess this range: --resetTracking');
     logger.info('   • Process without deduplication: remove --skipProcessed');
   }
-  
+
   logger.info('========================================');
 
   // Close URL tracker connection
   closeUrlTracker();
+
+  // Uninstall process error handlers
+  uninstallProcessErrorHandler();
 }

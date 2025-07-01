@@ -53,11 +53,11 @@ describe('Scan CLI with URL Deduplication', () => {
   const testDir = path.join(process.cwd(), 'test-cli-temp');
   const testUrlsFile = path.join(testDir, 'test-urls.txt');
   const testDbPath = path.join(testDir, 'data', 'url-tracker.db');
-  
+
   beforeAll(async () => {
     // Ensure the CLI is built
     await executeCommand('npm run build');
-    
+
     // Create test directory
     if (!fs.existsSync(testDir)) {
       fs.mkdirSync(testDir, { recursive: true });
@@ -73,14 +73,10 @@ describe('Scan CLI with URL Deduplication', () => {
 
   beforeEach(() => {
     // Create test URLs file
-    const testUrls = [
-      'example.com',
-      'test.com',
-      'google.com'
-    ].join('\\n');
-    
+    const testUrls = ['example.com', 'test.com', 'google.com'].join('\\n');
+
     fs.writeFileSync(testUrlsFile, testUrls);
-    
+
     // Clean up any existing database
     if (fs.existsSync(testDbPath)) {
       fs.unlinkSync(testDbPath);
@@ -96,7 +92,9 @@ describe('Scan CLI with URL Deduplication', () => {
 
       expect(result.code).toBe(0);
       expect(result.stdout).toContain('--skipProcessed');
-      expect(result.stdout).toContain('Skip URLs that have been previously processed');
+      expect(result.stdout).toContain(
+        'Skip URLs that have been previously processed'
+      );
     });
 
     it('should work with --skipProcessed flag and dry run', async () => {
@@ -164,8 +162,12 @@ describe('Scan CLI with URL Deduplication', () => {
       );
 
       expect(result.code).toBe(0);
-      expect(result.stdout).toContain('Skip URLs that have been previously processed successfully');
-      expect(result.stdout).toContain('Reset the URL tracking database before starting');
+      expect(result.stdout).toContain(
+        'Skip URLs that have been previously processed successfully'
+      );
+      expect(result.stdout).toContain(
+        'Reset the URL tracking database before starting'
+      );
     });
   });
 
@@ -201,7 +203,7 @@ describe('Scan CLI with URL Deduplication', () => {
   describe('Database creation', () => {
     it('should create database when skipProcessed is used', async () => {
       const dataDir = path.join(testDir, 'data');
-      
+
       // Ensure data directory doesn't exist initially
       if (fs.existsSync(dataDir)) {
         fs.rmSync(dataDir, { recursive: true });
@@ -234,7 +236,7 @@ describe('Scan CLI with URL Deduplication', () => {
       if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir, { recursive: true });
       }
-      
+
       const dbPath = path.join(dataDir, 'url-tracker.db');
       fs.writeFileSync(dbPath, 'invalid database content');
 
@@ -245,7 +247,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
       // Should still complete (may recreate database)
       expect(result.code).toBe(0);
-      
+
       // Clean up
       if (fs.existsSync(dbPath)) {
         fs.unlinkSync(dbPath);

@@ -48,7 +48,10 @@ import { formatConsoleLogMessage } from '../logger'; // This is not exported, ne
 // With MockTransport, the assertions will change.
 
 // Import the newly exported items for direct testing
-import { formatConsoleLogMessage as directFormatConsoleLogMessage, setTestIsVerbose } from '../logger';
+import {
+  formatConsoleLogMessage as directFormatConsoleLogMessage,
+  setTestIsVerbose,
+} from '../logger';
 
 // Mock fs to prevent actual directory creation during tests
 vi.mock('fs', async (importOriginal) => {
@@ -65,7 +68,12 @@ describe('Logger Module with Verbose Flag and MockTransport', () => {
 
   // Helper to simulate the info object structure after winston's formats (errors, splat, etc.)
   // but before the final printf. This is what our MockTransport will store.
-  const createRawInfo = (level: string, message: string, splatData?: any, error?: Error): Logform.TransformableInfo => {
+  const createRawInfo = (
+    level: string,
+    message: string,
+    splatData?: any,
+    error?: Error
+  ): Logform.TransformableInfo => {
     const info: Logform.TransformableInfo = {
       level,
       message,
@@ -88,7 +96,6 @@ describe('Logger Module with Verbose Flag and MockTransport', () => {
     return info;
   };
 
-
   describe('Verbose Mode OFF', () => {
     beforeEach(() => {
       mockTransport = new MockTransport();
@@ -97,8 +104,10 @@ describe('Logger Module with Verbose Flag and MockTransport', () => {
 
     it('should have error message and stack in log info, for non-verbose (formatting happens later)', () => {
       const logger = loggerModule.instance;
-      const errorMessage = 'Error: Failed to fetch URL: http://example.com/api due to timeout at Test.operation (test.js:12:34)';
-      const errorStack = 'Error: Failed to fetch URL: http://example.com/api due to timeout\n    at Test.operation (test.js:12:34)\n    at anotherFunc (test.js:56:78)';
+      const errorMessage =
+        'Error: Failed to fetch URL: http://example.com/api due to timeout at Test.operation (test.js:12:34)';
+      const errorStack =
+        'Error: Failed to fetch URL: http://example.com/api due to timeout\n    at Test.operation (test.js:12:34)\n    at anotherFunc (test.js:56:78)';
 
       logger.error(errorMessage, { stack: errorStack }); // Pass stack as metadata
 
@@ -117,8 +126,10 @@ describe('Logger Module with Verbose Flag and MockTransport', () => {
 
     it('should log generic errors with message and stack to transport, for non-verbose', () => {
       const logger = loggerModule.instance;
-      const errorMessage = 'SyntaxError: Unexpected token < in JSON at position 0';
-      const errorStack = 'SyntaxError: Unexpected token < in JSON at position 0\n    at JSON.parse (<anonymous>)\n    at processChunk (parser.js:42:10)';
+      const errorMessage =
+        'SyntaxError: Unexpected token < in JSON at position 0';
+      const errorStack =
+        'SyntaxError: Unexpected token < in JSON at position 0\n    at JSON.parse (<anonymous>)\n    at processChunk (parser.js:42:10)';
 
       logger.error(errorMessage, { stack: errorStack });
 
@@ -138,8 +149,10 @@ describe('Logger Module with Verbose Flag and MockTransport', () => {
 
     it('should have error message and stack in log info, for verbose (formatting happens later)', () => {
       const logger = loggerModule.instance;
-      const errorMessage = 'Error: Failed to fetch URL: http://example.com/api due to timeout at Test.operation (test.js:12:34)';
-      const errorStack = 'Error: Failed to fetch URL: http://example.com/api due to timeout\n    at Test.operation (test.js:12:34)\n    at anotherFunc (test.js:56:78)';
+      const errorMessage =
+        'Error: Failed to fetch URL: http://example.com/api due to timeout at Test.operation (test.js:12:34)';
+      const errorStack =
+        'Error: Failed to fetch URL: http://example.com/api due to timeout\n    at Test.operation (test.js:12:34)\n    at anotherFunc (test.js:56:78)';
 
       logger.error(errorMessage, { stack: errorStack });
 
@@ -151,18 +164,20 @@ describe('Logger Module with Verbose Flag and MockTransport', () => {
     });
 
     it('should log generic errors with message and stack to transport, for verbose', () => {
-        const logger = loggerModule.instance;
-        const errorMessage = 'SyntaxError: Unexpected token < in JSON at position 0';
-        const errorStack = 'SyntaxError: Unexpected token < in JSON at position 0\n    at JSON.parse (<anonymous>)\n    at processChunk (parser.js:42:10)';
+      const logger = loggerModule.instance;
+      const errorMessage =
+        'SyntaxError: Unexpected token < in JSON at position 0';
+      const errorStack =
+        'SyntaxError: Unexpected token < in JSON at position 0\n    at JSON.parse (<anonymous>)\n    at processChunk (parser.js:42:10)';
 
-        logger.error(errorMessage, { stack: errorStack });
+      logger.error(errorMessage, { stack: errorStack });
 
-        expect(mockTransport.messages).toHaveLength(1);
-        const loggedInfo = mockTransport.messages[0];
-        expect(loggedInfo.level).toBe('error');
-        expect(loggedInfo.message).toBe(errorMessage);
-        expect(loggedInfo.stack).toBe(errorStack);
-      });
+      expect(mockTransport.messages).toHaveLength(1);
+      const loggedInfo = mockTransport.messages[0];
+      expect(loggedInfo.level).toBe('error');
+      expect(loggedInfo.message).toBe(errorMessage);
+      expect(loggedInfo.stack).toBe(errorStack);
+    });
   });
 
   describe('Non-Error Logging with MockTransport', () => {
@@ -194,7 +209,8 @@ describe('formatConsoleLogMessage Direct Tests', () => {
     stack?: string,
     name?: string // For simulating error.name if different from 'Error'
   ): Logform.TransformableInfo => {
-    const info: any = { // Use any to easily add symbols, or cast later
+    const info: any = {
+      // Use any to easily add symbols, or cast later
       level,
       message,
       timestamp,
@@ -217,13 +233,12 @@ describe('formatConsoleLogMessage Direct Tests', () => {
     // We need to ensure this field is present if the logic relies on it.
     // If it's an error, info.name is often used by winston.format.errors()
     if (level === 'error' && message.startsWith('Error: ')) {
-        info.name = 'Error'; // Default if message starts with "Error: "
-        info.constructor = { name : 'Error'};
+      info.name = 'Error'; // Default if message starts with "Error: "
+      info.constructor = { name: 'Error' };
     } else if (level === 'error' && message.startsWith('SyntaxError: ')) {
-        info.name = 'SyntaxError';
-        info.constructor = { name : 'SyntaxError'};
+      info.name = 'SyntaxError';
+      info.constructor = { name: 'SyntaxError' };
     }
-
 
     // Important: formatConsoleLogMessage expects info.level to be the *final string* used in output,
     // which means if colorization is part of the pipeline *before* formatConsoleLogMessage,
@@ -243,7 +258,9 @@ describe('formatConsoleLogMessage Direct Tests', () => {
     // Expected: timestamp level: URLPart OriginalMessagePart (truncated)
     // OriginalMessagePart: "Something went wrong URL: http://example.com/test with details" (after "Error: " removed)
     // URLPart: "Error processing http://example.com/test : "
-    expect(result).toBe('2023-10-27 10:00:00 error: Error processing http://example.com/test : Something went wrong URL: http://example.com/test with details');
+    expect(result).toBe(
+      '2023-10-27 10:00:00 error: Error processing http://example.com/test : Something went wrong URL: http://example.com/test with details'
+    );
   });
 
   it('Non-verbose error output: full message if " at " is not present', () => {
@@ -258,7 +275,9 @@ describe('formatConsoleLogMessage Direct Tests', () => {
     // Expected: timestamp level: URLPart OriginalMessage (no " at ")
     // OriginalMessage: "Critical failure URL: http://anotherexample.com"
     // URLPart: "Error processing http://anotherexample.com : "
-    expect(result).toBe('2023-10-27 10:00:00 error: Error processing http://anotherexample.com : Critical failure URL: http://anotherexample.com');
+    expect(result).toBe(
+      '2023-10-27 10:00:00 error: Error processing http://anotherexample.com : Critical failure URL: http://anotherexample.com'
+    );
   });
 
   it('Non-verbose error output: no URL part if URL not matched', () => {
@@ -275,10 +294,10 @@ describe('formatConsoleLogMessage Direct Tests', () => {
     expect(result).toBe('2023-10-27 10:00:00 error: Just a failure message');
   });
 
-
   it('Verbose error output: includes full message and stack', () => {
     setTestIsVerbose(true);
-    const fullErrorMessage = 'Error: Something went wrong URL: http://example.com/test with details at some/file.js:10:20';
+    const fullErrorMessage =
+      'Error: Something went wrong URL: http://example.com/test with details at some/file.js:10:20';
     const stack = `${fullErrorMessage}\n    at another/file.js:5:5`;
     const mockInfo = createMockInfo(
       'error',
@@ -288,7 +307,9 @@ describe('formatConsoleLogMessage Direct Tests', () => {
     );
     const result = directFormatConsoleLogMessage(mockInfo);
     // Expected: timestamp level: FullMessage\nStack
-    expect(result).toBe(`2023-10-27 10:00:00 error: ${fullErrorMessage}\n${stack}`);
+    expect(result).toBe(
+      `2023-10-27 10:00:00 error: ${fullErrorMessage}\n${stack}`
+    );
   });
 
   it('Non-error message (verbose false): standard output', () => {

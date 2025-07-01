@@ -6,7 +6,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Page } from 'puppeteer';
 import type { Logger as WinstonLogger } from 'winston';
-import { processPageTask, configurePage, navigateWithRetry, extractDataSafely } from '../puppeteer-task.js';
+import {
+  processPageTask,
+  configurePage,
+  navigateWithRetry,
+  extractDataSafely,
+} from '../puppeteer-task.js';
 import type { TaskResult, PageData } from '../../common/types.js';
 
 // Mock logger
@@ -51,11 +56,13 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: ['googletag'],
-        prebidInstances: [{
-          globalVarName: 'pbjs',
-          version: '7.48.0',
-          modules: ['bidderFactory', 'core']
-        }]
+        prebidInstances: [
+          {
+            globalVarName: 'pbjs',
+            version: '7.48.0',
+            modules: ['bidderFactory', 'core'],
+          },
+        ],
       };
 
       const mockPage = createMockPage({
@@ -65,14 +72,18 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: '  https://example.com  ', logger: mockLogger }
+        data: { url: '  https://example.com  ', logger: mockLogger },
       });
 
       expect(result.type).toBe('success');
       expect((result as any).data.url).toBe('https://example.com');
       expect((result as any).data.prebidInstances).toHaveLength(1);
-      expect(mockLogger.info).toHaveBeenCalledWith('Attempting to process URL: https://example.com');
-      expect(mockLogger.info).toHaveBeenCalledWith('Successfully extracted data from https://example.com');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Attempting to process URL: https://example.com'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Successfully extracted data from https://example.com'
+      );
     });
 
     it('should return success result with only ad libraries (no Prebid)', async () => {
@@ -80,7 +91,7 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: ['googletag', 'apstag'],
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       const mockPage = createMockPage({
@@ -89,7 +100,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('success');
@@ -102,7 +113,7 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: ['googletag'],
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       const mockPage = createMockPage({
@@ -111,11 +122,13 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: '  \n\t https://example.com \t\n  ', logger: mockLogger }
+        data: { url: '  \n\t https://example.com \t\n  ', logger: mockLogger },
       });
 
       expect((result as any).data.url).toBe('https://example.com');
-      expect(mockLogger.info).toHaveBeenCalledWith('Attempting to process URL: https://example.com');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Attempting to process URL: https://example.com'
+      );
     });
   });
 
@@ -125,7 +138,7 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: [],
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       const mockPage = createMockPage({
@@ -134,7 +147,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('no_data');
@@ -149,7 +162,7 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: undefined,
-        prebidInstances: []
+        prebidInstances: [],
       } as any;
 
       const mockPage = createMockPage({
@@ -158,7 +171,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('no_data');
@@ -168,12 +181,14 @@ describe('processPageTask', () => {
   describe('Error scenarios', () => {
     it('should handle DNS resolution errors', async () => {
       const mockPage = createMockPage({
-        goto: vi.fn().mockRejectedValue(new Error('net::ERR_NAME_NOT_RESOLVED')),
+        goto: vi
+          .fn()
+          .mockRejectedValue(new Error('net::ERR_NAME_NOT_RESOLVED')),
       });
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://nonexistent.invalid', logger: mockLogger }
+        data: { url: 'https://nonexistent.invalid', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -183,19 +198,23 @@ describe('processPageTask', () => {
         expect.stringContaining('Error processing https://nonexistent.invalid'),
         expect.objectContaining({
           url: 'https://nonexistent.invalid',
-          errorCode: 'ERR_NAME_NOT_RESOLVED'
+          errorCode: 'ERR_NAME_NOT_RESOLVED',
         })
       );
     });
 
     it('should handle timeout errors', async () => {
       const mockPage = createMockPage({
-        goto: vi.fn().mockRejectedValue(new Error('Navigation timeout of 30000 ms exceeded')),
+        goto: vi
+          .fn()
+          .mockRejectedValue(
+            new Error('Navigation timeout of 30000 ms exceeded')
+          ),
       });
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://slow.example.com', logger: mockLogger }
+        data: { url: 'https://slow.example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -204,12 +223,14 @@ describe('processPageTask', () => {
 
     it('should handle certificate errors', async () => {
       const mockPage = createMockPage({
-        goto: vi.fn().mockRejectedValue(new Error('net::ERR_CERT_AUTHORITY_INVALID')),
+        goto: vi
+          .fn()
+          .mockRejectedValue(new Error('net::ERR_CERT_AUTHORITY_INVALID')),
       });
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://badssl.example.com', logger: mockLogger }
+        data: { url: 'https://badssl.example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -217,7 +238,9 @@ describe('processPageTask', () => {
     });
 
     it('should handle Puppeteer timeout errors', async () => {
-      const timeoutError = new Error('Protocol error (Page.navigate): Cannot navigate to invalid URL');
+      const timeoutError = new Error(
+        'Protocol error (Page.navigate): Cannot navigate to invalid URL'
+      );
       timeoutError.name = 'TimeoutError';
 
       const mockPage = createMockPage({
@@ -226,7 +249,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -235,12 +258,18 @@ describe('processPageTask', () => {
 
     it('should handle detached frame errors', async () => {
       const mockPage = createMockPage({
-        evaluate: vi.fn().mockRejectedValue(new Error('Execution context was destroyed, most likely because of a navigation detached Frame')),
+        evaluate: vi
+          .fn()
+          .mockRejectedValue(
+            new Error(
+              'Execution context was destroyed, most likely because of a navigation detached Frame'
+            )
+          ),
       });
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -249,12 +278,16 @@ describe('processPageTask', () => {
 
     it('should handle protocol errors', async () => {
       const mockPage = createMockPage({
-        goto: vi.fn().mockRejectedValue(new Error('Protocol error (Runtime.callFunctionOn): Session closed')),
+        goto: vi
+          .fn()
+          .mockRejectedValue(
+            new Error('Protocol error (Runtime.callFunctionOn): Session closed')
+          ),
       });
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -263,12 +296,16 @@ describe('processPageTask', () => {
 
     it('should handle session closed errors', async () => {
       const mockPage = createMockPage({
-        evaluate: vi.fn().mockRejectedValue(new Error('Session closed. Most likely the page has been closed.')),
+        evaluate: vi
+          .fn()
+          .mockRejectedValue(
+            new Error('Session closed. Most likely the page has been closed.')
+          ),
       });
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -282,7 +319,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -297,7 +334,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('error');
@@ -311,7 +348,7 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: ['googletag'],
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       const mockPage = createMockPage({
@@ -320,7 +357,7 @@ describe('processPageTask', () => {
 
       await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(mockPage.setDefaultTimeout).toHaveBeenCalled();
@@ -334,11 +371,12 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: [],
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       const mockPage = createMockPage({
-        goto: vi.fn()
+        goto: vi
+          .fn()
           .mockRejectedValueOnce(new Error('Network error'))
           .mockResolvedValueOnce(undefined),
         evaluate: vi.fn().mockResolvedValue(mockPageData),
@@ -346,7 +384,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('no_data');
@@ -360,7 +398,7 @@ describe('processPageTask', () => {
         url: 'https://example.com',
         date: '2025-06-28',
         libraries: ['googletag'],
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       const mockPage = createMockPage({
@@ -369,7 +407,7 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('success');
@@ -385,14 +423,14 @@ describe('processPageTask', () => {
           {
             globalVarName: 'pbjs',
             version: '7.48.0',
-            modules: ['core', 'bidderFactory']
+            modules: ['core', 'bidderFactory'],
           },
           {
             globalVarName: 'headerBiddingPbjs',
             version: '7.49.0',
-            modules: ['core', 'bidderFactory', 'userId']
-          }
-        ]
+            modules: ['core', 'bidderFactory', 'userId'],
+          },
+        ],
       };
 
       const mockPage = createMockPage({
@@ -401,13 +439,17 @@ describe('processPageTask', () => {
 
       const result = await processPageTask({
         page: mockPage,
-        data: { url: 'https://example.com', logger: mockLogger }
+        data: { url: 'https://example.com', logger: mockLogger },
       });
 
       expect(result.type).toBe('success');
       expect((result as any).data.prebidInstances).toHaveLength(2);
-      expect((result as any).data.prebidInstances[0].globalVarName).toBe('pbjs');
-      expect((result as any).data.prebidInstances[1].globalVarName).toBe('headerBiddingPbjs');
+      expect((result as any).data.prebidInstances[0].globalVarName).toBe(
+        'pbjs'
+      );
+      expect((result as any).data.prebidInstances[1].globalVarName).toBe(
+        'headerBiddingPbjs'
+      );
     });
   });
 });

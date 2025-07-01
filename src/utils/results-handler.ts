@@ -80,10 +80,10 @@ export function processAndLogTaskResults(
         if (detailedError) {
           logger.error(
             `ERROR: Processing failed for ${taskResult.url} - Category: ${detailedError.category}/${detailedError.subCategory}, Code: ${detailedError.code}, Phase: ${detailedError.phase}`,
-            { 
-              url: taskResult.url, 
+            {
+              url: taskResult.url,
               errorDetails: taskResult.error,
-              detailedError: detailedError 
+              detailedError: detailedError,
             }
           );
         } else {
@@ -349,7 +349,7 @@ export function appendErrorUrls(
       const errorCode = error?.code || 'UNKNOWN';
       const errorMessage = error?.message || 'Unknown error';
       const timestamp = new Date().toISOString();
-      
+
       if (errorCode.includes('ERR_NAME_NOT_RESOLVED')) {
         logEntry = `${url},${errorCode}`;
         targetFile = 'navigation_errors.txt';
@@ -381,9 +381,7 @@ export function appendErrorUrls(
         const errorFilePath = path.join(errorsDir, filename);
         const content = errors.join('\n') + '\n';
         fs.appendFileSync(errorFilePath, content, 'utf8');
-        logger.info(
-          `Appended ${errors.length} errors to ${filename}`
-        );
+        logger.info(`Appended ${errors.length} errors to ${filename}`);
       }
     }
   } catch (e: unknown) {
@@ -404,7 +402,7 @@ export function appendErrorUrls(
  */
 export function createErrorFileHeaders(logger: WinstonLogger): void {
   const errorsDir = path.join(process.cwd(), 'errors');
-  
+
   // Define headers for each error file type
   const errorFileHeaders: Record<string, string> = {
     'navigation_errors.txt': `# Navigation Errors
@@ -442,7 +440,7 @@ export function createErrorFileHeaders(logger: WinstonLogger): void {
     'no_prebid.txt': `# Sites Without Prebid
 # URLs that were successfully processed but had no Prebid.js or ad tech detected
 # Format: <url>
-`
+`,
   };
 
   try {

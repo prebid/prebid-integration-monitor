@@ -29,11 +29,11 @@ const createMockPage = (url: string, shouldError: boolean = false): any => {
     url,
     date: '2025-06-28',
     libraries: [],
-    prebidInstances: []
+    prebidInstances: [],
   };
 
   return {
-    goto: shouldError 
+    goto: shouldError
       ? vi.fn().mockRejectedValue(new Error('Navigation failed'))
       : vi.fn().mockResolvedValue(undefined),
     setDefaultTimeout: vi.fn(),
@@ -53,7 +53,7 @@ const TEST_DIR = './test-count-verification';
 describe('URL Count Verification Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Create test directory
     if (existsSync(TEST_DIR)) {
       rmSync(TEST_DIR, { recursive: true, force: true });
@@ -79,20 +79,20 @@ describe('URL Count Verification Tests', () => {
       for (const url of urls) {
         processedUrls.push(url);
         const mockPage = createMockPage(url);
-        
+
         const result = await processPageTask({
           page: mockPage,
-          data: { url, logger: mockLogger }
+          data: { url, logger: mockLogger },
         });
-        
+
         results.push(result);
       }
 
       expect(processedUrls).toHaveLength(5);
       expect(results).toHaveLength(5);
       expect(processedUrls).toEqual(urls);
-      expect(results.every(r => r.type === 'no_data')).toBe(true);
-      expect(results.map(r => r.url)).toEqual(urls);
+      expect(results.every((r) => r.type === 'no_data')).toBe(true);
+      expect(results.map((r) => r.url)).toEqual(urls);
     });
 
     it('should process exactly 5 URLs in cluster mode simulation', async () => {
@@ -106,7 +106,7 @@ describe('URL Count Verification Tests', () => {
         // Simulate processPageTask result
         return {
           type: 'no_data' as const,
-          url
+          url,
         };
       });
 
@@ -123,7 +123,7 @@ describe('URL Count Verification Tests', () => {
       expect(queuedUrls).toHaveLength(5);
       expect(promises).toHaveLength(5);
       expect(taskResults).toHaveLength(5);
-      expect(taskResults.map(r => r.url)).toEqual(urls);
+      expect(taskResults.map((r) => r.url)).toEqual(urls);
     });
 
     it('should handle 5 URLs with mixed success/error results', async () => {
@@ -137,7 +137,7 @@ describe('URL Count Verification Tests', () => {
 
         const result = await processPageTask({
           page: mockPage,
-          data: { url, logger: mockLogger }
+          data: { url, logger: mockLogger },
         });
 
         results.push(result);
@@ -161,14 +161,14 @@ describe('URL Count Verification Tests', () => {
       // Simulate cluster-like processing with concurrent promises
       const promises = urls.map(async (url, index) => {
         processedUrls.add(url);
-        
+
         // Add artificial delays to simulate real processing
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 50));
-        
+        await new Promise((resolve) => setTimeout(resolve, Math.random() * 50));
+
         return {
           type: 'no_data' as const,
           url,
-          index // Track original order
+          index, // Track original order
         };
       });
 
@@ -184,9 +184,9 @@ describe('URL Count Verification Tests', () => {
 
       expect(processedUrls.size).toBe(10);
       expect(taskResults).toHaveLength(10);
-      
+
       // Verify all URLs are present regardless of processing order
-      const resultUrls = taskResults.map(r => r.url).sort();
+      const resultUrls = taskResults.map((r) => r.url).sort();
       const expectedUrls = urls.sort();
       expect(resultUrls).toEqual(expectedUrls);
     });
@@ -204,7 +204,7 @@ describe('URL Count Verification Tests', () => {
         const promises = chunkUrls.map(async (url) => {
           return {
             type: 'no_data' as const,
-            url
+            url,
           };
         });
 
@@ -222,7 +222,7 @@ describe('URL Count Verification Tests', () => {
       }
 
       expect(allResults).toHaveLength(10);
-      expect(allResults.map(r => r.url).sort()).toEqual(urls.sort());
+      expect(allResults.map((r) => r.url).sort()).toEqual(urls.sort());
     });
 
     it('should maintain count accuracy with errors in 10 URL set', async () => {
@@ -241,25 +241,25 @@ describe('URL Count Verification Tests', () => {
               error: {
                 code: 'TEST_ERROR',
                 message: 'Test error',
-                stack: 'test stack'
-              }
+                stack: 'test stack',
+              },
             }
           : {
               type: 'no_data',
-              url
+              url,
             };
 
         results.push(result);
       }
 
       expect(results).toHaveLength(10);
-      
-      const errorResults = results.filter(r => r.type === 'error');
-      const successResults = results.filter(r => r.type === 'no_data');
-      
+
+      const errorResults = results.filter((r) => r.type === 'error');
+      const successResults = results.filter((r) => r.type === 'no_data');
+
       expect(errorResults).toHaveLength(3);
       expect(successResults).toHaveLength(7);
-      expect(results.map(r => r.url)).toEqual(urls);
+      expect(results.map((r) => r.url)).toEqual(urls);
     });
   });
 
@@ -273,17 +273,17 @@ describe('URL Count Verification Tests', () => {
       // Simulate high concurrency processing
       const promises = urls.map(async (url, index) => {
         startTimes.set(url, Date.now());
-        
+
         // Simulate varying processing times
         const processingTime = 10 + Math.random() * 40;
-        await new Promise(resolve => setTimeout(resolve, processingTime));
-        
+        await new Promise((resolve) => setTimeout(resolve, processingTime));
+
         endTimes.set(url, Date.now());
-        
+
         return {
           type: 'no_data' as const,
           url,
-          processingTime
+          processingTime,
         };
       });
 
@@ -300,11 +300,11 @@ describe('URL Count Verification Tests', () => {
       expect(taskResults).toHaveLength(25);
       expect(startTimes.size).toBe(25);
       expect(endTimes.size).toBe(25);
-      
+
       // Verify all URLs processed
-      const resultUrls = new Set(taskResults.map(r => r.url));
+      const resultUrls = new Set(taskResults.map((r) => r.url));
       expect(resultUrls.size).toBe(25);
-      urls.forEach(url => expect(resultUrls.has(url)).toBe(true));
+      urls.forEach((url) => expect(resultUrls.has(url)).toBe(true));
     });
 
     it('should handle 25 URLs with batch processing and progress tracking', async () => {
@@ -312,7 +312,11 @@ describe('URL Count Verification Tests', () => {
       const batchSize = 5;
       const totalBatches = Math.ceil(urls.length / batchSize);
       const allResults: TaskResult[] = [];
-      const batchResults: { batchNumber: number; count: number; urls: string[] }[] = [];
+      const batchResults: {
+        batchNumber: number;
+        count: number;
+        urls: string[];
+      }[] = [];
 
       for (let batchNum = 1; batchNum <= totalBatches; batchNum++) {
         const startIndex = (batchNum - 1) * batchSize;
@@ -323,7 +327,7 @@ describe('URL Count Verification Tests', () => {
         const promises = batchUrls.map(async (url) => {
           return {
             type: 'no_data' as const,
-            url
+            url,
           };
         });
 
@@ -341,13 +345,13 @@ describe('URL Count Verification Tests', () => {
         batchResults.push({
           batchNumber: batchNum,
           count: currentBatchResults.length,
-          urls: currentBatchResults.map(r => r.url)
+          urls: currentBatchResults.map((r) => r.url),
         });
       }
 
       expect(allResults).toHaveLength(25);
       expect(batchResults).toHaveLength(5); // 25/5 = 5 batches
-      
+
       // Verify batch counts
       expect(batchResults[0].count).toBe(5);
       expect(batchResults[1].count).toBe(5);
@@ -356,7 +360,7 @@ describe('URL Count Verification Tests', () => {
       expect(batchResults[4].count).toBe(5);
 
       // Verify no URLs lost
-      const allProcessedUrls = batchResults.flatMap(b => b.urls);
+      const allProcessedUrls = batchResults.flatMap((b) => b.urls);
       expect(allProcessedUrls.sort()).toEqual(urls.sort());
     });
 
@@ -369,18 +373,20 @@ describe('URL Count Verification Tests', () => {
       // Simulate the problematic scenario with some undefined results
       const promises = urls.map(async (url, index) => {
         // Simulate cluster bug - some promises resolve to undefined
-        if (index % 7 === 0) { // Every 7th URL has the bug
+        if (index % 7 === 0) {
+          // Every 7th URL has the bug
           return undefined;
         }
-        
+
         // Simulate some rejections
-        if (index % 11 === 0) { // Every 11th URL rejects
+        if (index % 11 === 0) {
+          // Every 11th URL rejects
           throw new Error(`Simulated rejection for ${url}`);
         }
-        
+
         return {
           type: 'no_data' as const,
-          url
+          url,
         };
       });
 
@@ -401,18 +407,21 @@ describe('URL Count Verification Tests', () => {
       // Calculate expected counts
       const expectedUndefined = Math.floor(25 / 7) + (25 % 7 > 0 ? 1 : 0); // URLs at indices 0, 7, 14, 21
       const expectedRejected = Math.floor(25 / 11) + (25 % 11 > 0 ? 1 : 0); // URLs at indices 0, 11, 22
-      
+
       // Note: index 0 satisfies both conditions, so it's counted as undefined (first condition)
       const actualExpectedUndefined = 4; // indices 0, 7, 14, 21
       const actualExpectedRejected = 2; // indices 11, 22 (0 is already counted as undefined)
-      const expectedValid = 25 - actualExpectedUndefined - actualExpectedRejected;
+      const expectedValid =
+        25 - actualExpectedUndefined - actualExpectedRejected;
 
       expect(undefinedCount.value).toBe(actualExpectedUndefined);
       expect(rejectedCount.value).toBe(actualExpectedRejected);
       expect(taskResults).toHaveLength(expectedValid);
-      
+
       // Total should equal original count
-      expect(taskResults.length + undefinedCount.value + rejectedCount.value).toBe(25);
+      expect(
+        taskResults.length + undefinedCount.value + rejectedCount.value
+      ).toBe(25);
     });
   });
 
@@ -420,7 +429,7 @@ describe('URL Count Verification Tests', () => {
     it('should process exact ranges of URLs (10-15 from 25)', async () => {
       const allUrls = generateTestUrls(25);
       const startIndex = 9; // 1-based 10 = 0-based 9
-      const endIndex = 15;   // 1-based 15 = 0-based 14, but slice excludes end
+      const endIndex = 15; // 1-based 15 = 0-based 14, but slice excludes end
       const rangeUrls = allUrls.slice(startIndex, endIndex);
       const results: TaskResult[] = [];
 
@@ -429,20 +438,20 @@ describe('URL Count Verification Tests', () => {
       for (const url of rangeUrls) {
         const result: TaskResult = {
           type: 'no_data',
-          url
+          url,
         };
         results.push(result);
       }
 
       expect(results).toHaveLength(6);
-      expect(results.map(r => r.url)).toEqual(rangeUrls);
+      expect(results.map((r) => r.url)).toEqual(rangeUrls);
       expect(results[0].url).toBe('https://test10.com');
       expect(results[5].url).toBe('https://test15.com');
     });
 
     it('should handle edge cases in range processing', async () => {
       const allUrls = generateTestUrls(10);
-      
+
       // Test range that goes beyond available URLs
       const beyondRange = allUrls.slice(8, 15); // Should only get last 2 URLs
       expect(beyondRange).toHaveLength(2);
@@ -451,7 +460,11 @@ describe('URL Count Verification Tests', () => {
       // Test range starting from 0
       const fromStart = allUrls.slice(0, 3);
       expect(fromStart).toHaveLength(3);
-      expect(fromStart).toEqual(['https://test1.com', 'https://test2.com', 'https://test3.com']);
+      expect(fromStart).toEqual([
+        'https://test1.com',
+        'https://test2.com',
+        'https://test3.com',
+      ]);
 
       // Test single URL range
       const singleUrl = allUrls.slice(4, 5);
@@ -469,7 +482,7 @@ describe('URL Count Verification Tests', () => {
         'https://test3.com',
         'https://test2.com', // Duplicate
       ];
-      
+
       const processedUrls: Set<string> = new Set();
       const results: TaskResult[] = [];
 
@@ -478,7 +491,7 @@ describe('URL Count Verification Tests', () => {
           processedUrls.add(url);
           results.push({
             type: 'no_data',
-            url
+            url,
           });
         }
       }
@@ -487,31 +500,37 @@ describe('URL Count Verification Tests', () => {
       expect(results).toHaveLength(3);
       expect(Array.from(processedUrls).sort()).toEqual([
         'https://test1.com',
-        'https://test2.com', 
-        'https://test3.com'
+        'https://test2.com',
+        'https://test3.com',
       ]);
     });
 
     it('should simulate skipProcessed flag behavior', async () => {
       const allUrls = generateTestUrls(10);
-      const previouslyProcessed = new Set(['https://test2.com', 'https://test5.com', 'https://test8.com']);
-      
+      const previouslyProcessed = new Set([
+        'https://test2.com',
+        'https://test5.com',
+        'https://test8.com',
+      ]);
+
       // Filter out previously processed URLs
-      const urlsToProcess = allUrls.filter(url => !previouslyProcessed.has(url));
+      const urlsToProcess = allUrls.filter(
+        (url) => !previouslyProcessed.has(url)
+      );
       const results: TaskResult[] = [];
 
       for (const url of urlsToProcess) {
         results.push({
           type: 'no_data',
-          url
+          url,
         });
       }
 
       expect(urlsToProcess).toHaveLength(7); // 10 - 3 = 7
       expect(results).toHaveLength(7);
-      expect(results.map(r => r.url)).not.toContain('https://test2.com');
-      expect(results.map(r => r.url)).not.toContain('https://test5.com');
-      expect(results.map(r => r.url)).not.toContain('https://test8.com');
+      expect(results.map((r) => r.url)).not.toContain('https://test2.com');
+      expect(results.map((r) => r.url)).not.toContain('https://test5.com');
+      expect(results.map((r) => r.url)).not.toContain('https://test8.com');
     });
   });
 
@@ -524,11 +543,11 @@ describe('URL Count Verification Tests', () => {
       // Track memory usage during processing
       for (let i = 0; i < urls.length; i++) {
         const url = urls[i];
-        
+
         // Simulate processing
         const result: TaskResult = {
           type: 'no_data',
-          url
+          url,
         };
         results.push(result);
 
@@ -541,12 +560,12 @@ describe('URL Count Verification Tests', () => {
 
       expect(results).toHaveLength(25);
       expect(memoryUsage).toHaveLength(25);
-      
+
       // Memory shouldn't grow linearly (simplified check)
       const initialMemory = memoryUsage[0];
       const finalMemory = memoryUsage[memoryUsage.length - 1];
       const memoryGrowth = (finalMemory - initialMemory) / initialMemory;
-      
+
       // Memory growth should be reasonable (less than 50% for this test)
       expect(memoryGrowth).toBeLessThan(0.5);
     });
@@ -559,10 +578,12 @@ describe('URL Count Verification Tests', () => {
       // Simulate concurrent processing
       const promises = urls.map(async (url, index) => {
         // Simulate realistic processing time (10-50ms per URL)
-        await new Promise(resolve => setTimeout(resolve, 10 + Math.random() * 40));
+        await new Promise((resolve) =>
+          setTimeout(resolve, 10 + Math.random() * 40)
+        );
         return {
           type: 'no_data' as const,
-          url
+          url,
         };
       });
 

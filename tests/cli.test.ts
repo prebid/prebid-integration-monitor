@@ -2175,8 +2175,14 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
     ); // Specific output for this suite
 
     // Define common paths for this suite
-    const localTestInputActualTxt = path.join(projectRoot, 'test_input_actual.txt');
-    const localTestInputActualCsv = path.join(projectRoot, 'test_input_actual.csv');
+    const localTestInputActualTxt = path.join(
+      projectRoot,
+      'test_input_actual.txt'
+    );
+    const localTestInputActualCsv = path.join(
+      projectRoot,
+      'test_input_actual.csv'
+    );
     const localTestInputActualJson = path.join(
       projectRoot,
       'test_input_actual.json'
@@ -2319,7 +2325,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Total URLs to process after range check: ${urls.length}`
           );
 
-          const inputFileContent = fs.readFileSync(localTestInputActualTxt, 'utf-8');
+          const inputFileContent = fs.readFileSync(
+            localTestInputActualTxt,
+            'utf-8'
+          );
           expect(inputFileContent.trim()).toBe(
             '',
             'TXT input file should be empty after processing'
@@ -2387,7 +2396,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Skipping modification of original CSV input file: ${localTestInputActualCsv}`
           );
 
-          const inputFileContent = fs.readFileSync(localTestInputActualCsv, 'utf-8');
+          const inputFileContent = fs.readFileSync(
+            localTestInputActualCsv,
+            'utf-8'
+          );
           expect(inputFileContent.trim()).toBe(
             csvContent.trim(),
             'CSV input file should NOT be empty after processing'
@@ -2658,7 +2670,10 @@ describe('CLI Tests for GitHub Repository Input with Mocked API', () => {
             `Skipping modification of original CSV input file: ${localTestInputActualCsv}`
           );
 
-          const csvFileContent = fs.readFileSync(localTestInputActualCsv, 'utf-8');
+          const csvFileContent = fs.readFileSync(
+            localTestInputActualCsv,
+            'utf-8'
+          );
           expect(csvFileContent.trim()).toBe(
             csvContent.trim(),
             'CSV file used as inputFile should not be emptied.'

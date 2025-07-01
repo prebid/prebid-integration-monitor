@@ -6,7 +6,7 @@ import { Response } from 'node-fetch';
 
 // Mock dependencies
 vi.mock('node-fetch', () => ({
-  default: vi.fn()
+  default: vi.fn(),
 }));
 
 const { default: mockFetch } = await import('node-fetch');
@@ -38,8 +38,8 @@ describe('URL Loading Optimizations', () => {
         text: () => Promise.resolve(testContent),
         headers: new Map([
           ['content-length', '100'],
-          ['etag', '"abc123"']
-        ])
+          ['etag', '"abc123"'],
+        ]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -54,8 +54,8 @@ describe('URL Loading Optimizations', () => {
       expect(result1).toHaveLength(3);
       expect(result1).toEqual([
         'https://google.com',
-        'https://youtube.com', 
-        'https://facebook.com'
+        'https://youtube.com',
+        'https://facebook.com',
       ]);
     });
 
@@ -67,8 +67,8 @@ describe('URL Loading Optimizations', () => {
         text: () => Promise.resolve(testContent),
         headers: new Map([
           ['content-length', '100'],
-          ['etag', '"abc123"']
-        ])
+          ['etag', '"abc123"'],
+        ]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -95,14 +95,15 @@ describe('URL Loading Optimizations', () => {
     });
 
     it('should avoid redundant fetches across different range requests', async () => {
-      const testContent = Array.from({ length: 100 }, (_, i) => `domain${i}.com`).join('\n');
+      const testContent = Array.from(
+        { length: 100 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(testContent),
-        headers: new Map([
-          ['content-length', '1000']
-        ])
+        headers: new Map([['content-length', '1000']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -117,7 +118,7 @@ describe('URL Loading Optimizations', () => {
 
       // Second range request - should use cached content
       const result2 = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/domains', 
+        'https://github.com/test/repo/blob/main/domains',
         undefined,
         mockLogger,
         { startRange: 11, endRange: 20 }
@@ -133,12 +134,15 @@ describe('URL Loading Optimizations', () => {
 
   describe('Range Optimization', () => {
     it('should only process specified range without loading full file', async () => {
-      const largeContent = Array.from({ length: 10000 }, (_, i) => `domain${i}.com`).join('\n');
+      const largeContent = Array.from(
+        { length: 10000 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(largeContent),
-        headers: new Map([['content-length', '100000']])
+        headers: new Map([['content-length', '100000']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -155,18 +159,21 @@ describe('URL Loading Optimizations', () => {
       expect(result).toHaveLength(50);
       expect(result[0]).toBe('https://domain999.com'); // 0-based index
       expect(result[49]).toBe('https://domain1048.com');
-      
+
       // Should be fast even with large file
       expect(endTime - startTime).toBeLessThan(1000);
     });
 
     it('should handle range beyond file size gracefully', async () => {
-      const smallContent = Array.from({ length: 10 }, (_, i) => `domain${i}.com`).join('\n');
+      const smallContent = Array.from(
+        { length: 10 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(smallContent),
-        headers: new Map([['content-length', '100']])
+        headers: new Map([['content-length', '100']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -182,12 +189,15 @@ describe('URL Loading Optimizations', () => {
     });
 
     it('should process entire file when no range specified', async () => {
-      const testContent = Array.from({ length: 50 }, (_, i) => `domain${i}.com`).join('\n');
+      const testContent = Array.from(
+        { length: 50 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(testContent),
-        headers: new Map([['content-length', '500']])
+        headers: new Map([['content-length', '500']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -205,18 +215,21 @@ describe('URL Loading Optimizations', () => {
 
   describe('Memory Efficiency', () => {
     it('should not load entire file into memory when using range optimization', async () => {
-      const hugeContent = Array.from({ length: 100000 }, (_, i) => `domain${i}.com`).join('\n');
+      const hugeContent = Array.from(
+        { length: 100000 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(hugeContent),
-        headers: new Map([['content-length', '1000000']])
+        headers: new Map([['content-length', '1000000']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
       const memoryBefore = process.memoryUsage().heapUsed;
-      
+
       const result = await fetchUrlsFromGitHub(
         'https://github.com/test/repo/blob/main/huge-domains',
         undefined,
@@ -240,7 +253,7 @@ describe('URL Loading Optimizations', () => {
         status: 404,
         statusText: 'Not Found',
         text: () => Promise.resolve('Not Found'),
-        headers: new Map()
+        headers: new Map(),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockErrorResponse);
@@ -255,7 +268,7 @@ describe('URL Loading Optimizations', () => {
 
       // Should try network again on next request
       mockFetch.mockResolvedValueOnce(mockErrorResponse);
-      
+
       const result2 = await fetchUrlsFromGitHub(
         'https://github.com/test/repo/blob/main/nonexistent',
         undefined,
@@ -275,14 +288,14 @@ describe('URL Loading Optimizations', () => {
         content: null, // Invalid content
         timestamp: Date.now(),
         size: 0,
-        hits: 1
+        hits: 1,
       });
 
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(testContent),
-        headers: new Map([['content-length', '20']])
+        headers: new Map([['content-length', '20']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -301,12 +314,15 @@ describe('URL Loading Optimizations', () => {
 
   describe('Performance Benchmarks', () => {
     it('should meet processing speed targets', async () => {
-      const mediumContent = Array.from({ length: 1000 }, (_, i) => `domain${i}.com`).join('\n');
+      const mediumContent = Array.from(
+        { length: 1000 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(mediumContent),
-        headers: new Map([['content-length', '10000']])
+        headers: new Map([['content-length', '10000']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);
@@ -320,22 +336,25 @@ describe('URL Loading Optimizations', () => {
       const endTime = Date.now();
 
       expect(result).toHaveLength(1000);
-      
+
       // Should process 1000 URLs in under 5 seconds
       expect(endTime - startTime).toBeLessThan(5000);
-      
+
       // Should process at least 200 URLs per second
       const urlsPerSecond = result.length / ((endTime - startTime) / 1000);
       expect(urlsPerSecond).toBeGreaterThan(200);
     });
 
     it('should demonstrate caching performance benefits', async () => {
-      const testContent = Array.from({ length: 5000 }, (_, i) => `domain${i}.com`).join('\n');
+      const testContent = Array.from(
+        { length: 5000 },
+        (_, i) => `domain${i}.com`
+      ).join('\n');
       const mockResponse = {
         ok: true,
         status: 200,
         text: () => Promise.resolve(testContent),
-        headers: new Map([['content-length', '50000']])
+        headers: new Map([['content-length', '50000']]),
       } as any;
 
       mockFetch.mockResolvedValueOnce(mockResponse);

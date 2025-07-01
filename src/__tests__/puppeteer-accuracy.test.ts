@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { Page } from 'puppeteer';
 import type { Logger as WinstonLogger } from 'winston';
-import { 
-  navigateWithRetry, 
-  triggerDynamicContent, 
+import {
+  navigateWithRetry,
+  triggerDynamicContent,
   extractDataSafely,
-  processPageTask 
+  processPageTask,
 } from '../utils/puppeteer-task.js';
 
 // Mock logger
@@ -25,7 +25,7 @@ const createMockPage = () => {
     content: vi.fn(),
     evaluate: vi.fn(),
     mouse: {
-      move: vi.fn()
+      move: vi.fn(),
     },
     setDefaultTimeout: vi.fn(),
     setUserAgent: vi.fn(),
@@ -33,7 +33,7 @@ const createMockPage = () => {
     evaluateOnNewDocument: vi.fn(),
     $: vi.fn(),
   } as unknown as Page;
-  
+
   return mockPage;
 };
 
@@ -50,17 +50,20 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       vi.mocked(mockPage.goto).mockResolvedValue(undefined as any);
       vi.mocked(mockPage.url).mockReturnValue('https://example.com');
       vi.mocked(mockPage.title).mockResolvedValue('Example Site');
-      vi.mocked(mockPage.content).mockResolvedValue('<html><body>Valid content</body></html>');
+      vi.mocked(mockPage.content).mockResolvedValue(
+        '<html><body>Valid content</body></html>'
+      );
       vi.mocked(mockPage.$).mockResolvedValue(null);
 
-      await expect(navigateWithRetry(mockPage, 'https://example.com', mockLogger))
-        .resolves.not.toThrow();
+      await expect(
+        navigateWithRetry(mockPage, 'https://example.com', mockLogger)
+      ).resolves.not.toThrow();
 
       expect(mockPage.goto).toHaveBeenCalledWith(
         'https://example.com',
         expect.objectContaining({
           timeout: 60000,
-          waitUntil: ['networkidle2', 'domcontentloaded']
+          waitUntil: ['networkidle2', 'domcontentloaded'],
         })
       );
     });
@@ -69,10 +72,13 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       vi.mocked(mockPage.goto).mockResolvedValue(undefined as any);
       vi.mocked(mockPage.url).mockReturnValue('https://parking.example.com');
       vi.mocked(mockPage.title).mockResolvedValue('Domain Parked');
-      vi.mocked(mockPage.content).mockResolvedValue('<html><body>This domain is parked</body></html>');
+      vi.mocked(mockPage.content).mockResolvedValue(
+        '<html><body>This domain is parked</body></html>'
+      );
 
-      await expect(navigateWithRetry(mockPage, 'https://example.com', mockLogger))
-        .rejects.toThrow('Page appears to be unavailable');
+      await expect(
+        navigateWithRetry(mockPage, 'https://example.com', mockLogger)
+      ).rejects.toThrow('Page appears to be unavailable');
     });
 
     it('should retry timeout errors but not DNS errors', async () => {
@@ -80,23 +86,29 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       vi.mocked(mockPage.goto)
         .mockRejectedValueOnce(new Error('Navigation timeout'))
         .mockResolvedValueOnce(undefined as any);
-      
+
       vi.mocked(mockPage.url).mockReturnValue('https://example.com');
       vi.mocked(mockPage.title).mockResolvedValue('Example Site');
-      vi.mocked(mockPage.content).mockResolvedValue('<html><body>Valid content</body></html>');
+      vi.mocked(mockPage.content).mockResolvedValue(
+        '<html><body>Valid content</body></html>'
+      );
       vi.mocked(mockPage.$).mockResolvedValue(null);
 
-      await expect(navigateWithRetry(mockPage, 'https://example.com', mockLogger))
-        .resolves.not.toThrow();
+      await expect(
+        navigateWithRetry(mockPage, 'https://example.com', mockLogger)
+      ).resolves.not.toThrow();
 
       expect(mockPage.goto).toHaveBeenCalledTimes(2);
     });
 
     it('should not retry DNS resolution errors', async () => {
-      vi.mocked(mockPage.goto).mockRejectedValue(new Error('net::ERR_NAME_NOT_RESOLVED'));
+      vi.mocked(mockPage.goto).mockRejectedValue(
+        new Error('net::ERR_NAME_NOT_RESOLVED')
+      );
 
-      await expect(navigateWithRetry(mockPage, 'https://nonexistent.example', mockLogger))
-        .rejects.toThrow('net::ERR_NAME_NOT_RESOLVED');
+      await expect(
+        navigateWithRetry(mockPage, 'https://nonexistent.example', mockLogger)
+      ).rejects.toThrow('net::ERR_NAME_NOT_RESOLVED');
 
       expect(mockPage.goto).toHaveBeenCalledTimes(1);
     });
@@ -116,10 +128,13 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
 
     it('should handle errors gracefully during content triggering', async () => {
       vi.mocked(mockPage.evaluate).mockRejectedValue(new Error('Page closed'));
-      vi.mocked(mockPage.mouse.move).mockRejectedValue(new Error('Mouse error'));
+      vi.mocked(mockPage.mouse.move).mockRejectedValue(
+        new Error('Mouse error')
+      );
 
-      await expect(triggerDynamicContent(mockPage, mockLogger))
-        .resolves.not.toThrow();
+      await expect(
+        triggerDynamicContent(mockPage, mockLogger)
+      ).resolves.not.toThrow();
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
         expect.stringContaining('Error during'),
@@ -133,12 +148,14 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       const mockPrebidData = {
         libraries: ['googletag'],
         date: '2024-01-01',
-        prebidInstances: [{
-          globalVarName: 'pbjs',
-          version: '8.0.0',
-          modules: ['appnexusBidAdapter', 'rubiconBidAdapter'],
-          initializationState: 'complete'
-        }]
+        prebidInstances: [
+          {
+            globalVarName: 'pbjs',
+            version: '8.0.0',
+            modules: ['appnexusBidAdapter', 'rubiconBidAdapter'],
+            initializationState: 'complete',
+          },
+        ],
       };
 
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockPrebidData);
@@ -153,12 +170,14 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       const mockPartialPrebidData = {
         libraries: [],
         date: '2024-01-01',
-        prebidInstances: [{
-          globalVarName: 'pbjs',
-          version: '8.0.0',
-          modules: [],
-          initializationState: 'partial'
-        }]
+        prebidInstances: [
+          {
+            globalVarName: 'pbjs',
+            version: '8.0.0',
+            modules: [],
+            initializationState: 'partial',
+          },
+        ],
       };
 
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockPartialPrebidData);
@@ -172,12 +191,14 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       const mockQueuePrebidData = {
         libraries: [],
         date: '2024-01-01',
-        prebidInstances: [{
-          globalVarName: 'pbjs',
-          version: 'queue-detected',
-          modules: [],
-          initializationState: 'queue'
-        }]
+        prebidInstances: [
+          {
+            globalVarName: 'pbjs',
+            version: 'queue-detected',
+            modules: [],
+            initializationState: 'queue',
+          },
+        ],
       };
 
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockQueuePrebidData);
@@ -194,7 +215,7 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
         .mockResolvedValue({
           libraries: [],
           date: '2024-01-01',
-          prebidInstances: []
+          prebidInstances: [],
         });
 
       const result = await extractDataSafely(mockPage, mockLogger);
@@ -203,7 +224,9 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       expect(result).toBeDefined();
       expect(result.prebidInstances).toEqual([]);
       // Should have called evaluate multiple times (retry logic)
-      expect(vi.mocked(mockPage.evaluate).mock.calls.length).toBeGreaterThanOrEqual(2);
+      expect(
+        vi.mocked(mockPage.evaluate).mock.calls.length
+      ).toBeGreaterThanOrEqual(2);
     });
   });
 
@@ -211,37 +234,43 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
     it('should successfully process a page with Prebid', async () => {
       const mockTaskData = {
         url: 'https://example.com',
-        logger: mockLogger
+        logger: mockLogger,
       };
 
       const mockPageData = {
         url: 'https://example.com',
         libraries: ['googletag'],
         date: '2024-01-01',
-        prebidInstances: [{
-          globalVarName: 'pbjs',
-          version: '8.0.0',
-          modules: ['appnexusBidAdapter', 'rubiconBidAdapter'],
-          initializationState: 'complete'
-        }]
+        prebidInstances: [
+          {
+            globalVarName: 'pbjs',
+            version: '8.0.0',
+            modules: ['appnexusBidAdapter', 'rubiconBidAdapter'],
+            initializationState: 'complete',
+          },
+        ],
       };
 
       // Mock all the required page methods
       vi.mocked(mockPage.goto).mockResolvedValue(undefined as any);
       vi.mocked(mockPage.url).mockReturnValue('https://example.com');
       vi.mocked(mockPage.title).mockResolvedValue('Example Site');
-      vi.mocked(mockPage.content).mockResolvedValue('<html><body>Valid content</body></html>');
+      vi.mocked(mockPage.content).mockResolvedValue(
+        '<html><body>Valid content</body></html>'
+      );
       vi.mocked(mockPage.$).mockResolvedValue(null);
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockPageData);
       vi.mocked(mockPage.mouse.move).mockResolvedValue(undefined);
       vi.mocked(mockPage.setDefaultTimeout).mockReturnValue(undefined);
       vi.mocked(mockPage.setUserAgent).mockResolvedValue(undefined);
       vi.mocked(mockPage.setViewport).mockResolvedValue(undefined);
-      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(undefined as any);
+      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(
+        undefined as any
+      );
 
       const result = await processPageTask({
         page: mockPage,
-        data: mockTaskData
+        data: mockTaskData,
       });
 
       expect(result.type).toBe('success');
@@ -255,32 +284,36 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
     it('should handle pages with no Prebid data', async () => {
       const mockTaskData = {
         url: 'https://example-no-prebid.com',
-        logger: mockLogger
+        logger: mockLogger,
       };
 
       const mockPageData = {
         url: 'https://example-no-prebid.com',
         libraries: [],
         date: '2024-01-01',
-        prebidInstances: []
+        prebidInstances: [],
       };
 
       // Mock all the required page methods
       vi.mocked(mockPage.goto).mockResolvedValue(undefined as any);
       vi.mocked(mockPage.url).mockReturnValue('https://example-no-prebid.com');
       vi.mocked(mockPage.title).mockResolvedValue('Example Site');
-      vi.mocked(mockPage.content).mockResolvedValue('<html><body>Valid content</body></html>');
+      vi.mocked(mockPage.content).mockResolvedValue(
+        '<html><body>Valid content</body></html>'
+      );
       vi.mocked(mockPage.$).mockResolvedValue(null);
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockPageData);
       vi.mocked(mockPage.mouse.move).mockResolvedValue(undefined);
       vi.mocked(mockPage.setDefaultTimeout).mockReturnValue(undefined);
       vi.mocked(mockPage.setUserAgent).mockResolvedValue(undefined);
       vi.mocked(mockPage.setViewport).mockResolvedValue(undefined);
-      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(undefined as any);
+      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(
+        undefined as any
+      );
 
       const result = await processPageTask({
         page: mockPage,
-        data: mockTaskData
+        data: mockTaskData,
       });
 
       expect(result.type).toBe('no_data');
@@ -292,19 +325,23 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
     it('should handle and categorize different error types', async () => {
       const mockTaskData = {
         url: 'https://error-example.com',
-        logger: mockLogger
+        logger: mockLogger,
       };
 
       // Mock navigation failure
       vi.mocked(mockPage.setDefaultTimeout).mockReturnValue(undefined);
       vi.mocked(mockPage.setUserAgent).mockResolvedValue(undefined);
       vi.mocked(mockPage.setViewport).mockResolvedValue(undefined);
-      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(undefined as any);
-      vi.mocked(mockPage.goto).mockRejectedValue(new Error('net::ERR_CONNECTION_TIMEOUT'));
+      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(
+        undefined as any
+      );
+      vi.mocked(mockPage.goto).mockRejectedValue(
+        new Error('net::ERR_CONNECTION_TIMEOUT')
+      );
 
       const result = await processPageTask({
         page: mockPage,
-        data: mockTaskData
+        data: mockTaskData,
       });
 
       expect(result.type).toBe('error');
@@ -318,31 +355,35 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
   describe('Performance and Reliability', () => {
     it('should complete processing within reasonable time limits', async () => {
       const startTime = Date.now();
-      
+
       // Mock fast, successful responses
       vi.mocked(mockPage.goto).mockResolvedValue(undefined as any);
       vi.mocked(mockPage.url).mockReturnValue('https://fast-example.com');
       vi.mocked(mockPage.title).mockResolvedValue('Fast Site');
-      vi.mocked(mockPage.content).mockResolvedValue('<html><body>Fast content</body></html>');
+      vi.mocked(mockPage.content).mockResolvedValue(
+        '<html><body>Fast content</body></html>'
+      );
       vi.mocked(mockPage.$).mockResolvedValue(null);
       vi.mocked(mockPage.evaluate).mockResolvedValue({
         libraries: [],
         date: '2024-01-01',
-        prebidInstances: []
+        prebidInstances: [],
       });
       vi.mocked(mockPage.mouse.move).mockResolvedValue(undefined);
       vi.mocked(mockPage.setDefaultTimeout).mockReturnValue(undefined);
       vi.mocked(mockPage.setUserAgent).mockResolvedValue(undefined);
       vi.mocked(mockPage.setViewport).mockResolvedValue(undefined);
-      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(undefined as any);
+      vi.mocked(mockPage.evaluateOnNewDocument).mockResolvedValue(
+        undefined as any
+      );
 
       await processPageTask({
         page: mockPage,
-        data: { url: 'https://fast-example.com', logger: mockLogger }
+        data: { url: 'https://fast-example.com', logger: mockLogger },
       });
 
       const duration = Date.now() - startTime;
-      
+
       // Should complete within 10 seconds for mocked responses
       expect(duration).toBeLessThan(10000);
     });

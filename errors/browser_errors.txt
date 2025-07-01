@@ -1,3 +1,85 @@
 # Browser/Puppeteer Errors
 # Session closed, protocol errors, browser crashes
 # Format: [timestamp] | Category: browser/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+[2025-06-30T21:15:55.658Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://radarsertanejo.com | Message: Execution context was destroyed
+[2025-06-30T21:16:18.976Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://audio4fun.com | Message: Attempted to use detached Frame 'E9F7C6861849A058373028480FA71EC7'.
+[2025-06-30T21:16:58.152Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://pallibatani.com | Message: Attempted to use detached Frame 'DAFE7FD949F387C31CE0FF6798960036'.
+[2025-06-30T21:17:45.640Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://countycomm.com | Message: Attempted to use detached Frame 'D7F29C89E69027A33AC0F35EDC4C2A60'.
+[2025-06-30T21:23:57.609Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://haikanbuhin.com | Message: Attempted to use detached Frame '2230269CACA952A5C4AFD352895C5244'.
+[2025-06-30T21:25:03.223Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://noticiasdelaciencia.com | Message: Attempted to use detached Frame '28C17355105E47C6931B87F8AEC14645'.
+[2025-06-30T21:26:23.308Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://liqui-moly.de | Message: Attempted to use detached Frame '4513FB7A4525BD168F8BCD0D9D160DEB'.
+[2025-06-30T21:27:10.935Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://kissfmuk.com | Message: Execution context was destroyed
+[2025-06-30T21:28:07.277Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://ion.ir | Message: Execution context was destroyed
+[2025-06-30T21:28:30.835Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://kcu.ac | Message: Execution context was destroyed
+[2025-06-30T21:30:44.888Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://popwrapped.com | Message: Attempted to use detached Frame 'B9F2F7F684D208F76851C2A028AE1AC6'.
+[2025-06-30T21:32:45.389Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://scmplayer.net | Message: Attempted to use detached Frame 'F45CDE5FE2BAB89CEDBD57BFFB053582'.
+[2025-06-30T21:33:11.119Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://conceptart.org | Message: Attempted to use detached Frame '9FA39104198117F9ECFEF212AAB85115'.
+[2025-06-30T21:33:35.860Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://batel.ru | Message: Attempted to use detached Frame '7808F98B8FA2ED634259129969D6C7EF'.
+[2025-06-30T21:35:36.731Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://kojitusanso.jp | Message: Attempted to use detached Frame '3A73F75BC5E34E57EAC4BE6FAF6139EF'.
+[2025-06-30T21:36:28.171Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://daesung.com | Message: Execution context was destroyed
+[2025-06-30T21:36:59.829Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://vinomofo.com | Message: Attempted to use detached Frame '176FB6DF35BE30E8BE4DABC799D21A5A'.
+[2025-06-30T21:37:41.859Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://thebarbiecollection.com | Message: Execution context was destroyed
+[2025-06-30T21:38:08.482Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://nordnet.com | Message: Execution context was destroyed
+[2025-06-30T21:39:15.751Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://zoomdici.fr | Message: Attempted to use detached Frame 'A4626F2CD70A6984FFC9918F3FF84A58'.
+[2025-06-30T21:39:25.020Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://bankmuscat.com | Message: Attempted to use detached Frame '3EE0970890460B434361FC3E927B5189'.
+[2025-06-30T21:40:58.969Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://safariland.com | Message: Execution context was destroyed
+[2025-06-30T21:41:30.478Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://flexshopper.com | Message: Attempted to use detached Frame 'E5E6C0C3D693DA1488319580CD04E6B9'.
+[2025-06-30T21:46:00.180Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://elegantangel.com | Message: Attempted to use detached Frame '033F7EA18CFF95A5CCD9CCC11E0B0974'.
+[2025-06-30T21:46:51.707Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://opiniatimisoarei.ro | Message: Execution context was destroyed
+[2025-06-30T21:47:10.822Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://onlinecomponents.com | Message: Execution context was destroyed
+[2025-06-30T21:51:07.795Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://mommylevy.com | Message: Attempted to use detached Frame '0A651E1F28E04311DC793D0F9BE9F6DE'.
+[2025-06-30T21:51:16.242Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://onamae-server.com | Message: Attempted to use detached Frame '5D0297830072D426851050637B5386B1'.
+[2025-06-30T21:51:47.158Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://opolskie.pl | Message: Attempted to use detached Frame '2371916BABD5969235D5F38D968A0F65'.
+[2025-06-30T21:54:26.776Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://bemaniwiki.com | Message: Attempted to use detached Frame '37F189FD38FFD367E78BADA269EAC3D9'.
+[2025-06-30T21:55:45.190Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://royalvegascasino.com | Message: Attempted to use detached Frame 'C38FFB6A351C7E78BE8F2A1833F27865'.
+[2025-06-30T21:56:13.820Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://panchemodan.ru | Message: Execution context was destroyed
+[2025-06-30T21:57:50.850Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://nicdarkthemes.com | Message: Execution context was destroyed
+[2025-06-30T21:59:05.189Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://ziuanews.ro | Message: Execution context was destroyed
+[2025-06-30T22:00:38.868Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://strapya.com | Message: Attempted to use detached Frame 'AB4CE54444E4A1B847DDD5E507F7E0A4'.
+[2025-06-30T22:04:20.939Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://yon.ir | Message: Attempted to use detached Frame 'ABB5506C50D0B835F33FE2B7AD5206C9'.
+[2025-06-30T22:04:38.131Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://101jakfm.com | Message: Execution context was destroyed
+[2025-06-30T22:04:43.681Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://directory10.org | Message: Attempted to use detached Frame '925DB66F86A06B4227409E8823FFB6B8'.
+[2025-06-30T22:04:49.580Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://strunz.com | Message: Execution context was destroyed
+[2025-06-30T22:05:21.553Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://seekingmilf.com | Message: Attempted to use detached Frame '8BAC6BE9432FBE46579D1584A4FBB0AE'.
+[2025-06-30T22:05:37.889Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://razor-games.com | Message: Attempted to use detached Frame '511070D31423E057BE196E0AB98F460A'.
+[2025-06-30T22:07:34.093Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://web-tools.pl | Message: Execution context was destroyed
+[2025-06-30T22:08:23.734Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://hobbyschneiderin24.net | Message: Execution context was destroyed
+[2025-06-30T22:12:53.182Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://officevibe.com | Message: Execution context was destroyed
+[2025-06-30T22:13:58.601Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://nordea.lu | Message: Attempted to use detached Frame '70677A927678CBBEDECB790E5F85E401'.
+[2025-06-30T22:15:18.129Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://free-weblink.com | Message: Attempted to use detached Frame '9EC9E5F3D9AD1564FBB926613B06F7A6'.
+[2025-06-30T22:20:23.911Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://games4king.com | Message: Execution context was destroyed
+[2025-06-30T22:20:55.261Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://hindimp3download.net | Message: Attempted to use detached Frame 'C94FB37EF2934497C0A97BC44FC89C30'.
+[2025-06-30T22:22:25.882Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://screenconnect.com | Message: Execution context was destroyed
+[2025-06-30T22:22:26.463Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://genomics.cn | Message: Attempted to use detached Frame '0CD77313F37BE0FE33D509B698A69C91'.
+[2025-06-30T22:25:05.930Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://eataly.com | Message: Attempted to use detached Frame '98F434AE6D3123B398BE3D63C3CE2C76'.
+[2025-06-30T22:27:39.327Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://comagic.ru | Message: Attempted to use detached Frame 'D7F365D62F45E0D59B9E1513BB5D55D3'.
+[2025-06-30T22:29:04.944Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://yearim.kr | Message: Attempted to use detached Frame 'DFE2FA8A5652629C99531BC866A0B5E3'.
+[2025-06-30T22:30:49.090Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://clochette-soft.jp | Message: Attempted to use detached Frame '531F50958FEA10374303930C321009D9'.
+[2025-06-30T22:31:38.339Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://destinationlighting.com | Message: Attempted to use detached Frame '4EFAAFC0D7A25C18FBBF952D7CA47517'.
+[2025-06-30T22:31:40.505Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://snapfish.de | Message: Attempted to use detached Frame 'AB8B2A8183E7443BD05F5B854C8153E6'.
+[2025-06-30T22:33:28.412Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://slovakrail.sk | Message: Attempted to use detached Frame 'F57F141DDD16A7753E4D428EDAE0B5B2'.
+[2025-06-30T22:35:28.699Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://gentv.be | Message: Attempted to use detached Frame '5AEE3C41B0077EB6321195FEC9746EB8'.
+[2025-06-30T22:39:28.725Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://pozareport.si | Message: Attempted to use detached Frame '38563227FAD82584C02A2D634CECB741'.
+[2025-06-30T22:40:05.723Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://1newsbd.com | Message: Attempted to use detached Frame 'CF095701536EE283CEF004DAB6744475'.
+[2025-06-30T22:42:26.395Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://rncb.ru | Message: Attempted to use detached Frame '5D12E26A4E6E75039707FFE16BF09450'.
+[2025-06-30T22:43:26.442Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://uraken.net | Message: Attempted to use detached Frame 'ADBA613F42CBE35DDDE94361EA0816EB'.
+[2025-06-30T22:45:52.429Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://img.uz | Message: Execution context was destroyed
+[2025-06-30T22:45:55.118Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://megatone.net | Message: Execution context was destroyed
+[2025-06-30T22:49:06.427Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://navigator4life.com | Message: Execution context was destroyed
+[2025-06-30T22:51:29.277Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://unisalute.it | Message: Execution context was destroyed
+[2025-06-30T22:54:32.400Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://mehromah.ir | Message: Attempted to use detached Frame 'BEE90F094E53001B64375438828EE9FD'.
+[2025-06-30T22:56:47.022Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://xuexila.com | Message: Attempted to use detached Frame '82F7F15BF36C4BD7A8F82CBE081C4DB7'.
+[2025-06-30T23:01:14.313Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://gazzettadellasera.com | Message: Attempted to use detached Frame 'F7B218CC3F31D83C18CB54ABB17163CA'.
+[2025-06-30T23:04:46.717Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://sexmomfuck.com | Message: Execution context was destroyed
+[2025-06-30T23:07:29.575Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://zentrada.de | Message: Execution context was destroyed
+[2025-06-30T23:11:12.278Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://firstmall.kr | Message: Execution context was destroyed
+[2025-06-30T23:18:02.150Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://august-soft.com | Message: Attempted to use detached Frame '988B076649BF78BC03AF39A9845FA409'.
+[2025-06-30T23:20:15.947Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://xtrasize.com | Message: Execution context was destroyed
+[2025-06-30T23:21:44.065Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://okanewiki.com | Message: Attempted to use detached Frame '12EF5594B4556A4044557CF4F2D7A961'.
+[2025-06-30T23:24:16.488Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://atakto.pl | Message: Attempted to use detached Frame 'AC318A8BA55F431F3B430A439AA560CC'.
+[2025-06-30T23:26:07.828Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://travel2be.com | Message: Attempted to use detached Frame '01427823BD4CF2BBAE878A1A416EA16F'.
+[2025-07-01T05:19:08.797Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://racocatala.cat | Message: Attempted to use detached Frame 'B4CF2653C798FD10C59B7AB19ACF24AB'.
+[2025-07-01T05:19:09.257Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://sharetribe.com | Message: Attempted to use detached Frame 'CE4A4A15666F2586275F102B767CF245'.
+[2025-07-01T05:19:09.260Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://allkidsnetwork.com | Message: Attempted to use detached Frame '91C1528FB404A4FECE0A18CF390C22A3'.
+[2025-07-01T05:19:09.261Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://trainingindustry.com | Message: Attempted to use detached Frame '432767E020576F3237D2FC5137A42158'.
+[2025-07-01T05:19:09.262Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://dailytarheel.com | Message: Attempted to use detached Frame 'B14532A97C6399A5E8096A0B2BA4736F'.

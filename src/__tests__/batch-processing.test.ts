@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { prebidExplorer, type PrebidExplorerOptions } from '../prebid.js';
-import type { TaskResult, TaskResultSuccess, TaskResultNoData, TaskResultError } from '../common/types.js';
+import type {
+  TaskResult,
+  TaskResultSuccess,
+  TaskResultNoData,
+  TaskResultError,
+} from '../common/types.js';
 import type { Logger as WinstonLogger } from 'winston';
 import * as fs from 'fs';
 
@@ -9,8 +14,8 @@ vi.mock('fs');
 vi.mock('../utils/logger.js', () => ({
   initializeLogger: vi.fn(() => createMockLogger()),
   default: {
-    instance: createMockLogger()
-  }
+    instance: createMockLogger(),
+  },
 }));
 
 vi.mock('../utils/url-tracker.js', () => ({
@@ -31,9 +36,7 @@ vi.mock('../utils/domain-validator.js', () => ({
 vi.mock('../utils/results-handler.js', () => ({
   processAndLogTaskResults: vi.fn((results) => {
     // Transform TaskResult[] to PageData[]
-    return results
-      .filter(r => r.type === 'success')
-      .map(r => r.data);
+    return results.filter((r) => r.type === 'success').map((r) => r.data);
   }),
   writeResultsToStoreFile: vi.fn(),
   appendNoPrebidUrls: vi.fn(),
@@ -45,27 +48,27 @@ vi.mock('../utils/results-handler.js', () => ({
 vi.mock('puppeteer', () => ({
   default: {
     launch: vi.fn(() => mockBrowser),
-  }
+  },
 }));
 
 vi.mock('puppeteer-cluster', () => ({
   Cluster: {
     launch: vi.fn(() => mockCluster),
-    CONCURRENCY_CONTEXT: 'CONCURRENCY_CONTEXT'
-  }
+    CONCURRENCY_CONTEXT: 'CONCURRENCY_CONTEXT',
+  },
 }));
 
 vi.mock('puppeteer-extra', () => ({
-  addExtra: vi.fn((pup) => pup)
+  addExtra: vi.fn((pup) => pup),
 }));
 
 vi.mock('puppeteer-extra-plugin-stealth', () => ({
-  default: vi.fn(() => ({}))
+  default: vi.fn(() => ({})),
 }));
 
 vi.mock('puppeteer-extra-plugin-block-resources', () => ({
   default: vi.fn(() => ({})),
-  __esModule: true
+  __esModule: true,
 }));
 
 // Mock logger
@@ -125,21 +128,21 @@ describe('Batch Processing Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogger = createMockLogger();
-    
+
     // Mock fs operations
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.mkdirSync).mockImplementation(() => '');
-    
+
     // Reset all mock implementations
     mockUrlTracker.getStats.mockReturnValue({});
     mockUrlTracker.filterUnprocessedUrls.mockImplementation((urls) => urls);
-    
+
     // Mock successful page processing by default
     mockPage.goto.mockResolvedValue(null as any);
     mockPage.evaluate.mockResolvedValue({
       libraries: ['googletag'],
       date: '2023-10-27',
-      prebidInstances: []
+      prebidInstances: [],
     });
   });
 
@@ -152,10 +155,12 @@ describe('Batch Processing Tests', () => {
       const testUrls = [
         'https://batch1-url1.com',
         'https://batch1-url2.com',
-        'https://batch2-url1.com'
+        'https://batch2-url1.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -167,7 +172,7 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 2
+        chunkSize: 2,
       };
 
       // Track which URLs were processed in which order
@@ -197,15 +202,17 @@ describe('Batch Processing Tests', () => {
         return Promise.resolve();
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -219,16 +226,24 @@ describe('Batch Processing Tests', () => {
       expect(processedUrls.sort()).toEqual(testUrls.sort());
 
       // Verify batch-specific logging
-      expect(mockLogger.info).toHaveBeenCalledWith('Chunked processing enabled. Chunk size: 2');
-      expect(mockLogger.info).toHaveBeenCalledWith('Total chunks to process: 2');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Chunked processing enabled. Chunk size: 2'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Total chunks to process: 2'
+      );
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Processing chunk 1 of 2: URLs 1-2'
       );
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Processing chunk 2 of 2: URLs 3-3'
       );
-      expect(mockLogger.info).toHaveBeenCalledWith('Finished processing chunk 1 of 2.');
-      expect(mockLogger.info).toHaveBeenCalledWith('Finished processing chunk 2 of 2.');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Finished processing chunk 1 of 2.'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Finished processing chunk 2 of 2.'
+      );
 
       // Verify results were collected from all batches
       expect(totalResults).toHaveLength(3);
@@ -240,10 +255,12 @@ describe('Batch Processing Tests', () => {
         'https://batch1-url2.com',
         'https://batch2-url1.com',
         'https://batch2-url2.com',
-        'https://batch3-url1.com'
+        'https://batch3-url1.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -255,7 +272,7 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 2
+        chunkSize: 2,
       };
 
       let browserCreateCount = 0;
@@ -265,15 +282,17 @@ describe('Batch Processing Tests', () => {
         return Promise.resolve(mockBrowser);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -282,10 +301,18 @@ describe('Batch Processing Tests', () => {
       expect(browserCreateCount).toBe(3); // Three chunks: 2+2+1
 
       // Verify chunk logging
-      expect(mockLogger.info).toHaveBeenCalledWith('Total chunks to process: 3');
-      expect(mockLogger.info).toHaveBeenCalledWith('Processing chunk 1 of 3: URLs 1-2');
-      expect(mockLogger.info).toHaveBeenCalledWith('Processing chunk 2 of 3: URLs 3-4');
-      expect(mockLogger.info).toHaveBeenCalledWith('Processing chunk 3 of 3: URLs 5-5');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Total chunks to process: 3'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Processing chunk 1 of 3: URLs 1-2'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Processing chunk 2 of 3: URLs 3-4'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Processing chunk 3 of 3: URLs 5-5'
+      );
 
       // Verify all results collected
       expect(totalResults).toHaveLength(5);
@@ -298,10 +325,12 @@ describe('Batch Processing Tests', () => {
         'https://cluster-batch1-url1.com',
         'https://cluster-batch1-url2.com',
         'https://cluster-batch2-url1.com',
-        'https://cluster-batch2-url2.com'
+        'https://cluster-batch2-url2.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -313,7 +342,7 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 2
+        chunkSize: 2,
       };
 
       let clusterCreateCount = 0;
@@ -331,28 +360,32 @@ describe('Batch Processing Tests', () => {
         return Promise.resolve();
       });
 
-      mockCluster.queue.mockImplementation((data: { url: string; logger: WinstonLogger }) => {
-        totalQueuedTasks.push(data);
-        return Promise.resolve({
-          type: 'success',
-          data: {
-            url: data.url,
-            libraries: ['googletag'],
-            date: '2023-10-27',
-            prebidInstances: []
-          }
-        } as TaskResult);
-      });
+      mockCluster.queue.mockImplementation(
+        (data: { url: string; logger: WinstonLogger }) => {
+          totalQueuedTasks.push(data);
+          return Promise.resolve({
+            type: 'success',
+            data: {
+              url: data.url,
+              libraries: ['googletag'],
+              date: '2023-10-27',
+              prebidInstances: [],
+            },
+          } as TaskResult);
+        }
+      );
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -363,7 +396,7 @@ describe('Batch Processing Tests', () => {
 
       // Verify all URLs were queued
       expect(totalQueuedTasks).toHaveLength(4);
-      const queuedUrls = totalQueuedTasks.map(task => task.url);
+      const queuedUrls = totalQueuedTasks.map((task) => task.url);
       expect(queuedUrls.sort()).toEqual(testUrls.sort());
 
       // Verify results collected from all chunks
@@ -377,10 +410,12 @@ describe('Batch Processing Tests', () => {
     it('should handle cluster errors gracefully in batch mode', async () => {
       const testUrls = [
         'https://good-cluster-batch.com',
-        'https://error-cluster-batch.com'
+        'https://error-cluster-batch.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -392,24 +427,26 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 1 // One URL per chunk
+        chunkSize: 1, // One URL per chunk
       };
 
       let chunkNumber = 0;
-      mockCluster.queue.mockImplementation((data: { url: string; logger: WinstonLogger }) => {
-        if (data.url === 'https://error-cluster-batch.com') {
-          return Promise.reject(new Error('Cluster processing failed'));
-        }
-        return Promise.resolve({
-          type: 'success',
-          data: {
-            url: data.url,
-            libraries: ['googletag'],
-            date: '2023-10-27',
-            prebidInstances: []
+      mockCluster.queue.mockImplementation(
+        (data: { url: string; logger: WinstonLogger }) => {
+          if (data.url === 'https://error-cluster-batch.com') {
+            return Promise.reject(new Error('Cluster processing failed'));
           }
-        } as TaskResult);
-      });
+          return Promise.resolve({
+            type: 'success',
+            data: {
+              url: data.url,
+              libraries: ['googletag'],
+              date: '2023-10-27',
+              prebidInstances: [],
+            },
+          } as TaskResult);
+        }
+      );
 
       // Mock cluster error for second chunk
       const { Cluster } = await import('puppeteer-cluster');
@@ -417,20 +454,24 @@ describe('Batch Processing Tests', () => {
         chunkNumber++;
         if (chunkNumber === 2) {
           // Simulate cluster launch failure for second chunk
-          mockCluster.queue.mockRejectedValue(new Error('Cluster launch failed'));
+          mockCluster.queue.mockRejectedValue(
+            new Error('Cluster launch failed')
+          );
         }
         return Promise.resolve(mockCluster);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -452,10 +493,12 @@ describe('Batch Processing Tests', () => {
         'https://success-batch.com',
         'https://no-data-batch.com',
         'https://error-batch.com',
-        'https://success-batch2.com'
+        'https://success-batch2.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -467,7 +510,7 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 2
+        chunkSize: 2,
       };
 
       // Mock different outcomes for different URLs
@@ -484,52 +527,59 @@ describe('Batch Processing Tests', () => {
           return Promise.resolve({
             libraries: [],
             date: '2023-10-27',
-            prebidInstances: []
+            prebidInstances: [],
           });
         }
         return Promise.resolve({
           libraries: ['googletag'],
           date: '2023-10-27',
-          prebidInstances: []
+          prebidInstances: [],
         });
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
-        
+
         // Count result types
-        const successCount = results.filter(r => r.type === 'success').length;
-        const noDataCount = results.filter(r => r.type === 'no_data').length;
-        const errorCount = results.filter(r => r.type === 'error').length;
-        
-        return results.filter(r => r.type === 'success');
+        const successCount = results.filter((r) => r.type === 'success').length;
+        const noDataCount = results.filter((r) => r.type === 'no_data').length;
+        const errorCount = results.filter((r) => r.type === 'error').length;
+
+        return results.filter((r) => r.type === 'success');
       });
 
       await prebidExplorer(options);
 
       // Verify all results were collected
       expect(totalResults).toHaveLength(4);
-      
+
       // Verify result distribution
-      const successResults = totalResults.filter(r => r.type === 'success');
-      const noDataResults = totalResults.filter(r => r.type === 'no_data');
-      const errorResults = totalResults.filter(r => r.type === 'error');
-      
+      const successResults = totalResults.filter((r) => r.type === 'success');
+      const noDataResults = totalResults.filter((r) => r.type === 'no_data');
+      const errorResults = totalResults.filter((r) => r.type === 'error');
+
       expect(successResults).toHaveLength(2); // success-batch.com, success-batch2.com
-      expect(noDataResults).toHaveLength(1);  // no-data-batch.com
-      expect(errorResults).toHaveLength(1);   // error-batch.com
+      expect(noDataResults).toHaveLength(1); // no-data-batch.com
+      expect(errorResults).toHaveLength(1); // error-batch.com
     });
   });
 
   describe('Batch Processing with URL Filtering', () => {
     it('should apply URL filtering per batch correctly', async () => {
-      const testUrls = Array.from({ length: 6 }, (_, i) => `https://batch-filter${i + 1}.com`);
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+      const testUrls = Array.from(
+        { length: 6 },
+        (_, i) => `https://batch-filter${i + 1}.com`
+      );
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -542,14 +592,16 @@ describe('Batch Processing Tests', () => {
         logDir: './logs',
         inputFile: 'test-urls.txt',
         chunkSize: 3,
-        skipProcessed: true
+        skipProcessed: true,
       };
 
       // Mock URL tracker to filter different URLs
-      mockUrlTracker.filterUnprocessedUrls.mockImplementation((urls: string[]) => {
-        // Remove every other URL to simulate some being processed
-        return urls.filter((_, index) => index % 2 === 0);
-      });
+      mockUrlTracker.filterUnprocessedUrls.mockImplementation(
+        (urls: string[]) => {
+          // Remove every other URL to simulate some being processed
+          return urls.filter((_, index) => index % 2 === 0);
+        }
+      );
 
       const processedUrls: string[] = [];
       mockPage.goto.mockImplementation((url: string) => {
@@ -557,15 +609,17 @@ describe('Batch Processing Tests', () => {
         return Promise.resolve(null);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -575,19 +629,23 @@ describe('Batch Processing Tests', () => {
       expect(processedUrls).toEqual([
         'https://batch-filter1.com',
         'https://batch-filter3.com',
-        'https://batch-filter5.com'
+        'https://batch-filter5.com',
       ]);
 
       // Verify URL tracker was called for filtering
-      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(testUrls);
+      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(
+        testUrls
+      );
     });
   });
 
   describe('Batch Processing Edge Cases', () => {
     it('should handle single URL in chunk correctly', async () => {
       const testUrls = ['https://single-batch-url.com'];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -599,32 +657,40 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 5 // Chunk size larger than URL count
+        chunkSize: 5, // Chunk size larger than URL count
       };
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
 
       // Should process as single chunk
-      expect(mockLogger.info).toHaveBeenCalledWith('Total chunks to process: 1');
-      expect(mockLogger.info).toHaveBeenCalledWith('Processing chunk 1 of 1: URLs 1-1');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Total chunks to process: 1'
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Processing chunk 1 of 1: URLs 1-1'
+      );
       expect(totalResults).toHaveLength(1);
     });
 
     it('should handle empty chunks gracefully', async () => {
       const testUrls: string[] = [];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -636,7 +702,7 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 3
+        chunkSize: 3,
       };
 
       await prebidExplorer(options);
@@ -652,10 +718,12 @@ describe('Batch Processing Tests', () => {
       const testUrls = [
         'https://no-chunk1.com',
         'https://no-chunk2.com',
-        'https://no-chunk3.com'
+        'https://no-chunk3.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -667,7 +735,7 @@ describe('Batch Processing Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 0 // Disable chunking
+        chunkSize: 0, // Disable chunking
       };
 
       let browserCreateCount = 0;
@@ -677,15 +745,17 @@ describe('Batch Processing Tests', () => {
         return Promise.resolve(mockBrowser);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);

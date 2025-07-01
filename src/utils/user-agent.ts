@@ -34,32 +34,39 @@ let cachedChromeVersion: string | null = null;
  * @param logger Optional logger for debugging
  * @returns Chrome version string (e.g., "127.0.6533.88")
  */
-export async function getPuppeteerChromeVersion(logger?: WinstonLogger): Promise<string> {
+export async function getPuppeteerChromeVersion(
+  logger?: WinstonLogger
+): Promise<string> {
   if (cachedChromeVersion) {
     return cachedChromeVersion;
   }
 
   try {
-    const browser = await puppeteer.launch({ 
+    const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
-    
+
     const version = await browser.version();
     await browser.close();
-    
+
     // Extract version number from "Chrome/127.0.6533.88" format
     const versionMatch = version.match(/Chrome\/(\d+\.\d+\.\d+\.\d+)/);
     if (versionMatch) {
       cachedChromeVersion = versionMatch[1];
-      logger?.debug(`Detected Puppeteer Chrome version: ${cachedChromeVersion}`);
+      logger?.debug(
+        `Detected Puppeteer Chrome version: ${cachedChromeVersion}`
+      );
       return cachedChromeVersion;
     }
-    
+
     throw new Error(`Could not parse Chrome version from: ${version}`);
   } catch (error) {
     const fallbackVersion = '127.0.0.0';
-    logger?.warn(`Failed to detect Chrome version, using fallback: ${fallbackVersion}`, { error });
+    logger?.warn(
+      `Failed to detect Chrome version, using fallback: ${fallbackVersion}`,
+      { error }
+    );
     cachedChromeVersion = fallbackVersion;
     return fallbackVersion;
   }
@@ -88,13 +95,16 @@ export function detectPlatform(): Exclude<Platform, 'auto'> {
  * @param chromeVersion Chrome version string
  * @returns Complete user agent string
  */
-export function generateUserAgent(platform: Exclude<Platform, 'auto'>, chromeVersion: string): string {
+export function generateUserAgent(
+  platform: Exclude<Platform, 'auto'>,
+  chromeVersion: string
+): string {
   const baseWebKit = '537.36';
-  
+
   const platformStrings = {
     macos: `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/${baseWebKit} (KHTML, like Gecko) Chrome/${chromeVersion} Safari/${baseWebKit}`,
     windows: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/${baseWebKit} (KHTML, like Gecko) Chrome/${chromeVersion} Safari/${baseWebKit}`,
-    linux: `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/${baseWebKit} (KHTML, like Gecko) Chrome/${chromeVersion} Safari/${baseWebKit}`
+    linux: `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/${baseWebKit} (KHTML, like Gecko) Chrome/${chromeVersion} Safari/${baseWebKit}`,
   };
 
   return platformStrings[platform];
@@ -113,12 +123,12 @@ export async function createAuthenticUserAgent(
   const {
     platform = 'auto',
     chromeVersion,
-    usePuppeteerVersion = true
+    usePuppeteerVersion = true,
   } = config;
 
   // Determine platform
   const targetPlatform = platform === 'auto' ? detectPlatform() : platform;
-  
+
   // Determine Chrome version
   let targetChromeVersion: string;
   if (chromeVersion) {
@@ -134,7 +144,7 @@ export async function createAuthenticUserAgent(
 
   const userAgent = generateUserAgent(targetPlatform, targetChromeVersion);
   logger?.info(`Generated user agent for ${targetPlatform}: ${userAgent}`);
-  
+
   return userAgent;
 }
 
@@ -143,13 +153,13 @@ export async function createAuthenticUserAgent(
  * @param userAgent User agent string to validate
  * @returns Validation result with issues
  */
-export function validateUserAgent(userAgent: string): { 
-  isValid: boolean; 
-  issues: string[]; 
-  info: { platform?: string; chromeVersion?: string; } 
+export function validateUserAgent(userAgent: string): {
+  isValid: boolean;
+  issues: string[];
+  info: { platform?: string; chromeVersion?: string };
 } {
   const issues: string[] = [];
-  const info: { platform?: string; chromeVersion?: string; } = {};
+  const info: { platform?: string; chromeVersion?: string } = {};
 
   // Check basic structure
   if (!userAgent.includes('Mozilla/5.0')) {
@@ -181,25 +191,30 @@ export function validateUserAgent(userAgent: string): {
   const chromeMatch = userAgent.match(/Chrome\/(\d+\.\d+\.\d+\.\d+)/);
   if (chromeMatch) {
     info.chromeVersion = chromeMatch[1];
-    
+
     // Check if version is recent (not too old)
     const majorVersion = parseInt(chromeMatch[1].split('.')[0]);
     if (majorVersion < 120) {
-      issues.push(`Chrome version ${info.chromeVersion} may be too old for authenticity`);
+      issues.push(
+        `Chrome version ${info.chromeVersion} may be too old for authenticity`
+      );
     }
   } else {
     issues.push('Could not parse Chrome version');
   }
 
   // Check for suspicious patterns
-  if (userAgent.toLowerCase().includes('bot') || userAgent.toLowerCase().includes('crawler')) {
+  if (
+    userAgent.toLowerCase().includes('bot') ||
+    userAgent.toLowerCase().includes('crawler')
+  ) {
     issues.push('Contains bot/crawler indicators');
   }
 
   return {
     isValid: issues.length === 0,
     issues,
-    info
+    info,
   };
 }
 
@@ -215,16 +230,16 @@ export async function getUserAgentOptions(logger?: WinstonLogger): Promise<{
 }> {
   const chromeVersion = await getPuppeteerChromeVersion(logger);
   const currentPlatform = detectPlatform();
-  
+
   const options = {
     macos: generateUserAgent('macos', chromeVersion),
     windows: generateUserAgent('windows', chromeVersion),
-    linux: generateUserAgent('linux', chromeVersion)
+    linux: generateUserAgent('linux', chromeVersion),
   };
 
   return {
     current: options[currentPlatform],
     options,
-    chromeVersion
+    chromeVersion,
   };
 }

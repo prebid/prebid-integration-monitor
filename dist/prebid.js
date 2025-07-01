@@ -28,8 +28,12 @@ import { processPageTask, // The core function for processing a single page
 import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, createErrorFileHeaders, } from './utils/results-handler.js';
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
 import { filterValidUrls } from './utils/domain-validator.js';
+import { PageLifecycleTracer, ClusterHealthMonitor } from './utils/puppeteer-telemetry.js';
+import { processUrlsWithRecovery } from './utils/cluster-wrapper.js';
+import { processUrlsWithBrowserPool } from './utils/browser-pool.js';
 import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
 import { initializeTelemetry, URLLoadingTracer, URLFilteringTracer } from './utils/telemetry.js';
+import { installProcessErrorHandler, uninstallProcessErrorHandler } from './utils/process-error-handler.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -74,6 +78,8 @@ const puppeteer = addExtra(puppeteerVanilla // Changed from unknown to any
 export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir); // Initialize the global logger
     initializeTelemetry('prebid-integration-monitor');
+    // Install global error handlers to catch puppeteer-cluster errors
+    installProcessErrorHandler(logger);
     logger.info('Starting Prebid Explorer with options:', options);
     // Initialize error file headers for better organization
     createErrorFileHeaders(logger);
@@ -358,42 +364,51 @@ export async function prebidExplorer(options) {
             logger.info(`Processing chunk ${chunkNumber} of ${totalChunks}: URLs ${i + 1}-${Math.min(i + chunkSize, urlsToProcess.length)}`);
             // Process the current chunk using either 'cluster' or 'vanilla' Puppeteer mode.
             if (options.puppeteerType === 'cluster') {
-                const cluster = await Cluster.launch({
-                    concurrency: Cluster.CONCURRENCY_CONTEXT,
-                    maxConcurrency: options.concurrency,
-                    monitor: options.monitor,
-                    puppeteer,
-                    puppeteerOptions: basePuppeteerOptions,
-                });
-                // Register a wrapper task that properly calls processPageTask and collects results
-                await cluster.task(async ({ page, data }) => {
-                    const result = await processPageTask({ page, data });
-                    // Push result directly to taskResults array since cluster.queue doesn't return values
-                    taskResults.push(result);
-                    return result;
-                });
+                // Use the safer processUrlsWithRecovery for chunked processing too
+                logger.info(`Using enhanced cluster processing with automatic recovery for chunk ${chunkNumber}...`);
                 try {
-                    const chunkPromises = currentChunkUrls
-                        .filter((url) => url)
-                        .map((url) => {
-                        processedUrls.add(url); // Add to global processedUrls as it's queued
-                        return cluster.queue({ url, logger, discoveryMode: options.discoveryMode }); // Pass url, logger, and discoveryMode
-                        // No specific .then or .catch here, as results are collected from settledChunkResults
-                        // Error handling for queueing itself might be needed if cluster.queue can throw directly
-                        // However, task errors are handled by processPageTask and returned as TaskResultError.
+                    await processUrlsWithRecovery(currentChunkUrls, {
+                        concurrency: options.concurrency,
+                        maxConcurrency: options.concurrency,
+                        monitor: options.monitor,
+                        puppeteer,
+                        puppeteerOptions: basePuppeteerOptions,
+                        logger,
+                        maxRetries: 2,
+                        onTaskComplete: (result) => {
+                            // Track results as they complete
+                            taskResults.push(result);
+                            const url = result.type === 'error' || result.type === 'no_data' ? result.url : result.data.url;
+                            if (url) {
+                                processedUrls.add(url);
+                            }
+                        }
+                    }, (processed, total) => {
+                        // Progress callback for chunk
+                        if (processed % 10 === 0 || processed === total) {
+                            logger.info(`Chunk ${chunkNumber} progress: ${processed}/${total} URLs processed`);
+                        }
                     });
-                    // Wait for all promises in the chunk to settle
-                    await Promise.allSettled(chunkPromises);
-                    // Results are now collected directly in the cluster task handler
-                    await cluster.idle();
-                    await cluster.close();
+                    // Results are already added via onTaskComplete callback
+                    // Just ensure all URLs are marked as processed
+                    currentChunkUrls.forEach(url => processedUrls.add(url));
                 }
                 catch (error) {
-                    logger.error(`An error occurred during processing chunk ${chunkNumber} with puppeteer-cluster.`, { error });
-                    // Cast cluster to any before calling isClosed and close
-                    if (cluster && !cluster.isClosed())
-                        // Changed cast
-                        await cluster.close(); // Ensure cluster is closed on error
+                    logger.error(`Fatal error in chunk ${chunkNumber} cluster processing:`, error);
+                    // Add error results for any URLs in this chunk that weren't processed
+                    for (const url of currentChunkUrls) {
+                        if (!taskResults.some(r => ((r.type === 'error' || r.type === 'no_data') ? r.url : r.data?.url) === url)) {
+                            taskResults.push({
+                                type: 'error',
+                                url: url,
+                                error: {
+                                    code: 'CHUNK_PROCESSING_ERROR',
+                                    message: `Chunk ${chunkNumber} processing failed: ${error.message}`,
+                                    stack: error.stack
+                                }
+                            });
+                        }
+                    }
                 }
             }
             else {
@@ -429,7 +444,50 @@ export async function prebidExplorer(options) {
     else {
         // Process all URLs at once (no chunking)
         logger.info(`Processing all ${urlsToProcess.length} URLs without chunking.`);
-        if (options.puppeteerType === 'cluster') {
+        // Use safer cluster processing for better stability
+        if (options.puppeteerType === 'cluster' && urlsToProcess.length > 0) {
+            logger.info('Using enhanced cluster processing with automatic recovery...');
+            try {
+                const clusterResults = await processUrlsWithRecovery(urlsToProcess, {
+                    concurrency: options.concurrency,
+                    maxConcurrency: options.concurrency,
+                    monitor: options.monitor,
+                    puppeteer,
+                    puppeteerOptions: basePuppeteerOptions,
+                    logger,
+                    maxRetries: 2
+                }, (processed, total) => {
+                    if (processed % 10 === 0) {
+                        logger.info(`Progress: ${processed}/${total} URLs processed`);
+                    }
+                });
+                taskResults.push(...clusterResults);
+                urlsToProcess.forEach(url => processedUrls.add(url));
+            }
+            catch (error) {
+                logger.error('Cluster processing failed, falling back to browser pool:', error);
+                // Fallback to browser pool if cluster fails
+                try {
+                    logger.info('Using browser pool as fallback...');
+                    const poolResults = await processUrlsWithBrowserPool(urlsToProcess, {
+                        concurrency: options.concurrency,
+                        puppeteerOptions: basePuppeteerOptions,
+                        logger
+                    }, (processed, total) => {
+                        if (processed % 10 === 0) {
+                            logger.info(`Progress: ${processed}/${total} URLs processed (browser pool)`);
+                        }
+                    });
+                    taskResults.push(...poolResults);
+                    urlsToProcess.forEach(url => processedUrls.add(url));
+                }
+                catch (poolError) {
+                    logger.error('Browser pool also failed:', poolError);
+                    throw poolError;
+                }
+            }
+        }
+        else if (options.puppeteerType === 'cluster') {
             const cluster = await Cluster.launch({
                 concurrency: Cluster.CONCURRENCY_CONTEXT,
                 maxConcurrency: options.concurrency,
@@ -437,24 +495,126 @@ export async function prebidExplorer(options) {
                 puppeteer,
                 puppeteerOptions: basePuppeteerOptions,
             });
+            // Create cluster health monitor
+            const clusterHealthMonitor = new ClusterHealthMonitor(logger);
+            clusterHealthMonitor.startMonitoring(cluster);
+            // Register cluster error handlers
+            cluster.on('taskerror', (err, data) => {
+                // Only log debug level for common lifecycle errors
+                if (err.message && err.message.includes('Requesting main frame too early')) {
+                    logger.debug(`Main frame lifecycle error for ${data.url}: ${err.message}`);
+                    // Create error result to ensure it's tracked
+                    const errorResult = {
+                        type: 'error',
+                        url: data.url,
+                        error: {
+                            code: 'PUPPETEER_MAIN_FRAME_ERROR',
+                            message: err.message,
+                            stack: err.stack
+                        }
+                    };
+                    // Ensure the error is recorded
+                    if (!taskResults.some(r => (r.type === 'error' || r.type === 'no_data') && r.url === data.url)) {
+                        taskResults.push(errorResult);
+                    }
+                }
+                else {
+                    logger.error(`Cluster task error for ${data.url}:`, err);
+                }
+            });
             // Register a wrapper task that properly calls processPageTask and collects results
             await cluster.task(async ({ page, data }) => {
-                const result = await processPageTask({ page, data });
-                // Push result directly to taskResults array since cluster.queue doesn't return values
-                taskResults.push(result);
-                return result;
+                const pageTracer = new PageLifecycleTracer(data.url, logger);
+                const span = pageTracer.startPageProcessing();
+                try {
+                    // Set aggressive timeouts to prevent hanging
+                    await page.setDefaultTimeout(30000); // 30 second timeout
+                    await page.setDefaultNavigationTimeout(30000);
+                    // Setup page event handlers for tracking
+                    pageTracer.setupPageEventHandlers(page);
+                    // Add page error handler to catch frame errors
+                    page.on('error', (error) => {
+                        if (error.message.includes('Requesting main frame too early')) {
+                            logger.debug(`Page lifecycle error for ${data.url}: ${error.message}`);
+                            // Don't let this crash the cluster
+                            pageTracer.recordEvent('critical_main_frame_error', error);
+                        }
+                        else {
+                            logger.error(`Page error for ${data.url}:`, error);
+                        }
+                    });
+                    const result = await processPageTask({ page, data });
+                    taskResults.push(result);
+                    pageTracer.finish(true, result.type === 'success' ? result.data : undefined);
+                    return result;
+                }
+                catch (error) {
+                    const err = error;
+                    pageTracer.finishWithError(err);
+                    // Handle "Requesting main frame too early" error specifically
+                    if (err.message && err.message.includes('Requesting main frame too early')) {
+                        logger.debug(`Puppeteer lifecycle error for ${data.url}: ${err.message}`);
+                        const errorResult = {
+                            type: 'error',
+                            url: data.url,
+                            error: {
+                                code: 'PUPPETEER_MAIN_FRAME_ERROR',
+                                message: err.message,
+                                stack: err.stack
+                            }
+                        };
+                        taskResults.push(errorResult);
+                        return errorResult;
+                    }
+                    // For other errors, also return error result instead of throwing
+                    const errorResult = {
+                        type: 'error',
+                        url: data.url,
+                        error: {
+                            code: 'UNKNOWN_ERROR',
+                            message: err.message,
+                            stack: err.stack
+                        }
+                    };
+                    taskResults.push(errorResult);
+                    return errorResult;
+                }
             });
             try {
                 const promises = urlsToProcess
                     .filter((url) => url)
                     .map((url) => {
                     processedUrls.add(url);
-                    return cluster.queue({ url, logger, discoveryMode: options.discoveryMode });
+                    // Wrap cluster.queue in try-catch to handle queue errors
+                    try {
+                        return cluster.queue({ url, logger, discoveryMode: options.discoveryMode });
+                    }
+                    catch (queueError) {
+                        logger.error(`Failed to queue URL ${url}:`, queueError);
+                        // Create error result for queue failures
+                        const errorResult = {
+                            type: 'error',
+                            url: url,
+                            error: {
+                                code: 'QUEUE_ERROR',
+                                message: queueError.message,
+                                stack: queueError.stack
+                            }
+                        };
+                        taskResults.push(errorResult);
+                        return Promise.resolve(); // Return resolved promise to continue
+                    }
                 });
                 await Promise.allSettled(promises);
+                // Check cluster health before closing
+                const healthStatus = clusterHealthMonitor.getHealthStatus();
+                if (!healthStatus.healthy) {
+                    logger.warn('Cluster unhealthy at end of processing:', healthStatus);
+                }
                 // Results are now collected directly in the cluster task handler
                 await cluster.idle();
                 await cluster.close();
+                clusterHealthMonitor.stopMonitoring();
             }
             catch (error) {
                 logger.error('An unexpected error occurred during cluster processing orchestration', { error });
@@ -605,4 +765,6 @@ export async function prebidExplorer(options) {
     logger.info('========================================');
     // Close URL tracker connection
     closeUrlTracker();
+    // Uninstall process error handlers
+    uninstallProcessErrorHandler();
 }

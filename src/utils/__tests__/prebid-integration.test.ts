@@ -55,15 +55,17 @@ vi.mocked(urlTracker.getUrlTracker).mockReturnValue(mockUrlTracker as any);
 vi.mocked(urlTracker.closeUrlTracker).mockImplementation(() => {});
 
 // Mock URL loader functions
-vi.mocked(urlLoader.loadFileContents).mockReturnValue('google.com\nyoutube.com\nfacebook.com');
+vi.mocked(urlLoader.loadFileContents).mockReturnValue(
+  'google.com\nyoutube.com\nfacebook.com'
+);
 vi.mocked(urlLoader.processFileContent).mockResolvedValue([
   'https://google.com',
-  'https://youtube.com', 
-  'https://facebook.com'
+  'https://youtube.com',
+  'https://facebook.com',
 ]);
 vi.mocked(urlLoader.fetchUrlsFromGitHub).mockResolvedValue([
   'https://github-url1.com',
-  'https://github-url2.com'
+  'https://github-url2.com',
 ]);
 
 // Mock results handler functions
@@ -97,7 +99,7 @@ describe('Prebid Explorer URL Filtering Integration', () => {
     it('should import existing results when database is empty', async () => {
       // Mock empty database stats
       mockUrlTracker.getStats.mockReturnValue({});
-      
+
       const options = {
         ...baseOptions,
         inputFile: 'test.txt',
@@ -116,7 +118,7 @@ describe('Prebid Explorer URL Filtering Integration', () => {
     it('should not import existing results when database has data', async () => {
       // Mock database with existing data
       mockUrlTracker.getStats.mockReturnValue({ success: 1000, no_data: 50 });
-      
+
       const options = {
         ...baseOptions,
         inputFile: 'test.txt',
@@ -128,11 +130,15 @@ describe('Prebid Explorer URL Filtering Integration', () => {
     });
 
     it('should filter URLs before processing', async () => {
-      const originalUrls = ['https://google.com', 'https://youtube.com', 'https://facebook.com'];
+      const originalUrls = [
+        'https://google.com',
+        'https://youtube.com',
+        'https://facebook.com',
+      ];
       const filteredUrls = ['https://youtube.com']; // Only youtube.com not processed
-      
+
       mockUrlTracker.filterUnprocessedUrls.mockReturnValue(filteredUrls);
-      
+
       const options = {
         ...baseOptions,
         inputFile: 'test.txt',
@@ -140,15 +146,19 @@ describe('Prebid Explorer URL Filtering Integration', () => {
 
       await prebidExplorer(options);
 
-      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(originalUrls);
+      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(
+        originalUrls
+      );
       expect(mockLogger.info).toHaveBeenCalledWith(
-        expect.stringContaining('URL filtering complete: 3 total, 1 unprocessed, 2 skipped')
+        expect.stringContaining(
+          'URL filtering complete: 3 total, 1 unprocessed, 2 skipped'
+        )
       );
     });
 
     it('should exit early when all URLs are processed', async () => {
       mockUrlTracker.filterUnprocessedUrls.mockReturnValue([]); // All URLs filtered out
-      
+
       const options = {
         ...baseOptions,
         inputFile: 'test.txt',
@@ -156,14 +166,16 @@ describe('Prebid Explorer URL Filtering Integration', () => {
 
       await prebidExplorer(options);
 
-      expect(mockLogger.info).toHaveBeenCalledWith('All URLs have been previously processed. Exiting.');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'All URLs have been previously processed. Exiting.'
+      );
       expect(urlTracker.closeUrlTracker).toHaveBeenCalled();
     });
 
     it('should update URL tracker with results after processing', async () => {
       const filteredUrls = ['https://youtube.com'];
       mockUrlTracker.filterUnprocessedUrls.mockReturnValue(filteredUrls);
-      
+
       const mockTaskResults: TaskResult[] = [
         {
           type: 'success',
@@ -171,16 +183,16 @@ describe('Prebid Explorer URL Filtering Integration', () => {
             url: 'https://youtube.com',
             libraries: ['googletag'],
             date: '2023-10-27',
-            prebidInstances: []
-          }
-        }
+            prebidInstances: [],
+          },
+        },
       ];
-      
+
       // Mock the processAndLogTaskResults to return the task results
       vi.mocked(resultsHandler.processAndLogTaskResults).mockReturnValue([
-        mockTaskResults[0].data
+        mockTaskResults[0].data,
       ]);
-      
+
       const options = {
         ...baseOptions,
         inputFile: 'test.txt',
@@ -206,7 +218,9 @@ describe('Prebid Explorer URL Filtering Integration', () => {
       await prebidExplorer(options);
 
       expect(mockUrlTracker.resetTracking).toHaveBeenCalled();
-      expect(mockLogger.info).toHaveBeenCalledWith('Resetting URL tracking database...');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Resetting URL tracking database...'
+      );
     });
 
     it('should work with GitHub repository as source', async () => {
@@ -217,7 +231,7 @@ describe('Prebid Explorer URL Filtering Integration', () => {
 
       const githubUrls = ['https://github-url1.com', 'https://github-url2.com'];
       const filteredUrls = ['https://github-url2.com'];
-      
+
       mockUrlTracker.filterUnprocessedUrls.mockReturnValue(filteredUrls);
 
       await prebidExplorer(options);
@@ -227,7 +241,9 @@ describe('Prebid Explorer URL Filtering Integration', () => {
         undefined,
         mockLogger
       );
-      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(githubUrls);
+      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(
+        githubUrls
+      );
     });
   });
 
@@ -274,7 +290,11 @@ describe('Prebid Explorer URL Filtering Integration', () => {
         range: '1-2', // Only first 2 URLs
       };
 
-      const originalUrls = ['https://google.com', 'https://youtube.com', 'https://facebook.com'];
+      const originalUrls = [
+        'https://google.com',
+        'https://youtube.com',
+        'https://facebook.com',
+      ];
       const rangedUrls = ['https://google.com', 'https://youtube.com']; // First 2 after range
       const filteredUrls = ['https://youtube.com']; // After URL filtering
 
@@ -282,7 +302,9 @@ describe('Prebid Explorer URL Filtering Integration', () => {
 
       await prebidExplorer(options);
 
-      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(rangedUrls);
+      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(
+        rangedUrls
+      );
       expect(mockLogger.info).toHaveBeenCalledWith(
         expect.stringContaining('Applied range: Processing URLs from 1 to 2')
       );
@@ -312,7 +334,9 @@ describe('Prebid Explorer URL Filtering Integration', () => {
 
     it('should close URL tracker even if processing fails', async () => {
       // Mock an error during processing
-      vi.mocked(urlLoader.processFileContent).mockRejectedValue(new Error('File read error'));
+      vi.mocked(urlLoader.processFileContent).mockRejectedValue(
+        new Error('File read error')
+      );
 
       const options: PrebidExplorerOptions = {
         puppeteerType: 'vanilla',
@@ -326,7 +350,7 @@ describe('Prebid Explorer URL Filtering Integration', () => {
       };
 
       await expect(prebidExplorer(options)).rejects.toThrow();
-      
+
       // URL tracker should still be closed
       expect(urlTracker.closeUrlTracker).toHaveBeenCalled();
     });
@@ -346,14 +370,20 @@ describe('Prebid Explorer URL Filtering Integration', () => {
         chunkSize: 2,
       };
 
-      const originalUrls = ['https://google.com', 'https://youtube.com', 'https://facebook.com'];
+      const originalUrls = [
+        'https://google.com',
+        'https://youtube.com',
+        'https://facebook.com',
+      ];
       const filteredUrls = ['https://youtube.com', 'https://facebook.com'];
 
       mockUrlTracker.filterUnprocessedUrls.mockReturnValue(filteredUrls);
 
       await prebidExplorer(options);
 
-      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(originalUrls);
+      expect(mockUrlTracker.filterUnprocessedUrls).toHaveBeenCalledWith(
+        originalUrls
+      );
       expect(mockLogger.info).toHaveBeenCalledWith(
         expect.stringContaining('Chunked processing enabled. Chunk size: 2')
       );

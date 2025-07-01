@@ -7,6 +7,7 @@ This document summarizes the comprehensive testing and validation infrastructure
 ## 🚀 Single Command Validation
 
 ### `npm run validate:all`
+
 This is the **master command** that runs everything:
 
 ```bash
@@ -14,8 +15,9 @@ npm run validate:all
 ```
 
 **What it runs (in order):**
+
 1. `npm run build:check` - TypeScript type checking
-2. `npm run lint` - ESLint code linting  
+2. `npm run lint` - ESLint code linting
 3. `npm run format` - Prettier code formatting
 4. `npm run sync-agent-docs` - Documentation synchronization
 5. `npm run test:all` - All unit tests + critical integration tests
@@ -24,6 +26,7 @@ npm run validate:all
 ## 🔧 Integration Points
 
 ### 1. Package.json Scripts
+
 ```json
 {
   "test:all": "npm run test && npm run test:critical",
@@ -38,12 +41,14 @@ npm run validate:all
 ```
 
 ### 2. Git Hooks Integration
+
 - **Location**: `.githooks/pre-commit`
 - **Activation**: `npm run setup:hooks`
 - **Function**: Runs `npm run validate:all` before every commit
 - **Result**: Prevents commits that would fail validation
 
 ### 3. CI/CD Integration
+
 - **Location**: `.github/workflows/comprehensive-validation.yml`
 - **Triggers**: Push to main/develop, Pull Requests
 - **Features**:
@@ -55,6 +60,7 @@ npm run validate:all
   - Security auditing
 
 ### 4. Documentation Sync Integration
+
 - **Command**: `npm run sync-agent-docs`
 - **Integration**: Automatically runs as part of `validate:all`
 - **Purpose**: Ensures CLAUDE.md, GEMINI.md, AGENTS.md stay in sync
@@ -63,20 +69,24 @@ npm run validate:all
 ## 🧪 Test Categories and Coverage
 
 ### Critical Integration Tests
+
 **Purpose**: Catch bugs like the GitHub range processing issue
 
 1. **GitHub Range Integration** (`src/__tests__/github-range-integration.test.ts`)
+
    - Tests complete GitHub URL processing pipeline
    - Validates range optimization
    - Catches double range application
    - Tests memory efficiency
 
 2. **CLI Integration Regression** (`src/__tests__/cli-integration-regression.test.ts`)
+
    - Tests complete CLI command processing
    - Validates batch processing
    - Prevents command-line interface regressions
 
 3. **Puppeteer Accuracy** (`src/__tests__/puppeteer-accuracy.test.ts`)
+
    - Tests website interaction optimizations
    - Validates Prebid detection accuracy
    - Ensures dynamic content loading works
@@ -87,9 +97,11 @@ npm run validate:all
    - Memory usage regression testing
 
 ### Anti-Pattern Detection
+
 **Location**: `scripts/validate-integration.js`
 
 Automatically detects:
+
 - Double range application patterns
 - Missing GitHub source type differentiation
 - Lack of range optimization usage
@@ -99,6 +111,7 @@ Automatically detects:
 ## 🔍 Specific GitHub Range Bug Prevention
 
 ### The Bug That Was Missed
+
 ```bash
 # Command that failed
 node ./bin/run.js scan --githubRepo URL --range="500000-500002"
@@ -110,6 +123,7 @@ node ./bin/run.js scan --githubRepo URL --range="500000-500002"
 ```
 
 ### How It's Now Prevented
+
 1. **Integration Test**: `github-range-integration.test.ts` contains "THE BUG SCENARIO" test
 2. **Pattern Detection**: Validation script checks for double range application
 3. **Pre-commit Hooks**: Catches the issue before commit
@@ -120,27 +134,33 @@ node ./bin/run.js scan --githubRepo URL --range="500000-500002"
 ### For Developers
 
 **Before any commit:**
+
 ```bash
 npm run validate:all
 ```
 
 **Setup once (recommended):**
+
 ```bash
 npm run setup:hooks
 ```
 
 **Quick testing:**
+
 ```bash
 npm run test:critical
 ```
 
 ### For CI/CD
+
 The GitHub Actions workflow automatically runs on:
+
 - Push to main/develop branches
 - Pull request creation
 - Pull request updates
 
 ### For Debugging
+
 ```bash
 # Test specific integration
 npm run test:integration
@@ -158,6 +178,7 @@ npm run validate:integration
 ## 🎯 Success Metrics
 
 ### Before This Integration
+
 - ❌ GitHub range bug went undetected
 - ❌ Only unit tests ran
 - ❌ No integration testing
@@ -165,6 +186,7 @@ npm run validate:integration
 - ❌ No anti-pattern detection
 
 ### After This Integration
+
 - ✅ GitHub range bug would be caught immediately
 - ✅ Complete pipeline validation
 - ✅ Comprehensive integration testing
@@ -174,7 +196,9 @@ npm run validate:integration
 ## 🚨 Failure Scenarios
 
 ### If `validate:all` Fails
+
 The validation will **stop and report exactly what failed**:
+
 - TypeScript compilation errors
 - Linting violations
 - Test failures (unit or integration)
@@ -182,7 +206,9 @@ The validation will **stop and report exactly what failed**:
 - Integration validation failures
 
 ### If Pre-commit Hook Triggers
+
 Commits are **blocked until all issues are resolved**:
+
 ```bash
 ❌ Comprehensive validation failed. Please fix all issues before committing.
    This includes: TypeScript errors, linting issues, formatting, docs sync, tests, and integration tests.
@@ -191,17 +217,21 @@ Commits are **blocked until all issues are resolved**:
 ## 🔧 Maintenance
 
 ### Adding New Tests
+
 1. Add test files to `src/__tests__/`
 2. Update test categories in `package.json` if needed
 3. Update `validate-integration.js` for pattern detection
 
 ### Modifying Validation
+
 1. Update `validate:all` script in `package.json`
 2. Modify `.githooks/pre-commit` if needed
 3. Update CI workflow `.github/workflows/comprehensive-validation.yml`
 
 ### Documentation Updates
+
 Documentation sync is **automatic** - just run `npm run validate:all` and it will:
+
 1. Sync documentation
 2. Detect if docs are out of sync
 3. Fail validation if sync is needed

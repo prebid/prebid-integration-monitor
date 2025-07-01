@@ -25,6 +25,10 @@
     "test:integration": "npm test src/__tests__/github-range-integration.test.ts && npm test src/__tests__/cli-integration-regression.test.ts",
     "test:regression": "npm test src/__tests__/github-range-integration.test.ts && npm test src/__tests__/cli-integration-regression.test.ts && npm test src/__tests__/optimization-integration.test.ts",
     "test:critical": "npm test src/__tests__/github-range-integration.test.ts && npm test src/__tests__/cli-integration-regression.test.ts && npm test src/__tests__/puppeteer-accuracy.test.ts",
+    "test:resilience": "npm test src/__tests__/puppeteer-resilience.test.ts",
+    "test:stress": "npm test src/__tests__/cluster-stress.test.ts",
+    "test:health": "npm test src/__tests__/health-monitoring.test.ts",
+    "test:stability": "npm run test:resilience && npm run test:health",
     "validate:integration": "node scripts/validate-integration.js",
     "validate:pre-commit": ".githooks/pre-commit",
     "setup:hooks": "git config core.hooksPath .githooks && echo 'Git hooks configured to use .githooks directory'"

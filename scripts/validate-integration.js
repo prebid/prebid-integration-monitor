@@ -19,53 +19,59 @@ console.log('🔍 Starting comprehensive integration validation...\n');
 const testScenarios = [
   {
     name: 'GitHub Range Processing Validation',
-    description: 'Tests GitHub URL processing with various range configurations',
+    description:
+      'Tests GitHub URL processing with various range configurations',
     command: 'npm test src/__tests__/github-range-integration.test.ts',
-    critical: true
+    critical: true,
   },
   {
     name: 'CLI Integration Regression Tests',
     description: 'Tests complete CLI command processing pipeline',
     command: 'npm test src/__tests__/cli-integration-regression.test.ts',
-    critical: true
+    critical: true,
   },
   {
     name: 'Optimization Integration Tests',
     description: 'Tests performance optimizations and memory usage',
     command: 'npm test src/__tests__/optimization-integration.test.ts',
-    critical: false
+    critical: false,
   },
   {
     name: 'Puppeteer Accuracy Tests',
     description: 'Tests website interaction and Prebid detection accuracy',
     command: 'npm test src/__tests__/puppeteer-accuracy.test.ts',
-    critical: false
+    critical: false,
   },
   {
     name: 'URL Processing Integration Tests',
     description: 'Tests complete URL loading and processing pipeline',
     command: 'npm test src/__tests__/url-processing-integration.test.ts',
-    critical: true
-  }
+    critical: true,
+  },
 ];
 
 // Bug pattern detection
 const bugPatterns = [
   {
     name: 'Double Range Application Pattern',
-    description: 'Checks for the specific pattern that caused the GitHub range bug',
+    description:
+      'Checks for the specific pattern that caused the GitHub range bug',
     pattern: /options\.range.*allUrls\.slice.*urlSourceType/,
     files: ['src/prebid.ts'],
     shouldExist: true, // We want to see the fix pattern
-    message: 'Should have proper GitHub source type checking for range application'
+    message:
+      'Should have proper GitHub source type checking for range application',
   },
   {
     name: 'GitHub Source Type Differentiation',
-    description: 'Ensures GitHub and local file processing are handled differently',
-    pattern: /urlSourceType.*!==.*['"]GitHub['"]|urlSourceType.*===.*['"]GitHub['"]/,
+    description:
+      'Ensures GitHub and local file processing are handled differently',
+    pattern:
+      /urlSourceType.*!==.*['"]GitHub['"]|urlSourceType.*===.*['"]GitHub['"]/,
     files: ['src/prebid.ts'],
     shouldExist: true,
-    message: 'Must differentiate between GitHub and local file sources for range processing'
+    message:
+      'Must differentiate between GitHub and local file sources for range processing',
   },
   {
     name: 'Range Optimization Usage',
@@ -73,16 +79,19 @@ const bugPatterns = [
     pattern: /rangeOptions.*startRange.*endRange/,
     files: ['src/prebid.ts', 'src/utils/url-loader.ts'],
     shouldExist: true,
-    message: 'Should use range optimization to prevent memory issues with large files'
+    message:
+      'Should use range optimization to prevent memory issues with large files',
   },
   {
     name: 'Duplicate Range Prevention',
-    description: 'Checks for explicit prevention of duplicate range application',
+    description:
+      'Checks for explicit prevention of duplicate range application',
     pattern: /already applied.*GitHub.*skip.*duplicate/,
     files: ['src/prebid.ts'],
     shouldExist: true,
-    message: 'Must explicitly prevent duplicate range application for GitHub sources'
-  }
+    message:
+      'Must explicitly prevent duplicate range application for GitHub sources',
+  },
 ];
 
 let totalTests = 0;
@@ -120,7 +129,7 @@ function checkBugPattern(pattern, files, shouldExist, message) {
   }
 
   const success = found === shouldExist;
-  
+
   if (success) {
     console.log(`✅ Pattern check passed: ${message}`);
     if (foundFiles.length > 0) {
@@ -134,20 +143,20 @@ function checkBugPattern(pattern, files, shouldExist, message) {
       console.log(`   Unexpected pattern found in: ${foundFiles.join(', ')}`);
     }
   }
-  
+
   console.log('');
   return success;
 }
 
 // Run all test scenarios
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 console.log('RUNNING TEST SCENARIOS');
-console.log('=' .repeat(60) + '\n');
+console.log('='.repeat(60) + '\n');
 
 for (const scenario of testScenarios) {
   totalTests++;
   const result = runCommand(scenario.command, scenario.description);
-  
+
   if (result.success) {
     passedTests++;
   } else if (scenario.critical) {
@@ -156,39 +165,42 @@ for (const scenario of testScenarios) {
 }
 
 // Check for bug patterns
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 console.log('CHECKING FOR BUG PATTERNS');
-console.log('=' .repeat(60) + '\n');
+console.log('='.repeat(60) + '\n');
 
 let patternChecksPassed = 0;
 for (const bugPattern of bugPatterns) {
   totalTests++;
   console.log(`🔍 ${bugPattern.name}: ${bugPattern.description}`);
-  
+
   const success = checkBugPattern(
     bugPattern.pattern,
     bugPattern.files,
     bugPattern.shouldExist,
     bugPattern.message
   );
-  
+
   if (success) {
     passedTests++;
     patternChecksPassed++;
-  } else if (bugPattern.name.includes('GitHub') || bugPattern.name.includes('Range')) {
+  } else if (
+    bugPattern.name.includes('GitHub') ||
+    bugPattern.name.includes('Range')
+  ) {
     criticalFailures++;
   }
 }
 
 // Additional validation checks
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 console.log('ADDITIONAL VALIDATION CHECKS');
-console.log('=' .repeat(60) + '\n');
+console.log('='.repeat(60) + '\n');
 
 // Check if the specific bug scenario files exist
 const criticalTestFiles = [
   'src/__tests__/github-range-integration.test.ts',
-  'src/__tests__/cli-integration-regression.test.ts'
+  'src/__tests__/cli-integration-regression.test.ts',
 ];
 
 for (const testFile of criticalTestFiles) {
@@ -205,10 +217,17 @@ for (const testFile of criticalTestFiles) {
 
 // Check for the specific bug test case
 totalTests++;
-const githubRangeTestPath = path.join(__dirname, '..', 'src/__tests__/github-range-integration.test.ts');
+const githubRangeTestPath = path.join(
+  __dirname,
+  '..',
+  'src/__tests__/github-range-integration.test.ts'
+);
 if (fs.existsSync(githubRangeTestPath)) {
   const testContent = fs.readFileSync(githubRangeTestPath, 'utf8');
-  if (testContent.includes('THE BUG SCENARIO') || testContent.includes('500000-500002')) {
+  if (
+    testContent.includes('THE BUG SCENARIO') ||
+    testContent.includes('500000-500002')
+  ) {
     console.log('✅ GitHub range bug scenario test found');
     passedTests++;
   } else {
@@ -221,9 +240,9 @@ if (fs.existsSync(githubRangeTestPath)) {
 }
 
 // Summary report
-console.log('\n' + '=' .repeat(60));
+console.log('\n' + '='.repeat(60));
 console.log('VALIDATION SUMMARY');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 console.log(`📊 Total Tests: ${totalTests}`);
 console.log(`✅ Passed: ${passedTests}`);
@@ -239,7 +258,9 @@ if (criticalFailures > 0) {
   console.log('- GitHub range processing validation failed');
   console.log('- CLI integration tests are missing or failing');
   console.log('- Bug prevention patterns are not in place');
-  console.log('\nThese failures indicate that similar bugs to the GitHub range issue could occur again.');
+  console.log(
+    '\nThese failures indicate that similar bugs to the GitHub range issue could occur again.'
+  );
   process.exit(1);
 } else if (passRate < 90) {
   console.log('\n⚠️  WARNING: Low pass rate detected.');
@@ -247,7 +268,11 @@ if (criticalFailures > 0) {
   process.exit(1);
 } else {
   console.log('\n🎉 All validation checks passed!');
-  console.log('The system has proper safeguards against GitHub range processing bugs.');
-  console.log('Integration testing infrastructure is robust and comprehensive.');
+  console.log(
+    'The system has proper safeguards against GitHub range processing bugs.'
+  );
+  console.log(
+    'Integration testing infrastructure is robust and comprehensive.'
+  );
   process.exit(0);
 }

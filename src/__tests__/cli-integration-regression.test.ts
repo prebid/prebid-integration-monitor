@@ -5,7 +5,7 @@ import type { Logger as WinstonLogger } from 'winston';
 
 // Mock the entire processing pipeline
 vi.mock('../prebid.js', () => ({
-  processPrebidWithOptions: vi.fn()
+  processPrebidWithOptions: vi.fn(),
 }));
 
 import { processPrebidWithOptions } from '../prebid.js';
@@ -16,7 +16,7 @@ describe('CLI Integration Regression Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Clean up test files
     if (fs.existsSync(testDbPath)) {
       fs.unlinkSync(testDbPath);
@@ -40,9 +40,10 @@ describe('CLI Integration Regression Tests', () => {
     it('should prevent the 500k range bug from recurring', async () => {
       // This test simulates the exact command that failed:
       // node ./bin/run.js scan --githubRepo URL --range="500000-500002"
-      
+
       const mockOptions = {
-        githubRepo: 'https://github.com/zer0h/top-1000000-domains/blob/master/top-1000000-domains',
+        githubRepo:
+          'https://github.com/zer0h/top-1000000-domains/blob/master/top-1000000-domains',
         range: '500000-500002',
         skipProcessed: true,
         prefilterProcessed: true,
@@ -55,12 +56,12 @@ describe('CLI Integration Regression Tests', () => {
         numUrls: 100,
         resetTracking: false,
         forceReprocess: false,
-        verbose: false
+        verbose: false,
       };
 
       // Mock the processPrebidWithOptions to simulate the bug scenario
       const mockProcessPrebid = vi.mocked(processPrebidWithOptions);
-      
+
       // The bug scenario: function should complete successfully, not exit early with "No URLs to process"
       mockProcessPrebid.mockImplementation(async (options) => {
         // Simulate the bug condition check
@@ -70,28 +71,32 @@ describe('CLI Integration Regression Tests', () => {
           const extractedUrlCount = 3; // URLs from range 500000-500002
           const [startStr] = options.range.split('-');
           const start = parseInt(startStr, 10) - 1; // 499999
-          
+
           // The bug: start (499999) >= extractedUrlCount (3)
           const bugCondition = start >= extractedUrlCount;
-          
+
           if (bugCondition) {
             // In the buggy version, this would cause "No URLs to process" and early exit
-            throw new Error('Range bug reproduced: No URLs to process after applying range');
+            throw new Error(
+              'Range bug reproduced: No URLs to process after applying range'
+            );
           }
         }
-        
+
         // In the fixed version, processing should continue normally
         return Promise.resolve();
       });
 
       // The test: this should NOT throw an error in the fixed version
-      await expect(processPrebidWithOptions(mockOptions)).rejects.toThrow('Range bug reproduced');
-      
+      await expect(processPrebidWithOptions(mockOptions)).rejects.toThrow(
+        'Range bug reproduced'
+      );
+
       // Verify the bug condition was checked
       expect(mockProcessPrebid).toHaveBeenCalledWith(
         expect.objectContaining({
           githubRepo: mockOptions.githubRepo,
-          range: mockOptions.range
+          range: mockOptions.range,
         })
       );
     });
@@ -112,19 +117,20 @@ describe('CLI Integration Regression Tests', () => {
         prefilterProcessed: false,
         resetTracking: false,
         forceReprocess: false,
-        verbose: false
+        verbose: false,
       };
 
       const mockProcessPrebid = vi.mocked(processPrebidWithOptions);
-      
+
       // Mock the FIXED behavior: GitHub range is applied once, manual range is skipped
       mockProcessPrebid.mockImplementation(async (options) => {
         if (options.range && options.githubRepo) {
           // In the fixed version, we should skip the manual range application
           // when GitHub range was already applied
           const urlSourceType = 'GitHub';
-          const shouldSkipManualRange = urlSourceType === 'GitHub' && options.range;
-          
+          const shouldSkipManualRange =
+            urlSourceType === 'GitHub' && options.range;
+
           if (shouldSkipManualRange) {
             // This represents the fix: skip duplicate range filtering
             // Processing should continue with the GitHub-extracted URLs
@@ -135,8 +141,10 @@ describe('CLI Integration Regression Tests', () => {
       });
 
       // The fixed version should complete successfully
-      await expect(processPrebidWithOptions(mockOptions)).resolves.not.toThrow();
-      
+      await expect(
+        processPrebidWithOptions(mockOptions)
+      ).resolves.not.toThrow();
+
       expect(mockProcessPrebid).toHaveBeenCalledWith(mockOptions);
     });
   });
@@ -145,7 +153,8 @@ describe('CLI Integration Regression Tests', () => {
     it('should handle batch mode with large ranges correctly', async () => {
       // Test batch processing that would have failed with the bug
       const mockBatchOptions = {
-        githubRepo: 'https://github.com/zer0h/top-1000000-domains/blob/master/top-1000000-domains',
+        githubRepo:
+          'https://github.com/zer0h/top-1000000-domains/blob/master/top-1000000-domains',
         batchMode: true,
         startUrl: 500000,
         totalUrls: 250,
@@ -160,24 +169,24 @@ describe('CLI Integration Regression Tests', () => {
         monitor: false,
         resetTracking: false,
         forceReprocess: false,
-        verbose: false
+        verbose: false,
       };
 
       const mockProcessPrebid = vi.mocked(processPrebidWithOptions);
-      
+
       // Mock batch processing - each batch should process successfully
       let batchCallCount = 0;
       mockProcessPrebid.mockImplementation(async (options) => {
         batchCallCount++;
-        
+
         // Each batch should have a range calculated from startUrl + batch offset
-        const expectedRangeStart = 500000 + ((batchCallCount - 1) * 50);
+        const expectedRangeStart = 500000 + (batchCallCount - 1) * 50;
         const expectedRangeEnd = expectedRangeStart + 49;
         const expectedRange = `${expectedRangeStart}-${expectedRangeEnd}`;
-        
+
         // Verify the range is being set correctly for each batch
         expect(options.range).toBe(expectedRange);
-        
+
         // The bug would cause this to fail for large ranges
         // The fix ensures it succeeds
         return Promise.resolve();
@@ -185,15 +194,15 @@ describe('CLI Integration Regression Tests', () => {
 
       // Simulate processing 5 batches (250 URLs / 50 per batch)
       for (let batch = 0; batch < 5; batch++) {
-        const batchStart = 500000 + (batch * 50);
+        const batchStart = 500000 + batch * 50;
         const batchEnd = batchStart + 49;
         const batchRange = `${batchStart}-${batchEnd}`;
-        
+
         const batchOptions = {
           ...mockBatchOptions,
-          range: batchRange
+          range: batchRange,
         };
-        
+
         await processPrebidWithOptions(batchOptions);
       }
 
@@ -209,20 +218,20 @@ describe('CLI Integration Regression Tests', () => {
           description: 'Large range start beyond extracted URLs',
           range: '999999-1000000',
           extractedCount: 5,
-          shouldFail: true
+          shouldFail: true,
         },
         {
           description: 'Range start at boundary',
           range: '1000-1005',
           extractedCount: 6,
-          shouldFail: false
+          shouldFail: false,
         },
         {
           description: 'Small range with normal processing',
           range: '1-10',
           extractedCount: 10,
-          shouldFail: false
-        }
+          shouldFail: false,
+        },
       ];
 
       for (const scenario of problematicScenarios) {
@@ -240,30 +249,32 @@ describe('CLI Integration Regression Tests', () => {
           prefilterProcessed: false,
           resetTracking: false,
           forceReprocess: false,
-          verbose: false
+          verbose: false,
         };
 
         const mockProcessPrebid = vi.mocked(processPrebidWithOptions);
-        
+
         mockProcessPrebid.mockImplementation(async (options) => {
           // Simulate the bug detection logic
           const [startStr] = options.range!.split('-');
           const start = parseInt(startStr, 10) - 1;
           const bugCondition = start >= scenario.extractedCount;
-          
+
           if (bugCondition && scenario.shouldFail) {
             throw new Error(`Range conflict detected: ${scenario.description}`);
           }
-          
+
           return Promise.resolve();
         });
 
         if (scenario.shouldFail) {
-          await expect(processPrebidWithOptions(mockOptions))
-            .rejects.toThrow(scenario.description);
+          await expect(processPrebidWithOptions(mockOptions)).rejects.toThrow(
+            scenario.description
+          );
         } else {
-          await expect(processPrebidWithOptions(mockOptions))
-            .resolves.not.toThrow();
+          await expect(
+            processPrebidWithOptions(mockOptions)
+          ).resolves.not.toThrow();
         }
       }
     });
@@ -283,17 +294,17 @@ describe('CLI Integration Regression Tests', () => {
         prefilterProcessed: false,
         resetTracking: false,
         forceReprocess: false,
-        verbose: false
+        verbose: false,
       };
 
       const localFileOptions = {
         ...githubOptions,
         githubRepo: undefined,
-        inputFile: '/path/to/local/domains.txt'
+        inputFile: '/path/to/local/domains.txt',
       };
 
       const mockProcessPrebid = vi.mocked(processPrebidWithOptions);
-      
+
       mockProcessPrebid.mockImplementation(async (options) => {
         if (options.githubRepo) {
           // GitHub processing: range should be applied during fetch, not post-processing
@@ -308,9 +319,13 @@ describe('CLI Integration Regression Tests', () => {
       });
 
       // Both should succeed, but use different range processing paths
-      await expect(processPrebidWithOptions(githubOptions)).resolves.not.toThrow();
-      await expect(processPrebidWithOptions(localFileOptions)).resolves.not.toThrow();
-      
+      await expect(
+        processPrebidWithOptions(githubOptions)
+      ).resolves.not.toThrow();
+      await expect(
+        processPrebidWithOptions(localFileOptions)
+      ).resolves.not.toThrow();
+
       expect(mockProcessPrebid).toHaveBeenCalledTimes(2);
     });
   });

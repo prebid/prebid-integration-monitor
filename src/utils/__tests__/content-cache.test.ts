@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ContentCache, getContentCache, closeContentCache } from '../content-cache.js';
+import {
+  ContentCache,
+  getContentCache,
+  closeContentCache,
+} from '../content-cache.js';
 import type { Logger as WinstonLogger } from 'winston';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -28,12 +32,12 @@ describe('ContentCache', () => {
     mockFs.writeFileSync.mockReturnValue(undefined);
     mockFs.unlinkSync.mockReturnValue(undefined);
     mockFs.statSync.mockReturnValue({ size: 1000 } as any);
-    
+
     cache = new ContentCache(mockLogger, {
       cacheDir: testCacheDir,
       maxSize: 1024 * 1024, // 1MB
       ttl: 60000, // 1 minute
-      persistent: false // Disable for testing
+      persistent: false, // Disable for testing
     });
   });
 
@@ -87,7 +91,7 @@ describe('ContentCache', () => {
     it('should expire entries after TTL', async () => {
       const shortTtlCache = new ContentCache(mockLogger, {
         ttl: 10, // 10ms
-        persistent: false
+        persistent: false,
       });
 
       const url = 'https://example.com/test';
@@ -97,7 +101,7 @@ describe('ContentCache', () => {
       expect(shortTtlCache.get(url)).toBe(content);
 
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise((resolve) => setTimeout(resolve, 20));
 
       expect(shortTtlCache.get(url)).toBeNull();
     });
@@ -105,14 +109,14 @@ describe('ContentCache', () => {
     it('should clean up expired entries', async () => {
       const shortTtlCache = new ContentCache(mockLogger, {
         ttl: 10, // 10ms
-        persistent: false
+        persistent: false,
       });
 
       shortTtlCache.set('https://example1.com', 'content1');
       shortTtlCache.set('https://example2.com', 'content2');
 
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise((resolve) => setTimeout(resolve, 20));
 
       const statsBefore = shortTtlCache.getStats();
       shortTtlCache.cleanup();
@@ -138,7 +142,7 @@ describe('ContentCache', () => {
       const smallCache = new ContentCache(mockLogger, {
         maxSize: 5000, // 5KB
         maxEntries: 10,
-        persistent: false
+        persistent: false,
       });
 
       // Add entries that exceed size limit
@@ -155,7 +159,7 @@ describe('ContentCache', () => {
     it('should not cache content larger than max size', () => {
       const smallCache = new ContentCache(mockLogger, {
         maxSize: 1000,
-        persistent: false
+        persistent: false,
       });
 
       const largeContent = 'x'.repeat(2000);
@@ -171,7 +175,7 @@ describe('ContentCache', () => {
       const content = 'test content';
 
       cache.set(url, content);
-      
+
       // Access multiple times
       cache.get(url);
       cache.get(url);
@@ -184,7 +188,7 @@ describe('ContentCache', () => {
     it('should prefer frequently accessed entries during eviction', () => {
       const smallCache = new ContentCache(mockLogger, {
         maxEntries: 3,
-        persistent: false
+        persistent: false,
       });
 
       // Add initial entries
@@ -196,7 +200,7 @@ describe('ContentCache', () => {
       for (let i = 0; i < 10; i++) {
         smallCache.get('https://frequently-used.com');
       }
-      
+
       smallCache.get('https://sometimes-used.com');
 
       // Add new entry to trigger eviction
@@ -204,7 +208,7 @@ describe('ContentCache', () => {
 
       // Frequently used should still be there
       expect(smallCache.get('https://frequently-used.com')).toBe('content2');
-      
+
       // Rarely used should be evicted
       expect(smallCache.get('https://rarely-used.com')).toBeNull();
     });
@@ -214,13 +218,13 @@ describe('ContentCache', () => {
     it('should provide accurate statistics', () => {
       cache.set('https://example1.com', 'content1');
       cache.set('https://example2.com', 'content2');
-      
+
       // Access to create hits
       cache.get('https://example1.com');
       cache.get('https://example2.com');
 
       const stats = cache.getStats();
-      
+
       expect(stats.entries).toBe(2);
       expect(stats.size).toBeGreaterThan(0);
       expect(stats.hitRate).toBeGreaterThan(0);
@@ -230,7 +234,7 @@ describe('ContentCache', () => {
 
     it('should handle empty cache statistics', () => {
       const stats = cache.getStats();
-      
+
       expect(stats.entries).toBe(0);
       expect(stats.size).toBe(0);
       expect(stats.hitRate).toBe(0);
@@ -243,7 +247,7 @@ describe('ContentCache', () => {
     it('should return the same instance for multiple calls', () => {
       const cache1 = getContentCache(mockLogger);
       const cache2 = getContentCache(mockLogger);
-      
+
       expect(cache1).toBe(cache2);
     });
 
@@ -251,7 +255,7 @@ describe('ContentCache', () => {
       const cache1 = getContentCache(mockLogger);
       closeContentCache();
       const cache2 = getContentCache(mockLogger);
-      
+
       expect(cache1).not.toBe(cache2);
     });
   });

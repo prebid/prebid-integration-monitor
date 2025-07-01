@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { prebidExplorer, type PrebidExplorerOptions } from '../prebid.js';
-import type { TaskResult, TaskResultSuccess, TaskResultNoData, TaskResultError } from '../common/types.js';
+import type {
+  TaskResult,
+  TaskResultSuccess,
+  TaskResultNoData,
+  TaskResultError,
+} from '../common/types.js';
 import type { Logger as WinstonLogger } from 'winston';
 import * as fs from 'fs';
 
@@ -9,8 +14,8 @@ vi.mock('fs');
 vi.mock('../utils/logger.js', () => ({
   initializeLogger: vi.fn(() => createMockLogger()),
   default: {
-    instance: createMockLogger()
-  }
+    instance: createMockLogger(),
+  },
 }));
 
 vi.mock('../utils/url-tracker.js', () => ({
@@ -31,9 +36,7 @@ vi.mock('../utils/domain-validator.js', () => ({
 vi.mock('../utils/results-handler.js', () => ({
   processAndLogTaskResults: vi.fn((results) => {
     // Transform TaskResult[] to PageData[]
-    return results
-      .filter(r => r.type === 'success')
-      .map(r => r.data);
+    return results.filter((r) => r.type === 'success').map((r) => r.data);
   }),
   writeResultsToStoreFile: vi.fn(),
   appendNoPrebidUrls: vi.fn(),
@@ -45,27 +48,27 @@ vi.mock('../utils/results-handler.js', () => ({
 vi.mock('puppeteer', () => ({
   default: {
     launch: vi.fn(() => mockBrowser),
-  }
+  },
 }));
 
 vi.mock('puppeteer-cluster', () => ({
   Cluster: {
     launch: vi.fn(() => mockCluster),
-    CONCURRENCY_CONTEXT: 'CONCURRENCY_CONTEXT'
-  }
+    CONCURRENCY_CONTEXT: 'CONCURRENCY_CONTEXT',
+  },
 }));
 
 vi.mock('puppeteer-extra', () => ({
-  addExtra: vi.fn((pup) => pup)
+  addExtra: vi.fn((pup) => pup),
 }));
 
 vi.mock('puppeteer-extra-plugin-stealth', () => ({
-  default: vi.fn(() => ({}))
+  default: vi.fn(() => ({})),
 }));
 
 vi.mock('puppeteer-extra-plugin-block-resources', () => ({
   default: vi.fn(() => ({})),
-  __esModule: true
+  __esModule: true,
 }));
 
 // Mock logger
@@ -125,21 +128,21 @@ describe('Error Scenario Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogger = createMockLogger();
-    
+
     // Mock fs operations
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.mkdirSync).mockImplementation(() => '');
-    
+
     // Reset all mock implementations
     mockUrlTracker.getStats.mockReturnValue({});
     mockUrlTracker.filterUnprocessedUrls.mockImplementation((urls) => urls);
-    
+
     // Mock successful page processing by default
     mockPage.goto.mockResolvedValue(null as any);
     mockPage.evaluate.mockResolvedValue({
       libraries: ['googletag'],
       date: '2023-10-27',
-      prebidInstances: []
+      prebidInstances: [],
     });
   });
 
@@ -155,7 +158,7 @@ describe('Error Scenario Tests', () => {
       monitor: false,
       outputDir: './output',
       logDir: './logs',
-      inputFile: 'test-urls.txt'
+      inputFile: 'test-urls.txt',
     };
 
     it('should handle mix of valid URLs, DNS errors, and timeouts', async () => {
@@ -164,21 +167,25 @@ describe('Error Scenario Tests', () => {
         'https://invalid-dns.nonexistent',
         'https://valid-site2.com',
         'https://timeout-site.com',
-        'https://valid-site3.com'
+        'https://valid-site3.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
       // Mock different error types
       mockPage.goto.mockImplementation((url: string) => {
         mockPage.url.mockReturnValue(url);
-        
+
         if (url.includes('invalid-dns')) {
           return Promise.reject(new Error('net::ERR_NAME_NOT_RESOLVED'));
         } else if (url.includes('timeout-site')) {
-          const timeoutError = new Error('Navigation timeout of 30000 ms exceeded');
+          const timeoutError = new Error(
+            'Navigation timeout of 30000 ms exceeded'
+          );
           timeoutError.name = 'TimeoutError';
           return Promise.reject(timeoutError);
         }
@@ -192,42 +199,46 @@ describe('Error Scenario Tests', () => {
           return Promise.resolve({
             libraries: ['googletag'],
             date: '2023-10-27',
-            prebidInstances: []
+            prebidInstances: [],
           });
         }
         return Promise.resolve({
           libraries: [],
           date: '2023-10-27',
-          prebidInstances: []
+          prebidInstances: [],
         });
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let capturedResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         capturedResults = [...results];
-        
+
         // Verify all URLs attempted
         expect(results).toHaveLength(5);
-        
+
         // Check result distribution
-        const successCount = results.filter(r => r.type === 'success').length;
-        const errorCount = results.filter(r => r.type === 'error').length;
-        
+        const successCount = results.filter((r) => r.type === 'success').length;
+        const errorCount = results.filter((r) => r.type === 'error').length;
+
         expect(successCount).toBe(3); // valid-site1, valid-site2, valid-site3
-        expect(errorCount).toBe(2);   // invalid-dns, timeout-site
-        
+        expect(errorCount).toBe(2); // invalid-dns, timeout-site
+
         // Verify error types
-        const errorResults = results.filter(r => r.type === 'error') as TaskResultError[];
-        const errorCodes = errorResults.map(e => e.error.code);
+        const errorResults = results.filter(
+          (r) => r.type === 'error'
+        ) as TaskResultError[];
+        const errorCodes = errorResults.map((e) => e.error.code);
         expect(errorCodes).toContain('ERR_NAME_NOT_RESOLVED');
         expect(errorCodes).toContain('PUPPETEER_TIMEOUT');
-        
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -235,13 +246,13 @@ describe('Error Scenario Tests', () => {
       // Verify all URLs were attempted
       expect(mockPage.goto).toHaveBeenCalledTimes(5);
       expect(capturedResults).toHaveLength(5);
-      
+
       // Verify error logging occurred
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Error processing'),
         expect.objectContaining({
           url: expect.any(String),
-          errorCode: expect.any(String)
+          errorCode: expect.any(String),
         })
       );
     });
@@ -250,40 +261,48 @@ describe('Error Scenario Tests', () => {
       const testUrls = [
         'https://self-signed-cert.com',
         'https://protocol-error.com',
-        'https://valid-site.com'
+        'https://valid-site.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
       mockPage.goto.mockImplementation((url: string) => {
         mockPage.url.mockReturnValue(url);
-        
+
         if (url.includes('self-signed-cert')) {
           return Promise.reject(new Error('net::ERR_CERT_AUTHORITY_INVALID'));
         } else if (url.includes('protocol-error')) {
-          return Promise.reject(new Error('Protocol error (Page.navigate): Target closed'));
+          return Promise.reject(
+            new Error('Protocol error (Page.navigate): Target closed')
+          );
         }
         return Promise.resolve(null);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         expect(results).toHaveLength(3);
-        
-        const errorResults = results.filter(r => r.type === 'error') as TaskResultError[];
+
+        const errorResults = results.filter(
+          (r) => r.type === 'error'
+        ) as TaskResultError[];
         expect(errorResults).toHaveLength(2);
-        
-        const errorCodes = errorResults.map(e => e.error.code);
+
+        const errorCodes = errorResults.map((e) => e.error.code);
         expect(errorCodes).toContain('ERR_CERT_AUTHORITY_INVALID');
         expect(errorCodes).toContain('PROTOCOL_ERROR');
-        
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -295,46 +314,58 @@ describe('Error Scenario Tests', () => {
       const testUrls = [
         'https://js-error-site.com',
         'https://frame-detached.com',
-        'https://valid-site.com'
+        'https://valid-site.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
       // Navigation succeeds but JS execution fails
       mockPage.goto.mockResolvedValue(null as any);
-      
+
       mockPage.evaluate.mockImplementation(() => {
         const url = mockPage.url();
         if (url.includes('js-error-site')) {
-          return Promise.reject(new Error('Evaluation failed: ReferenceError: pbjs is not defined'));
+          return Promise.reject(
+            new Error('Evaluation failed: ReferenceError: pbjs is not defined')
+          );
         } else if (url.includes('frame-detached')) {
-          return Promise.reject(new Error('Execution context was destroyed, most likely because of a detached Frame'));
+          return Promise.reject(
+            new Error(
+              'Execution context was destroyed, most likely because of a detached Frame'
+            )
+          );
         }
         return Promise.resolve({
           libraries: ['googletag'],
           date: '2023-10-27',
-          prebidInstances: []
+          prebidInstances: [],
         });
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         expect(results).toHaveLength(3);
-        
-        const errorResults = results.filter(r => r.type === 'error') as TaskResultError[];
+
+        const errorResults = results.filter(
+          (r) => r.type === 'error'
+        ) as TaskResultError[];
         expect(errorResults).toHaveLength(2);
-        
-        const errorCodes = errorResults.map(e => e.error.code);
+
+        const errorCodes = errorResults.map((e) => e.error.code);
         expect(errorCodes).toContain('UNKNOWN_PROCESSING_ERROR'); // JS error
         expect(errorCodes).toContain('DETACHED_FRAME'); // Frame error
-        
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -351,7 +382,7 @@ describe('Error Scenario Tests', () => {
       monitor: false,
       outputDir: './output',
       logDir: './logs',
-      inputFile: 'test-urls.txt'
+      inputFile: 'test-urls.txt',
     };
 
     it('should handle mixed results in cluster mode with proper Promise resolution', async () => {
@@ -360,75 +391,81 @@ describe('Error Scenario Tests', () => {
         'https://cluster-error1.com',
         'https://cluster-valid2.com',
         'https://cluster-error2.com',
-        'https://cluster-nodata.com'
+        'https://cluster-nodata.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
       // Mock cluster queue responses
-      mockCluster.queue.mockImplementation((data: { url: string; logger: WinstonLogger }) => {
-        const url = data.url;
-        
-        if (url.includes('cluster-error1')) {
-          return Promise.resolve({
-            type: 'error',
-            url: url,
-            error: {
-              code: 'ERR_NAME_NOT_RESOLVED',
-              message: 'DNS resolution failed'
-            }
-          } as TaskResultError);
-        } else if (url.includes('cluster-error2')) {
-          return Promise.resolve({
-            type: 'error',
-            url: url,
-            error: {
-              code: 'TIMEOUT',
-              message: 'Navigation timeout'
-            }
-          } as TaskResultError);
-        } else if (url.includes('cluster-nodata')) {
-          return Promise.resolve({
-            type: 'no_data',
-            url: url
-          } as TaskResultNoData);
-        } else {
-          return Promise.resolve({
-            type: 'success',
-            data: {
-              url: url,
-              libraries: ['googletag'],
-              date: '2023-10-27',
-              prebidInstances: []
-            }
-          } as TaskResultSuccess);
-        }
-      });
+      mockCluster.queue.mockImplementation(
+        (data: { url: string; logger: WinstonLogger }) => {
+          const url = data.url;
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+          if (url.includes('cluster-error1')) {
+            return Promise.resolve({
+              type: 'error',
+              url: url,
+              error: {
+                code: 'ERR_NAME_NOT_RESOLVED',
+                message: 'DNS resolution failed',
+              },
+            } as TaskResultError);
+          } else if (url.includes('cluster-error2')) {
+            return Promise.resolve({
+              type: 'error',
+              url: url,
+              error: {
+                code: 'TIMEOUT',
+                message: 'Navigation timeout',
+              },
+            } as TaskResultError);
+          } else if (url.includes('cluster-nodata')) {
+            return Promise.resolve({
+              type: 'no_data',
+              url: url,
+            } as TaskResultNoData);
+          } else {
+            return Promise.resolve({
+              type: 'success',
+              data: {
+                url: url,
+                libraries: ['googletag'],
+                date: '2023-10-27',
+                prebidInstances: [],
+              },
+            } as TaskResultSuccess);
+          }
+        }
+      );
+
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let capturedResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         capturedResults = [...results];
-        
+
         // Verify all promises resolved and results captured
         expect(results).toHaveLength(5);
-        
+
         // Check result distribution
-        const successCount = results.filter(r => r.type === 'success').length;
-        const errorCount = results.filter(r => r.type === 'error').length;
-        const noDataCount = results.filter(r => r.type === 'no_data').length;
-        
+        const successCount = results.filter((r) => r.type === 'success').length;
+        const errorCount = results.filter((r) => r.type === 'error').length;
+        const noDataCount = results.filter((r) => r.type === 'no_data').length;
+
         expect(successCount).toBe(2); // cluster-valid1, cluster-valid2
-        expect(errorCount).toBe(2);   // cluster-error1, cluster-error2
-        expect(noDataCount).toBe(1);  // cluster-nodata
-        
+        expect(errorCount).toBe(2); // cluster-error1, cluster-error2
+        expect(noDataCount).toBe(1); // cluster-nodata
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -441,56 +478,64 @@ describe('Error Scenario Tests', () => {
       const testUrls = [
         'https://queue-reject.com',
         'https://task-error.com',
-        'https://valid-cluster.com'
+        'https://valid-cluster.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
       // Mock different types of failures
-      mockCluster.queue.mockImplementation((data: { url: string; logger: WinstonLogger }) => {
-        const url = data.url;
-        
-        if (url.includes('queue-reject')) {
-          // Promise rejection (cluster infrastructure error)
-          return Promise.reject(new Error('Cluster internal error'));
-        } else if (url.includes('task-error')) {
-          // Task completes but returns error result
-          return Promise.resolve({
-            type: 'error',
-            url: url,
-            error: {
-              code: 'PROCESSING_ERROR',
-              message: 'Page processing failed'
-            }
-          } as TaskResultError);
-        } else {
-          return Promise.resolve({
-            type: 'success',
-            data: {
-              url: url,
-              libraries: ['googletag'],
-              date: '2023-10-27',
-              prebidInstances: []
-            }
-          } as TaskResultSuccess);
-        }
-      });
+      mockCluster.queue.mockImplementation(
+        (data: { url: string; logger: WinstonLogger }) => {
+          const url = data.url;
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+          if (url.includes('queue-reject')) {
+            // Promise rejection (cluster infrastructure error)
+            return Promise.reject(new Error('Cluster internal error'));
+          } else if (url.includes('task-error')) {
+            // Task completes but returns error result
+            return Promise.resolve({
+              type: 'error',
+              url: url,
+              error: {
+                code: 'PROCESSING_ERROR',
+                message: 'Page processing failed',
+              },
+            } as TaskResultError);
+          } else {
+            return Promise.resolve({
+              type: 'success',
+              data: {
+                url: url,
+                libraries: ['googletag'],
+                date: '2023-10-27',
+                prebidInstances: [],
+              },
+            } as TaskResultSuccess);
+          }
+        }
+      );
+
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         // Should only have results from resolved promises
         expect(results).toHaveLength(2); // task-error + valid-cluster
-        
-        const errorResult = results.find(r => r.type === 'error') as TaskResultError;
+
+        const errorResult = results.find(
+          (r) => r.type === 'error'
+        ) as TaskResultError;
         expect(errorResult.error.code).toBe('PROCESSING_ERROR');
-        
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(baseOptions);
@@ -499,7 +544,7 @@ describe('Error Scenario Tests', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('was rejected'),
         expect.objectContaining({
-          reason: expect.any(Error)
+          reason: expect.any(Error),
         })
       );
     });
@@ -510,10 +555,12 @@ describe('Error Scenario Tests', () => {
       const testUrls = [
         'https://before-crash.com',
         'https://crash-browser.com',
-        'https://after-crash.com'
+        'https://after-crash.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -524,35 +571,37 @@ describe('Error Scenario Tests', () => {
         monitor: false,
         outputDir: './output',
         logDir: './logs',
-        inputFile: 'test-urls.txt'
+        inputFile: 'test-urls.txt',
       };
 
       // Mock browser crash during second URL
       mockPage.goto.mockImplementation((url: string) => {
         mockPage.url.mockReturnValue(url);
-        
+
         if (url.includes('crash-browser')) {
           throw new Error('Browser crashed unexpectedly');
         }
         return Promise.resolve(null);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         expect(results).toHaveLength(3);
-        
+
         // Should have 2 success, 1 error
-        const successCount = results.filter(r => r.type === 'success').length;
-        const errorCount = results.filter(r => r.type === 'error').length;
-        
+        const successCount = results.filter((r) => r.type === 'success').length;
+        const errorCount = results.filter((r) => r.type === 'error').length;
+
         expect(successCount).toBe(2);
         expect(errorCount).toBe(1);
-        
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -565,10 +614,12 @@ describe('Error Scenario Tests', () => {
         'https://chunk1-good.com',
         'https://chunk1-bad.com',
         'https://chunk2-good.com',
-        'https://chunk2-bad.com'
+        'https://chunk2-bad.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -580,35 +631,37 @@ describe('Error Scenario Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        chunkSize: 2
+        chunkSize: 2,
       };
 
       mockPage.goto.mockImplementation((url: string) => {
         mockPage.url.mockReturnValue(url);
-        
+
         if (url.includes('-bad')) {
           return Promise.reject(new Error('Simulated failure'));
         }
         return Promise.resolve(null);
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let totalResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
 
       // All URLs should be attempted despite partial failures
       expect(totalResults).toHaveLength(4);
-      expect(totalResults.filter(r => r.type === 'success')).toHaveLength(2);
-      expect(totalResults.filter(r => r.type === 'error')).toHaveLength(2);
+      expect(totalResults.filter((r) => r.type === 'success')).toHaveLength(2);
+      expect(totalResults.filter((r) => r.type === 'error')).toHaveLength(2);
     });
   });
 
@@ -619,10 +672,12 @@ describe('Error Scenario Tests', () => {
         'invalid-url-format',
         'https://another-valid.com',
         'ftp://unsupported-protocol.com',
-        'https://final-valid.com'
+        'https://final-valid.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -631,7 +686,7 @@ describe('Error Scenario Tests', () => {
       vi.mocked(filterValidUrls).mockResolvedValue([
         'https://valid-domain.com',
         'https://another-valid.com',
-        'https://final-valid.com'
+        'https://final-valid.com',
       ]);
 
       const options: PrebidExplorerOptions = {
@@ -641,29 +696,34 @@ describe('Error Scenario Tests', () => {
         monitor: false,
         outputDir: './output',
         logDir: './logs',
-        inputFile: 'test-urls.txt'
+        inputFile: 'test-urls.txt',
       };
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         // Should only process valid URLs
         expect(results).toHaveLength(3);
-        
-        const resultUrls = results.map(r => 
-          r.type === 'success' ? r.data.url : 
-          r.type === 'no_data' ? r.url : r.url
+
+        const resultUrls = results.map((r) =>
+          r.type === 'success'
+            ? r.data.url
+            : r.type === 'no_data'
+              ? r.url
+              : r.url
         );
         expect(resultUrls).toEqual([
           'https://valid-domain.com',
           'https://another-valid.com',
-          'https://final-valid.com'
+          'https://final-valid.com',
         ]);
-        
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       await prebidExplorer(options);
@@ -677,8 +737,10 @@ describe('Error Scenario Tests', () => {
   describe('Error Message and Stack Trace Verification', () => {
     it('should capture detailed error information in TaskResultError', async () => {
       const testUrls = ['https://detailed-error.com'];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -689,27 +751,32 @@ describe('Error Scenario Tests', () => {
         monitor: false,
         outputDir: './output',
         logDir: './logs',
-        inputFile: 'test-urls.txt'
+        inputFile: 'test-urls.txt',
       };
 
       const detailedError = new Error('Detailed error with stack trace');
-      detailedError.stack = 'Error: Detailed error with stack trace\n    at processPage\n    at line 123';
-      
+      detailedError.stack =
+        'Error: Detailed error with stack trace\n    at processPage\n    at line 123';
+
       mockPage.goto.mockRejectedValue(detailedError);
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         expect(results).toHaveLength(1);
-        
+
         const errorResult = results[0] as TaskResultError;
         expect(errorResult.type).toBe('error');
         expect(errorResult.url).toBe('https://detailed-error.com');
         expect(errorResult.error.code).toBe('UNKNOWN_PROCESSING_ERROR');
-        expect(errorResult.error.message).toBe('Detailed error with stack trace');
+        expect(errorResult.error.message).toBe(
+          'Detailed error with stack trace'
+        );
         expect(errorResult.error.stack).toContain('at processPage');
-        
+
         return [];
       });
 
@@ -721,7 +788,7 @@ describe('Error Scenario Tests', () => {
         expect.objectContaining({
           url: 'https://detailed-error.com',
           errorCode: 'UNKNOWN_PROCESSING_ERROR',
-          originalStack: expect.stringContaining('at processPage')
+          originalStack: expect.stringContaining('at processPage'),
         })
       );
     });
@@ -736,10 +803,12 @@ describe('Error Scenario Tests', () => {
         'https://timeout-error.com',
         'https://no-data.com',
         'https://success3.com',
-        'https://cert-error.com'
+        'https://cert-error.com',
       ];
-      
-      const { loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+
+      const { loadFileContents, processFileContent } = await import(
+        '../utils/url-loader.js'
+      );
       vi.mocked(loadFileContents).mockReturnValue('file content');
       vi.mocked(processFileContent).mockResolvedValue(testUrls);
 
@@ -751,13 +820,13 @@ describe('Error Scenario Tests', () => {
         outputDir: './output',
         logDir: './logs',
         inputFile: 'test-urls.txt',
-        skipProcessed: true
+        skipProcessed: true,
       };
 
       // Mock different outcomes
       mockPage.goto.mockImplementation((url: string) => {
         mockPage.url.mockReturnValue(url);
-        
+
         if (url.includes('dns-error')) {
           return Promise.reject(new Error('net::ERR_NAME_NOT_RESOLVED'));
         } else if (url.includes('timeout-error')) {
@@ -776,48 +845,54 @@ describe('Error Scenario Tests', () => {
           return Promise.resolve({
             libraries: [],
             date: '2023-10-27',
-            prebidInstances: []
+            prebidInstances: [],
           });
         }
         return Promise.resolve({
           libraries: ['googletag'],
           date: '2023-10-27',
-          prebidInstances: []
+          prebidInstances: [],
         });
       });
 
-      const { processAndLogTaskResults } = await import('../utils/results-handler.js');
+      const { processAndLogTaskResults } = await import(
+        '../utils/results-handler.js'
+      );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
-      
+
       let capturedResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         capturedResults = [...results];
-        
+
         expect(results).toHaveLength(7);
-        
-        const successCount = results.filter(r => r.type === 'success').length;
-        const errorCount = results.filter(r => r.type === 'error').length;
-        const noDataCount = results.filter(r => r.type === 'no_data').length;
-        
+
+        const successCount = results.filter((r) => r.type === 'success').length;
+        const errorCount = results.filter((r) => r.type === 'error').length;
+        const noDataCount = results.filter((r) => r.type === 'no_data').length;
+
         expect(successCount).toBe(3); // success1, success2, success3
-        expect(errorCount).toBe(3);   // dns-error, timeout-error, cert-error
-        expect(noDataCount).toBe(1);  // no-data
-        
+        expect(errorCount).toBe(3); // dns-error, timeout-error, cert-error
+        expect(noDataCount).toBe(1); // no-data
+
         return results
-          .filter(r => r.type === 'success')
-          .map(r => (r as TaskResultSuccess).data);
+          .filter((r) => r.type === 'success')
+          .map((r) => (r as TaskResultSuccess).data);
       });
 
       // Mock URL tracker to verify error tracking
-      mockUrlTracker.updateFromTaskResults.mockImplementation((results: TaskResult[]) => {
-        const errorResults = results.filter(r => r.type === 'error') as TaskResultError[];
-        expect(errorResults).toHaveLength(3);
-        
-        const errorCodes = errorResults.map(e => e.error.code);
-        expect(errorCodes).toContain('ERR_NAME_NOT_RESOLVED');
-        expect(errorCodes).toContain('PUPPETEER_TIMEOUT');
-        expect(errorCodes).toContain('ERR_CERT_COMMON_NAME_INVALID');
-      });
+      mockUrlTracker.updateFromTaskResults.mockImplementation(
+        (results: TaskResult[]) => {
+          const errorResults = results.filter(
+            (r) => r.type === 'error'
+          ) as TaskResultError[];
+          expect(errorResults).toHaveLength(3);
+
+          const errorCodes = errorResults.map((e) => e.error.code);
+          expect(errorCodes).toContain('ERR_NAME_NOT_RESOLVED');
+          expect(errorCodes).toContain('PUPPETEER_TIMEOUT');
+          expect(errorCodes).toContain('ERR_CERT_COMMON_NAME_INVALID');
+        }
+      );
 
       await prebidExplorer(options);
 

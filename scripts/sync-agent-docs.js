@@ -38,28 +38,22 @@ const AGENT_CONFIGS = {
   'CLAUDE.md': {
     title: 'Claude AI Agent Instructions',
     persona: 'Claude AI',
-    specificSections: [
-      'claude-specific-tips',
-      'claude-workflow-notes'
-    ]
+    specificSections: ['claude-specific-tips', 'claude-workflow-notes'],
   },
   'GEMINI.md': {
     title: 'Gemini AI Agent Instructions',
-    persona: 'Google\'s Gemini AI',
+    persona: "Google's Gemini AI",
     specificSections: [
       'gemini-specific-tips',
       'gemini-code-generation',
-      'gemini-performance-notes'
-    ]
+      'gemini-performance-notes',
+    ],
   },
   'AGENTS.md': {
     title: 'AI Agent Instructions - Prebid Integration Monitor',
     persona: 'AI agents (Claude, Gemini, GPT, etc.)',
-    specificSections: [
-      'universal-guidelines',
-      'cross-platform-compatibility'
-    ]
-  }
+    specificSections: ['universal-guidelines', 'cross-platform-compatibility'],
+  },
 };
 
 /**
@@ -71,9 +65,9 @@ const SHARED_SECTIONS = {
     content: `**NEVER skip this step when modifying .ts files:**
 \`\`\`bash
 npm run build
-\`\`\``
+\`\`\``,
   },
-  
+
   quickTesting: {
     title: 'Quick Testing Protocol',
     content: `### 1. Verify CLI Changes Work
@@ -95,7 +89,7 @@ node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains
 
 # Pre-filtering test (new feature)
 node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --prefilterProcessed --range "1-100"
-\`\`\``
+\`\`\``,
   },
 
   flagReference: {
@@ -114,7 +108,7 @@ node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains
 ### URL Management:
 - \`--skipProcessed\` - Skip already processed URLs
 - \`--resetTracking\` - Clear tracking database
-- \`--range="start-end"\` - Process specific URL range`
+- \`--range="start-end"\` - Process specific URL range`,
   },
 
   commonCommands: {
@@ -137,7 +131,7 @@ node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains
 ### Force Reprocess Range:
 \`\`\`bash
 node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --forceReprocess --range "1-1000" --batchSize=100
-\`\`\``
+\`\`\``,
   },
 
   troubleshooting: {
@@ -163,7 +157,7 @@ node ./bin/run.js scan --resetTracking ...
 
 ### Resume batch processing:
 1. Check \`batch-progress-*.json\` for last completed batch
-2. Use \`--resumeBatch=N\` where N is next batch to process`
+2. Use \`--resumeBatch=N\` where N is next batch to process`,
   },
 
   successIndicators: {
@@ -173,8 +167,8 @@ node ./bin/run.js scan --resetTracking ...
 ✅ Appropriate log messages appear  
 ✅ Database files created/updated  
 ✅ Batch progress files generated  
-✅ Output files created in \`store/\` directory`
-  }
+✅ Output files created in \`store/\` directory`,
+  },
 };
 
 /**
@@ -194,7 +188,7 @@ function readFileContent(filePath) {
 function generateAgentContent(agentFile, config) {
   const persona = config.persona;
   const title = config.title;
-  
+
   let content = `# ${title}
 
 ## Project: Prebid Integration Monitor
@@ -372,16 +366,16 @@ When implementing new features:
  */
 function updateAgentDocs() {
   logHeader('🔄 Synchronizing Agent Documentation');
-  
+
   let updatedFiles = 0;
   let totalFiles = 0;
-  
+
   for (const [fileName, config] of Object.entries(AGENT_CONFIGS)) {
     totalFiles++;
     const filePath = path.join(process.cwd(), fileName);
     const newContent = generateAgentContent(fileName, config);
     const existingContent = readFileContent(filePath);
-    
+
     if (existingContent !== newContent) {
       fs.writeFileSync(filePath, newContent, 'utf8');
       log(`✅ Updated ${fileName}`, 'green');
@@ -390,7 +384,7 @@ function updateAgentDocs() {
       log(`⏭️  ${fileName} already up to date`, 'blue');
     }
   }
-  
+
   log(`\n📊 Summary: ${updatedFiles}/${totalFiles} files updated`, 'cyan');
   return updatedFiles > 0;
 }
@@ -400,9 +394,9 @@ function updateAgentDocs() {
  */
 function validateDocs() {
   logHeader('🔍 Validating Documentation Consistency');
-  
+
   const issues = [];
-  
+
   // Check that all files exist
   for (const fileName of Object.keys(AGENT_CONFIGS)) {
     const filePath = path.join(process.cwd(), fileName);
@@ -410,14 +404,14 @@ function validateDocs() {
       issues.push(`Missing file: ${fileName}`);
     }
   }
-  
+
   // Check for shared content consistency
   const fileContents = {};
   for (const fileName of Object.keys(AGENT_CONFIGS)) {
     const filePath = path.join(process.cwd(), fileName);
     fileContents[fileName] = readFileContent(filePath);
   }
-  
+
   // Validate shared sections are present in all files
   for (const [sectionName, section] of Object.entries(SHARED_SECTIONS)) {
     for (const [fileName, content] of Object.entries(fileContents)) {
@@ -426,14 +420,14 @@ function validateDocs() {
       }
     }
   }
-  
+
   if (issues.length === 0) {
     log('✅ All documentation files are consistent', 'green');
   } else {
     log('⚠️  Found documentation issues:', 'yellow');
-    issues.forEach(issue => log(`   • ${issue}`, 'red'));
+    issues.forEach((issue) => log(`   • ${issue}`, 'red'));
   }
-  
+
   return issues.length === 0;
 }
 
@@ -442,7 +436,7 @@ function validateDocs() {
  */
 function setupGitHook() {
   logHeader('🔗 Setting Up Git Hook');
-  
+
   const hookPath = path.join(process.cwd(), '.git', 'hooks', 'pre-commit');
   const hookContent = `#!/bin/sh
 # Auto-sync agent documentation before commits
@@ -460,7 +454,7 @@ git add CLAUDE.md GEMINI.md AGENTS.md 2>/dev/null || true
     if (!fs.existsSync(hooksDir)) {
       fs.mkdirSync(hooksDir, { recursive: true });
     }
-    
+
     fs.writeFileSync(hookPath, hookContent, { mode: 0o755 });
     log('✅ Git pre-commit hook installed', 'green');
     log('   Documentation will auto-sync before commits', 'blue');
@@ -475,29 +469,29 @@ git add CLAUDE.md GEMINI.md AGENTS.md 2>/dev/null || true
  */
 function generateStatusReport() {
   logHeader('📋 Documentation Status Report');
-  
+
   const report = {
     timestamp: new Date().toISOString(),
     files: {},
     sharedSections: Object.keys(SHARED_SECTIONS).length,
-    lastSync: null
+    lastSync: null,
   };
-  
+
   for (const fileName of Object.keys(AGENT_CONFIGS)) {
     const filePath = path.join(process.cwd(), fileName);
     const stats = fs.existsSync(filePath) ? fs.statSync(filePath) : null;
-    
+
     report.files[fileName] = {
       exists: !!stats,
       size: stats ? stats.size : 0,
-      lastModified: stats ? stats.mtime.toISOString() : null
+      lastModified: stats ? stats.mtime.toISOString() : null,
     };
   }
-  
+
   // Save report
   const reportPath = path.join(process.cwd(), '.agent-docs-status.json');
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-  
+
   // Display summary
   log('📁 File Status:', 'cyan');
   for (const [fileName, info] of Object.entries(report.files)) {
@@ -505,7 +499,7 @@ function generateStatusReport() {
     const size = info.exists ? `(${(info.size / 1024).toFixed(1)}KB)` : '';
     log(`   ${status} ${fileName} ${size}`, info.exists ? 'green' : 'red');
   }
-  
+
   log(`\n📊 Shared sections: ${report.sharedSections}`, 'blue');
   log(`📅 Report saved to: .agent-docs-status.json`, 'cyan');
 }
@@ -518,38 +512,38 @@ function main() {
   const isAutoMode = args.includes('--auto');
   const validateOnly = args.includes('--validate');
   const setupHook = args.includes('--setup-hook');
-  
+
   if (!isAutoMode) {
     log('🤖 Agent Documentation Synchronization Tool', 'bright');
   }
-  
+
   if (setupHook) {
     setupGitHook();
     return;
   }
-  
+
   if (validateOnly) {
     const isValid = validateDocs();
     process.exit(isValid ? 0 : 1);
   }
-  
+
   // Update documentation
   const hasUpdates = updateAgentDocs();
-  
+
   // Validate consistency
   const isValid = validateDocs();
-  
+
   // Generate status report
   if (!isAutoMode) {
     generateStatusReport();
   }
-  
+
   if (hasUpdates && !isAutoMode) {
     log('\n💡 Consider committing the updated documentation:', 'yellow');
     log('   git add CLAUDE.md GEMINI.md AGENTS.md', 'cyan');
     log('   git commit -m "sync: update agent documentation"', 'cyan');
   }
-  
+
   if (!isValid) {
     process.exit(1);
   }

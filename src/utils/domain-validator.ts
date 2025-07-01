@@ -29,18 +29,18 @@ const PROBLEMATIC_PATTERNS = [
   /^127\./,
   /^192\.168\./,
   /^10\./,
-  
+
   // Common typos or malformed domains
   /\.\./,
-  /^\.|\.$/, 
+  /^\.|\.$/,
   /[^a-zA-Z0-9.-]/,
-  
+
   // Suspicious TLDs that are often typos
   /\.c$/,
   /\.co\.$/,
   /\.htm$/,
   /\.html$/,
-  
+
   // Known parking/advertising domains
   /parked-content/,
   /domain-for-sale/,
@@ -59,7 +59,7 @@ export function extractDomain(url: string): string {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'https://' + url;
     }
-    
+
     const urlObj = new URL(url);
     return urlObj.hostname;
   } catch (error) {
@@ -80,7 +80,7 @@ export function validateDomainPattern(domain: string): DomainValidationResult {
     return {
       isValid: false,
       reason: 'Empty domain',
-      domain
+      domain,
     };
   }
 
@@ -92,7 +92,7 @@ export function validateDomainPattern(domain: string): DomainValidationResult {
       return {
         isValid: false,
         reason: `Matches problematic pattern: ${pattern.source}`,
-        domain: cleanDomain
+        domain: cleanDomain,
       };
     }
   }
@@ -102,7 +102,7 @@ export function validateDomainPattern(domain: string): DomainValidationResult {
     return {
       isValid: false,
       reason: 'Domain too long',
-      domain: cleanDomain
+      domain: cleanDomain,
     };
   }
 
@@ -112,7 +112,7 @@ export function validateDomainPattern(domain: string): DomainValidationResult {
     return {
       isValid: false,
       reason: 'Invalid domain structure',
-      domain: cleanDomain
+      domain: cleanDomain,
     };
   }
 
@@ -122,14 +122,14 @@ export function validateDomainPattern(domain: string): DomainValidationResult {
       return {
         isValid: false,
         reason: 'Invalid domain part length',
-        domain: cleanDomain
+        domain: cleanDomain,
       };
     }
   }
 
   return {
     isValid: true,
-    domain: cleanDomain
+    domain: cleanDomain,
   };
 }
 
@@ -141,7 +141,7 @@ export function validateDomainPattern(domain: string): DomainValidationResult {
  * @returns Promise resolving to validation result
  */
 export async function validateDomainDNS(
-  domain: string, 
+  domain: string,
   logger?: WinstonLogger,
   timeoutMs: number = 5000
 ): Promise<DomainValidationResult> {
@@ -159,21 +159,20 @@ export async function validateDomainDNS(
     });
 
     await Promise.race([lookupPromise, timeoutPromise]);
-    
+
     logger?.debug(`DNS validation passed for ${domain}`);
     return {
       isValid: true,
-      domain
+      domain,
     };
-    
   } catch (error) {
     const reason = error instanceof Error ? error.message : 'DNS lookup failed';
     logger?.debug(`DNS validation failed for ${domain}: ${reason}`);
-    
+
     return {
       isValid: false,
       reason: `DNS lookup failed: ${reason}`,
-      domain
+      domain,
     };
   }
 }
@@ -192,16 +191,20 @@ export async function validateDomainsBatch(
   concurrency: number = 10,
   includeDNS: boolean = false
 ): Promise<DomainValidationResult[]> {
-  logger?.info(`Validating ${domains.length} domains (DNS: ${includeDNS}, concurrency: ${concurrency})`);
+  logger?.info(
+    `Validating ${domains.length} domains (DNS: ${includeDNS}, concurrency: ${concurrency})`
+  );
 
   if (!includeDNS) {
     // Fast pattern-only validation
-    return domains.map(domain => validateDomainPattern(extractDomain(domain)));
+    return domains.map((domain) =>
+      validateDomainPattern(extractDomain(domain))
+    );
   }
 
   // DNS validation with concurrency control
   const results: DomainValidationResult[] = [];
-  
+
   for (let i = 0; i < domains.length; i += concurrency) {
     const batch = domains.slice(i, i + concurrency);
     const batchPromises = batch.map(async (domain) => {
@@ -210,7 +213,7 @@ export async function validateDomainsBatch(
     });
 
     const batchResults = await Promise.allSettled(batchPromises);
-    
+
     batchResults.forEach((result, index) => {
       if (result.status === 'fulfilled') {
         results.push(result.value);
@@ -220,19 +223,23 @@ export async function validateDomainsBatch(
         results.push({
           isValid: false,
           reason: 'Validation error: ' + result.reason,
-          domain
+          domain,
         });
       }
     });
 
     // Log progress for large batches
     if (domains.length > 100) {
-      logger?.debug(`Validated ${Math.min(i + concurrency, domains.length)}/${domains.length} domains`);
+      logger?.debug(
+        `Validated ${Math.min(i + concurrency, domains.length)}/${domains.length} domains`
+      );
     }
   }
 
-  const validCount = results.filter(r => r.isValid).length;
-  logger?.info(`Domain validation complete: ${validCount}/${domains.length} valid domains`);
+  const validCount = results.filter((r) => r.isValid).length;
+  logger?.info(
+    `Domain validation complete: ${validCount}/${domains.length} valid domains`
+  );
 
   return results;
 }
@@ -251,23 +258,33 @@ export async function filterValidUrls(
   includeDNS: boolean = false,
   concurrency: number = 10
 ): Promise<string[]> {
-  const validationResults = await validateDomainsBatch(urls, logger, concurrency, includeDNS);
-  
+  const validationResults = await validateDomainsBatch(
+    urls,
+    logger,
+    concurrency,
+    includeDNS
+  );
+
   const validUrls = urls.filter((_, index) => validationResults[index].isValid);
   const invalidCount = urls.length - validUrls.length;
-  
+
   if (invalidCount > 0) {
-    logger?.info(`Filtered out ${invalidCount} invalid URLs, ${validUrls.length} remaining`);
-    
+    logger?.info(
+      `Filtered out ${invalidCount} invalid URLs, ${validUrls.length} remaining`
+    );
+
     // Log some examples of filtered URLs for debugging
     const invalidResults = validationResults
-      .filter(r => !r.isValid)
+      .filter((r) => !r.isValid)
       .slice(0, 5);
-    
+
     if (invalidResults.length > 0) {
-      logger?.debug('Example invalid domains:', invalidResults.map(r => `${r.domain}: ${r.reason}`));
+      logger?.debug(
+        'Example invalid domains:',
+        invalidResults.map((r) => `${r.domain}: ${r.reason}`)
+      );
     }
   }
-  
+
   return validUrls;
 }

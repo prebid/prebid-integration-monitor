@@ -1,9 +1,6 @@
 [
   {
-    "libraries": [
-      "googletag",
-      "ats"
-    ],
+    "libraries": ["googletag", "ats"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -78,9 +75,7 @@
     "url": "https://9gag.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -116,9 +111,7 @@
     "url": "https://aarp.org"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -188,17 +181,13 @@
     "url": "https://accuweather.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://agoda.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -260,25 +249,19 @@
     "url": "https://arcpublishing.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://arlo.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://asos.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -320,10 +303,7 @@
     "url": "https://att.net"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -381,10 +361,7 @@
     "url": "https://bbc.co.uk"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -434,10 +411,7 @@
     "url": "https://bleacherreport.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -488,10 +462,7 @@
     "url": "https://buzzfeed.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -525,10 +496,7 @@
     "url": "https://cbsnews.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -564,35 +532,25 @@
     "url": "https://coingecko.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://curseforge.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
         "globalVarName": "hubjs",
         "version": "v9.35.0",
-        "modules": [
-          "rtdModule",
-          "adagioRtdProvider"
-        ]
+        "modules": ["rtdModule", "adagioRtdProvider"]
       }
     ],
     "url": "https://dailymotion.com"
   },
   {
-    "libraries": [
-      "apstag",
-      "googletag"
-    ],
+    "libraries": ["apstag", "googletag"],
     "date": "2025-06-10",
     "prebidInstances": [
       {
@@ -721,25 +679,19 @@
     "url": "https://dictionary.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://disney.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://ebay.com"
   },
   {
-    "libraries": [
-      "googletag"
-    ],
+    "libraries": ["googletag"],
     "date": "2025-06-10",
     "prebidInstances": [],
     "url": "https://eskimi.com"

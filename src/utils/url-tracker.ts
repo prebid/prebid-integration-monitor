@@ -1,7 +1,7 @@
 /**
  * @fileoverview URL tracking service using SQLite for persistent deduplication.
  * Provides efficient URL tracking across scan runs to avoid reprocessing
- * previously scanned URLs, especially useful for large datasets like 
+ * previously scanned URLs, especially useful for large datasets like
  * top-1M domain lists.
  */
 
@@ -57,7 +57,8 @@ export class UrlTracker {
   constructor(logger: WinstonLogger, config: UrlTrackerConfig = {}) {
     this.logger = logger;
     this.config = {
-      dbPath: config.dbPath || path.join(process.cwd(), 'data', 'url-tracker.db'),
+      dbPath:
+        config.dbPath || path.join(process.cwd(), 'data', 'url-tracker.db'),
       maxRetries: config.maxRetries || 3,
       debug: config.debug || false,
     };
@@ -87,7 +88,7 @@ export class UrlTracker {
     this.db.pragma('cache_size = 10000'); // 10MB cache
     this.db.pragma('temp_store = MEMORY'); // Store temp tables in memory
     this.db.pragma('mmap_size = 268435456'); // 256MB memory mapping
-    
+
     // Create table with optimized schema
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS processed_urls (
@@ -151,7 +152,9 @@ export class UrlTracker {
       const result = this.bulkCheckStmt.get(url.trim());
       return !!result;
     } catch (error) {
-      this.logger.error(`Error checking URL processing status: ${url}`, { error });
+      this.logger.error(`Error checking URL processing status: ${url}`, {
+        error,
+      });
       return false;
     }
   }
@@ -191,22 +194,41 @@ export class UrlTracker {
    * @param status Processing status
    * @param errorCode Optional error code for failed URLs
    */
-  public markUrlProcessed(url: string, status: UrlStatus, errorCode?: string): void {
+  public markUrlProcessed(
+    url: string,
+    status: UrlStatus,
+    errorCode?: string
+  ): void {
     try {
       const trimmedUrl = url.trim();
       const timestamp = new Date().toISOString();
-      
+
       // Get existing record to determine retry count
       const existing = this.selectStmt.get(trimmedUrl) as UrlRecord | undefined;
-      const retryCount = existing ? existing.retryCount + (status === 'retry' ? 1 : 0) : 0;
+      const retryCount = existing
+        ? existing.retryCount + (status === 'retry' ? 1 : 0)
+        : 0;
 
-      this.insertStmt.run(trimmedUrl, status, timestamp, errorCode ?? null, retryCount);
-      
+      this.insertStmt.run(
+        trimmedUrl,
+        status,
+        timestamp,
+        errorCode ?? null,
+        retryCount
+      );
+
       if (this.config.debug) {
-        this.logger.debug(`Marked URL as ${status}: ${trimmedUrl}`, { errorCode, retryCount });
+        this.logger.debug(`Marked URL as ${status}: ${trimmedUrl}`, {
+          errorCode,
+          retryCount,
+        });
       }
     } catch (error) {
-      this.logger.error(`Error marking URL as processed: ${url}`, { error, status, errorCode });
+      this.logger.error(`Error marking URL as processed: ${url}`, {
+        error,
+        status,
+        errorCode,
+      });
     }
   }
 
@@ -229,10 +251,13 @@ export class UrlTracker {
             this.markUrlProcessed(result.url, 'no_data');
             break;
           case 'error':
-            const shouldRetry = this.shouldRetryUrl(result.url, result.error.code);
+            const shouldRetry = this.shouldRetryUrl(
+              result.url,
+              result.error.code
+            );
             this.markUrlProcessed(
-              result.url, 
-              shouldRetry ? 'retry' : 'error', 
+              result.url,
+              shouldRetry ? 'retry' : 'error',
               result.error.code
             );
             break;
@@ -242,9 +267,13 @@ export class UrlTracker {
 
     try {
       transaction(taskResults);
-      this.logger.info(`Updated URL tracking for ${taskResults.length} task results`);
+      this.logger.info(
+        `Updated URL tracking for ${taskResults.length} task results`
+      );
     } catch (error) {
-      this.logger.error('Error updating URL tracking from task results', { error });
+      this.logger.error('Error updating URL tracking from task results', {
+        error,
+      });
     }
   }
 
@@ -257,7 +286,7 @@ export class UrlTracker {
   private shouldRetryUrl(url: string, errorCode: string): boolean {
     const existing = this.selectStmt.get(url.trim()) as UrlRecord | undefined;
     const currentRetryCount = existing ? existing.retryCount : 0;
-    
+
     // Don't retry permanent failures
     const permanentErrors = ['ERR_NAME_NOT_RESOLVED', 'ERR_CONNECTION_REFUSED'];
     if (permanentErrors.includes(errorCode)) {
@@ -281,9 +310,11 @@ export class UrlTracker {
         ORDER BY updated_at ASC
         LIMIT ?
       `);
-      
-      const results = stmt.all(this.config.maxRetries, limit) as { url: string }[];
-      return results.map(r => r.url);
+
+      const results = stmt.all(this.config.maxRetries, limit) as {
+        url: string;
+      }[];
+      return results.map((r) => r.url);
     } catch (error) {
       this.logger.error('Error getting URLs for retry', { error });
       return [];
@@ -301,14 +332,14 @@ export class UrlTracker {
         FROM processed_urls 
         GROUP BY status
       `);
-      
+
       const results = stmt.all() as { status: string; count: number }[];
       const stats: Record<string, number> = {};
-      
+
       for (const { status, count } of results) {
         stats[status] = count;
       }
-      
+
       return stats;
     } catch (error) {
       this.logger.error('Error getting URL processing stats', { error });
@@ -321,8 +352,10 @@ export class UrlTracker {
    * @param storeDirectory Path to the store directory
    */
   public async importExistingResults(storeDirectory: string): Promise<void> {
-    this.logger.info(`Starting import of existing results from: ${storeDirectory}`);
-    
+    this.logger.info(
+      `Starting import of existing results from: ${storeDirectory}`
+    );
+
     try {
       if (!fs.existsSync(storeDirectory)) {
         this.logger.warn(`Store directory does not exist: ${storeDirectory}`);
@@ -348,13 +381,15 @@ export class UrlTracker {
    * Perform database maintenance operations for optimal performance
    * @param options Maintenance options
    */
-  public performMaintenance(options: { 
-    vacuum?: boolean; 
-    analyze?: boolean; 
-    reindex?: boolean;
-    cleanupOld?: boolean;
-    olderThanDays?: number;
-  } = {}): void {
+  public performMaintenance(
+    options: {
+      vacuum?: boolean;
+      analyze?: boolean;
+      reindex?: boolean;
+      cleanupOld?: boolean;
+      olderThanDays?: number;
+    } = {}
+  ): void {
     try {
       this.logger.info('Starting database maintenance operations...');
       const startTime = Date.now();
@@ -368,7 +403,9 @@ export class UrlTracker {
           AND status IN ('error', 'retry')
         `);
         const cleanupResult = cleanupStmt.run();
-        this.logger.info(`Cleaned up ${cleanupResult.changes} old records older than ${daysThreshold} days`);
+        this.logger.info(
+          `Cleaned up ${cleanupResult.changes} old records older than ${daysThreshold} days`
+        );
       }
 
       // Re-analyze tables for query optimizer
@@ -399,10 +436,10 @@ export class UrlTracker {
   /**
    * Get database performance statistics
    */
-  public getDatabaseStats(): { 
-    size: number; 
-    pageCount: number; 
-    pageSize: number; 
+  public getDatabaseStats(): {
+    size: number;
+    pageCount: number;
+    pageSize: number;
     indexCount: number;
     walSize?: number;
   } {
@@ -412,21 +449,29 @@ export class UrlTracker {
         pageCount: 0,
         pageSize: 0,
         indexCount: 0,
-        walSize: 0
+        walSize: 0,
       };
 
       // Get basic database info
-      const pageCountResult = this.db.pragma('page_count', { simple: true }) as number;
-      const pageSizeResult = this.db.pragma('page_size', { simple: true }) as number;
-      
+      const pageCountResult = this.db.pragma('page_count', {
+        simple: true,
+      }) as number;
+      const pageSizeResult = this.db.pragma('page_size', {
+        simple: true,
+      }) as number;
+
       stats.pageCount = pageCountResult;
       stats.pageSize = pageSizeResult;
       stats.size = pageCountResult * pageSizeResult;
 
       // Get index count
-      const indexResult = this.db.prepare(`
+      const indexResult = this.db
+        .prepare(
+          `
         SELECT COUNT(*) as count FROM sqlite_master WHERE type = 'index'
-      `).get() as { count: number };
+      `
+        )
+        .get() as { count: number };
       stats.indexCount = indexResult.count;
 
       // Get WAL file size if it exists
@@ -449,19 +494,22 @@ export class UrlTracker {
   /**
    * Recursively import URLs from JSON files in directory
    */
-  private importDirectoryRecursive(dir: string, callback: (url: string) => void): void {
+  private importDirectoryRecursive(
+    dir: string,
+    callback: (url: string) => void
+  ): void {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      
+
       if (entry.isDirectory()) {
         this.importDirectoryRecursive(fullPath, callback);
       } else if (entry.isFile() && entry.name.endsWith('.json')) {
         try {
           const content = fs.readFileSync(fullPath, 'utf8');
           const data = JSON.parse(content);
-          
+
           if (Array.isArray(data)) {
             for (const item of data) {
               if (item && typeof item.url === 'string') {
@@ -495,7 +543,11 @@ export class UrlTracker {
    * @param allUrls Array of all URLs to analyze
    * @returns Range analysis with processing statistics
    */
-  public analyzeUrlRange(startIndex: number, endIndex: number, allUrls: string[]): {
+  public analyzeUrlRange(
+    startIndex: number,
+    endIndex: number,
+    allUrls: string[]
+  ): {
     totalInRange: number;
     processedCount: number;
     unprocessedCount: number;
@@ -504,14 +556,15 @@ export class UrlTracker {
     nextUnprocessedIndex?: number;
   } {
     const rangeUrls = allUrls.slice(startIndex, endIndex);
-    const processedUrls = rangeUrls.filter(url => this.isUrlProcessed(url));
-    
+    const processedUrls = rangeUrls.filter((url) => this.isUrlProcessed(url));
+
     const totalInRange = rangeUrls.length;
     const processedCount = processedUrls.length;
     const unprocessedCount = totalInRange - processedCount;
-    const processedPercentage = totalInRange > 0 ? (processedCount / totalInRange) * 100 : 0;
+    const processedPercentage =
+      totalInRange > 0 ? (processedCount / totalInRange) * 100 : 0;
     const isFullyProcessed = unprocessedCount === 0;
-    
+
     // Find next unprocessed URL index in the full array
     let nextUnprocessedIndex: number | undefined;
     if (!isFullyProcessed) {
@@ -522,14 +575,14 @@ export class UrlTracker {
         }
       }
     }
-    
+
     return {
       totalInRange,
       processedCount,
       unprocessedCount,
       processedPercentage,
       isFullyProcessed,
-      nextUnprocessedIndex
+      nextUnprocessedIndex,
     };
   }
 
@@ -540,11 +593,15 @@ export class UrlTracker {
    * @param maxSuggestions Maximum number of range suggestions to return
    * @returns Array of suggested ranges with their processing status
    */
-  public suggestNextRanges(allUrls: string[], batchSize: number, maxSuggestions: number = 3): Array<{
+  public suggestNextRanges(
+    allUrls: string[],
+    batchSize: number,
+    maxSuggestions: number = 3
+  ): Array<{
     startIndex: number;
     endIndex: number;
     startUrl: number; // 1-based
-    endUrl: number; // 1-based  
+    endUrl: number; // 1-based
     totalUrls: number;
     estimatedUnprocessed: number;
     efficiency: number; // percentage of unprocessed URLs in range
@@ -562,27 +619,33 @@ export class UrlTracker {
     // Sample ranges to find gaps efficiently (don't check every single URL)
     const sampleSize = Math.min(1000, Math.floor(allUrls.length / 100)); // Sample 1% or max 1000 URLs
     const step = Math.max(1, Math.floor(allUrls.length / sampleSize));
-    
-    for (let i = 0; i < allUrls.length && suggestions.length < maxSuggestions; i += batchSize) {
+
+    for (
+      let i = 0;
+      i < allUrls.length && suggestions.length < maxSuggestions;
+      i += batchSize
+    ) {
       const endIndex = Math.min(i + batchSize, allUrls.length);
-      
+
       // Sample URLs in this range to estimate efficiency
       let sampledProcessed = 0;
       let sampledTotal = 0;
-      
+
       for (let j = i; j < endIndex; j += step) {
         if (this.isUrlProcessed(allUrls[j])) {
           sampledProcessed++;
         }
         sampledTotal++;
       }
-      
-      const estimatedProcessedPercentage = sampledTotal > 0 ? (sampledProcessed / sampledTotal) * 100 : 0;
+
+      const estimatedProcessedPercentage =
+        sampledTotal > 0 ? (sampledProcessed / sampledTotal) * 100 : 0;
       const efficiency = 100 - estimatedProcessedPercentage;
       const estimatedUnprocessed = Math.round((batchSize * efficiency) / 100);
-      
+
       // Only suggest ranges with significant unprocessed URLs
-      if (efficiency > 20) { // At least 20% unprocessed
+      if (efficiency > 20) {
+        // At least 20% unprocessed
         suggestions.push({
           startIndex: i,
           endIndex,
@@ -590,11 +653,11 @@ export class UrlTracker {
           endUrl: endIndex, // 1-based inclusive
           totalUrls: endIndex - i,
           estimatedUnprocessed,
-          efficiency
+          efficiency,
         });
       }
     }
-    
+
     // Sort by efficiency (most unprocessed first)
     return suggestions.sort((a, b) => b.efficiency - a.efficiency);
   }
@@ -607,9 +670,15 @@ export class UrlTracker {
    * @param minEfficiency Minimum percentage of unprocessed URLs required (default: 10%)
    * @returns true if range has enough unprocessed URLs to be worth processing
    */
-  public isRangeWorthProcessing(startIndex: number, endIndex: number, allUrls: string[], minEfficiency: number = 10): boolean {
+  public isRangeWorthProcessing(
+    startIndex: number,
+    endIndex: number,
+    allUrls: string[],
+    minEfficiency: number = 10
+  ): boolean {
     const analysis = this.analyzeUrlRange(startIndex, endIndex, allUrls);
-    const efficiency = (analysis.unprocessedCount / analysis.totalInRange) * 100;
+    const efficiency =
+      (analysis.unprocessedCount / analysis.totalInRange) * 100;
     return efficiency >= minEfficiency;
   }
 
@@ -637,7 +706,10 @@ let globalUrlTracker: UrlTracker | null = null;
  * @param config Optional configuration
  * @returns UrlTracker instance
  */
-export function getUrlTracker(logger: WinstonLogger, config?: UrlTrackerConfig): UrlTracker {
+export function getUrlTracker(
+  logger: WinstonLogger,
+  config?: UrlTrackerConfig
+): UrlTracker {
   if (!globalUrlTracker) {
     globalUrlTracker = new UrlTracker(logger, config);
   }

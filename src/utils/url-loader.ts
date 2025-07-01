@@ -50,36 +50,50 @@ export async function processFileContent(
   }
 
   // Check for .txt files OR files that appear to contain domain lists (no extension, likely domain files)
-  const isDomainFile = fileName.endsWith('.txt') || (!fileName.includes('.') && content.includes('.com'));
-  
+  const isDomainFile =
+    fileName.endsWith('.txt') ||
+    (!fileName.includes('.') && content.includes('.com'));
+
   if (isDomainFile) {
     logger.info(`Processing domain file: ${fileName} for schemeless domains.`);
-    
+
     // For domain list files, process line by line to handle pure domain names
     const lines = content.split('\n');
     let domainsFound = 0;
-    
+
     for (const line of lines) {
       const trimmedLine = line.trim();
-      if (trimmedLine && !trimmedLine.startsWith('#') && !trimmedLine.startsWith('//')) {
+      if (
+        trimmedLine &&
+        !trimmedLine.startsWith('#') &&
+        !trimmedLine.startsWith('//')
+      ) {
         // Check if it looks like a domain name
-        if (/^[a-zA-Z0-9][a-zA-Z0-9-_]*\.([a-zA-Z]{2,}|[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})$/.test(trimmedLine)) {
+        if (
+          /^[a-zA-Z0-9][a-zA-Z0-9-_]*\.([a-zA-Z]{2,}|[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})$/.test(
+            trimmedLine
+          )
+        ) {
           const fullUrl = `https://${trimmedLine}`;
           if (!extractedUrls.has(fullUrl)) {
             extractedUrls.add(fullUrl);
             domainsFound++;
             if (domainsFound <= 5) {
-              logger.info(`Found and added domain as ${fullUrl} from ${fileName}`);
+              logger.info(
+                `Found and added domain as ${fullUrl} from ${fileName}`
+              );
             }
           }
         }
       }
     }
-    
+
     if (domainsFound > 5) {
-      logger.info(`Added ${domainsFound} total domains from ${fileName} (showing first 5)`);
+      logger.info(
+        `Added ${domainsFound} total domains from ${fileName} (showing first 5)`
+      );
     }
-    
+
     // Also try the original regex approach for any missed domains
     const schemelessMatches = content.match(schemelessDomainRegex);
     if (schemelessMatches) {
@@ -177,7 +191,7 @@ export async function processFileContent(
  * @param {string} content - File content to process
  * @param {string} fileName - File name for processing logic
  * @param {number | undefined} startRange - Starting index for range (1-based)
- * @param {number | undefined} endRange - Ending index for range (1-based) 
+ * @param {number | undefined} endRange - Ending index for range (1-based)
  * @param {WinstonLogger} logger - Logger instance
  * @returns {Promise<string[]>} Optimized URL array for the specified range
  */
@@ -189,31 +203,47 @@ export async function processContentWithRangeOptimization(
   logger: WinstonLogger
 ): Promise<string[]> {
   const extractedUrls: string[] = [];
-  
+
   // Check if this is a domain file that needs line-by-line processing
-  const isDomainFile = fileName.endsWith('.txt') || (!fileName.includes('.') && content.includes('.com'));
-  
+  const isDomainFile =
+    fileName.endsWith('.txt') ||
+    (!fileName.includes('.') && content.includes('.com'));
+
   if (isDomainFile && (startRange || endRange)) {
-    logger.info(`Optimized processing: extracting range ${startRange || 1}-${endRange || 'end'} from domain file`);
-    
     const lines = content.split('\n');
+    logger.info(
+      `Optimized processing: extracting range ${startRange || 1}-${endRange || 'end'} from domain file (lines.length=${lines.length})`
+    );
     const startIdx = startRange ? startRange - 1 : 0; // Convert to 0-based
-    const endIdx = endRange ? Math.min(endRange, lines.length) : lines.length;
-    
+    const endIdx = endRange ? Math.min(endRange, lines.length) : lines.length; // endRange is 1-based, keep as-is for exclusive loop
+    logger.info(
+      `Debug: startRange=${startRange}, endRange=${endRange}, startIdx=${startIdx}, endIdx=${endIdx}, will process ${endIdx - startIdx} lines`
+    );
+
     // Process only the requested range
     for (let i = startIdx; i < endIdx; i++) {
       const trimmedLine = lines[i]?.trim();
-      if (trimmedLine && !trimmedLine.startsWith('#') && !trimmedLine.startsWith('//')) {
-        if (/^[a-zA-Z0-9][a-zA-Z0-9-_]*\.([a-zA-Z]{2,}|[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})$/.test(trimmedLine)) {
+      if (
+        trimmedLine &&
+        !trimmedLine.startsWith('#') &&
+        !trimmedLine.startsWith('//')
+      ) {
+        if (
+          /^[a-zA-Z0-9][a-zA-Z0-9-_]*\.([a-zA-Z]{2,}|[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})$/.test(
+            trimmedLine
+          )
+        ) {
           extractedUrls.push(`https://${trimmedLine}`);
         }
       }
     }
-    
-    logger.info(`Optimized processing: extracted ${extractedUrls.length} URLs from range ${startIdx + 1}-${endIdx}`);
+
+    logger.info(
+      `Optimized processing: extracted ${extractedUrls.length} URLs from range ${startIdx + 1}-${endIdx} (0-based: ${startIdx}-${endIdx - 1})`
+    );
     return extractedUrls;
   }
-  
+
   // Fallback to full processing for small files or non-range requests
   return processFileContent(fileName, content, logger);
 }
@@ -248,7 +278,7 @@ export async function fetchUrlsFromGitHub(
 ): Promise<string[]> {
   const tracer = new GitHubFetchTracer(repoUrl, logger);
   const cache = getContentCache(logger);
-  
+
   logger.info(`Attempting to fetch URLs from GitHub source: ${repoUrl}`);
 
   const allExtractedUrls = new Set<string>(); // Use Set for deduplication during collection
@@ -267,24 +297,31 @@ export async function fetchUrlsFromGitHub(
       // Check cache first
       let content = cache.get(rawUrl);
       let fromCache = true;
-      
+
       if (!content) {
         logger.info(`Fetching content directly from raw GitHub URL: ${rawUrl}`);
         fromCache = false;
         const fileResponse: FetchResponse = await fetch(rawUrl);
-        tracer.recordHttpRequest(rawUrl, fileResponse.status, 
-          parseInt(fileResponse.headers.get('content-length') || '0'));
-          
+        tracer.recordHttpRequest(
+          rawUrl,
+          fileResponse.status,
+          parseInt(fileResponse.headers.get('content-length') || '0')
+        );
+
         if (fileResponse.ok) {
           content = await fileResponse.text();
-          
+
           // Cache the content for future use
           const etag = fileResponse.headers.get('etag') || undefined;
           cache.set(rawUrl, content, etag);
-          logger.debug(`Cached content for ${rawUrl} (${content.length} characters)`);
+          logger.debug(
+            `Cached content for ${rawUrl} (${content.length} characters)`
+          );
         } else {
           const errorBody = await fileResponse.text();
-          const error = new Error(`HTTP ${fileResponse.status}: ${fileResponse.statusText}. Body: ${errorBody}`);
+          const error = new Error(
+            `HTTP ${fileResponse.status}: ${fileResponse.statusText}. Body: ${errorBody}`
+          );
           tracer.recordError(error, 'file_fetch');
           logger.error(
             `Failed to download content from direct file link: ${rawUrl} - Status: ${fileResponse.status} ${fileResponse.statusText}`
@@ -297,10 +334,10 @@ export async function fetchUrlsFromGitHub(
         logger.info(`Using cached content for ${rawUrl}`);
         tracer.recordHttpRequest(rawUrl, 200, content.length);
       }
-      
+
       if (content) {
         tracer.recordParsingResults(content.split('\n').length, 0, 0); // Will update after processing
-        
+
         const urlsFromFile = await processContentWithRangeOptimization(
           content,
           fileName,
@@ -309,8 +346,12 @@ export async function fetchUrlsFromGitHub(
           logger
         );
         urlsFromFile.forEach((url) => allExtractedUrls.add(url));
-        tracer.recordParsingResults(content.split('\n').length, urlsFromFile.length, 0);
-        
+        tracer.recordParsingResults(
+          content.split('\n').length,
+          urlsFromFile.length,
+          0
+        );
+
         logger.info(
           `Extracted ${urlsFromFile.length} URLs from ${fromCache ? 'cached' : 'fresh'} content: ${rawUrl}`
         );
@@ -413,11 +454,11 @@ export async function fetchUrlsFromGitHub(
 
     const finalUrls = Array.from(allExtractedUrls);
     const limitedUrls = numUrls ? finalUrls.slice(0, numUrls) : finalUrls;
-    
+
     logger.info(
       `Total unique URLs extracted from GitHub before applying limit: ${finalUrls.length}`
     );
-    
+
     tracer.finish(limitedUrls.length);
     return limitedUrls;
   } catch (e: unknown) {

@@ -5,8 +5,9 @@ This project maintains synchronized documentation across multiple AI agent instr
 ## Overview
 
 The agent documentation system ensures that critical information is kept in sync across:
+
 - `CLAUDE.md` - Claude AI specific instructions
-- `GEMINI.md` - Google Gemini specific instructions  
+- `GEMINI.md` - Google Gemini specific instructions
 - `AGENTS.md` - Universal AI agent guidelines
 
 ## Automated Synchronization
@@ -32,7 +33,7 @@ npm run docs-status
 The following sections are automatically kept in sync across all agent files:
 
 - **Build Protocol** - Critical TypeScript compilation steps
-- **Testing Commands** - Standard test procedures  
+- **Testing Commands** - Standard test procedures
 - **Flag Reference** - CLI flag documentation
 - **Common Commands** - Copy-paste ready commands
 - **Troubleshooting** - Common issues and solutions
@@ -43,16 +44,19 @@ The following sections are automatically kept in sync across all agent files:
 Each agent file retains unique sections tailored to that AI:
 
 **CLAUDE.md**:
+
 - Development workflow specifics
 - Error pattern recognition
 - Claude-specific best practices
 
 **GEMINI.md**:
+
 - Gemini development workflow
 - Common pitfalls for AI agents
 - Code generation guidelines
 
 **AGENTS.md**:
+
 - Universal best practices
 - Cross-platform compatibility
 - Testing checklist
@@ -84,6 +88,7 @@ npm run validate-docs
 ```
 
 This validates:
+
 - All required files exist
 - Shared sections are present in all files
 - Content consistency across agent files
@@ -119,7 +124,7 @@ To add content specific to one agent:
 ```
 project-root/
 ├── CLAUDE.md                    # Claude-specific instructions
-├── GEMINI.md                    # Gemini-specific instructions  
+├── GEMINI.md                    # Gemini-specific instructions
 ├── AGENTS.md                    # Universal agent guidelines
 ├── DOCS_SYNC.md                 # This documentation
 ├── scripts/
@@ -179,6 +184,7 @@ ls -la .git/hooks/pre-commit
 ### CI/CD Failures
 
 Check that:
+
 - All agent files are committed
 - No merge conflicts in documentation
 - Scripts are executable: `chmod +x scripts/sync-agent-docs.js`

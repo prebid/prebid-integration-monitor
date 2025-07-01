@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { UrlTracker, getUrlTracker, closeUrlTracker, type UrlTrackerConfig } from '../url-tracker.js';
-import type { TaskResult, TaskResultSuccess, TaskResultNoData, TaskResultError } from '../../common/types.js';
+import {
+  UrlTracker,
+  getUrlTracker,
+  closeUrlTracker,
+  type UrlTrackerConfig,
+} from '../url-tracker.js';
+import type {
+  TaskResult,
+  TaskResultSuccess,
+  TaskResultNoData,
+  TaskResultError,
+} from '../../common/types.js';
 import type { Logger as WinstonLogger } from 'winston';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -28,12 +38,13 @@ vi.mock('better-sqlite3', () => {
 });
 
 // Create mock logger
-const createMockLogger = (): WinstonLogger => ({
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-  debug: vi.fn(),
-} as any);
+const createMockLogger = (): WinstonLogger =>
+  ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  }) as any;
 
 describe('UrlTracker', () => {
   let mockLogger: WinstonLogger;
@@ -42,10 +53,10 @@ describe('UrlTracker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogger = createMockLogger();
-    
+
     // Setup mock to return statement
     mockDb.prepare.mockReturnValue(mockStatement);
-    
+
     // Mock fs.existsSync and fs.mkdirSync
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.mkdirSync).mockImplementation(() => '');
@@ -66,7 +77,9 @@ describe('UrlTracker', () => {
         { recursive: true }
       );
       expect(mockDb.pragma).toHaveBeenCalledWith('journal_mode = WAL');
-      expect(mockDb.exec).toHaveBeenCalledWith(expect.stringContaining('CREATE TABLE'));
+      expect(mockDb.exec).toHaveBeenCalledWith(
+        expect.stringContaining('CREATE TABLE')
+      );
       expect(mockDb.prepare).toHaveBeenCalledTimes(4); // 4 prepared statements
     });
 
@@ -76,10 +89,12 @@ describe('UrlTracker', () => {
         maxRetries: 5,
         debug: true,
       };
-      
+
       const customTracker = new UrlTracker(mockLogger, config);
-      
-      expect(fs.mkdirSync).toHaveBeenCalledWith('/custom/path', { recursive: true });
+
+      expect(fs.mkdirSync).toHaveBeenCalledWith('/custom/path', {
+        recursive: true,
+      });
     });
   });
 
@@ -92,24 +107,24 @@ describe('UrlTracker', () => {
 
     it('should check if URL is processed (not found)', () => {
       mockStatement.get.mockReturnValue(null);
-      
+
       const result = urlTracker.isUrlProcessed('https://example.com');
-      
+
       expect(result).toBe(false);
       expect(mockStatement.get).toHaveBeenCalledWith('https://example.com');
     });
 
     it('should check if URL is processed (found with success status)', () => {
       mockStatement.get.mockReturnValue({ url: 'https://example.com' });
-      
+
       const result = urlTracker.isUrlProcessed('https://example.com');
-      
+
       expect(result).toBe(true);
     });
 
     it('should mark URL as processed with success status', () => {
       urlTracker.markUrlProcessed('https://example.com', 'success');
-      
+
       expect(mockStatement.run).toHaveBeenCalledWith(
         'https://example.com',
         'success',
@@ -121,7 +136,7 @@ describe('UrlTracker', () => {
 
     it('should mark URL as processed with error status', () => {
       urlTracker.markUrlProcessed('https://example.com', 'error', 'TIMEOUT');
-      
+
       expect(mockStatement.run).toHaveBeenCalledWith(
         'https://example.com',
         'error',
@@ -137,9 +152,9 @@ describe('UrlTracker', () => {
         url: 'https://example.com',
         retryCount: 1,
       });
-      
+
       urlTracker.markUrlProcessed('https://example.com', 'retry', 'TIMEOUT');
-      
+
       expect(mockStatement.run).toHaveBeenCalledWith(
         'https://example.com',
         'retry',
@@ -155,44 +170,44 @@ describe('UrlTracker', () => {
       const urls = [
         'https://example.com',
         'https://test.com',
-        'https://new.com'
+        'https://new.com',
       ];
-      
+
       // Mock that first two URLs are processed
       mockStatement.get
         .mockReturnValueOnce({ url: 'https://example.com' }) // processed
-        .mockReturnValueOnce({ url: 'https://test.com' })    // processed
-        .mockReturnValueOnce(null);                         // not processed
-      
+        .mockReturnValueOnce({ url: 'https://test.com' }) // processed
+        .mockReturnValueOnce(null); // not processed
+
       const result = urlTracker.filterUnprocessedUrls(urls);
-      
+
       expect(result).toEqual(['https://new.com']);
       expect(mockStatement.get).toHaveBeenCalledTimes(3);
     });
 
     it('should return empty array when all URLs are processed', () => {
       const urls = ['https://example.com', 'https://test.com'];
-      
+
       mockStatement.get.mockReturnValue({ url: 'mock' });
-      
+
       const result = urlTracker.filterUnprocessedUrls(urls);
-      
+
       expect(result).toEqual([]);
     });
 
     it('should return all URLs when none are processed', () => {
       const urls = ['https://example.com', 'https://test.com'];
-      
+
       mockStatement.get.mockReturnValue(null);
-      
+
       const result = urlTracker.filterUnprocessedUrls(urls);
-      
+
       expect(result).toEqual(urls);
     });
 
     it('should handle empty URL list', () => {
       const result = urlTracker.filterUnprocessedUrls([]);
-      
+
       expect(result).toEqual([]);
       expect(mockStatement.get).not.toHaveBeenCalled();
     });
@@ -207,38 +222,53 @@ describe('UrlTracker', () => {
             url: 'https://example.com',
             libraries: ['googletag'],
             date: '2023-10-27',
-            prebidInstances: []
-          }
+            prebidInstances: [],
+          },
         } as TaskResultSuccess,
         {
           type: 'no_data',
-          url: 'https://test.com'
+          url: 'https://test.com',
         } as TaskResultNoData,
         {
           type: 'error',
           url: 'https://error.com',
           error: {
             code: 'TIMEOUT',
-            message: 'Request timeout'
-          }
-        } as TaskResultError
+            message: 'Request timeout',
+          },
+        } as TaskResultError,
       ];
 
       // Mock that error URL should be retried
       mockStatement.get.mockReturnValue({ retryCount: 0 });
-      
+
       urlTracker.updateFromTaskResults(taskResults);
-      
+
       // Should have called markUrlProcessed for each result
       expect(mockStatement.run).toHaveBeenCalledTimes(3);
-      expect(mockStatement.run).toHaveBeenNthCalledWith(1,
-        'https://example.com', 'success', expect.any(String), null, 0
+      expect(mockStatement.run).toHaveBeenNthCalledWith(
+        1,
+        'https://example.com',
+        'success',
+        expect.any(String),
+        null,
+        0
       );
-      expect(mockStatement.run).toHaveBeenNthCalledWith(2,
-        'https://test.com', 'no_data', expect.any(String), null, 0
+      expect(mockStatement.run).toHaveBeenNthCalledWith(
+        2,
+        'https://test.com',
+        'no_data',
+        expect.any(String),
+        null,
+        0
       );
-      expect(mockStatement.run).toHaveBeenNthCalledWith(3,
-        'https://error.com', 'retry', expect.any(String), 'TIMEOUT', 1
+      expect(mockStatement.run).toHaveBeenNthCalledWith(
+        3,
+        'https://error.com',
+        'retry',
+        expect.any(String),
+        'TIMEOUT',
+        1
       );
     });
 
@@ -251,12 +281,12 @@ describe('UrlTracker', () => {
             date: '2023-10-27',
             prebidInstances: [],
             // url is optional and missing
-          }
-        } as TaskResultSuccess
+          },
+        } as TaskResultSuccess,
       ];
-      
+
       urlTracker.updateFromTaskResults(taskResults);
-      
+
       // Should not call markUrlProcessed since URL is missing
       expect(mockStatement.run).not.toHaveBeenCalled();
     });
@@ -268,15 +298,19 @@ describe('UrlTracker', () => {
           url: 'https://error.com',
           error: {
             code: 'ERR_NAME_NOT_RESOLVED',
-            message: 'DNS resolution failed'
-          }
-        } as TaskResultError
+            message: 'DNS resolution failed',
+          },
+        } as TaskResultError,
       ];
-      
+
       urlTracker.updateFromTaskResults(taskResults);
-      
+
       expect(mockStatement.run).toHaveBeenCalledWith(
-        'https://error.com', 'error', expect.any(String), 'ERR_NAME_NOT_RESOLVED', 0
+        'https://error.com',
+        'error',
+        expect.any(String),
+        'ERR_NAME_NOT_RESOLVED',
+        0
       );
     });
 
@@ -287,18 +321,22 @@ describe('UrlTracker', () => {
           url: 'https://error.com',
           error: {
             code: 'TIMEOUT',
-            message: 'Request timeout'
-          }
-        } as TaskResultError
+            message: 'Request timeout',
+          },
+        } as TaskResultError,
       ];
 
       // Mock existing record with max retries reached
       mockStatement.get.mockReturnValue({ retryCount: 3 });
-      
+
       urlTracker.updateFromTaskResults(taskResults);
-      
+
       expect(mockStatement.run).toHaveBeenCalledWith(
-        'https://error.com', 'error', expect.any(String), 'TIMEOUT', 3
+        'https://error.com',
+        'error',
+        expect.any(String),
+        'TIMEOUT',
+        3
       );
     });
   });
@@ -308,39 +346,39 @@ describe('UrlTracker', () => {
       const mockStats = [
         { status: 'success', count: 100 },
         { status: 'no_data', count: 20 },
-        { status: 'error', count: 5 }
+        { status: 'error', count: 5 },
       ];
-      
+
       mockStatement.all.mockReturnValue(mockStats);
-      
+
       const stats = urlTracker.getStats();
-      
+
       expect(stats).toEqual({
         success: 100,
         no_data: 20,
-        error: 5
+        error: 5,
       });
     });
 
     it('should get URLs for retry', () => {
       const mockRetryUrls = [
         { url: 'https://retry1.com' },
-        { url: 'https://retry2.com' }
+        { url: 'https://retry2.com' },
       ];
-      
+
       mockStatement.all.mockReturnValue(mockRetryUrls);
-      
+
       const retryUrls = urlTracker.getUrlsForRetry(10);
-      
+
       expect(retryUrls).toEqual(['https://retry1.com', 'https://retry2.com']);
       expect(mockStatement.all).toHaveBeenCalledWith(3, 10); // maxRetries=3, limit=10
     });
 
     it('should handle empty retry list', () => {
       mockStatement.all.mockReturnValue([]);
-      
+
       const retryUrls = urlTracker.getUrlsForRetry();
-      
+
       expect(retryUrls).toEqual([]);
     });
   });
@@ -348,13 +386,13 @@ describe('UrlTracker', () => {
   describe('Database Management', () => {
     it('should reset tracking data', () => {
       urlTracker.resetTracking();
-      
+
       expect(mockDb.exec).toHaveBeenCalledWith('DELETE FROM processed_urls');
     });
 
     it('should close database connection', () => {
       urlTracker.close();
-      
+
       expect(mockDb.close).toHaveBeenCalled();
     });
   });
@@ -363,31 +401,45 @@ describe('UrlTracker', () => {
     it('should import URLs from JSON files', async () => {
       const mockFileContent = JSON.stringify([
         { url: 'https://imported1.com', libraries: [] },
-        { url: 'https://imported2.com', libraries: [] }
+        { url: 'https://imported2.com', libraries: [] },
       ]);
-      
+
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readdirSync).mockReturnValue([
-        { name: 'results.json', isFile: () => true, isDirectory: () => false } as any
+        {
+          name: 'results.json',
+          isFile: () => true,
+          isDirectory: () => false,
+        } as any,
       ]);
       vi.mocked(fs.readFileSync).mockReturnValue(mockFileContent);
-      
+
       await urlTracker.importExistingResults('/test/store');
-      
+
       expect(mockStatement.run).toHaveBeenCalledTimes(2);
-      expect(mockStatement.run).toHaveBeenNthCalledWith(1,
-        'https://imported1.com', 'success', expect.any(String), null, 0
+      expect(mockStatement.run).toHaveBeenNthCalledWith(
+        1,
+        'https://imported1.com',
+        'success',
+        expect.any(String),
+        null,
+        0
       );
-      expect(mockStatement.run).toHaveBeenNthCalledWith(2,
-        'https://imported2.com', 'success', expect.any(String), null, 0
+      expect(mockStatement.run).toHaveBeenNthCalledWith(
+        2,
+        'https://imported2.com',
+        'success',
+        expect.any(String),
+        null,
+        0
       );
     });
 
     it('should handle non-existent store directory', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
-      
+
       await urlTracker.importExistingResults('/nonexistent/store');
-      
+
       expect(mockLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Store directory does not exist')
       );
@@ -397,12 +449,16 @@ describe('UrlTracker', () => {
     it('should handle malformed JSON files gracefully', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readdirSync).mockReturnValue([
-        { name: 'bad.json', isFile: () => true, isDirectory: () => false } as any
+        {
+          name: 'bad.json',
+          isFile: () => true,
+          isDirectory: () => false,
+        } as any,
       ]);
       vi.mocked(fs.readFileSync).mockReturnValue('invalid json');
-      
+
       await urlTracker.importExistingResults('/test/store');
-      
+
       expect(mockLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Error importing file'),
         expect.any(Object)
@@ -415,9 +471,9 @@ describe('UrlTracker', () => {
       mockStatement.get.mockImplementation(() => {
         throw new Error('Database error');
       });
-      
+
       const result = urlTracker.isUrlProcessed('https://example.com');
-      
+
       expect(result).toBe(false);
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Error checking URL processing status'),
@@ -429,11 +485,11 @@ describe('UrlTracker', () => {
       mockStatement.run.mockImplementation(() => {
         throw new Error('Database error');
       });
-      
+
       expect(() => {
         urlTracker.markUrlProcessed('https://example.com', 'success');
       }).not.toThrow();
-      
+
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Error marking URL as processed'),
         expect.any(Object)
@@ -444,10 +500,10 @@ describe('UrlTracker', () => {
       mockStatement.get.mockImplementation(() => {
         throw new Error('Database error');
       });
-      
+
       const urls = ['https://example.com'];
       const result = urlTracker.filterUnprocessedUrls(urls);
-      
+
       // Should return all URLs if filtering fails
       expect(result).toEqual(urls);
       expect(mockLogger.error).toHaveBeenCalledWith(
@@ -473,16 +529,16 @@ describe('Global UrlTracker Management', () => {
   it('should create singleton instance', () => {
     const tracker1 = getUrlTracker(mockLogger);
     const tracker2 = getUrlTracker(mockLogger);
-    
+
     expect(tracker1).toBe(tracker2);
   });
 
   it('should close singleton instance', () => {
     const tracker = getUrlTracker(mockLogger);
     const closeSpy = vi.spyOn(tracker, 'close');
-    
+
     closeUrlTracker();
-    
+
     expect(closeSpy).toHaveBeenCalled();
   });
 
@@ -490,7 +546,7 @@ describe('Global UrlTracker Management', () => {
     const tracker1 = getUrlTracker(mockLogger);
     closeUrlTracker();
     const tracker2 = getUrlTracker(mockLogger);
-    
+
     expect(tracker1).not.toBe(tracker2);
   });
 });

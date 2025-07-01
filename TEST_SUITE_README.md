@@ -7,6 +7,7 @@ This test suite is specifically designed to verify and fix the Promise resolutio
 ## Problem Analysis
 
 ### The Issue
+
 Based on your logs showing 250 URLs being processed but warnings about "undefined/null values" from cluster.queue, the problem is:
 
 1. **250 URLs** are queued for processing ✅
@@ -18,15 +19,19 @@ This means the actual page processing works fine, but the cluster integration ha
 ## Test Suite Structure
 
 ### 1. Unit Tests - `src/utils/__tests__/puppeteer-task.test.ts`
+
 **Purpose**: Verify that `processPageTask` always returns valid TaskResult objects
+
 - ✅ Success scenarios (with/without Prebid.js)
-- ✅ No data scenarios  
+- ✅ No data scenarios
 - ✅ All error types (DNS, timeout, certificate, protocol, frame detachment)
 - ✅ URL processing and trimming
 - ✅ Helper function validation
 
 ### 2. Integration Tests - `src/__tests__/url-processing-integration.test.ts`
+
 **Purpose**: Compare cluster vs vanilla mode behavior and identify inconsistencies
+
 - ✅ Vanilla vs cluster mode comparison
 - ✅ Promise.allSettled behavior validation
 - ✅ taskResults array accumulation verification
@@ -34,7 +39,9 @@ This means the actual page processing works fine, but the cluster integration ha
 - ✅ Chunk processing across modes
 
 ### 3. Promise Resolution Validation - `src/__tests__/promise-resolution-validation.test.ts`
+
 **Purpose**: Specifically target the cluster mode Promise resolution issue
+
 - ✅ Cluster task registration validation
 - ✅ Promise resolution simulation (reproduces the bug)
 - ✅ TaskResult object structure validation
@@ -42,7 +49,9 @@ This means the actual page processing works fine, but the cluster integration ha
 - ✅ Proposed fix validation
 
 ### 4. URL Count Verification - `src/__tests__/url-count-verification.test.ts`
+
 **Purpose**: Verify exact URL counts are processed (5, 10, 25 URLs)
+
 - ✅ Small, medium, and large URL set processing
 - ✅ Batch processing with progress tracking
 - ✅ Range processing validation
@@ -68,6 +77,7 @@ The `cluster.queue()` calls are resolving with `undefined` instead of the TaskRe
 ## Running the Tests
 
 ### Individual Test Suites
+
 ```bash
 # Unit tests
 npm test src/utils/__tests__/puppeteer-task.test.ts
@@ -83,6 +93,7 @@ npm test src/__tests__/url-count-verification.test.ts
 ```
 
 ### Comprehensive Test Runner
+
 ```bash
 # Run all tests with detailed reporting
 node run-comprehensive-tests.js
@@ -95,10 +106,12 @@ chmod +x run-comprehensive-tests.js
 ## Expected Test Outcomes
 
 ### ✅ What Should Pass
+
 - **Unit tests**: `processPageTask` should always return valid TaskResult objects
 - **URL count verification**: All URLs should be accounted for in test scenarios
 
 ### ❌ What Will Likely Fail (Indicating the Bug)
+
 - **Promise resolution tests**: Will reproduce the undefined result issue
 - **Integration tests**: May show discrepancies between cluster and vanilla modes
 
@@ -107,6 +120,7 @@ chmod +x run-comprehensive-tests.js
 Based on the test results, the fix will likely involve:
 
 1. **Ensuring proper task registration**:
+
    ```typescript
    // Make sure the task function is properly registered
    await cluster.task(async ({ page, data }) => {
@@ -127,25 +141,32 @@ Based on the test results, the fix will likely involve:
 ## Test Reports
 
 The test runner generates detailed reports in `./test-results/`:
+
 - **JSON Report**: Machine-readable results with full details
 - **Markdown Report**: Human-readable summary with recommendations
 
 ## Key Insights from Tests
 
 ### Promise Resolution Issue (High Priority)
+
 The tests specifically reproduce the scenario where:
+
 - `cluster.queue()` promises resolve with `undefined`
 - `Promise.allSettled()` captures these as "fulfilled but undefined"
 - Results in the warning messages you observed
 
-### URL Processing Verification (High Priority)  
+### URL Processing Verification (High Priority)
+
 The tests confirm that:
+
 - All URLs ARE being processed (explains why you see the log messages)
 - The issue is NOT with URL skipping
 - The issue IS with result capture after processing
 
 ### Performance Impact (Medium Priority)
+
 The undefined results mean:
+
 - Statistics are incomplete
 - Output files may not be generated
 - Database updates may be missing
@@ -161,6 +182,7 @@ The undefined results mean:
 ## Continuous Integration
 
 Add this to your CI pipeline:
+
 ```yaml
 - name: Run URL Processing Tests
   run: |
