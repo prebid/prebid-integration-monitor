@@ -1,11 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { prebidExplorer, type PrebidExplorerOptions } from '../prebid.js';
-import type {
-  TaskResult,
-  TaskResultSuccess,
-  TaskResultNoData,
-  TaskResultError,
-} from '../common/types.js';
+import type { TaskResult, TaskResultSuccess } from '../common/types.js';
 import type { Logger as WinstonLogger } from 'winston';
 import * as fs from 'fs';
 
@@ -227,9 +222,7 @@ describe('Progress Tracking and Statistics Tests', () => {
       );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
 
-      let capturedResults: TaskResult[] = [];
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
-        capturedResults = [...results];
         return results
           .filter((r) => r.type === 'success')
           .map((r) => (r as TaskResultSuccess).data);
@@ -349,7 +342,7 @@ describe('Progress Tracking and Statistics Tests', () => {
       );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
 
-      mockProcessResults.mockImplementation((results: TaskResult[]) => {
+      mockProcessResults.mockImplementation((_results: TaskResult[]) => {
         return []; // No successful extractions
       });
 
@@ -910,7 +903,7 @@ describe('Progress Tracking and Statistics Tests', () => {
       );
       const mockProcessResults = vi.mocked(processAndLogTaskResults);
 
-      mockProcessResults.mockImplementation((results: TaskResult[]) => {
+      mockProcessResults.mockImplementation((_results: TaskResult[]) => {
         return []; // No successful results
       });
 

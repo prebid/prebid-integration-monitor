@@ -121,9 +121,8 @@ describe('GitHub Range Integration Tests', () => {
       const manualRangeString = '500000-500001';
 
       // Simulate the buggy behavior: applying range twice
-      const [startStr, endStr] = manualRangeString.split('-');
+      const [startStr] = manualRangeString.split('-');
       const start = parseInt(startStr, 10) - 1; // Convert to 0-based
-      const end = parseInt(endStr, 10);
 
       // This would fail in the original code because start (499999) >= githubExtractedUrls.length (2)
       const wouldFail = start >= githubExtractedUrls.length;
@@ -147,9 +146,8 @@ describe('GitHub Range Integration Tests', () => {
       const rangeString = '500000-500002'; // Original range specification
 
       // Parse the range as the buggy code would
-      const [startStr, endStr] = rangeString.split('-');
+      const [startStr] = rangeString.split('-');
       const start = parseInt(startStr, 10) - 1; // 499999 (0-based)
-      const end = parseInt(endStr, 10); // 500002
 
       // The bug: trying to apply this range to already-extracted URLs
       const bugWouldOccur = start >= githubProcessedUrls;

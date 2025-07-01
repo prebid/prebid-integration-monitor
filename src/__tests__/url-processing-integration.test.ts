@@ -6,8 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Logger as WinstonLogger } from 'winston';
 import { prebidExplorer, PrebidExplorerOptions } from '../prebid.js';
-import { processPageTask } from '../utils/puppeteer-task.js';
-import type { TaskResult, PageData } from '../common/types.js';
+import type { TaskResult } from '../common/types.js';
 import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
 import { join } from 'path';
 
@@ -58,110 +57,106 @@ describe('URL Processing Integration Tests', () => {
   });
 
   describe('Cluster vs Vanilla Mode Comparison', () => {
-    it(
-      'should process same URLs consistently in both modes',
-      async () => {
-        const baseOptions: PrebidExplorerOptions = {
-          inputFile: TEST_INPUT_FILE,
-          puppeteerType: 'vanilla',
-          concurrency: 1,
-          headless: true,
-          monitor: false,
-          outputDir: TEST_OUTPUT_DIR,
-          logDir: TEST_LOG_DIR,
-          numUrls: 3, // Process first 3 URLs only
-          skipProcessed: false,
-        };
+    it('should process same URLs consistently in both modes', async () => {
+      const baseOptions: PrebidExplorerOptions = {
+        inputFile: TEST_INPUT_FILE,
+        puppeteerType: 'vanilla',
+        concurrency: 1,
+        headless: true,
+        monitor: false,
+        outputDir: TEST_OUTPUT_DIR,
+        logDir: TEST_LOG_DIR,
+        numUrls: 3, // Process first 3 URLs only
+        skipProcessed: false,
+      };
 
-        // Test vanilla mode
-        const vanillaResults: TaskResult[] = [];
-        vi.doMock('../prebid.js', () => ({
-          prebidExplorer: vi
-            .fn()
-            .mockImplementation(async (options: PrebidExplorerOptions) => {
-              // Simulate vanilla processing
-              const urls = TEST_URLS.slice(0, 3);
-              for (const url of urls) {
-                const result: TaskResult = {
-                  type:
-                    url.includes('404') || url.includes('invalid')
-                      ? 'error'
-                      : 'no_data',
-                  url: url.trim(),
-                  ...(url.includes('404') || url.includes('invalid')
-                    ? {
-                        error: {
-                          code: url.includes('invalid')
-                            ? 'ERR_NAME_NOT_RESOLVED'
-                            : 'HTTP_404',
-                          message: `Error processing ${url}`,
-                          stack: 'test stack',
-                        },
-                      }
-                    : {}),
-                };
-                vanillaResults.push(result);
+      // Test vanilla mode
+      const vanillaResults: TaskResult[] = [];
+      vi.doMock('../prebid.js', () => ({
+        prebidExplorer: vi
+          .fn()
+          .mockImplementation(async (_options: PrebidExplorerOptions) => {
+            // Simulate vanilla processing
+            const urls = TEST_URLS.slice(0, 3);
+            for (const url of urls) {
+              const result: TaskResult =
+                url.includes('404') || url.includes('invalid')
+                  ? {
+                      type: 'error' as const,
+                      url: url.trim(),
+                      error: {
+                        code: url.includes('invalid')
+                          ? 'ERR_NAME_NOT_RESOLVED'
+                          : 'HTTP_404',
+                        message: `Error processing ${url}`,
+                        stack: 'test stack',
+                      },
+                    }
+                  : {
+                      type: 'no_data' as const,
+                      url: url.trim(),
+                    };
+              vanillaResults.push(result);
+            }
+          }),
+      }));
+
+      await prebidExplorer({ ...baseOptions, puppeteerType: 'vanilla' });
+
+      // Test cluster mode
+      const clusterResults: TaskResult[] = [];
+      vi.doMock('../prebid.js', () => ({
+        prebidExplorer: vi
+          .fn()
+          .mockImplementation(async (_options: PrebidExplorerOptions) => {
+            // Simulate cluster processing
+            const urls = TEST_URLS.slice(0, 3);
+            const promises = urls.map(async (url) => {
+              const result: TaskResult =
+                url.includes('404') || url.includes('invalid')
+                  ? {
+                      type: 'error' as const,
+                      url: url.trim(),
+                      error: {
+                        code: url.includes('invalid')
+                          ? 'ERR_NAME_NOT_RESOLVED'
+                          : 'HTTP_404',
+                        message: `Error processing ${url}`,
+                        stack: 'test stack',
+                      },
+                    }
+                  : {
+                      type: 'no_data' as const,
+                      url: url.trim(),
+                    };
+              return result;
+            });
+
+            const settledResults = await Promise.allSettled(promises);
+            settledResults.forEach((settledResult) => {
+              if (settledResult.status === 'fulfilled') {
+                clusterResults.push(settledResult.value);
               }
-            }),
-        }));
+            });
+          }),
+      }));
 
-        await prebidExplorer({ ...baseOptions, puppeteerType: 'vanilla' });
+      await prebidExplorer({ ...baseOptions, puppeteerType: 'cluster' });
 
-        // Test cluster mode
-        const clusterResults: TaskResult[] = [];
-        vi.doMock('../prebid.js', () => ({
-          prebidExplorer: vi
-            .fn()
-            .mockImplementation(async (options: PrebidExplorerOptions) => {
-              // Simulate cluster processing
-              const urls = TEST_URLS.slice(0, 3);
-              const promises = urls.map(async (url) => {
-                const result: TaskResult = {
-                  type:
-                    url.includes('404') || url.includes('invalid')
-                      ? 'error'
-                      : 'no_data',
-                  url: url.trim(),
-                  ...(url.includes('404') || url.includes('invalid')
-                    ? {
-                        error: {
-                          code: url.includes('invalid')
-                            ? 'ERR_NAME_NOT_RESOLVED'
-                            : 'HTTP_404',
-                          message: `Error processing ${url}`,
-                          stack: 'test stack',
-                        },
-                      }
-                    : {}),
-                };
-                return result;
-              });
+      // Compare results
+      expect(vanillaResults).toHaveLength(3);
+      expect(clusterResults).toHaveLength(3);
 
-              const settledResults = await Promise.allSettled(promises);
-              settledResults.forEach((settledResult) => {
-                if (settledResult.status === 'fulfilled') {
-                  clusterResults.push(settledResult.value);
-                }
-              });
-            }),
-        }));
-
-        await prebidExplorer({ ...baseOptions, puppeteerType: 'cluster' });
-
-        // Compare results
-        expect(vanillaResults).toHaveLength(3);
-        expect(clusterResults).toHaveLength(3);
-
-        // Results should have same types and URLs
-        expect(vanillaResults.map((r) => r.type)).toEqual(
-          clusterResults.map((r) => r.type)
-        );
-        expect(vanillaResults.map((r) => r.url)).toEqual(
-          clusterResults.map((r) => r.url)
-        );
-      },
-      { timeout: 30000 }
-    );
+      // Results should have same types and URLs
+      expect(vanillaResults.map((r) => r.type)).toEqual(
+        clusterResults.map((r) => r.type)
+      );
+      expect(
+        vanillaResults.map((r) => (r as any).url || (r as any).data?.url)
+      ).toEqual(
+        clusterResults.map((r) => (r as any).url || (r as any).data?.url)
+      );
+    }, 30000);
 
     it('should handle Promise.allSettled correctly in cluster mode', async () => {
       const testUrls = [
@@ -210,7 +205,9 @@ describe('URL Processing Integration Tests', () => {
       expect(taskResults).toHaveLength(2);
       expect(taskResults[0].type).toBe('no_data');
       expect(taskResults[1].type).toBe('error');
-      expect(taskResults[1].url).toBe('https://httpbin.org/status/404');
+      expect((taskResults[1] as any).url).toBe(
+        'https://httpbin.org/status/404'
+      );
     });
 
     it('should detect undefined result values in cluster mode', async () => {
@@ -248,7 +245,9 @@ describe('URL Processing Integration Tests', () => {
 
       expect(validResults).toHaveLength(1); // Only one valid result
       expect(undefinedCount.count).toBe(1); // One undefined result
-      expect(validResults[0].url).toBe('https://example.com');
+      expect(
+        (validResults[0] as any).url || (validResults[0] as any).data?.url
+      ).toBe('https://example.com');
     });
   });
 
@@ -332,7 +331,9 @@ describe('URL Processing Integration Tests', () => {
         'no_data',
         'error',
       ]);
-      expect(results.map((r) => r.url || (r as any).data?.url)).toEqual([
+      expect(
+        results.map((r) => (r as any).url || (r as any).data?.url)
+      ).toEqual([
         'https://success.com',
         'https://nodata.com',
         'https://error.com',
@@ -392,7 +393,9 @@ describe('URL Processing Integration Tests', () => {
 
       expect(results).toHaveLength(3);
       // Results should include all URLs regardless of processing order
-      const resultUrls = results.map((r) => r.url).sort();
+      const resultUrls = results
+        .map((r) => (r as any).url || (r as any).data?.url)
+        .sort();
       expect(resultUrls).toEqual(urls.sort());
     });
   });
@@ -433,7 +436,9 @@ describe('URL Processing Integration Tests', () => {
       }
 
       expect(allResults).toHaveLength(5);
-      expect(allResults.map((r) => r.url)).toEqual(urls);
+      expect(
+        allResults.map((r) => (r as any).url || (r as any).data?.url)
+      ).toEqual(urls);
     });
 
     it('should handle empty chunks gracefully', async () => {

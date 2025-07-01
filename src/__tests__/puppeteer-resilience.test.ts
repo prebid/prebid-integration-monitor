@@ -169,14 +169,14 @@ describe('Puppeteer Resilience Tests', () => {
         });
 
         // Queue a task that will throw
-        const errorPromise = cluster.execute(async ({ page }) => {
+        const errorPromise = cluster.execute(async ({ page: _page }) => {
           throw new Error('Simulated crash');
         });
 
         await expect(errorPromise).rejects.toThrow();
 
         // Cluster should still be usable
-        const successPromise = cluster.execute(async ({ page }) => {
+        const successPromise = cluster.execute(async ({ page: _page }) => {
           return { success: true };
         });
 
@@ -320,7 +320,7 @@ describe('Puppeteer Resilience Tests', () => {
       };
 
       // Test pattern matching
-      Object.entries(errorPatterns).forEach(([category, patterns]) => {
+      Object.entries(errorPatterns).forEach(([_category, patterns]) => {
         patterns.forEach((pattern) => {
           expect(pattern).toBeTruthy();
         });

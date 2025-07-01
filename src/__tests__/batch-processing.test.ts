@@ -1,11 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { prebidExplorer, type PrebidExplorerOptions } from '../prebid.js';
-import type {
-  TaskResult,
-  TaskResultSuccess,
-  TaskResultNoData,
-  TaskResultError,
-} from '../common/types.js';
+import type { TaskResult, TaskResultSuccess } from '../common/types.js';
 import type { Logger as WinstonLogger } from 'winston';
 import * as fs from 'fs';
 
@@ -190,7 +185,6 @@ describe('Batch Processing Tests', () => {
       });
 
       // Mock browser lifecycle
-      const originalLaunch = vi.mocked(mockBrowser);
       const puppeteer = await import('puppeteer');
       vi.mocked(puppeteer.default.launch).mockImplementation(() => {
         browserCreateCount++;
@@ -546,10 +540,12 @@ describe('Batch Processing Tests', () => {
       mockProcessResults.mockImplementation((results: TaskResult[]) => {
         totalResults.push(...results);
 
-        // Count result types
-        const successCount = results.filter((r) => r.type === 'success').length;
-        const noDataCount = results.filter((r) => r.type === 'no_data').length;
-        const errorCount = results.filter((r) => r.type === 'error').length;
+        // Count result types (unused variables removed)
+        // These counts were calculated but not used in the test
+        // If needed for future assertions, uncomment:
+        // const successCount = results.filter((r) => r.type === 'success').length;
+        // const noDataCount = results.filter((r) => r.type === 'no_data').length;
+        // const errorCount = results.filter((r) => r.type === 'error').length;
 
         return results.filter((r) => r.type === 'success');
       });

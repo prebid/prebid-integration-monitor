@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { Page } from 'puppeteer';
 import type { Logger as WinstonLogger } from 'winston';
 import {

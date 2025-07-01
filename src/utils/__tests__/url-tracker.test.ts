@@ -23,6 +23,7 @@ const mockDb = {
   exec: vi.fn(),
   prepare: vi.fn(),
   close: vi.fn(),
+  transaction: vi.fn(),
 };
 
 const mockStatement = {
@@ -56,6 +57,14 @@ describe('UrlTracker', () => {
 
     // Setup mock to return statement
     mockDb.prepare.mockReturnValue(mockStatement);
+
+    // Setup transaction mock by default - returns a function that calls the original with arguments
+    mockDb.transaction.mockImplementation(
+      (fn: (...args: any[]) => any) => (args: any) => fn(args)
+    );
+
+    // Reset mockStatement.get to return undefined by default
+    mockStatement.get.mockReturnValue(undefined);
 
     // Mock fs.existsSync and fs.mkdirSync
     vi.mocked(fs.existsSync).mockReturnValue(false);
@@ -507,7 +516,7 @@ describe('UrlTracker', () => {
       // Should return all URLs if filtering fails
       expect(result).toEqual(urls);
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining('Error filtering unprocessed URLs'),
+        expect.stringContaining('Error checking URL processing status'),
         expect.any(Object)
       );
     });

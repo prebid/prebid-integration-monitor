@@ -1,16 +1,7 @@
 import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  vi,
-} from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 
 // Helper function to execute CLI command
 interface ExecResult {
@@ -30,7 +21,7 @@ function executeCommand(
   cwd: string = '.'
 ): Promise<ExecResult> {
   return new Promise((resolve) => {
-    const env = { ...process.env, NODE_ENV: 'production' };
+    const env: any = { ...process.env, NODE_ENV: 'production' };
     if (env.NODE_OPTIONS) {
       env.NODE_OPTIONS = env.NODE_OPTIONS.replace(
         /--loader\s+ts-node\/esm/g,
@@ -43,7 +34,7 @@ function executeCommand(
       resolve({
         stdout: stdout.toString(),
         stderr: stderr.toString(),
-        code: error ? error.code : 0,
+        code: error ? (error.code ?? null) : 0,
       });
     });
   });
@@ -100,22 +91,22 @@ describe('Scan CLI with URL Deduplication', () => {
     it('should work with --skipProcessed flag and dry run', async () => {
       // Create a minimal test that doesn't actually process URLs
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
-      // Should exit gracefully with range that selects no URLs
+      // Should exit gracefully with range that selects no URLs (999 is beyond the test URLs)
       expect(result.stdout).toContain('No URLs to process');
       expect(result.code).toBe(0);
     });
 
     it('should show URL filtering logs when enabled', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
-      expect(result.stdout).toContain('URL tracking database');
+      expect(result.stdout).toContain('URL tracker database');
       expect(result.code).toBe(0);
     });
   });
@@ -134,7 +125,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
     it('should work with --resetTracking flag', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --resetTracking --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --resetTracking --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -174,7 +165,7 @@ describe('Scan CLI with URL Deduplication', () => {
   describe('Flag validation', () => {
     it('should allow skipProcessed without resetTracking', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -183,7 +174,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
     it('should allow resetTracking without skipProcessed', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --resetTracking --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --resetTracking --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -192,7 +183,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
     it('should allow both flags together', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --resetTracking --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --resetTracking --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -210,7 +201,7 @@ describe('Scan CLI with URL Deduplication', () => {
       }
 
       await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -241,7 +232,7 @@ describe('Scan CLI with URL Deduplication', () => {
       fs.writeFileSync(dbPath, 'invalid database content');
 
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -268,7 +259,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
     it('should work with --chunkSize flag', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --chunkSize=1 --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --chunkSize=1 --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -288,7 +279,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
     it('should work with --puppeteerType=cluster', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=cluster --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=cluster --range=999-999`,
         process.cwd()
       );
 
@@ -299,7 +290,7 @@ describe('Scan CLI with URL Deduplication', () => {
   describe('Output verification', () => {
     it('should show correct options in verbose output', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --resetTracking --verbose --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --resetTracking --verbose --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 
@@ -310,7 +301,7 @@ describe('Scan CLI with URL Deduplication', () => {
 
     it('should show database statistics', async () => {
       const result = await executeCommand(
-        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=1-0`,
+        `node ./bin/run.js scan ${testUrlsFile} --skipProcessed --puppeteerType=vanilla --range=999-999`,
         process.cwd()
       );
 

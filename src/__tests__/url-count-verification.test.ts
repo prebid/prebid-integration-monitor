@@ -7,8 +7,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Logger as WinstonLogger } from 'winston';
 import type { TaskResult, PageData } from '../common/types.js';
 import { processPageTask } from '../utils/puppeteer-task.js';
-import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync, existsSync, rmSync } from 'fs';
 
 // Mock logger
 const mockLogger: WinstonLogger = {
@@ -271,7 +270,7 @@ describe('URL Count Verification Tests', () => {
       const endTimes: Map<string, number> = new Map();
 
       // Simulate high concurrency processing
-      const promises = urls.map(async (url, index) => {
+      const promises = urls.map(async (url, _index) => {
         startTimes.set(url, Date.now());
 
         // Simulate varying processing times
@@ -403,10 +402,6 @@ describe('URL Count Verification Tests', () => {
           rejectedCount.value++;
         }
       });
-
-      // Calculate expected counts
-      const expectedUndefined = Math.floor(25 / 7) + (25 % 7 > 0 ? 1 : 0); // URLs at indices 0, 7, 14, 21
-      const expectedRejected = Math.floor(25 / 11) + (25 % 11 > 0 ? 1 : 0); // URLs at indices 0, 11, 22
 
       // Note: index 0 satisfies both conditions, so it's counted as undefined (first condition)
       const actualExpectedUndefined = 4; // indices 0, 7, 14, 21
@@ -576,7 +571,7 @@ describe('URL Count Verification Tests', () => {
       const startTime = Date.now();
 
       // Simulate concurrent processing
-      const promises = urls.map(async (url, index) => {
+      const promises = urls.map(async (url, _index) => {
         // Simulate realistic processing time (10-50ms per URL)
         await new Promise((resolve) =>
           setTimeout(resolve, 10 + Math.random() * 40)

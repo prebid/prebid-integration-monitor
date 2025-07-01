@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Logger as WinstonLogger } from 'winston';
 
 // Mock the entire processing pipeline
 vi.mock('../prebid.js', () => ({

@@ -1,14 +1,41 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fetchUrlsFromGitHub } from '../url-loader.js';
-import { getContentCache, closeContentCache } from '../content-cache.js';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from 'vitest';
 import type { Logger as WinstonLogger } from 'winston';
 
-// Mock dependencies
+// Mock node-fetch module with factory function
 vi.mock('node-fetch', () => ({
   default: vi.fn(),
+  Response: class Response {
+    ok: boolean;
+    status: number;
+    statusText: string;
+    headers: Map<string, string>;
+    text: () => Promise<string>;
+
+    constructor(body: any, init: any = {}) {
+      this.ok = init.ok ?? true;
+      this.status = init.status ?? 200;
+      this.statusText = init.statusText ?? 'OK';
+      this.headers = init.headers ?? new Map();
+      this.text = init.text ?? (() => Promise.resolve(body));
+    }
+  },
 }));
 
-const { default: mockFetch } = await import('node-fetch');
+// Import after mocking
+import { fetchUrlsFromGitHub } from '../url-loader.js';
+import { getContentCache, closeContentCache } from '../content-cache.js';
+import fetch from 'node-fetch';
+
+// Get the mocked version
+const mockFetch = vi.mocked(fetch);
 
 // Mock logger
 const mockLogger = {
@@ -39,7 +66,7 @@ describe('URL Loading Optimizations', () => {
           ['content-length', '100'],
           ['etag', '"abc123"'],
         ]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -50,6 +77,10 @@ describe('URL Loading Optimizations', () => {
       );
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://raw.githubusercontent.com/test/repo/main/domains.txt',
+        expect.any(Object)
+      );
       expect(result1).toHaveLength(3);
       expect(result1).toEqual([
         'https://google.com',
@@ -68,7 +99,7 @@ describe('URL Loading Optimizations', () => {
           ['content-length', '100'],
           ['etag', '"abc123"'],
         ]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -89,8 +120,9 @@ describe('URL Loading Optimizations', () => {
       expect(mockFetch).toHaveBeenCalledTimes(1); // Only called once
       expect(result1).toEqual(result2);
       // Check for cache usage in logs
-      const cacheLogCall = mockLogger.info.mock.calls.find(call => 
-        call[0]?.includes('cached') || call[0]?.includes('cache')
+      const cacheLogCall = (mockLogger.info as Mock).mock.calls.find(
+        (call: any[]) =>
+          call[0]?.includes('cached') || call[0]?.includes('cache')
       );
       expect(cacheLogCall).toBeDefined();
     });
@@ -105,7 +137,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(testContent),
         headers: new Map([['content-length', '1000']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -144,13 +176,13 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(largeContent),
         headers: new Map([['content-length', '100000']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
       const startTime = Date.now();
       const result = await fetchUrlsFromGitHub(
-        'https://github.com/test/repo/blob/main/large-domains.txt', // Add .txt extension
+        'https://github.com/test/repo/blob/main/large-domains.txt',
         undefined,
         mockLogger,
         { startRange: 1000, endRange: 1050 }
@@ -175,7 +207,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(smallContent),
         headers: new Map([['content-length', '100']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -199,7 +231,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(testContent),
         headers: new Map([['content-length', '500']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -225,7 +257,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(hugeContent),
         headers: new Map([['content-length', '1000000']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -255,7 +287,7 @@ describe('URL Loading Optimizations', () => {
         statusText: 'Not Found',
         text: () => Promise.resolve('Not Found'),
         headers: new Map(),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockErrorResponse);
 
@@ -297,7 +329,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(testContent),
         headers: new Map([['content-length', '20']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -324,7 +356,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(mediumContent),
         headers: new Map([['content-length', '10000']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 
@@ -356,7 +388,7 @@ describe('URL Loading Optimizations', () => {
         status: 200,
         text: () => Promise.resolve(testContent),
         headers: new Map([['content-length', '50000']]),
-      } as any;
+      };
 
       mockFetch.mockResolvedValueOnce(mockResponse);
 

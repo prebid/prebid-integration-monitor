@@ -14,15 +14,9 @@ import type { PageData, TaskResult } from '../common/types.js';
 import {
   DEFAULT_USER_AGENT,
   PUPPETEER_DEFAULT_PAGE_TIMEOUT,
-  PBJS_VERSION_WAIT_TIMEOUT_MS,
-  PBJS_VERSION_WAIT_INTERVAL_MS,
 } from '../config/app-config.js';
 import { createAuthenticUserAgent } from './user-agent.js';
-import {
-  ProcessingPhase,
-  detectErrorType,
-  DetailedError,
-} from './error-types.js';
+import { ProcessingPhase, detectErrorType } from './error-types.js';
 
 /**
  * Configures a given Puppeteer {@link Page} instance with standard settings

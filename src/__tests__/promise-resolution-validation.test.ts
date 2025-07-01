@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Logger as WinstonLogger } from 'winston';
 import { Cluster } from 'puppeteer-cluster';
 import { processPageTask } from '../utils/puppeteer-task.js';
-import type { TaskResult, PageData } from '../common/types.js';
+import type { TaskResult } from '../common/types.js';
 
 // Mock logger
 const mockLogger: WinstonLogger = {
@@ -351,7 +351,7 @@ describe('Promise Resolution Validation Tests', () => {
       // Mock the exact cluster setup from prebid.ts
       const mockCluster = {
         task: vi.fn(),
-        queue: vi.fn().mockImplementation(({ url, logger }) => {
+        queue: vi.fn().mockImplementation(({ url, logger: _logger }) => {
           processedUrls.add(url);
 
           // Simulate the exact problem: cluster.queue returns a promise
@@ -362,11 +362,12 @@ describe('Promise Resolution Validation Tests', () => {
               setTimeout(() => {
                 // This simulates processPageTask being called correctly
                 // but the result not being returned properly
-                const taskResult = {
+                // The bug: resolve with undefined instead of a proper taskResult
+                // This simulates the issue where cluster.queue loses the return value
+                void {
                   type: 'no_data' as const,
                   url,
                 };
-                // The bug: resolve with undefined instead of taskResult
                 resolve(undefined);
               }, 10);
             });
