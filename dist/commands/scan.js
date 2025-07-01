@@ -147,7 +147,11 @@ export default class Scan extends Command {
         const resumeFromBatch = flags.resumeBatch || 1;
         // Batch progress tracking
         const progressFile = `batch-progress-${startUrl}-${endUrl}.json`;
-        let batchProgress = { completedBatches: [], failedBatches: [], startTime: new Date().toISOString() };
+        let batchProgress = {
+            completedBatches: [],
+            failedBatches: [],
+            startTime: new Date().toISOString(),
+        };
         // Load existing progress if resuming
         try {
             const fs = await import('fs');
@@ -178,7 +182,7 @@ export default class Scan extends Command {
             const range = `${batchStartUrl}-${batchEndUrl}`;
             logger.info(`\n🔄 Processing batch ${batchNum}/${totalBatches}: URLs ${range}`);
             logger.info(`⏰ Started at: ${new Date().toLocaleTimeString()}`);
-            logger.info(`📊 Batch progress: ${((batchNum - 1) / totalBatches * 100).toFixed(1)}% complete`);
+            logger.info(`📊 Batch progress: ${(((batchNum - 1) / totalBatches) * 100).toFixed(1)}% complete`);
             logger.info(`📁 Log directory: ${`${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`}`);
             // Show estimated completion based on average batch time
             if (batchProgress.completedBatches.length > 0) {
@@ -205,7 +209,7 @@ export default class Scan extends Command {
                     urlsSkipped: 0,
                     successfulExtractions: 0,
                     errors: 0,
-                    noAdTech: 0
+                    noAdTech: 0,
                 };
                 // Try to read stats from the batch log file
                 try {
@@ -233,7 +237,7 @@ export default class Scan extends Command {
                         logger.debug(`Batch ${batchNum} log parsing results:`, {
                             processedMatch: processedMatch?.[1],
                             skippedMatch: skippedMatch?.[1],
-                            batchStats
+                            batchStats,
                         });
                     }
                     else {
@@ -257,7 +261,7 @@ export default class Scan extends Command {
                 else if (batchStats.urlsSkipped === 0) {
                     logger.warn(`   ⚠️  No URLs processed or skipped in this batch - check range validity`);
                 }
-                logger.info(`📊 Overall progress: ${batchNum}/${totalBatches} batches (${(batchNum / totalBatches * 100).toFixed(1)}%)`);
+                logger.info(`📊 Overall progress: ${batchNum}/${totalBatches} batches (${((batchNum / totalBatches) * 100).toFixed(1)}%)`);
                 batchTracer.recordUrlCounts(batchStats.urlsProcessed, batchStats.urlsSkipped, batchStats.successfulExtractions, batchStats.errors);
                 batchTracer.finish(true);
                 successfulBatches++;
@@ -268,8 +272,8 @@ export default class Scan extends Command {
                     completedAt: new Date().toISOString(),
                     duration: batchDuration,
                     statistics: {
-                        note: 'Detailed statistics available in individual batch logs'
-                    }
+                        note: 'Detailed statistics available in individual batch logs',
+                    },
                 });
             }
             catch (error) {
@@ -284,7 +288,7 @@ export default class Scan extends Command {
                     range: range,
                     failedAt: new Date().toISOString(),
                     duration: batchDuration,
-                    error: error instanceof Error ? error.message : String(error)
+                    error: error instanceof Error ? error.message : String(error),
                 });
                 // Continue with next batch instead of stopping
                 logger.warn(`⏭️  Continuing with next batch...`);
@@ -300,7 +304,7 @@ export default class Scan extends Command {
             // Brief pause between batches to avoid overwhelming the system
             if (batchNum < totalBatches) {
                 logger.info('⏸️  Pausing 5 seconds before next batch...');
-                await new Promise(resolve => setTimeout(resolve, 5000));
+                await new Promise((resolve) => setTimeout(resolve, 5000));
             }
         }
         // Collect comprehensive statistics from all batches
@@ -361,7 +365,8 @@ export default class Scan extends Command {
         if (totalUrlsSkipped > 0) {
             logger.info(`   ⏭️  URLs skipped (previously processed): ${totalUrlsSkipped.toLocaleString()}`);
             // Add clear explanation when most/all URLs were skipped
-            const skipPercentage = ((totalUrlsSkipped / totalUrlsInRange) * 100).toFixed(1);
+            const skipPercentage = ((totalUrlsSkipped / totalUrlsInRange) *
+                100).toFixed(1);
             if (totalUrlsSkipped === totalUrlsInRange) {
                 logger.info('');
                 logger.info('🎯 IMPORTANT: ALL URLs in this range were already processed!');
@@ -379,7 +384,8 @@ export default class Scan extends Command {
         logger.info(`   🚫 No ad tech found: ${totalNoAdTech.toLocaleString()}`);
         // Calculate success rates only if URLs were actually processed
         if (totalUrlsProcessed > 0) {
-            const extractionRate = ((totalSuccessfulExtractions / totalUrlsProcessed) * 100).toFixed(1);
+            const extractionRate = ((totalSuccessfulExtractions / totalUrlsProcessed) *
+                100).toFixed(1);
             const errorRate = ((totalErrors / totalUrlsProcessed) * 100).toFixed(1);
             const noAdTechRate = ((totalNoAdTech / totalUrlsProcessed) * 100).toFixed(1);
             logger.info('');
@@ -425,7 +431,9 @@ export default class Scan extends Command {
             });
         }
         // Data verification suggestions
-        if (totalSuccessfulExtractions === 0 && totalUrlsProcessed === 0 && totalUrlsSkipped === totalUrls) {
+        if (totalSuccessfulExtractions === 0 &&
+            totalUrlsProcessed === 0 &&
+            totalUrlsSkipped === totalUrls) {
             logger.info('');
             logger.info('📝 ALL URLS WERE PREVIOUSLY PROCESSED:');
             logger.info('   • This range has been fully processed before');

@@ -28,12 +28,12 @@ import { processPageTask, // The core function for processing a single page
 import { processAndLogTaskResults, writeResultsToStoreFile, appendNoPrebidUrls, appendErrorUrls, updateInputFile, createErrorFileHeaders, } from './utils/results-handler.js';
 import { getUrlTracker, closeUrlTracker } from './utils/url-tracker.js';
 import { filterValidUrls } from './utils/domain-validator.js';
-import { PageLifecycleTracer, ClusterHealthMonitor } from './utils/puppeteer-telemetry.js';
+import { PageLifecycleTracer, ClusterHealthMonitor, } from './utils/puppeteer-telemetry.js';
 import { processUrlsWithRecovery } from './utils/cluster-wrapper.js';
 import { processUrlsWithBrowserPool } from './utils/browser-pool.js';
 import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
-import { initializeTelemetry, URLLoadingTracer, URLFilteringTracer } from './utils/telemetry.js';
-import { installProcessErrorHandler, uninstallProcessErrorHandler } from './utils/process-error-handler.js';
+import { initializeTelemetry, URLLoadingTracer, URLFilteringTracer, } from './utils/telemetry.js';
+import { installProcessErrorHandler, uninstallProcessErrorHandler, } from './utils/process-error-handler.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
 // Apply puppeteer-extra plugins.
 // The 'as any' and 'as unknown as typeof puppeteerVanilla' casts are a common way
@@ -128,7 +128,7 @@ export async function prebidExplorer(options) {
         headless: options.headless,
         args: [
             ...ENHANCED_PUPPETEER_ARGS, // Use enhanced args for better stability
-            ...(options.puppeteerLaunchOptions?.args || []) // Allow additional custom args
+            ...(options.puppeteerLaunchOptions?.args || []), // Allow additional custom args
         ],
         ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
     };
@@ -150,7 +150,7 @@ export async function prebidExplorer(options) {
             const [startStr, endStr] = options.range.split('-');
             rangeOptions = {
                 startRange: startStr ? parseInt(startStr, 10) : undefined,
-                endRange: endStr ? parseInt(endStr, 10) : undefined
+                endRange: endStr ? parseInt(endStr, 10) : undefined,
             };
             logger.info(`Using optimized range processing: ${options.range}`);
         }
@@ -273,7 +273,7 @@ export async function prebidExplorer(options) {
                     totalInRange: analysis.totalInRange,
                     processedCount: analysis.processedCount,
                     unprocessedCount: analysis.unprocessedCount,
-                    processedPercentage: analysis.processedPercentage.toFixed(1) + '%'
+                    processedPercentage: analysis.processedPercentage.toFixed(1) + '%',
                 });
                 if (analysis.isFullyProcessed) {
                     logger.info('🎯 RANGE FULLY PROCESSED: All URLs in this range have been processed!');
@@ -378,11 +378,13 @@ export async function prebidExplorer(options) {
                         onTaskComplete: (result) => {
                             // Track results as they complete
                             taskResults.push(result);
-                            const url = result.type === 'error' || result.type === 'no_data' ? result.url : result.data.url;
+                            const url = result.type === 'error' || result.type === 'no_data'
+                                ? result.url
+                                : result.data.url;
                             if (url) {
                                 processedUrls.add(url);
                             }
-                        }
+                        },
                     }, (processed, total) => {
                         // Progress callback for chunk
                         if (processed % 10 === 0 || processed === total) {
@@ -391,21 +393,23 @@ export async function prebidExplorer(options) {
                     });
                     // Results are already added via onTaskComplete callback
                     // Just ensure all URLs are marked as processed
-                    currentChunkUrls.forEach(url => processedUrls.add(url));
+                    currentChunkUrls.forEach((url) => processedUrls.add(url));
                 }
                 catch (error) {
                     logger.error(`Fatal error in chunk ${chunkNumber} cluster processing:`, error);
                     // Add error results for any URLs in this chunk that weren't processed
                     for (const url of currentChunkUrls) {
-                        if (!taskResults.some(r => ((r.type === 'error' || r.type === 'no_data') ? r.url : r.data?.url) === url)) {
+                        if (!taskResults.some((r) => (r.type === 'error' || r.type === 'no_data'
+                            ? r.url
+                            : r.data?.url) === url)) {
                             taskResults.push({
                                 type: 'error',
                                 url: url,
                                 error: {
                                     code: 'CHUNK_PROCESSING_ERROR',
                                     message: `Chunk ${chunkNumber} processing failed: ${error.message}`,
-                                    stack: error.stack
-                                }
+                                    stack: error.stack,
+                                },
                             });
                         }
                     }
@@ -455,14 +459,14 @@ export async function prebidExplorer(options) {
                     puppeteer,
                     puppeteerOptions: basePuppeteerOptions,
                     logger,
-                    maxRetries: 2
+                    maxRetries: 2,
                 }, (processed, total) => {
                     if (processed % 10 === 0) {
                         logger.info(`Progress: ${processed}/${total} URLs processed`);
                     }
                 });
                 taskResults.push(...clusterResults);
-                urlsToProcess.forEach(url => processedUrls.add(url));
+                urlsToProcess.forEach((url) => processedUrls.add(url));
             }
             catch (error) {
                 logger.error('Cluster processing failed, falling back to browser pool:', error);
@@ -472,14 +476,14 @@ export async function prebidExplorer(options) {
                     const poolResults = await processUrlsWithBrowserPool(urlsToProcess, {
                         concurrency: options.concurrency,
                         puppeteerOptions: basePuppeteerOptions,
-                        logger
+                        logger,
                     }, (processed, total) => {
                         if (processed % 10 === 0) {
                             logger.info(`Progress: ${processed}/${total} URLs processed (browser pool)`);
                         }
                     });
                     taskResults.push(...poolResults);
-                    urlsToProcess.forEach(url => processedUrls.add(url));
+                    urlsToProcess.forEach((url) => processedUrls.add(url));
                 }
                 catch (poolError) {
                     logger.error('Browser pool also failed:', poolError);
@@ -501,7 +505,8 @@ export async function prebidExplorer(options) {
             // Register cluster error handlers
             cluster.on('taskerror', (err, data) => {
                 // Only log debug level for common lifecycle errors
-                if (err.message && err.message.includes('Requesting main frame too early')) {
+                if (err.message &&
+                    err.message.includes('Requesting main frame too early')) {
                     logger.debug(`Main frame lifecycle error for ${data.url}: ${err.message}`);
                     // Create error result to ensure it's tracked
                     const errorResult = {
@@ -510,11 +515,12 @@ export async function prebidExplorer(options) {
                         error: {
                             code: 'PUPPETEER_MAIN_FRAME_ERROR',
                             message: err.message,
-                            stack: err.stack
-                        }
+                            stack: err.stack,
+                        },
                     };
                     // Ensure the error is recorded
-                    if (!taskResults.some(r => (r.type === 'error' || r.type === 'no_data') && r.url === data.url)) {
+                    if (!taskResults.some((r) => (r.type === 'error' || r.type === 'no_data') &&
+                        r.url === data.url)) {
                         taskResults.push(errorResult);
                     }
                 }
@@ -552,7 +558,8 @@ export async function prebidExplorer(options) {
                     const err = error;
                     pageTracer.finishWithError(err);
                     // Handle "Requesting main frame too early" error specifically
-                    if (err.message && err.message.includes('Requesting main frame too early')) {
+                    if (err.message &&
+                        err.message.includes('Requesting main frame too early')) {
                         logger.debug(`Puppeteer lifecycle error for ${data.url}: ${err.message}`);
                         const errorResult = {
                             type: 'error',
@@ -560,8 +567,8 @@ export async function prebidExplorer(options) {
                             error: {
                                 code: 'PUPPETEER_MAIN_FRAME_ERROR',
                                 message: err.message,
-                                stack: err.stack
-                            }
+                                stack: err.stack,
+                            },
                         };
                         taskResults.push(errorResult);
                         return errorResult;
@@ -573,8 +580,8 @@ export async function prebidExplorer(options) {
                         error: {
                             code: 'UNKNOWN_ERROR',
                             message: err.message,
-                            stack: err.stack
-                        }
+                            stack: err.stack,
+                        },
                     };
                     taskResults.push(errorResult);
                     return errorResult;
@@ -587,7 +594,11 @@ export async function prebidExplorer(options) {
                     processedUrls.add(url);
                     // Wrap cluster.queue in try-catch to handle queue errors
                     try {
-                        return cluster.queue({ url, logger, discoveryMode: options.discoveryMode });
+                        return cluster.queue({
+                            url,
+                            logger,
+                            discoveryMode: options.discoveryMode,
+                        });
                     }
                     catch (queueError) {
                         logger.error(`Failed to queue URL ${url}:`, queueError);
@@ -598,8 +609,8 @@ export async function prebidExplorer(options) {
                             error: {
                                 code: 'QUEUE_ERROR',
                                 message: queueError.message,
-                                stack: queueError.stack
-                            }
+                                stack: queueError.stack,
+                            },
                         };
                         taskResults.push(errorResult);
                         return Promise.resolve(); // Return resolved promise to continue
@@ -673,15 +684,15 @@ export async function prebidExplorer(options) {
     // Debug logging to understand what's happening
     logger.debug('Processing summary calculation:', {
         'allUrls.length': allUrls.length,
-        'preFilterCount': preFilterCount,
-        'urlsSkippedProcessed': urlsSkippedProcessed,
-        'originalUrlCount': originalUrlCount,
-        'processedUrlCount': processedUrlCount,
-        'taskResults.length': taskResults.length
+        preFilterCount: preFilterCount,
+        urlsSkippedProcessed: urlsSkippedProcessed,
+        originalUrlCount: originalUrlCount,
+        processedUrlCount: processedUrlCount,
+        'taskResults.length': taskResults.length,
     });
     const successfulExtractions = successfulResults.length;
-    const errorCount = taskResults.filter(r => r.type === 'error').length;
-    const noDataCount = taskResults.filter(r => r.type === 'no_data').length;
+    const errorCount = taskResults.filter((r) => r.type === 'error').length;
+    const noDataCount = taskResults.filter((r) => r.type === 'no_data').length;
     // Get final database statistics
     const finalStats = urlTracker.getStats();
     const totalInDatabase = Object.values(finalStats).reduce((sum, count) => sum + count, 0);

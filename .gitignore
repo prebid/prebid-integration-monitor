@@ -32,3 +32,11 @@ lerna-debug.log*
 
 # test
 coverage
+
+# cache
+.cache/
+
+# database
+data/url-tracker.db
+data/url-tracker.db-shm
+data/url-tracker.db-wal

@@ -2,7 +2,7 @@
  * @fileoverview Tests for health monitoring and early detection of issues
  */
 
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, it, expect, vi } from 'vitest';
 import { ClusterHealthMonitor } from '../utils/puppeteer-telemetry.js';
 import { Cluster } from 'puppeteer-cluster';
 import puppeteer from 'puppeteer';
@@ -59,7 +59,7 @@ describe('Health Monitoring Tests', () => {
 
       let criticalErrorDetected = false;
       const originalError = mockLogger.error;
-      mockLogger.error = jest.fn((message: string) => {
+      mockLogger.error = vi.fn((message: string) => {
         if (message.includes('Critical cluster error')) {
           criticalErrorDetected = true;
         }

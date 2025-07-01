@@ -2,7 +2,7 @@
  * @fileoverview Stress tests for cluster processing to identify concurrency issues
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import puppeteer from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 import { processUrlsWithRecovery } from '../utils/cluster-wrapper.js';

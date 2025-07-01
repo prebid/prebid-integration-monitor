@@ -3,7 +3,7 @@
  * Specifically tests for "Requesting main frame too early" and similar errors
  */
 
-import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 import { processPageTask } from '../utils/puppeteer-task.js';

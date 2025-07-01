@@ -209,7 +209,10 @@ export function initializeLogger(logDir, verboseFlag = false, testTransports = n
     }
     logger = winston.createLogger({
         levels: winston.config.npm.levels,
-        format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.errors({ stack: true }), winston.format.splat()),
+        format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.errors({ stack: true }), winston.format.splat()
+        // Note: formatConsoleLogMessage is applied per-transport for Console
+        // If testTransports are used, they need to handle their own formatting if mimicking Console
+        ),
         transports: effectiveTransports,
         exitOnError: false,
     });
