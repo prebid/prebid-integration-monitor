@@ -60,6 +60,19 @@ export interface PageData {
    */
   cdpPlatforms?: string[];
   /**
+   * Detected Consent Management Platform information.
+   * Always present but may be empty object if no CMP detected.
+   * @example { name: "OneTrust", version: "6.34.0", tcfVersion: "2.2" }
+   */
+  cmpInfo: {
+    name?: string;
+    version?: string;
+    tcfVersion?: string;
+    gdprApplies?: boolean;
+    ccpaApplies?: boolean;
+    consentString?: string;
+  };
+  /**
    * Unknown ad tech discovered in discovery mode.
    * Contains variable names and properties for further analysis.
    */
@@ -84,6 +97,17 @@ export interface PageData {
    * @example "https://www.example.com/article"
    */
   url?: string;
+  /**
+   * Tool-specific metadata about the extraction process.
+   * This is not actual page data but information about how the tool processed the page.
+   */
+  toolMetadata?: {
+    /**
+     * Initialization states for each Prebid instance, keyed by globalVarName.
+     * @example { "pbjs": "complete", "pbjs2": "partial" }
+     */
+    prebidInitStates?: Record<string, 'complete' | 'partial' | 'queue'>;
+  };
 }
 
 /**

@@ -153,9 +153,13 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
             globalVarName: 'pbjs',
             version: '8.0.0',
             modules: ['appnexusBidAdapter', 'rubiconBidAdapter'],
-            initializationState: 'complete',
           },
         ],
+        toolMetadata: {
+          prebidInitStates: {
+            'pbjs': 'complete'
+          }
+        }
       };
 
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockPrebidData);
@@ -163,7 +167,7 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
       const result = await extractDataSafely(mockPage, mockLogger);
 
       expect(result).toEqual(mockPrebidData);
-      expect(result.prebidInstances[0].initializationState).toBe('complete');
+      expect(result.toolMetadata?.prebidInitStates?.['pbjs']).toBe('complete');
     });
 
     it('should detect partially loaded Prebid instances', async () => {
@@ -175,16 +179,20 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
             globalVarName: 'pbjs',
             version: '8.0.0',
             modules: [],
-            initializationState: 'partial',
           },
         ],
+        toolMetadata: {
+          prebidInitStates: {
+            'pbjs': 'partial'
+          }
+        }
       };
 
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockPartialPrebidData);
 
       const result = await extractDataSafely(mockPage, mockLogger);
 
-      expect(result.prebidInstances[0].initializationState).toBe('partial');
+      expect(result.toolMetadata?.prebidInitStates?.['pbjs']).toBe('partial');
     });
 
     it('should detect Prebid command queue', async () => {
@@ -196,16 +204,20 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
             globalVarName: 'pbjs',
             version: 'queue-detected',
             modules: [],
-            initializationState: 'queue',
           },
         ],
+        toolMetadata: {
+          prebidInitStates: {
+            'pbjs': 'queue'
+          }
+        }
       };
 
       vi.mocked(mockPage.evaluate).mockResolvedValue(mockQueuePrebidData);
 
       const result = await extractDataSafely(mockPage, mockLogger);
 
-      expect(result.prebidInstances[0].initializationState).toBe('queue');
+      expect(result.toolMetadata?.prebidInitStates?.['pbjs']).toBe('queue');
       expect(result.prebidInstances[0].version).toBe('queue-detected');
     });
 
@@ -246,9 +258,13 @@ describe('Puppeteer Accuracy Optimization Tests', () => {
             globalVarName: 'pbjs',
             version: '8.0.0',
             modules: ['appnexusBidAdapter', 'rubiconBidAdapter'],
-            initializationState: 'complete',
           },
         ],
+        toolMetadata: {
+          prebidInitStates: {
+            'pbjs': 'complete'
+          }
+        }
       };
 
       // Mock all the required page methods

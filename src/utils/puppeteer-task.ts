@@ -719,6 +719,24 @@ export async function extractDataSafely(
             analytics?: any; // Segment (often uses window.analytics)
             _satellite?: unknown; // Adobe Launch/DTM
             utag?: unknown; // Tealium Universal Tag
+            // CMP-related properties
+            __tcfapi?: Function; // TCF v2 API
+            __cmp?: Function; // TCF v1 API (legacy)
+            __uspapi?: Function; // CCPA/USP API
+            OneTrust?: any; // OneTrust CMP
+            OnetrustActiveGroups?: unknown; // OneTrust groups
+            __qcCmpApi?: unknown; // Quantcast Choice
+            quantcastChoice?: unknown; // Quantcast Choice alternative
+            truste?: unknown; // TrustArc (legacy name)
+            TrustArc?: unknown; // TrustArc
+            Cookiebot?: any; // Cookiebot CMP
+            Didomi?: any; // Didomi CMP
+            didomiOnReady?: unknown; // Didomi ready callback
+            UC?: unknown; // Usercentrics
+            usercentrics?: unknown; // Usercentrics alternative
+            _sp_?: unknown; // Sourcepoint
+            _sp_queue?: unknown; // Sourcepoint queue
+            Osano?: unknown; // Osano CMP
             [key: string]: any; // Index signature for dynamic access to Prebid instances (e.g., window['pbjs'])
           }
 
@@ -727,6 +745,7 @@ export async function extractDataSafely(
             libraries: [],
             identitySolutions: [],
             cdpPlatforms: [],
+            cmpInfo: {},
             unknownAdTech: [],
             date: new Date().toISOString().slice(0, 10),
             prebidInstances: [],
@@ -766,6 +785,147 @@ export async function extractDataSafely(
             )
               data.cdpPlatforms.push('Segment');
             if (customWindow._satellite) data.cdpPlatforms.push('Adobe');
+
+            // Consent Management Platforms (CMPs)
+            try {
+              // Helper to get TCF data synchronously with timeout
+              const getTCFData = async () => {
+                return new Promise((resolve) => {
+                  const timeout = setTimeout(() => {
+                    resolve(null);
+                  }, 500); // 500ms timeout for TCF API
+
+                  if (typeof customWindow.__tcfapi === 'function') {
+                    try {
+                      customWindow.__tcfapi('getTCData', 2, (tcData: any, success: boolean) => {
+                        clearTimeout(timeout);
+                        if (success && tcData) {
+                          resolve({
+                            tcfVersion: '2.x',
+                            gdprApplies: tcData.gdprApplies,
+                            consentString: tcData.tcString,
+                            cmpId: tcData.cmpId,
+                            version: tcData.cmpVersion ? String(tcData.cmpVersion) : undefined
+                          });
+                        } else {
+                          resolve(null);
+                        }
+                      });
+                    } catch {
+                      clearTimeout(timeout);
+                      resolve(null);
+                    }
+                  } else if (typeof customWindow.__cmp === 'function') {
+                    clearTimeout(timeout);
+                    // TCF v1 API (legacy)
+                    resolve({ tcfVersion: '1.x' });
+                  } else {
+                    clearTimeout(timeout);
+                    resolve(null);
+                  }
+                });
+              };
+
+              // Helper to get USP data synchronously
+              const getUSPData = async () => {
+                return new Promise((resolve) => {
+                  if (typeof customWindow.__uspapi === 'function') {
+                    try {
+                      customWindow.__uspapi('getUSPData', 1, (uspData: any, success: boolean) => {
+                        if (success && uspData) {
+                          resolve({
+                            ccpaApplies: true,
+                            uspString: uspData.uspString
+                          });
+                        } else {
+                          resolve(null);
+                        }
+                      });
+                    } catch {
+                      resolve(null);
+                    }
+                  } else {
+                    resolve(null);
+                  }
+                });
+              };
+
+              // Get TCF/USP data
+              const [tcfData, uspData] = await Promise.all([getTCFData(), getUSPData()]);
+              
+              if (tcfData) {
+                Object.assign(data.cmpInfo, tcfData);
+              }
+              
+              if (uspData) {
+                Object.assign(data.cmpInfo, uspData);
+              }
+
+              // OneTrust detection
+              if (customWindow.OneTrust || customWindow.OnetrustActiveGroups) {
+                data.cmpInfo.name = 'OneTrust';
+                if (customWindow.OneTrust && customWindow.OneTrust.getGeolocationData) {
+                  try {
+                    const geoData = customWindow.OneTrust.getGeolocationData();
+                    if (geoData && geoData.country) {
+                      data.cmpInfo.gdprApplies = ['EU', 'UK', 'GB'].includes(geoData.country);
+                    }
+                  } catch {}
+                }
+              }
+
+              // Quantcast Choice detection
+              if (customWindow.__qcCmpApi || customWindow.quantcastChoice) {
+                data.cmpInfo.name = 'Quantcast Choice';
+              }
+
+              // TrustArc detection  
+              if (customWindow.truste || customWindow.TrustArc) {
+                data.cmpInfo.name = 'TrustArc';
+              }
+
+              // Cookiebot detection
+              if (customWindow.Cookiebot) {
+                data.cmpInfo.name = 'Cookiebot';
+                if (customWindow.Cookiebot.consent) {
+                  data.cmpInfo.consentString = customWindow.Cookiebot.consent.stamp;
+                }
+              }
+
+              // Didomi detection
+              if (customWindow.Didomi || customWindow.didomiOnReady) {
+                data.cmpInfo.name = 'Didomi';
+                if (customWindow.Didomi && customWindow.Didomi.getUserStatus) {
+                  try {
+                    const userStatus = customWindow.Didomi.getUserStatus();
+                    if (userStatus) {
+                      data.cmpInfo.consentString = userStatus.consent_string;
+                    }
+                  } catch {}
+                }
+              }
+
+              // Usercentrics detection
+              if (customWindow.UC || customWindow.usercentrics) {
+                data.cmpInfo.name = 'Usercentrics';
+              }
+
+              // Sourcepoint detection
+              if (customWindow._sp_ || customWindow._sp_queue) {
+                data.cmpInfo.name = 'Sourcepoint';
+              }
+
+              // Osano detection
+              if (customWindow.Osano) {
+                data.cmpInfo.name = 'Osano';
+              }
+
+              // Keep cmpInfo as empty object if no CMP detected (consistent with other fields)
+              // This ensures the field is always present in the output
+            } catch (cmpError) {
+              // Ignore CMP detection errors, keep empty object
+              data.cmpInfo = {};
+            }
 
             // Discovery mode: Find potential unknown ad tech (only if enabled)
             if (discoveryMode) {
@@ -859,7 +1019,7 @@ export async function extractDataSafely(
                       globalVarName: globalVarName,
                       version: pbjsInstance.version,
                       modules: pbjsInstance.installedModules.map(String),
-                      initializationState: 'complete',
+                      _initState: 'complete', // Temporary marker for tool metadata
                     };
                   }
                 }
@@ -873,7 +1033,7 @@ export async function extractDataSafely(
                     modules: Array.isArray(pbjsInstance.installedModules)
                       ? pbjsInstance.installedModules.map(String)
                       : [],
-                    initializationState: 'partial',
+                    _initState: 'partial', // Temporary marker for tool metadata
                   };
                 }
 
@@ -883,7 +1043,7 @@ export async function extractDataSafely(
                     globalVarName: globalVarName,
                     version: 'queue-detected',
                     modules: [],
-                    initializationState: 'queue',
+                    _initState: 'queue', // Temporary marker for tool metadata
                   };
                 }
               } catch (e) {
@@ -904,6 +1064,8 @@ export async function extractDataSafely(
           };
 
           // Check for Prebid.js instances if _pbjsGlobals array exists
+          const prebidInitStates: Record<string, 'complete' | 'partial' | 'queue'> = {};
+          
           try {
             if (
               customWindow._pbjsGlobals &&
@@ -913,6 +1075,13 @@ export async function extractDataSafely(
                 try {
                   const instanceData = await getPbjsInstanceData(globalVarName);
                   if (instanceData) {
+                    // Extract the initialization state from the temporary marker
+                    const initState = (instanceData as any)._initState;
+                    if (initState) {
+                      prebidInitStates[globalVarName] = initState;
+                      // Remove the temporary marker before adding to prebidInstances
+                      delete (instanceData as any)._initState;
+                    }
                     data.prebidInstances.push(instanceData);
                   }
                 } catch (e) {
@@ -923,6 +1092,13 @@ export async function extractDataSafely(
             }
           } catch (e) {
             // If we can't access _pbjsGlobals, that's okay
+          }
+
+          // Add toolMetadata if we have any prebid initialization states
+          if (Object.keys(prebidInitStates).length > 0) {
+            data.toolMetadata = {
+              prebidInitStates: prebidInitStates
+            };
           }
 
           return data;
@@ -1079,12 +1255,15 @@ export const processPageTask = async ({
       const prebidCount = extractedPageData.prebidInstances?.length || 0;
       const identityCount = extractedPageData.identitySolutions?.length || 0;
       const cdpCount = extractedPageData.cdpPlatforms?.length || 0;
+      const hasCMP = extractedPageData.cmpInfo ? 1 : 0;
 
       logger.info(`✅ Successfully extracted ad tech data from ${trimmedUrl}`, {
         libraries: libraryCount,
         prebidInstances: prebidCount,
         identitySolutions: identityCount,
         cdpPlatforms: cdpCount,
+        cmp: hasCMP,
+        cmpName: extractedPageData.cmpInfo?.name,
         firstPrebidVersion: extractedPageData.prebidInstances?.[0]?.version,
       });
       return { type: 'success', data: extractedPageData };
