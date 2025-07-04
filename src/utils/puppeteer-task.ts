@@ -679,7 +679,10 @@ export async function extractDataSafely(
   page: Page,
   logger?: WinstonLogger,
   maxRetries: number = 2,
-  discoveryMode: boolean = false
+  discoveryMode: boolean = false,
+  extractMetadata: boolean = false,
+  adUnitDetail: 'basic' | 'standard' | 'full' = 'basic',
+  moduleDetail: 'simple' | 'categorized' = 'simple'
 ): Promise<any> {
   let lastError: Error | null = null;
 
@@ -692,7 +695,7 @@ export async function extractDataSafely(
         await import('../config/app-config.js');
 
       const extractedPageData = await page.evaluate(
-        async (pbjsTimeoutMs, pbjsIntervalMs, discoveryMode) => {
+        async (pbjsTimeoutMs, pbjsIntervalMs, discoveryMode, extractMetadata, adUnitDetail, moduleDetail) => {
           // Define a type for the window object to avoid using 'any' repeatedly
           interface CustomWindow extends Window {
             apstag?: unknown; // Amazon Publisher Services UAM tag
@@ -1015,12 +1018,141 @@ export async function extractDataSafely(
                     typeof pbjsInstance.addAdUnits === 'function';
 
                   if (isFullyLoaded) {
-                    return {
-                      globalVarName: globalVarName,
-                      version: pbjsInstance.version,
-                      modules: pbjsInstance.installedModules.map(String),
-                      _initState: 'complete', // Temporary marker for tool metadata
-                    };
+                    // Get all modules
+                    const allModules = pbjsInstance.installedModules.map(String);
+                    
+                    if (moduleDetail === 'categorized') {
+                      // Categorize modules when requested
+                      const userIdModules: string[] = [];
+                      const analyticsModules: string[] = [];
+                      const bidderModules: string[] = [];
+                      const rtdModules: string[] = [];
+                      const videoModules: string[] = [];
+                      const consentModules: string[] = [];
+                      const remainingModules: string[] = [];
+                      
+                      // Pattern definitions
+                      const userIdPatterns = [
+                        'IdSystem', 'userId', 'uid2', 'identity', 'sharedId', 'unifiedId', 'id5',
+                        'parrableId', 'criteoId', 'lotamePanorama', 'liveIntent', 'merkle', 
+                        'zeotap', 'quantcast', 'pubProvided', 'admixer', 'amx', 'britepoolId',
+                        'dmdId', 'hadronId', 'idx', 'intentIq', 'justId', 'kinessoId', 
+                        'mwOpenLink', 'netId', 'novatiq', 'oneKey', 'pairId', 'pubCommonId',
+                        'tapadId', 'trustpid', 'uid2', 'utiq', 'verizonMedia', 'zeotapIdPlus'
+                      ];
+                      
+                      const analyticsPatterns = ['AnalyticsAdapter', 'Analytics', 'analytics'];
+                      const bidderPatterns = ['BidAdapter', 'Adapter'];
+                      const rtdPatterns = ['RtdProvider', 'RtdModule', 'rtdModule'];
+                      const isRtdCoreModule = (module: string) => module === 'rtdModule';
+                      
+                      const videoPatterns = [
+                        'Video', 'video', 'adpod', 'adPod', 'instream', 'outstream',
+                        'vast', 'vpaid', 'ima'
+                      ];
+                      
+                      const consentPatterns = [
+                        'consentManagement', 'consentManagementGpp', 'consentManagementUsp',
+                        'consentManagementTcf', 'gdprEnforcement', 'gppControl', 'tcfControl',
+                        'ccpaControl', 'privacyControl', 'usPrivacy', 'consent', 'gdpr', 'ccpa', 'gpp'
+                      ];
+                      
+                      // Categorize each module
+                      allModules.forEach((module: string) => {
+                        const moduleLower = module.toLowerCase();
+                        
+                        if (userIdPatterns.some(pattern => moduleLower.includes(pattern.toLowerCase()))) {
+                          userIdModules.push(module);
+                        }
+                        else if (analyticsPatterns.some(pattern => moduleLower.includes(pattern.toLowerCase()))) {
+                          analyticsModules.push(module);
+                        }
+                        else if (!isRtdCoreModule(module) && rtdPatterns.some(pattern => module.includes(pattern))) {
+                          rtdModules.push(module);
+                        }
+                        else if (videoPatterns.some(pattern => moduleLower.includes(pattern.toLowerCase()))) {
+                          videoModules.push(module);
+                        }
+                        else if (consentPatterns.some(pattern => moduleLower.includes(pattern.toLowerCase()))) {
+                          consentModules.push(module);
+                        }
+                        else if (bidderPatterns.some(pattern => module.includes(pattern))) {
+                          bidderModules.push(module);
+                        }
+                        else {
+                          remainingModules.push(module);
+                        }
+                      });
+                      
+                      // Get active bidders for categorized mode
+                      const activeBidders = pbjsInstance.getBidderCodes?.() ||
+                        pbjsInstance.adUnits?.flatMap((au: any) =>
+                          au.bids?.map((bid: any) => bid.bidder)
+                        ).filter((bidder: string, index: number, arr: string[]) =>
+                          bidder && arr.indexOf(bidder) === index
+                        ) || [];
+                      
+                      // Find inactive bid adapters
+                      const inactiveBidAdapters: string[] = [];
+                      if (bidderModules.length > 0 && activeBidders.length > 0) {
+                        const bidderToAdapterMap: Record<string, string> = {
+                          'yahooAds': 'yahoosspBidAdapter',
+                          'yahooPrebidServer': 'prebidServerBidAdapter',
+                          'ayPrebidServer': 'prebidServerBidAdapter',
+                        };
+                        
+                        bidderModules.forEach((adapterModule: string) => {
+                          const bidderName = adapterModule.replace(/BidAdapter$/, '');
+                          const isActive = activeBidders.some((activeBidder: string) => {
+                            if (activeBidder === bidderName) return true;
+                            if (bidderToAdapterMap[activeBidder] === adapterModule) return true;
+                            if (activeBidder.toLowerCase() === bidderName.toLowerCase()) return true;
+                            if (adapterModule === 'prebidServerBidAdapter' && 
+                                (activeBidder.includes('PrebidServer') || activeBidder.includes('prebidServer'))) {
+                              return true;
+                            }
+                            return false;
+                          });
+                          
+                          if (!isActive) {
+                            inactiveBidAdapters.push(adapterModule);
+                          }
+                        });
+                      }
+                      
+                      return {
+                        globalVarName: globalVarName,
+                        version: pbjsInstance.version,
+                        timeout: pbjsInstance.getConfig?.()?.bidderTimeout,
+                        adUnits: pbjsInstance.adUnits?.length || 0,
+                        adUnitTypes: adUnitDetail === 'basic' ? (pbjsInstance.adUnits || [])
+                          .reduce((types: string[], au: any) => {
+                            if (au.mediaTypes) {
+                              if (au.mediaTypes.banner && !types.includes('banner')) types.push('banner');
+                              if (au.mediaTypes.video && !types.includes('video')) types.push('video');
+                              if (au.mediaTypes.native && !types.includes('native')) types.push('native');
+                            }
+                            return types;
+                          }, []) : undefined,
+                        bidders: activeBidders,
+                        inactiveBidAdapters: inactiveBidAdapters.length > 0 ? inactiveBidAdapters : undefined,
+                        userIds: userIdModules.length > 0 ? userIdModules : undefined,
+                        analyticsAdapters: analyticsModules.length > 0 ? analyticsModules : undefined,
+                        rtdModules: rtdModules.length > 0 ? rtdModules : undefined,
+                        videoModules: videoModules.length > 0 ? videoModules : undefined,
+                        consentModules: consentModules.length > 0 ? consentModules : undefined,
+                        modules: remainingModules.length > 0 ? remainingModules : undefined,
+                        _initState: 'complete',
+                      };
+                    } else {
+                      // Simple mode - return all modules in one array
+                      return {
+                        globalVarName: globalVarName,
+                        version: pbjsInstance.version,
+                        modules: allModules,
+                        _initState: 'complete',
+                      };
+                    }
                   }
                 }
 
@@ -1105,7 +1237,10 @@ export async function extractDataSafely(
         },
         PBJS_VERSION_WAIT_TIMEOUT_MS,
         PBJS_VERSION_WAIT_INTERVAL_MS,
-        discoveryMode
+        discoveryMode,
+        extractMetadata,
+        adUnitDetail,
+        moduleDetail
       );
 
       logger?.debug(`Data extraction attempt ${attempt} succeeded`);
@@ -1213,10 +1348,17 @@ export async function extractDataSafely(
  */
 export const processPageTask = async ({
   page,
-  data: { url, logger, discoveryMode = false },
+  data: { url, logger, discoveryMode = false, extractMetadata = false, adUnitDetail = 'basic', moduleDetail = 'simple' },
 }: {
   page: Page;
-  data: { url: string; logger: WinstonLogger; discoveryMode?: boolean };
+  data: { 
+    url: string; 
+    logger: WinstonLogger; 
+    discoveryMode?: boolean;
+    extractMetadata?: boolean;
+    adUnitDetail?: 'basic' | 'standard' | 'full';
+    moduleDetail?: 'simple' | 'categorized';
+  };
 }): Promise<TaskResult> => {
   const trimmedUrl: string = url.trim(); // Ensure URL is trimmed before processing
   logger.info(`Attempting to process URL: ${trimmedUrl}`);
@@ -1237,7 +1379,10 @@ export const processPageTask = async ({
       page,
       logger,
       2,
-      discoveryMode
+      discoveryMode,
+      extractMetadata,
+      adUnitDetail,
+      moduleDetail
     )) as PageData;
 
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data

@@ -8,6 +8,34 @@
 import type { DetailedError } from '../utils/error-types.js';
 
 /**
+ * Represents details about an ad unit in Prebid.js
+ */
+export interface AdUnitInfo {
+  /** The ad unit code/identifier */
+  code: string;
+  /** Media types configured for this ad unit */
+  mediaTypes?: {
+    banner?: {
+      sizes?: number[][];
+    };
+    video?: {
+      context?: string;
+      playerSize?: number[][];
+      mimes?: string[];
+      protocols?: number[];
+      maxduration?: number;
+      api?: number[];
+    };
+    native?: {
+      type?: string;
+      native?: any;
+    };
+  };
+  /** Number of bidders for this ad unit */
+  bidderCount?: number;
+}
+
+/**
  * Represents a specific Prebid.js instance found on a web page.
  * Contains details about its global variable name, version, and loaded modules.
  */
@@ -16,17 +44,220 @@ export interface PrebidInstance {
    * The global variable name under which the Prebid.js instance is available.
    * @example "pbjs"
    */
-  globalVarName: string;
+  globalVarName?: string;
   /**
    * The version string of the Prebid.js instance.
    * @example "7.53.0"
    */
-  version: string;
+  version?: string;
   /**
-   * An array of strings, where each string is the name of an installed Prebid.js module.
-   * @example ["consentManagement", "gptPreAuction", "dfpAdServerVideo"]
+   * The bidder timeout in milliseconds
+   * @example 3000
    */
-  modules: string[];
+  timeout?: number | null;
+  /**
+   * The number of ad units configured
+   * @example 5
+   */
+  adUnits?: number;
+  /**
+   * Simple array of media types when adUnitDetail is "basic"
+   * @example ["banner", "video", "native"]
+   */
+  adUnitTypes?: string[];
+  /**
+   * Detailed information about ad units (if available)
+   */
+  adUnitDetails?: AdUnitInfo[];
+  /**
+   * An array of ACTIVE bidder codes configured in ad units
+   * @example ["appnexus", "rubicon", "criteo"]
+   */
+  bidders?: string[];
+  /**
+   * An array of INACTIVE bid adapters that are installed but not configured
+   * @example ["smilewantedBidAdapter", "adagioBidAdapter"]
+   */
+  inactiveBidAdapters?: string[];
+  /**
+   * An array of user ID modules that are configured
+   * @example ["unifiedIdSystem", "id5IdSystem", "sharedIdSystem"]
+   */
+  userIds?: string[];
+  /**
+   * An array of analytics adapters that are configured
+   * @example ["googleAnalyticsAdapter", "pubmaticAnalyticsAdapter"]
+   */
+  analyticsAdapters?: string[];
+  /**
+   * An array of Real-Time Data (RTD) modules that are configured
+   * @example ["jwplayerRtdProvider", "permutiveRtdProvider", "browsiRtdProvider"]
+   */
+  rtdModules?: string[];
+  /**
+   * An array of video-related modules
+   * @example ["dfpAdServerVideo", "freeWheelAdserverVideo", "adpod", "instreamTracking"]
+   */
+  videoModules?: string[];
+  /**
+   * An array of consent and privacy-related modules
+   * @example ["consentManagement", "consentManagementGpp", "consentManagementUsp", "gdprEnforcement", "gppControl_usnat", "gppControl_usstates", "tcfControl"]
+   */
+  consentModules?: string[];
+  /**
+   * An array of remaining modules after categorization
+   * @example ["gptPreAuction", "priceFloors", "enrichmentFpdModule"]
+   */
+  modules?: string[];
+}
+
+/**
+ * Represents Schema.org structured data found on the page.
+ * Can be from JSON-LD, microdata, or RDFa formats.
+ */
+export interface SchemaOrgData {
+  /** Type of the schema (e.g., "Article", "Product", "Organization") */
+  '@type'?: string | string[];
+  /** Context URL */
+  '@context'?: string | any;
+  /** Any additional properties */
+  [key: string]: any;
+}
+
+/**
+ * Represents OpenGraph protocol metadata.
+ */
+export interface OpenGraphData {
+  /** Basic OpenGraph tags */
+  'og:type'?: string;
+  'og:title'?: string;
+  'og:description'?: string;
+  'og:url'?: string;
+  'og:site_name'?: string;
+  'og:image'?: string | string[];
+  /** Article-specific tags */
+  'article:author'?: string;
+  'article:publisher'?: string;
+  'article:section'?: string;
+  'article:tag'?: string | string[];
+  'article:published_time'?: string;
+  'article:modified_time'?: string;
+  /** Product-specific tags */
+  'product:price:amount'?: string;
+  'product:price:currency'?: string;
+  'product:availability'?: string;
+  'product:category'?: string;
+  /** Additional OpenGraph properties */
+  [key: string]: string | string[] | undefined;
+}
+
+/**
+ * Represents Twitter Card metadata.
+ */
+export interface TwitterCardData {
+  'twitter:card'?: string;
+  'twitter:site'?: string;
+  'twitter:creator'?: string;
+  'twitter:title'?: string;
+  'twitter:description'?: string;
+  'twitter:image'?: string;
+  /** Custom Twitter labels and data */
+  [key: string]: string | undefined;
+}
+
+/**
+ * Represents standard HTML meta tags.
+ */
+export interface StandardMetaTags {
+  description?: string;
+  keywords?: string;
+  author?: string;
+  generator?: string;
+  'application-name'?: string;
+  viewport?: string;
+  robots?: string;
+  /** Dublin Core metadata */
+  'DC.type'?: string;
+  'DC.subject'?: string;
+  'DC.creator'?: string;
+  'DC.publisher'?: string;
+  /** News-specific */
+  'news_keywords'?: string;
+  /** Verification tags */
+  'google-site-verification'?: string;
+  'msvalidate.01'?: string;
+  /** Additional meta tags */
+  [key: string]: string | undefined;
+}
+
+/**
+ * Site categorization signals extracted from the page.
+ */
+export interface SiteCategorizationData {
+  /** URL path segments */
+  urlPath: string[];
+  /** Breadcrumb navigation items */
+  breadcrumbs: string[];
+  /** Main navigation menu items */
+  navigationItems: string[];
+  /** CSS classes on body element */
+  bodyClasses: string[];
+}
+
+/**
+ * Comprehensive metadata extracted from the page.
+ */
+export interface PageMetadata {
+  /** Basic page information */
+  title: string;
+  url: string;
+  domain: string;
+  /** Schema.org structured data (JSON-LD format) */
+  jsonLd: SchemaOrgData[];
+  /** Schema.org microdata items */
+  microdata: Array<{
+    type: string | null;
+    properties: Record<string, string>;
+  }>;
+  /** OpenGraph protocol data */
+  openGraph: OpenGraphData;
+  /** Twitter Card data */
+  twitterCard: TwitterCardData;
+  /** Standard HTML meta tags */
+  meta: StandardMetaTags;
+  /** Publisher information extracted from various sources */
+  publisher: {
+    name?: string;
+    logo?: string;
+    url?: string;
+    twitter?: string;
+    copyright?: string;
+  };
+  /** Site categorization signals */
+  categorization: SiteCategorizationData;
+  /** E-commerce specific signals */
+  ecommerce: {
+    hasProducts: boolean;
+    productCount?: number;
+    currency?: string;
+    priceRange?: {
+      min?: number;
+      max?: number;
+    };
+  };
+  /** Site type indicators */
+  indicators: {
+    hasProducts: boolean;
+    hasArticles: boolean;
+    hasEvents: boolean;
+    hasJobs: boolean;
+    hasRecipes: boolean;
+    hasRealEstate: boolean;
+    platform?: string;
+    cmsType?: string;
+  };
+  /** Inferred site type based on all signals */
+  siteType?: 'e-commerce' | 'news' | 'blog' | 'corporate' | 'job-board' | 'real-estate' | 'recipe' | 'forum' | 'social' | 'unknown';
 }
 
 /**
@@ -108,6 +339,11 @@ export interface PageData {
      */
     prebidInitStates?: Record<string, 'complete' | 'partial' | 'queue'>;
   };
+  /**
+   * Comprehensive metadata extracted from the page including Schema.org,
+   * OpenGraph, and other structured data.
+   */
+  metadata?: PageMetadata;
 }
 
 /**

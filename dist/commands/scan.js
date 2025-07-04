@@ -4,6 +4,7 @@ import { scanArgs, scanFlags } from './scan-options.js';
 import loggerModule, { initializeLogger } from '../utils/logger.js'; // Import initializeLogger
 import { AppError } from '../common/AppError.js';
 import { BatchProcessingTracer } from '../utils/telemetry.js';
+import * as path from 'path';
 /**
  * @class Scan
  * @description Oclif command for scanning websites for Prebid.js integrations and other ad technologies.
@@ -67,6 +68,12 @@ export default class Scan extends Command {
             prefilterProcessed: flags.prefilterProcessed,
             forceReprocess: flags.forceReprocess,
             discoveryMode: flags.discoveryMode,
+            extractMetadata: flags.extractMetadata,
+            preflightCheck: flags.preflightCheck,
+            skipDNSFailed: flags.skipDNSFailed,
+            skipSSLFailed: flags.skipSSLFailed,
+            adUnitDetail: flags.adUnitDetail,
+            moduleDetail: flags.moduleDetail,
             puppeteerLaunchOptions: {
                 headless: flags.headless, // Ensure headless state is consistent
                 args: ['--no-sandbox', '--disable-setuid-sandbox'], // Default args for broader compatibility
@@ -265,6 +272,106 @@ export default class Scan extends Command {
                 batchTracer.recordUrlCounts(batchStats.urlsProcessed, batchStats.urlsSkipped, batchStats.successfulExtractions, batchStats.errors);
                 batchTracer.finish(true);
                 successfulBatches++;
+                // Verify skipped URLs are actually in the database
+                let skipVerification = {
+                    verified: false,
+                    expectedInDb: 0,
+                    actuallyInDb: 0,
+                    missingFromDb: 0,
+                    sampleMissingUrls: []
+                };
+                if (batchStats.urlsSkipped > 0) {
+                    try {
+                        // Get URL tracker to verify database entries
+                        const { getUrlTracker } = await import('../utils/url-tracker.js');
+                        const { fetchUrlsFromGitHub, loadFileContents, processFileContent } = await import('../utils/url-loader.js');
+                        const urlTracker = getUrlTracker(logger);
+                        // Get expected URLs in this range
+                        const rangeUrls = batchOptions.range?.split('-').map(n => parseInt(n));
+                        if (rangeUrls && rangeUrls.length === 2) {
+                            const [startIdx, endIdx] = rangeUrls;
+                            const expectedTotal = endIdx - startIdx + 1;
+                            const expectedSkipped = batchStats.urlsSkipped;
+                            const expectedProcessed = batchStats.urlsProcessed;
+                            // Verify the math adds up
+                            if (expectedTotal !== expectedSkipped + expectedProcessed) {
+                                logger.warn(`   ⚠️  URL count mismatch in batch ${batchNum}:`);
+                                logger.warn(`      Expected total: ${expectedTotal}`);
+                                logger.warn(`      Skipped + Processed: ${expectedSkipped + expectedProcessed}`);
+                                logger.warn(`      Difference: ${expectedTotal - (expectedSkipped + expectedProcessed)}`);
+                            }
+                            // Load the actual URLs for this range to verify
+                            let rangeUrlList = [];
+                            if (baseOptions.githubRepo) {
+                                // Load URLs from GitHub for this specific range
+                                const allUrls = await fetchUrlsFromGitHub(baseOptions.githubRepo, undefined, logger);
+                                rangeUrlList = allUrls.slice(startIdx - 1, endIdx); // Convert to 0-based
+                            }
+                            else if (baseOptions.inputFile) {
+                                const fileContent = loadFileContents(baseOptions.inputFile, logger);
+                                if (fileContent) {
+                                    const allUrls = await processFileContent(baseOptions.inputFile, fileContent, logger);
+                                    rangeUrlList = allUrls.slice(startIdx - 1, endIdx); // Convert to 0-based
+                                }
+                            }
+                            if (rangeUrlList.length > 0) {
+                                // Verify each URL in the range
+                                const verificationResult = urlTracker.verifyUrlsInDatabase(rangeUrlList);
+                                skipVerification.verified = true;
+                                skipVerification.expectedInDb = expectedSkipped;
+                                skipVerification.actuallyInDb = verificationResult.foundInDb;
+                                skipVerification.missingFromDb = verificationResult.missingFromDb;
+                                skipVerification.sampleMissingUrls = verificationResult.missingUrls;
+                                if (verificationResult.foundInDb === expectedSkipped) {
+                                    logger.info(`   ✅ Skip verification: All ${expectedSkipped} skipped URLs confirmed in database`);
+                                }
+                                else {
+                                    logger.warn(`   ⚠️  Skip verification discrepancy:`);
+                                    logger.warn(`      Expected skipped: ${expectedSkipped}`);
+                                    logger.warn(`      Actually in DB: ${verificationResult.foundInDb}`);
+                                    logger.warn(`      Missing from DB: ${verificationResult.missingFromDb}`);
+                                    if (verificationResult.missingUrls.length > 0) {
+                                        logger.warn(`      Sample missing URLs: ${verificationResult.missingUrls.slice(0, 3).join(', ')}...`);
+                                    }
+                                }
+                            }
+                            else {
+                                logger.debug(`   Could not load URLs for range verification`);
+                            }
+                        }
+                    }
+                    catch (e) {
+                        logger.debug('Could not verify skipped URLs:', e);
+                    }
+                }
+                // Check if errors are being written to main error files
+                let errorFilesUpdated = false;
+                try {
+                    const fs = await import('fs');
+                    const errorDir = path.join(process.cwd(), 'errors');
+                    const errorProcessingFile = path.join(errorDir, 'error_processing.txt');
+                    const noPrebidFile = path.join(errorDir, 'no_prebid.txt');
+                    // Check file sizes before and after to confirm updates
+                    const errorFileStatsBefore = fs.existsSync(errorProcessingFile)
+                        ? fs.statSync(errorProcessingFile).size
+                        : 0;
+                    const noPrebidStatsBefore = fs.existsSync(noPrebidFile)
+                        ? fs.statSync(noPrebidFile).size
+                        : 0;
+                    // Wait a moment for file writes to complete
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    const errorFileStatsAfter = fs.existsSync(errorProcessingFile)
+                        ? fs.statSync(errorProcessingFile).size
+                        : 0;
+                    const noPrebidStatsAfter = fs.existsSync(noPrebidFile)
+                        ? fs.statSync(noPrebidFile).size
+                        : 0;
+                    errorFilesUpdated = (errorFileStatsAfter > errorFileStatsBefore) ||
+                        (noPrebidStatsAfter > noPrebidStatsBefore);
+                }
+                catch (e) {
+                    logger.debug('Could not verify error file updates:', e);
+                }
                 // Update progress with comprehensive statistics
                 batchProgress.completedBatches.push({
                     batchNumber: batchNum,
@@ -272,7 +379,19 @@ export default class Scan extends Command {
                     completedAt: new Date().toISOString(),
                     duration: batchDuration,
                     statistics: {
-                        note: 'Detailed statistics available in individual batch logs',
+                        urlsProcessed: batchStats.urlsProcessed,
+                        urlsSkipped: batchStats.urlsSkipped,
+                        successfulExtractions: batchStats.successfulExtractions,
+                        errors: batchStats.errors,
+                        noAdTech: batchStats.noAdTech,
+                        errorFilesUpdated: errorFilesUpdated,
+                        skipVerification: skipVerification.verified ? {
+                            expectedInDb: skipVerification.expectedInDb,
+                            actuallyInDb: skipVerification.actuallyInDb,
+                            missingFromDb: skipVerification.missingFromDb,
+                            sampleMissingUrls: skipVerification.sampleMissingUrls
+                        } : null,
+                        note: 'Detailed logs in individual batch directories',
                     },
                 });
             }
@@ -314,34 +433,55 @@ export default class Scan extends Command {
         let totalSuccessfulExtractions = 0;
         let totalErrors = 0;
         let totalNoAdTech = 0;
-        // Parse log files to gather detailed statistics
-        for (let batchNum = 1; batchNum <= successfulBatches; batchNum++) {
-            const logDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
-            const logFile = `${logDir}/app.log`;
-            try {
-                const fs = await import('fs');
-                if (fs.existsSync(logFile)) {
-                    const logContent = fs.readFileSync(logFile, 'utf8');
-                    // Extract statistics from log content
-                    const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
-                    const skippedMatch = logContent.match(/⏭️  URLs skipped \(already processed\): (\d+)/);
-                    const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
-                    const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
-                    const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
-                    if (processedMatch)
-                        totalUrlsProcessed += parseInt(processedMatch[1]);
-                    if (skippedMatch)
-                        totalUrlsSkipped += parseInt(skippedMatch[1]);
-                    if (successMatch)
-                        totalSuccessfulExtractions += parseInt(successMatch[1]);
-                    if (errorMatch)
-                        totalErrors += parseInt(errorMatch[1]);
-                    if (noAdTechMatch)
-                        totalNoAdTech += parseInt(noAdTechMatch[1]);
+        let batchesWithErrorFileUpdates = 0;
+        let batchesWithoutErrorFileUpdates = 0;
+        // Parse batch progress and log files to gather detailed statistics
+        for (const batch of batchProgress.completedBatches) {
+            if (batch.statistics) {
+                totalUrlsProcessed += batch.statistics.urlsProcessed || 0;
+                totalUrlsSkipped += batch.statistics.urlsSkipped || 0;
+                totalSuccessfulExtractions += batch.statistics.successfulExtractions || 0;
+                totalErrors += batch.statistics.errors || 0;
+                totalNoAdTech += batch.statistics.noAdTech || 0;
+                if (batch.statistics.errorFilesUpdated) {
+                    batchesWithErrorFileUpdates++;
+                }
+                else if (batch.statistics.errors > 0 || batch.statistics.noAdTech > 0) {
+                    batchesWithoutErrorFileUpdates++;
                 }
             }
-            catch (e) {
-                logger.warn(`Could not parse statistics from batch ${batchNum} logs`);
+        }
+        // Also parse log files as fallback for batches without statistics
+        for (let batchNum = 1; batchNum <= successfulBatches; batchNum++) {
+            const batch = batchProgress.completedBatches.find((b) => b.batchNumber === batchNum);
+            if (!batch?.statistics) {
+                const logDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
+                const logFile = `${logDir}/app.log`;
+                try {
+                    const fs = await import('fs');
+                    if (fs.existsSync(logFile)) {
+                        const logContent = fs.readFileSync(logFile, 'utf8');
+                        // Extract statistics from log content
+                        const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
+                        const skippedMatch = logContent.match(/⏭️  URLs skipped \(already processed\): (\d+)/);
+                        const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
+                        const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
+                        const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
+                        if (processedMatch)
+                            totalUrlsProcessed += parseInt(processedMatch[1]);
+                        if (skippedMatch)
+                            totalUrlsSkipped += parseInt(skippedMatch[1]);
+                        if (successMatch)
+                            totalSuccessfulExtractions += parseInt(successMatch[1]);
+                        if (errorMatch)
+                            totalErrors += parseInt(errorMatch[1]);
+                        if (noAdTechMatch)
+                            totalNoAdTech += parseInt(noAdTechMatch[1]);
+                    }
+                }
+                catch (e) {
+                    logger.warn(`Could not parse statistics from batch ${batchNum} logs`);
+                }
             }
         }
         // Final batch summary
@@ -382,6 +522,36 @@ export default class Scan extends Command {
         logger.info(`   🎯 Successful data extractions: ${totalSuccessfulExtractions.toLocaleString()}`);
         logger.info(`   ⚠️  Errors encountered: ${totalErrors.toLocaleString()}`);
         logger.info(`   🚫 No ad tech found: ${totalNoAdTech.toLocaleString()}`);
+        // Add skip verification warnings if any discrepancies found
+        let skipVerificationIssues = 0;
+        for (const batch of batchProgress.completedBatches) {
+            if (batch.statistics?.skipVerification &&
+                batch.statistics.skipVerification.missingFromDb > 0) {
+                skipVerificationIssues++;
+            }
+        }
+        if (skipVerificationIssues > 0) {
+            logger.warn('');
+            logger.warn('⚠️  SKIP VERIFICATION ISSUES DETECTED:');
+            logger.warn(`   ${skipVerificationIssues} batches had URLs marked as skipped but not found in database`);
+            logger.warn('   This could indicate a synchronization issue or database inconsistency');
+            logger.warn('   Check individual batch progress files for details');
+        }
+        // Add error file verification status
+        if (totalErrors > 0 || totalNoAdTech > 0) {
+            logger.info('');
+            logger.info('🗂️  ERROR FILE VERIFICATION:');
+            if (batchesWithErrorFileUpdates > 0 || batchesWithoutErrorFileUpdates > 0) {
+                logger.info(`   ✅ Batches with confirmed error file updates: ${batchesWithErrorFileUpdates}`);
+                if (batchesWithoutErrorFileUpdates > 0) {
+                    logger.warn(`   ⚠️  Batches with errors but no file updates detected: ${batchesWithoutErrorFileUpdates}`);
+                    logger.warn('      Check error files manually to ensure all errors were recorded');
+                }
+            }
+            logger.info(`   📄 Error files location: ${path.join(process.cwd(), 'errors')}`);
+            logger.info(`      • error_processing.txt - Processing failures`);
+            logger.info(`      • no_prebid.txt - Sites without ad tech`);
+        }
         // Calculate success rates only if URLs were actually processed
         if (totalUrlsProcessed > 0) {
             const extractionRate = ((totalSuccessfulExtractions / totalUrlsProcessed) *

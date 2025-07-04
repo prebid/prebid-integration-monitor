@@ -20,6 +20,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import * as BlockResourcesModule from 'puppeteer-extra-plugin-block-resources';
 import { Cluster } from 'puppeteer-cluster';
 import * as path from 'path';
+import * as fs from 'fs';
 // Import functions from new modules
 import { processFileContent, fetchUrlsFromGitHub, loadFileContents, } from './utils/url-loader.js';
 import { processPageTask, // The core function for processing a single page
@@ -32,6 +33,9 @@ import { PageLifecycleTracer, ClusterHealthMonitor, } from './utils/puppeteer-te
 import { processUrlsWithRecovery } from './utils/cluster-wrapper.js';
 import { processUrlsWithBrowserPool } from './utils/browser-pool.js';
 import { ENHANCED_PUPPETEER_ARGS } from './config/app-config.js';
+import { PreflightChecker } from './utils/preflight-check.js';
+import { DomainHealthTracker } from './utils/error-recovery.js';
+import { ErrorCategory, ProcessingPhase } from './utils/error-types.js';
 import { initializeTelemetry, URLLoadingTracer, URLFilteringTracer, } from './utils/telemetry.js';
 import { installProcessErrorHandler, uninstallProcessErrorHandler, } from './utils/process-error-handler.js';
 let logger; // Global logger instance, initialized within prebidExplorer.
@@ -133,7 +137,7 @@ export async function prebidExplorer(options) {
         ...(options.puppeteerLaunchOptions || {}), // Ensures options.puppeteerLaunchOptions is an object before spreading
     };
     // results array is correctly typed with PageData from puppeteer-task.ts
-    const taskResults = []; // Correctly typed with TaskResult from puppeteer-task.ts
+    let taskResults = []; // Using let to allow reassignment after retry
     /** @type {string[]} Array to store all URLs fetched from the specified source. */
     let allUrls = [];
     /** @type {Set<string>} Set to keep track of URLs that have been processed or are queued for processing. */
@@ -345,8 +349,127 @@ export async function prebidExplorer(options) {
         return;
     }
     filteringTracer.finish(allUrls.length);
-    /** @type {string[]} URLs to be processed after applying range and other filters. */
-    const urlsToProcess = allUrls; // This now contains potentially ranged URLs
+    // Initialize domain health tracker for error recovery
+    const domainHealthTracker = new DomainHealthTracker(logger);
+    // Pre-flight checks if enabled
+    let urlsToProcess = allUrls;
+    let preflightSkipped = 0;
+    if (options.preflightCheck) {
+        logger.info('========================================');
+        logger.info('🔍 STARTING PRE-FLIGHT CHECKS');
+        logger.info('========================================');
+        const preflightChecker = new PreflightChecker(domainHealthTracker, logger);
+        const preflightStartTime = Date.now();
+        const preflightResults = await preflightChecker.checkUrls(urlsToProcess, {
+            checkDNS: true,
+            checkSSL: true,
+            checkHealth: true,
+            dnsConcurrency: 50,
+            sslConcurrency: 10
+        });
+        const preflightDuration = (Date.now() - preflightStartTime) / 1000;
+        logger.info(`Pre-flight checks completed in ${preflightDuration.toFixed(1)} seconds`);
+        // Filter URLs based on pre-flight results
+        const originalPreflightCount = urlsToProcess.length;
+        const processableUrls = [];
+        const skippedUrls = [];
+        for (const url of urlsToProcess) {
+            const result = preflightResults.get(url);
+            if (!result) {
+                processableUrls.push(url);
+                continue;
+            }
+            // Skip based on flags
+            if (!result.passedDNS && options.skipDNSFailed) {
+                skippedUrls.push(url);
+                logger.debug(`Skipping ${url}: DNS lookup failed`);
+            }
+            else if (!result.passedSSL && options.skipSSLFailed) {
+                skippedUrls.push(url);
+                logger.debug(`Skipping ${url}: SSL validation failed`);
+            }
+            else {
+                processableUrls.push(url);
+                // Log warnings for URLs we're still processing
+                if (result.warnings && result.warnings.length > 0) {
+                    logger.debug(`Processing ${url} with warnings: ${result.warnings.join(', ')}`);
+                }
+            }
+        }
+        urlsToProcess = processableUrls;
+        preflightSkipped = skippedUrls.length;
+        // Write skipped URLs to error files
+        if (skippedUrls.length > 0) {
+            const dnsFailedUrls = skippedUrls.filter(url => {
+                const result = preflightResults.get(url);
+                return result && !result.passedDNS;
+            });
+            const sslFailedUrls = skippedUrls.filter(url => {
+                const result = preflightResults.get(url);
+                return result && result.passedDNS && !result.passedSSL;
+            });
+            // Write DNS failures to navigation errors file
+            if (dnsFailedUrls.length > 0) {
+                const timestamp = new Date().toISOString();
+                const dnsErrorEntries = dnsFailedUrls.map(url => {
+                    const result = preflightResults.get(url);
+                    return `[${timestamp}] | Category: network/dns | Phase: preflight | Code: DNS_RESOLUTION_FAILED | URL: ${url} | Message: ${result?.skipReason || 'DNS lookup failed'}`;
+                });
+                const navigationErrorPath = path.join(process.cwd(), 'errors', 'navigation_errors.txt');
+                try {
+                    fs.appendFileSync(navigationErrorPath, dnsErrorEntries.join('\n') + '\n', 'utf8');
+                    logger.info(`Wrote ${dnsFailedUrls.length} DNS failures to navigation_errors.txt`);
+                }
+                catch (error) {
+                    logger.error('Failed to write DNS errors to file', error);
+                }
+            }
+            // Write SSL failures to SSL errors file
+            if (sslFailedUrls.length > 0) {
+                const timestamp = new Date().toISOString();
+                const sslErrorEntries = sslFailedUrls.map(url => {
+                    const result = preflightResults.get(url);
+                    return `[${timestamp}] | Category: ssl/validation | Phase: preflight | Code: SSL_VALIDATION_FAILED | URL: ${url} | Message: ${result?.skipReason || 'SSL validation failed'}`;
+                });
+                const sslErrorPath = path.join(process.cwd(), 'errors', 'ssl_errors.txt');
+                try {
+                    fs.appendFileSync(sslErrorPath, sslErrorEntries.join('\n') + '\n', 'utf8');
+                    logger.info(`Wrote ${sslFailedUrls.length} SSL failures to ssl_errors.txt`);
+                }
+                catch (error) {
+                    logger.error('Failed to write SSL errors to file', error);
+                }
+            }
+        }
+        logger.info('========================================');
+        logger.info('PRE-FLIGHT CHECK SUMMARY');
+        logger.info('========================================');
+        logger.info(`📊 Total URLs checked: ${originalPreflightCount}`);
+        logger.info(`✅ Passed pre-flight: ${processableUrls.length}`);
+        logger.info(`❌ Failed pre-flight: ${preflightSkipped}`);
+        if (preflightSkipped > 0) {
+            const dnsFailCount = skippedUrls.filter(url => {
+                const result = preflightResults.get(url);
+                return result && !result.passedDNS;
+            }).length;
+            const sslFailCount = skippedUrls.filter(url => {
+                const result = preflightResults.get(url);
+                return result && result.passedDNS && !result.passedSSL;
+            }).length;
+            if (dnsFailCount > 0) {
+                logger.info(`   🚫 DNS failures: ${dnsFailCount}`);
+            }
+            if (sslFailCount > 0) {
+                logger.info(`   🔒 SSL failures: ${sslFailCount}`);
+            }
+        }
+        logger.info('========================================');
+        if (urlsToProcess.length === 0) {
+            logger.warn('No URLs passed pre-flight checks. Exiting.');
+            closeUrlTracker();
+            return;
+        }
+    }
     // Define the core processing task (used by both vanilla and cluster)
     // Note: The actual definition of processPageTask is now imported.
     // We pass it to the cluster or call it directly, along with the logger.
@@ -426,7 +549,13 @@ export async function prebidExplorer(options) {
                             // Call the imported processPageTask directly
                             const result = await processPageTask({
                                 page,
-                                data: { url, logger, discoveryMode: options.discoveryMode },
+                                data: {
+                                    url,
+                                    logger,
+                                    discoveryMode: options.discoveryMode,
+                                    extractMetadata: options.extractMetadata,
+                                    adUnitDetail: options.adUnitDetail
+                                },
                             });
                             taskResults.push(result);
                             await page.close();
@@ -598,6 +727,9 @@ export async function prebidExplorer(options) {
                             url,
                             logger,
                             discoveryMode: options.discoveryMode,
+                            extractMetadata: options.extractMetadata,
+                            adUnitDetail: options.adUnitDetail,
+                            moduleDetail: options.moduleDetail,
                         });
                     }
                     catch (queueError) {
@@ -645,7 +777,13 @@ export async function prebidExplorer(options) {
                         const page = await browser.newPage();
                         const result = await processPageTask({
                             page,
-                            data: { url, logger, discoveryMode: options.discoveryMode },
+                            data: {
+                                url,
+                                logger,
+                                discoveryMode: options.discoveryMode,
+                                extractMetadata: options.extractMetadata,
+                                adUnitDetail: options.adUnitDetail
+                            },
                         });
                         taskResults.push(result);
                         await page.close();
@@ -662,8 +800,172 @@ export async function prebidExplorer(options) {
             }
         }
     }
+    // Separate timeout errors for retry
+    const timeoutErrors = [];
+    const nonTimeoutResults = [];
+    for (const result of taskResults) {
+        if (result.type === 'error' &&
+            result.error.message &&
+            result.error.message.toLowerCase().includes('timeout')) {
+            timeoutErrors.push({ url: result.url, originalError: result });
+        }
+        else {
+            nonTimeoutResults.push(result);
+        }
+    }
+    // Retry timeout errors at the end of batch with more lenient settings
+    if (timeoutErrors.length > 0) {
+        logger.info('========================================');
+        logger.info(`RETRYING ${timeoutErrors.length} TIMEOUT ERRORS`);
+        logger.info('========================================');
+        logger.info('Using extended timeout and relaxed settings for retries...');
+        const retryResults = [];
+        // Create a special puppeteer instance with even more lenient settings for retries
+        const retryPuppeteerOptions = {
+            ...basePuppeteerOptions,
+            protocolTimeout: 180000, // 3 minutes
+        };
+        if (options.puppeteerType === 'cluster') {
+            try {
+                // Process timeout retries with special settings
+                const cluster = await Cluster.launch({
+                    puppeteer,
+                    concurrency: Cluster.CONCURRENCY_CONTEXT,
+                    maxConcurrency: Math.min(options.concurrency, 3), // Lower concurrency for retries
+                    puppeteerOptions: retryPuppeteerOptions,
+                    monitor: false,
+                    timeout: 150000, // 2.5 minutes per page
+                });
+                await cluster.task(async ({ page, data }) => {
+                    try {
+                        // Even more aggressive timeout for retries
+                        page.setDefaultTimeout(120000); // 2 minutes
+                        page.setDefaultNavigationTimeout(120000);
+                        const result = await processPageTask({
+                            page,
+                            data: {
+                                url: data.url,
+                                logger,
+                                discoveryMode: options.discoveryMode,
+                                extractMetadata: options.extractMetadata
+                            }
+                        });
+                        retryResults.push(result);
+                    }
+                    catch (error) {
+                        // If retry also fails, keep original error
+                        const originalResult = timeoutErrors.find(e => e.url === data.url)?.originalError;
+                        if (originalResult) {
+                            retryResults.push(originalResult);
+                        }
+                    }
+                });
+                // Queue all timeout URLs for retry
+                for (const { url } of timeoutErrors) {
+                    await cluster.queue({
+                        url,
+                        logger,
+                        discoveryMode: options.discoveryMode,
+                        extractMetadata: options.extractMetadata,
+                        adUnitDetail: options.adUnitDetail
+                    });
+                }
+                await cluster.idle();
+                await cluster.close();
+            }
+            catch (error) {
+                logger.error('Retry cluster failed:', error);
+                // Keep original errors if retry cluster fails
+                retryResults.push(...timeoutErrors.map(e => e.originalError));
+            }
+        }
+        else {
+            // Vanilla puppeteer retry
+            let browser = null;
+            try {
+                browser = await puppeteer.launch(retryPuppeteerOptions);
+                for (const { url, originalError } of timeoutErrors) {
+                    try {
+                        const page = await browser.newPage();
+                        page.setDefaultTimeout(120000);
+                        page.setDefaultNavigationTimeout(120000);
+                        const result = await processPageTask({
+                            page,
+                            data: {
+                                url,
+                                logger,
+                                discoveryMode: options.discoveryMode,
+                                extractMetadata: options.extractMetadata,
+                                adUnitDetail: options.adUnitDetail
+                            },
+                        });
+                        retryResults.push(result);
+                        await page.close();
+                    }
+                    catch (error) {
+                        // Keep original error if retry fails
+                        retryResults.push(originalError);
+                        logger.debug(`Retry failed for ${url}, keeping original error`);
+                    }
+                }
+            }
+            catch (error) {
+                logger.error('Retry browser launch failed:', error);
+                retryResults.push(...timeoutErrors.map(e => e.originalError));
+            }
+            finally {
+                if (browser)
+                    await browser.close();
+            }
+        }
+        // Log retry summary
+        const retrySuccesses = retryResults.filter(r => r.type === 'success').length;
+        const retryNoData = retryResults.filter(r => r.type === 'no_data').length;
+        const retryFailures = retryResults.filter(r => r.type === 'error').length;
+        logger.info('========================================');
+        logger.info('RETRY SUMMARY');
+        logger.info('========================================');
+        logger.info(`✅ Successful on retry: ${retrySuccesses}`);
+        logger.info(`🚫 No data on retry: ${retryNoData}`);
+        logger.info(`❌ Still failed: ${retryFailures}`);
+        logger.info('========================================');
+        // Merge retry results with non-timeout results
+        taskResults = [...nonTimeoutResults, ...retryResults];
+    }
     // Use functions from results-handler.ts
     const successfulResults = processAndLogTaskResults(taskResults, logger);
+    // Update domain health tracker with results
+    for (const result of taskResults) {
+        const url = result.type === 'error' || result.type === 'no_data'
+            ? result.url
+            : result.data.url;
+        // Skip if no URL is available
+        if (!url)
+            continue;
+        if (result.type === 'success' || result.type === 'no_data') {
+            // Record as success (even no_data means the page loaded successfully)
+            const responseTime = 5000; // Default response time, ideally we'd track actual timing
+            domainHealthTracker.recordSuccess(url, responseTime);
+        }
+        else if (result.type === 'error') {
+            // Record failure with detailed error if available
+            if (result.error.detailedError) {
+                domainHealthTracker.recordFailure(url, result.error.detailedError);
+            }
+            else {
+                // Create a basic DetailedError for compatibility
+                domainHealthTracker.recordFailure(url, {
+                    code: result.error.code || 'UNKNOWN_ERROR',
+                    message: result.error.message || 'Unknown error',
+                    category: ErrorCategory.UNKNOWN,
+                    subCategory: 'general',
+                    phase: ProcessingPhase.DATA_EXTRACTION,
+                    url: url,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+    }
     // Update URL tracker with results if skip-processed is enabled
     if (options.skipProcessed) {
         urlTracker.updateFromTaskResults(taskResults);

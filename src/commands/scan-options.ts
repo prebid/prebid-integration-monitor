@@ -110,4 +110,36 @@ export const scanFlags = {
       'Enable discovery mode to detect unknown ad tech libraries and identity solutions. Captures unrecognized global variables that match ad tech patterns.',
     default: false,
   }),
+  extractMetadata: Flags.boolean({
+    description:
+      'Extract comprehensive page metadata including Schema.org, OpenGraph, Twitter Cards, and site categorization signals. Adds significant data to output.',
+    default: false,
+  }),
+  preflightCheck: Flags.boolean({
+    description:
+      'Enable pre-flight checks (DNS, SSL) to skip dead/invalid sites before browser launch. Reduces errors but adds initial overhead.',
+    default: false,
+  }),
+  skipDNSFailed: Flags.boolean({
+    description:
+      'Skip URLs that fail DNS resolution during pre-flight check. Requires --preflightCheck.',
+    default: true,
+  }),
+  skipSSLFailed: Flags.boolean({
+    description:
+      'Skip URLs that fail SSL validation during pre-flight check. Requires --preflightCheck.',
+    default: false,
+  }),
+  adUnitDetail: Flags.string({
+    description:
+      'Level of detail for ad unit extraction: "basic" (media types only), "standard" (includes sizes), "full" (all details including mimes, protocols, etc.)',
+    options: ['basic', 'standard', 'full'],
+    default: 'basic',
+  }),
+  moduleDetail: Flags.string({
+    description:
+      'Level of module categorization: "simple" (all modules in single array), "categorized" (separate arrays for userIds, analytics, consent, etc.)',
+    options: ['simple', 'categorized'],
+    default: 'simple',
+  }),
 };

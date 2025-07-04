@@ -97,3 +97,5 @@
 [2025-07-03T05:08:21.767Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://meltyfan.es | Message: Attempted to use detached Frame 'E430F10703B175D3B25BF3492798474D'.
 [2025-07-03T05:08:21.769Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://smsd.org | Message: Attempted to use detached Frame '83533BA55AF543CF5292FE9B6E971E9C'.
 [2025-07-03T05:08:21.770Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://kohalibrary.com | Message: Attempted to use detached Frame '5581FBACF13975746C17467D1F088CBD'.
+[2025-07-03T12:35:38.544Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://jridol.info | Message: Execution context was destroyed, most likely because of a navigation.
+[2025-07-03T12:55:13.919Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://creativefan.com | Message: Execution context was destroyed, most likely because of a navigation.

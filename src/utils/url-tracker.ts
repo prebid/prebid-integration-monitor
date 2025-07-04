@@ -335,10 +335,14 @@ export class UrlTracker {
 
       const results = stmt.all() as { status: string; count: number }[];
       const stats: Record<string, number> = {};
+      let total = 0;
 
       for (const { status, count } of results) {
         stats[status] = count;
+        total += count;
       }
+      
+      stats.total = total;
 
       return stats;
     } catch (error) {
@@ -680,6 +684,80 @@ export class UrlTracker {
     const efficiency =
       (analysis.unprocessedCount / analysis.totalInRange) * 100;
     return efficiency >= minEfficiency;
+  }
+
+  /**
+   * Verify that a batch of URLs exist in the database
+   * @param urls Array of URLs to verify
+   * @returns Object with verification statistics
+   */
+  public verifyUrlsInDatabase(urls: string[]): {
+    totalUrls: number;
+    foundInDb: number;
+    missingFromDb: number;
+    missingUrls: string[];
+  } {
+    if (!urls || urls.length === 0) {
+      return {
+        totalUrls: 0,
+        foundInDb: 0,
+        missingFromDb: 0,
+        missingUrls: [],
+      };
+    }
+
+    const missingUrls: string[] = [];
+    let foundCount = 0;
+
+    const transaction = this.db.transaction((urlList: string[]) => {
+      for (const url of urlList) {
+        if (this.isUrlProcessed(url)) {
+          foundCount++;
+        } else {
+          missingUrls.push(url);
+        }
+      }
+    });
+
+    try {
+      transaction(urls);
+      return {
+        totalUrls: urls.length,
+        foundInDb: foundCount,
+        missingFromDb: missingUrls.length,
+        missingUrls: missingUrls.slice(0, 10), // Return first 10 missing URLs for debugging
+      };
+    } catch (error) {
+      this.logger.error('Error verifying URLs in database', { error });
+      return {
+        totalUrls: urls.length,
+        foundInDb: 0,
+        missingFromDb: urls.length,
+        missingUrls: [],
+      };
+    }
+  }
+
+  /**
+   * Get total count of URLs in database by status
+   */
+  public getTotalCount(status?: UrlStatus): number {
+    try {
+      let query = 'SELECT COUNT(*) as count FROM processed_urls';
+      const params: any[] = [];
+      
+      if (status) {
+        query += ' WHERE status = ?';
+        params.push(status);
+      }
+      
+      const stmt = this.db.prepare(query);
+      const result = stmt.get(...params) as { count: number };
+      return result.count;
+    } catch (error) {
+      this.logger.error('Error getting total count', { error });
+      return 0;
+    }
   }
 
   /**
