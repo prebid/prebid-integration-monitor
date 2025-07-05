@@ -176,7 +176,7 @@ prebid-integration-monitor/
 
 - `--skipProcessed` - Skip already processed URLs
 - `--resetTracking` - Clear tracking database
-- `--range="start-end"` - Process specific URL range
+- `--range="start-end"` - Process specific URL range (positions refer to original file, not filtered list)
 
 ## Data Storage Locations
 
@@ -220,6 +220,22 @@ node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains
 ```bash
 node ./bin/run.js scan --githubRepo https://github.com/zer0h/top-1000000-domains/blob/master/top-100000-domains --forceReprocess --range "1-1000" --batchSize=100
 ```
+
+## Range Behavior
+
+When using `--range` with `--skipProcessed`:
+
+1. **Range positions are absolute**: `--range "30001-40000"` always refers to lines 30,001-40,000 in the original file
+2. **Skip only applies within range**: Only URLs within the specified range that have been processed are skipped
+3. **Original positions maintained**: The range doesn't shift based on how many URLs were previously processed
+
+Example:
+- File has URLs at positions 1-100,000
+- Positions 1-10,000 were previously processed
+- `--range "5001-15000" --skipProcessed` will:
+  - Load URLs from positions 5,001-15,000 (10,000 URLs)
+  - Skip positions 5,001-10,000 (already processed)
+  - Process positions 10,001-15,000 (5,000 new URLs)
 
 ## Troubleshooting Guide
 

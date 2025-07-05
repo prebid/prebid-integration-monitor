@@ -99,3 +99,10 @@
 [2025-07-03T05:08:21.770Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://kohalibrary.com | Message: Attempted to use detached Frame '5581FBACF13975746C17467D1F088CBD'.
 [2025-07-03T12:35:38.544Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://jridol.info | Message: Execution context was destroyed, most likely because of a navigation.
 [2025-07-03T12:55:13.919Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://creativefan.com | Message: Execution context was destroyed, most likely because of a navigation.
+[2025-07-05T01:49:35.964Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://kochrezepte.de | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-05T03:51:27.661Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://gorillavsbear.net | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-05T03:55:23.970Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://aranyoldalak.hu | Message: Attempted to use detached Frame 'A675B01C8C70D0B5DFA2B45C0E9218E7'.
+[2025-07-05T04:14:26.320Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://viamichelin.ch | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-05T05:56:19.688Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://codersclan.net | Message: Attempted to use detached Frame 'D33FB01C577CA1DEF35B55A757D359D0'.
+[2025-07-05T05:58:09.827Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://visalietuva.lt | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-05T06:18:15.814Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://universoformulas.com | Message: Protocol error (Runtime.callFunctionOn): Target closed

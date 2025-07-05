@@ -219,6 +219,9 @@ export async function processContentWithRangeOptimization(
     logger.info(
       `Debug: startRange=${startRange}, endRange=${endRange}, startIdx=${startIdx}, endIdx=${endIdx}, will process ${endIdx - startIdx} lines`
     );
+    logger.info(
+      `DEBUG: First line in range: ${lines[startIdx]}, Last line in range: ${lines[endIdx - 1]}`
+    );
 
     // Process only the requested range
     for (let i = startIdx; i < endIdx; i++) {
@@ -233,7 +236,12 @@ export async function processContentWithRangeOptimization(
             trimmedLine
           )
         ) {
-          extractedUrls.push(`https://${trimmedLine}`);
+          const url = `https://${trimmedLine}`;
+          extractedUrls.push(url);
+          // Log first 5 URLs for debugging
+          if (extractedUrls.length <= 5) {
+            logger.info(`DEBUG: URL #${i + 1} (position ${i + 1}): ${trimmedLine} -> ${url}`);
+          }
         }
       }
     }
@@ -293,6 +301,7 @@ export async function fetchUrlsFromGitHub(
         .replace('github.com', 'raw.githubusercontent.com')
         .replace('/blob/', '/');
       const fileName = repoUrl.substring(repoUrl.lastIndexOf('/') + 1);
+      logger.info(`DEBUG: Fetching file - fileName=${fileName}, rawUrl=${rawUrl}`);
 
       // Check cache first
       let content = cache.get(rawUrl);

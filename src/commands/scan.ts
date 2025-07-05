@@ -65,7 +65,7 @@ export default class Scan extends Command {
       monitor: flags.monitor,
       outputDir: flags.outputDir,
       logDir: flags.logDir,
-      numUrls: flags.numUrls,
+      numUrls: flags.range ? undefined : flags.numUrls, // Don't use numUrls if range is specified
       range: flags.range,
       chunkSize: flags.chunkSize,
       skipProcessed: flags.skipProcessed,
@@ -219,6 +219,12 @@ export default class Scan extends Command {
       logger.info(
         `\n🔄 Processing batch ${batchNum}/${totalBatches}: URLs ${range}`
       );
+      logger.info(
+        `DEBUG: Batch calculation - startUrl=${startUrl}, batchNum=${batchNum}, batchSize=${batchSize}, range=${range}`
+      );
+      logger.info(
+        `DEBUG: Base options - range=${baseOptions.range}, numUrls=${baseOptions.numUrls}`
+      );
       logger.info(`⏰ Started at: ${new Date().toLocaleTimeString()}`);
       logger.info(
         `📊 Batch progress: ${(((batchNum - 1) / totalBatches) * 100).toFixed(1)}% complete`
@@ -247,8 +253,15 @@ export default class Scan extends Command {
       const batchOptions: PrebidExplorerOptions = {
         ...baseOptions,
         range: range,
+        numUrls: undefined, // Override numUrls to prevent interference with range
         logDir: `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`,
       };
+      
+      logger.info(`DEBUG: Batch options created with:`);
+      logger.info(`  - range: ${batchOptions.range}`);
+      logger.info(`  - numUrls: ${batchOptions.numUrls}`);
+      logger.info(`  - githubRepo: ${batchOptions.githubRepo}`);
+      logger.info(`  - Expected to process URLs from positions ${batchStartUrl} to ${batchEndUrl}`);
 
       const batchTracer = new BatchProcessingTracer(batchNum, range, logger);
       const batchStartTime = Date.now();
@@ -803,6 +816,26 @@ export default class Scan extends Command {
     const options = this._getPrebidExplorerOptions(flags);
     this._getInputSourceOptions(args, flags, options); // This method might call this.error and exit
 
+    // Warn if it looks like batch flags were intended but batchMode wasn't set
+    if (!flags.batchMode && (flags.startUrl || flags.totalUrls || flags.resumeBatch)) {
+      logger.warn('⚠️  WARNING: Batch-related flags detected but --batchMode not set!');
+      logger.warn('   Did you mean to include --batchMode?');
+      logger.warn(`   Detected flags: ${[
+        flags.startUrl && `--startUrl=${flags.startUrl}`,
+        flags.totalUrls && `--totalUrls=${flags.totalUrls}`,
+        flags.resumeBatch && `--resumeBatch=${flags.resumeBatch}`
+      ].filter(Boolean).join(', ')}`);
+      logger.warn('   Proceeding with regular scan mode...');
+    }
+
+    // Warn if using default numUrls with a large repository
+    if (!flags.range && !flags.batchMode && flags.numUrls === 100 && flags.githubRepo?.includes('1000000')) {
+      logger.warn('⚠️  WARNING: Processing only 100 URLs from a million-domain file!');
+      logger.warn('   Use --numUrls=N to process more URLs');
+      logger.warn('   Or use --batchMode with --startUrl and --totalUrls');
+      logger.warn('   Or use --range="start-end" to process a specific range');
+    }
+
     // Handle batch mode vs single scan mode
     if (flags.batchMode) {
       logger.info(`Starting Prebid batch scan with options:`);
@@ -818,6 +851,7 @@ export default class Scan extends Command {
       try {
         await this._runBatchMode(flags, args, options);
         this.log('Batch processing completed successfully.');
+        return; // Exit after batch mode completes
       } catch (error: unknown) {
         this.error(
           `Batch processing failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -826,6 +860,9 @@ export default class Scan extends Command {
       }
     } else {
       // Original single scan mode
+      logger.info('========================================');
+      logger.info('RUNNING IN SINGLE SCAN MODE');
+      logger.info('========================================');
       logger.info(`Starting Prebid scan with options:`);
       // Log the options (excluding potentially sensitive puppeteerLaunchOptions if necessary in future)
       const loggableOptions = { ...options };

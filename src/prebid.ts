@@ -342,9 +342,11 @@ export async function prebidExplorer(
         endRange: endStr ? parseInt(endStr, 10) : undefined,
       };
       logger.info(`Using optimized range processing: ${options.range}`);
+      logger.info(`DEBUG: Parsed range - startRange=${rangeOptions.startRange}, endRange=${rangeOptions.endRange}`);
     }
 
     const urlLimit = options.range ? undefined : options.numUrls;
+    logger.info(`DEBUG: Calling fetchUrlsFromGitHub with urlLimit=${urlLimit}, rangeOptions=${JSON.stringify(rangeOptions)}`);
     allUrls = await fetchUrlsFromGitHub(
       options.githubRepo,
       urlLimit,
@@ -416,6 +418,13 @@ export async function prebidExplorer(
   logger.info(`Initial total URLs found: ${allUrls.length}`, {
     firstFew: allUrls.slice(0, 5),
   });
+  
+  // DEBUG: Check for Amazon
+  if (allUrls.some(url => url.toLowerCase().includes('amazon.com'))) {
+    logger.error('🚨 DEBUG: Amazon.com found in URL list! This should not happen with range 146001+');
+    const amazonIndex = allUrls.findIndex(url => url.toLowerCase().includes('amazon.com'));
+    logger.error(`Amazon found at index ${amazonIndex}: ${allUrls[amazonIndex]}`);
+  }
 
   // 1. URL Range Logic
   // Apply URL range filtering if specified in options, but only for non-GitHub sources
@@ -482,6 +491,13 @@ export async function prebidExplorer(
     firstFew: allUrls.slice(0, 5),
   });
 
+  // Debug logging for range issues
+  if (options.range) {
+    logger.info(`DEBUG: Processing with range ${options.range}, allUrls.length=${allUrls.length}`);
+    logger.info(`DEBUG: First 5 URLs: ${allUrls.slice(0, 5).join(', ')}`);
+    logger.info(`DEBUG: Last 5 URLs: ${allUrls.slice(-5).join(', ')}`);
+  }
+
   // Pre-filter processed URLs if requested (more efficient for large lists)
   if (options.prefilterProcessed) {
     logger.info('Pre-filtering processed URLs before loading full range...');
@@ -524,6 +540,14 @@ export async function prebidExplorer(
           unprocessedCount: analysis.unprocessedCount,
           processedPercentage: analysis.processedPercentage.toFixed(1) + '%',
         });
+        
+        // Show sample URLs from the range to help user verify they're looking at the right range
+        if (allUrls.length > 0) {
+          logger.info(`Sample URLs from range ${options.range}:`, {
+            first5: allUrls.slice(0, 5),
+            last5: allUrls.slice(-5),
+          });
+        }
 
         if (analysis.isFullyProcessed) {
           logger.info(
@@ -572,17 +596,36 @@ export async function prebidExplorer(
     );
     // Don't filter anything - process all URLs
   } else if (options.skipProcessed) {
-    logger.info('Filtering out previously processed URLs...');
+    logger.info('Filtering out previously processed URLs within the range...');
     const originalCount = allUrls.length;
-    allUrls = urlTracker.filterUnprocessedUrls(allUrls);
-    urlsSkippedProcessed = originalCount - allUrls.length;
+    
+    // When we have a range, we need to maintain positional integrity
+    // The range should always refer to positions in the original file
+    if (options.range) {
+      // Filter but keep track of original positions
+      const filteredUrls: string[] = [];
+      for (const url of allUrls) {
+        if (!urlTracker.isUrlProcessed(url)) {
+          filteredUrls.push(url);
+        } else {
+          urlsSkippedProcessed++;
+        }
+      }
+      allUrls = filteredUrls;
+      
+      logger.info(
+        `Range filtering complete: ${originalCount} URLs in range ${options.range}, ${allUrls.length} unprocessed, ${urlsSkippedProcessed} skipped`
+      );
+    } else {
+      // For non-range processing, use the existing bulk filter
+      allUrls = urlTracker.filterUnprocessedUrls(allUrls);
+      urlsSkippedProcessed = originalCount - allUrls.length;
+    }
+    
     filteringTracer.recordProcessedFiltering(
       originalCount,
       allUrls.length,
       urlsSkippedProcessed
-    );
-    logger.info(
-      `URL filtering complete: ${originalCount} total, ${allUrls.length} unprocessed, ${urlsSkippedProcessed} skipped`
     );
 
     if (allUrls.length === 0) {

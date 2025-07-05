@@ -1362,6 +1362,12 @@ export const processPageTask = async ({
 }): Promise<TaskResult> => {
   const trimmedUrl: string = url.trim(); // Ensure URL is trimmed before processing
   logger.info(`Attempting to process URL: ${trimmedUrl}`);
+  
+  // DEBUG: Alert if Amazon is being processed
+  if (trimmedUrl.toLowerCase().includes('amazon.com') && !trimmedUrl.toLowerCase().includes('amazonappservices')) {
+    logger.error(`🚨 DEBUG: AMAZON.COM DETECTED! This should not happen with range 146001+`);
+    logger.error(`Stack trace:`, new Error().stack);
+  }
   try {
     await configurePage(page, logger); // Use the configurePage from this module
 
