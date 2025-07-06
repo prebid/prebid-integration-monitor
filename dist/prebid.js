@@ -45,40 +45,6 @@ let logger; // Global logger instance, initialized within prebidExplorer.
 // for the core puppeteerVanilla methods.
 const puppeteer = addExtra(puppeteerVanilla // Changed from unknown to any
 );
-/**
- * The main entry point for the Prebid Explorer tool.
- * This asynchronous function orchestrates the entire process of:
- * 1. Initializing logging.
- * 2. Applying Puppeteer plugins (Stealth, Block Resources).
- * 3. Determining the source of URLs (GitHub or local file) and loading them.
- * 4. Filtering URLs based on the specified range, if any.
- * 5. Launching Puppeteer (either a single instance or a cluster for concurrency).
- * 6. Processing each URL in chunks (if specified) using the `processPageTask`.
- * 7. Collecting and logging results from each task.
- * 8. Writing aggregated successful results to JSON files.
- * 9. Updating the input file if applicable (e.g., removing successfully processed URLs).
- *
- * @param {PrebidExplorerOptions} options - An object containing all configuration settings
- *                                          for the current run of the Prebid Explorer.
- * @returns {Promise<void>} A promise that resolves when all URLs have been processed and
- *                          results have been handled, or rejects if a critical error occurs
- *                          during setup or orchestration.
- * @example
- * const options = {
- *   inputFile: "urls.txt",
- *   outputDir: "output_results",
- *   logDir: "logs",
- *   puppeteerType: 'cluster',
- *   concurrency: 5,
- *   headless: true,
- *   monitor: false,
- *   chunkSize: 100,
- *   range: "1-500"
- * };
- * prebidExplorer(options)
- *   .then(() => console.log("Prebid Explorer finished."))
- *   .catch(error => console.error("Prebid Explorer failed:", error));
- */
 export async function prebidExplorer(options) {
     logger = initializeLogger(options.logDir); // Initialize the global logger
     initializeTelemetry('prebid-integration-monitor');
@@ -204,7 +170,13 @@ export async function prebidExplorer(options) {
     if (allUrls.length === 0) {
         urlLoadingTracer.finish(0);
         logger.warn(`No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`);
-        return;
+        return {
+            urlsProcessed: 0,
+            urlsSkipped: 0,
+            successfulExtractions: 0,
+            errors: 0,
+            noAdTech: 0,
+        };
     }
     urlLoadingTracer.finish(allUrls.length);
     logger.info(`Initial total URLs found: ${allUrls.length}`, {
@@ -255,7 +227,13 @@ export async function prebidExplorer(options) {
     }
     if (allUrls.length === 0) {
         logger.warn(`No URLs to process after applying range or due to empty initial list. Exiting.`);
-        return;
+        return {
+            urlsProcessed: 0,
+            urlsSkipped: 0,
+            successfulExtractions: 0,
+            errors: 0,
+            noAdTech: 0,
+        };
     }
     logger.info(`Total URLs to process after range check: ${allUrls.length}`, {
         firstFew: allUrls.slice(0, 5),
@@ -312,7 +290,13 @@ export async function prebidExplorer(options) {
                     }
                     logger.info('Use --forceReprocess to reprocess this range, or choose a different range.');
                     closeUrlTracker();
-                    return;
+                    return {
+                        urlsProcessed: 0,
+                        urlsSkipped: 0,
+                        successfulExtractions: 0,
+                        errors: 0,
+                        noAdTech: 0,
+                    };
                 }
                 else if (analysis.processedPercentage > 80) {
                     logger.warn(`⚠️  LOW EFFICIENCY: ${analysis.processedPercentage.toFixed(1)}% of URLs already processed`);
@@ -372,7 +356,13 @@ export async function prebidExplorer(options) {
             logger.info(`   Use --forceReprocess to reprocess them anyway.`);
             logger.info('========================================');
             closeUrlTracker();
-            return;
+            return {
+                urlsProcessed: 0,
+                urlsSkipped: skippedUrlCount,
+                successfulExtractions: 0,
+                errors: 0,
+                noAdTech: 0,
+            };
         }
     }
     // Pre-filter URLs for valid domains to avoid expensive Puppeteer operations on invalid domains
@@ -385,7 +375,13 @@ export async function prebidExplorer(options) {
         filteringTracer.finish(0);
         logger.warn('No valid URLs remaining after domain filtering. Exiting.');
         closeUrlTracker();
-        return;
+        return {
+            urlsProcessed: 0,
+            urlsSkipped: urlsSkippedProcessed,
+            successfulExtractions: 0,
+            errors: 0,
+            noAdTech: 0,
+        };
     }
     filteringTracer.finish(allUrls.length);
     // Initialize domain health tracker for error recovery
@@ -506,7 +502,13 @@ export async function prebidExplorer(options) {
         if (urlsToProcess.length === 0) {
             logger.warn('No URLs passed pre-flight checks. Exiting.');
             closeUrlTracker();
-            return;
+            return {
+                urlsProcessed: 0,
+                urlsSkipped: 0,
+                successfulExtractions: 0,
+                errors: 0,
+                noAdTech: 0,
+            };
         }
     }
     // Define the core processing task (used by both vanilla and cluster)
@@ -1119,4 +1121,12 @@ export async function prebidExplorer(options) {
     closeUrlTracker();
     // Uninstall process error handlers
     uninstallProcessErrorHandler();
+    // Return statistics for batch processing
+    return {
+        urlsProcessed: processedUrlCount,
+        urlsSkipped: skippedUrlCount,
+        successfulExtractions,
+        errors: errorCount,
+        noAdTech: noDataCount,
+    };
 }

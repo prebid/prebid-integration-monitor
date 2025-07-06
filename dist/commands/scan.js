@@ -217,50 +217,51 @@ export default class Scan extends Command {
             try {
                 const batchResult = await prebidExplorer(batchOptions);
                 const batchDuration = (Date.now() - batchStartTime) / 1000;
-                // Extract batch statistics from prebidExplorer result if available
-                // For now, we'll parse from the most recent log file
+                // Use statistics directly from prebidExplorer result
                 let batchStats = {
-                    urlsProcessed: 0,
-                    urlsSkipped: 0,
-                    successfulExtractions: 0,
-                    errors: 0,
-                    noAdTech: 0,
+                    urlsProcessed: batchResult.urlsProcessed || 0,
+                    urlsSkipped: batchResult.urlsSkipped || 0,
+                    successfulExtractions: batchResult.successfulExtractions || 0,
+                    errors: batchResult.errors || 0,
+                    noAdTech: batchResult.noAdTech || 0,
                 };
-                // Try to read stats from the batch log file
-                try {
-                    const fs = await import('fs');
-                    const batchLogDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
-                    const logFile = `${batchLogDir}/app.log`;
-                    if (fs.existsSync(logFile)) {
-                        const logContent = fs.readFileSync(logFile, 'utf8');
-                        const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
-                        const skippedMatch = logContent.match(/⏭️  URLs skipped \(already processed\): (\d+)/);
-                        const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
-                        const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
-                        const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
-                        if (processedMatch)
-                            batchStats.urlsProcessed = parseInt(processedMatch[1]);
-                        if (skippedMatch)
-                            batchStats.urlsSkipped = parseInt(skippedMatch[1]);
-                        if (successMatch)
-                            batchStats.successfulExtractions = parseInt(successMatch[1]);
-                        if (errorMatch)
-                            batchStats.errors = parseInt(errorMatch[1]);
-                        if (noAdTechMatch)
-                            batchStats.noAdTech = parseInt(noAdTechMatch[1]);
-                        // Debug: log what we found
-                        logger.debug(`Batch ${batchNum} log parsing results:`, {
-                            processedMatch: processedMatch?.[1],
-                            skippedMatch: skippedMatch?.[1],
-                            batchStats,
-                        });
+                // If stats are all zeros, try to read from the batch log file as fallback
+                if (batchStats.urlsProcessed === 0 && batchStats.urlsSkipped === 0) {
+                    try {
+                        const fs = await import('fs');
+                        const batchLogDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
+                        const logFile = `${batchLogDir}/app.log`;
+                        if (fs.existsSync(logFile)) {
+                            const logContent = fs.readFileSync(logFile, 'utf8');
+                            const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
+                            const skippedMatch = logContent.match(/⏭️\s+URLs skipped \(already processed\): (\d+)/);
+                            const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
+                            const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
+                            const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
+                            if (processedMatch)
+                                batchStats.urlsProcessed = parseInt(processedMatch[1]);
+                            if (skippedMatch)
+                                batchStats.urlsSkipped = parseInt(skippedMatch[1]);
+                            if (successMatch)
+                                batchStats.successfulExtractions = parseInt(successMatch[1]);
+                            if (errorMatch)
+                                batchStats.errors = parseInt(errorMatch[1]);
+                            if (noAdTechMatch)
+                                batchStats.noAdTech = parseInt(noAdTechMatch[1]);
+                            // Debug: log what we found
+                            logger.debug(`Batch ${batchNum} log parsing results:`, {
+                                processedMatch: processedMatch?.[1],
+                                skippedMatch: skippedMatch?.[1],
+                                batchStats,
+                            });
+                        }
+                        else {
+                            logger.debug(`Batch ${batchNum} log file not found: ${logFile}`);
+                        }
                     }
-                    else {
-                        logger.debug(`Batch ${batchNum} log file not found: ${logFile}`);
+                    catch (e) {
+                        logger.debug(`Error reading batch ${batchNum} logs:`, e);
                     }
-                }
-                catch (e) {
-                    logger.debug(`Error reading batch ${batchNum} logs:`, e);
                 }
                 logger.info(`✅ Batch ${batchNum} completed successfully in ${batchDuration.toFixed(1)}s`);
                 // Show batch-specific results immediately
@@ -471,7 +472,7 @@ export default class Scan extends Command {
                         const logContent = fs.readFileSync(logFile, 'utf8');
                         // Extract statistics from log content
                         const processedMatch = logContent.match(/🔄 URLs actually processed: (\d+)/);
-                        const skippedMatch = logContent.match(/⏭️  URLs skipped \(already processed\): (\d+)/);
+                        const skippedMatch = logContent.match(/⏭️\s+URLs skipped \(already processed\): (\d+)/);
                         const successMatch = logContent.match(/🎯 Successful data extractions: (\d+)/);
                         const errorMatch = logContent.match(/⚠️  Errors encountered: (\d+)/);
                         const noAdTechMatch = logContent.match(/🚫 No ad tech found: (\d+)/);
@@ -692,7 +693,6 @@ export default class Scan extends Command {
         }
         else {
             // Original single scan mode
-            logger.error('🚨 DEBUG: ENTERING SINGLE SCAN MODE - This should NOT happen after batch mode!');
             logger.info('========================================');
             logger.info('RUNNING IN SINGLE SCAN MODE');
             logger.info('========================================');

@@ -228,9 +228,17 @@ const puppeteer = addExtra(
  *   .then(() => console.log("Prebid Explorer finished."))
  *   .catch(error => console.error("Prebid Explorer failed:", error));
  */
+export interface PrebidExplorerStats {
+  urlsProcessed: number;
+  urlsSkipped: number;
+  successfulExtractions: number;
+  errors: number;
+  noAdTech: number;
+}
+
 export async function prebidExplorer(
   options: PrebidExplorerOptions
-): Promise<void> {
+): Promise<PrebidExplorerStats> {
   logger = initializeLogger(options.logDir); // Initialize the global logger
   initializeTelemetry('prebid-integration-monitor');
 
@@ -412,7 +420,13 @@ export async function prebidExplorer(
     logger.warn(
       `No URLs to process from ${urlSourceType || 'any specified source'}. Exiting.`
     );
-    return;
+    return {
+      urlsProcessed: 0,
+      urlsSkipped: 0,
+      successfulExtractions: 0,
+      errors: 0,
+      noAdTech: 0,
+    };
   }
   urlLoadingTracer.finish(allUrls.length);
   logger.info(`Initial total URLs found: ${allUrls.length}`, {
@@ -485,7 +499,13 @@ export async function prebidExplorer(
     logger.warn(
       `No URLs to process after applying range or due to empty initial list. Exiting.`
     );
-    return;
+    return {
+      urlsProcessed: 0,
+      urlsSkipped: 0,
+      successfulExtractions: 0,
+      errors: 0,
+      noAdTech: 0,
+    };
   }
   logger.info(`Total URLs to process after range check: ${allUrls.length}`, {
     firstFew: allUrls.slice(0, 5),
@@ -573,7 +593,13 @@ export async function prebidExplorer(
             'Use --forceReprocess to reprocess this range, or choose a different range.'
           );
           closeUrlTracker();
-          return;
+          return {
+            urlsProcessed: 0,
+            urlsSkipped: 0,
+            successfulExtractions: 0,
+            errors: 0,
+            noAdTech: 0,
+          };
         } else if (analysis.processedPercentage > 80) {
           logger.warn(
             `⚠️  LOW EFFICIENCY: ${analysis.processedPercentage.toFixed(1)}% of URLs already processed`
@@ -652,7 +678,13 @@ export async function prebidExplorer(
       logger.info('========================================');
 
       closeUrlTracker();
-      return;
+      return {
+        urlsProcessed: 0,
+        urlsSkipped: skippedUrlCount,
+        successfulExtractions: 0,
+        errors: 0,
+        noAdTech: 0,
+      };
     }
   }
 
@@ -669,7 +701,13 @@ export async function prebidExplorer(
     filteringTracer.finish(0);
     logger.warn('No valid URLs remaining after domain filtering. Exiting.');
     closeUrlTracker();
-    return;
+    return {
+      urlsProcessed: 0,
+      urlsSkipped: urlsSkippedProcessed,
+      successfulExtractions: 0,
+      errors: 0,
+      noAdTech: 0,
+    };
   }
 
   filteringTracer.finish(allUrls.length);
@@ -809,7 +847,13 @@ export async function prebidExplorer(
     if (urlsToProcess.length === 0) {
       logger.warn('No URLs passed pre-flight checks. Exiting.');
       closeUrlTracker();
-      return;
+      return {
+        urlsProcessed: 0,
+        urlsSkipped: 0,
+        successfulExtractions: 0,
+        errors: 0,
+        noAdTech: 0,
+      };
     }
   }
 
@@ -1545,4 +1589,13 @@ export async function prebidExplorer(
 
   // Uninstall process error handlers
   uninstallProcessErrorHandler();
+
+  // Return statistics for batch processing
+  return {
+    urlsProcessed: processedUrlCount,
+    urlsSkipped: skippedUrlCount,
+    successfulExtractions,
+    errors: errorCount,
+    noAdTech: noDataCount,
+  };
 }

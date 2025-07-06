@@ -270,18 +270,18 @@ export default class Scan extends Command {
         const batchResult = await prebidExplorer(batchOptions);
         const batchDuration = (Date.now() - batchStartTime) / 1000;
 
-        // Extract batch statistics from prebidExplorer result if available
-        // For now, we'll parse from the most recent log file
+        // Use statistics directly from prebidExplorer result
         let batchStats = {
-          urlsProcessed: 0,
-          urlsSkipped: 0,
-          successfulExtractions: 0,
-          errors: 0,
-          noAdTech: 0,
+          urlsProcessed: batchResult.urlsProcessed || 0,
+          urlsSkipped: batchResult.urlsSkipped || 0,
+          successfulExtractions: batchResult.successfulExtractions || 0,
+          errors: batchResult.errors || 0,
+          noAdTech: batchResult.noAdTech || 0,
         };
 
-        // Try to read stats from the batch log file
-        try {
+        // If stats are all zeros, try to read from the batch log file as fallback
+        if (batchStats.urlsProcessed === 0 && batchStats.urlsSkipped === 0) {
+          try {
           const fs = await import('fs');
           const batchLogDir = `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`;
           const logFile = `${batchLogDir}/app.log`;
@@ -293,7 +293,7 @@ export default class Scan extends Command {
               /🔄 URLs actually processed: (\d+)/
             );
             const skippedMatch = logContent.match(
-              /⏭️  URLs skipped \(already processed\): (\d+)/
+              /⏭️\s+URLs skipped \(already processed\): (\d+)/
             );
             const successMatch = logContent.match(
               /🎯 Successful data extractions: (\d+)/
@@ -323,8 +323,9 @@ export default class Scan extends Command {
           } else {
             logger.debug(`Batch ${batchNum} log file not found: ${logFile}`);
           }
-        } catch (e) {
-          logger.debug(`Error reading batch ${batchNum} logs:`, e);
+          } catch (e) {
+            logger.debug(`Error reading batch ${batchNum} logs:`, e);
+          }
         }
 
         logger.info(
@@ -587,7 +588,7 @@ export default class Scan extends Command {
               /🔄 URLs actually processed: (\d+)/
             );
             const skippedMatch = logContent.match(
-              /⏭️  URLs skipped \(already processed\): (\d+)/
+              /⏭️\s+URLs skipped \(already processed\): (\d+)/
             );
             const successMatch = logContent.match(
               /🎯 Successful data extractions: (\d+)/
