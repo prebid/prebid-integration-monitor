@@ -209,3 +209,8 @@
 [2025-07-09T02:27:42.625Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://123ru.net | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-07-09T03:25:07.410Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://cusocal.org | Message: Attempted to use detached Frame 'D881E208904CFA9E7BE9AC3B84AC73E7'.
 [2025-07-09T07:36:43.512Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://gsell.fr | Message: Attempted to use detached Frame '777C4B1CD8312BC9DE951F740F1A4610'.
+[2025-07-09T15:56:31.342Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://morenewmediastore.com | Message: Execution context was destroyed, most likely because of a navigation.
+[2025-07-09T16:00:45.545Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://muysencillo.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-09T16:12:17.559Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://wunschfee.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-09T17:06:51.073Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://sportadictos.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-09T18:22:08.435Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://gingergeneration.it | Message: Protocol error (Runtime.callFunctionOn): Target closed
