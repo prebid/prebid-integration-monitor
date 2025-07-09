@@ -77,7 +77,8 @@ export async function createSafeCluster(
       (err.message.includes('Unable to get browser page') ||
         err.message.includes('Requesting main frame too early'))
     ) {
-      logger.debug(`Lifecycle error for ${data.url}: ${err.message}`);
+      // Log as warning instead of debug for better visibility
+      logger.warn(`Browser lifecycle error for ${data.url}: ${err.message}`);
     } else {
       logger.error(`Cluster task error for ${data.url}:`, err);
     }
@@ -292,13 +293,13 @@ export async function processUrlsWithRecovery(
             err.message.includes('Unable to get browser page')
           ) {
             errorCode = 'BROWSER_PAGE_ERROR';
-            logger.debug(`Browser page lifecycle error for ${url}`);
+            logger.warn(`Browser page lifecycle error for ${url}: ${err.message}`);
           } else if (
             err.message &&
             err.message.includes('Requesting main frame too early')
           ) {
             errorCode = 'PUPPETEER_MAIN_FRAME_ERROR';
-            logger.debug(`Main frame error for ${url}`);
+            logger.warn(`Main frame error for ${url}: ${err.message}`);
           }
 
           results.push({

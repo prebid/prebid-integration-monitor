@@ -406,18 +406,87 @@ export default class Scan extends Command {
             }
             catch (error) {
                 const batchDuration = (Date.now() - batchStartTime) / 1000;
+                // Enhanced error logging with full stack trace
                 logger.error(`❌ Batch ${batchNum} failed after ${batchDuration.toFixed(1)}s:`, error);
-                batchTracer.recordError(error instanceof Error ? error : new Error(String(error)));
-                batchTracer.finish(false);
-                failedBatches++;
-                // Update progress
-                batchProgress.failedBatches.push({
+                // Log full error details including stack trace
+                if (error instanceof Error) {
+                    logger.error(`   Error type: ${error.constructor.name}`);
+                    logger.error(`   Error message: ${error.message}`);
+                    if (error.stack) {
+                        logger.error(`   Stack trace:\n${error.stack}`);
+                    }
+                }
+                else {
+                    logger.error(`   Error (non-Error object): ${JSON.stringify(error)}`);
+                }
+                // Log batch details for debugging
+                logger.error(`   Batch details:`, {
                     batchNumber: batchNum,
                     range: range,
-                    failedAt: new Date().toISOString(),
-                    duration: batchDuration,
-                    error: error instanceof Error ? error.message : String(error),
+                    expectedUrls: batchEndUrl - batchStartUrl + 1,
+                    logDir: batchOptions.logDir,
                 });
+                // Attempt batch recovery for certain error types
+                let recoveryAttempted = false;
+                if (error instanceof Error &&
+                    (error.message.includes('ECONNREFUSED') ||
+                        error.message.includes('ETIMEDOUT') ||
+                        error.message.includes('cluster') ||
+                        error.message.includes('browser'))) {
+                    logger.warn(`🔄 Attempting to recover batch ${batchNum} after transient error...`);
+                    // Wait before retry
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    try {
+                        // Retry with reduced concurrency
+                        const recoveryOptions = {
+                            ...batchOptions,
+                            concurrency: Math.max(1, Math.floor((batchOptions.concurrency || 5) / 2)),
+                        };
+                        const recoveryResult = await prebidExplorer(recoveryOptions);
+                        const recoveryDuration = (Date.now() - batchStartTime) / 1000;
+                        logger.info(`✅ Batch ${batchNum} recovered successfully after ${recoveryDuration.toFixed(1)}s`);
+                        // Update statistics with recovery result
+                        const batchStats = {
+                            urlsProcessed: recoveryResult.urlsProcessed || 0,
+                            urlsSkipped: recoveryResult.urlsSkipped || 0,
+                            successfulExtractions: recoveryResult.successfulExtractions || 0,
+                            errors: recoveryResult.errors || 0,
+                            noAdTech: recoveryResult.noAdTech || 0,
+                        };
+                        batchTracer.recordUrlCounts(batchStats.urlsProcessed, batchStats.urlsSkipped, batchStats.successfulExtractions, batchStats.errors);
+                        batchTracer.finish(true);
+                        successfulBatches++;
+                        recoveryAttempted = true;
+                        // Update progress with recovery info
+                        batchProgress.completedBatches.push({
+                            batchNumber: batchNum,
+                            range: range,
+                            completedAt: new Date().toISOString(),
+                            duration: recoveryDuration,
+                            stats: batchStats,
+                            recovered: true,
+                            note: 'Recovered after initial failure',
+                        });
+                    }
+                    catch (recoveryError) {
+                        logger.error(`❌ Batch ${batchNum} recovery failed:`, recoveryError);
+                    }
+                }
+                if (!recoveryAttempted) {
+                    batchTracer.recordError(error instanceof Error ? error : new Error(String(error)));
+                    batchTracer.finish(false);
+                    failedBatches++;
+                    // Update progress with detailed error info
+                    batchProgress.failedBatches.push({
+                        batchNumber: batchNum,
+                        range: range,
+                        failedAt: new Date().toISOString(),
+                        duration: batchDuration,
+                        error: error instanceof Error ? error.message : String(error),
+                        errorStack: error instanceof Error ? error.stack : undefined,
+                        errorType: error instanceof Error ? error.constructor.name : typeof error,
+                    });
+                }
                 // Continue with next batch instead of stopping
                 logger.warn(`⏭️  Continuing with next batch...`);
             }

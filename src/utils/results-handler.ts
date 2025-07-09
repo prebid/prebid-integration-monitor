@@ -386,10 +386,18 @@ export function appendErrorUrls(
     }
   } catch (e: unknown) {
     const err = e as Error;
-    logger.error('Failed to append URLs to error files', {
+    logger.error('CRITICAL: Failed to append URLs to error files - data may be lost!', {
       errorName: err.name,
       errorMessage: err.message,
       stack: err.stack,
+      errorCategories: Array.from(errorFileMap.keys()),
+      totalErrors: taskResults.filter(r => r.type === 'error').length,
+    });
+    
+    // Log sample of lost errors for debugging
+    const sampleErrors = taskResults.filter(r => r.type === 'error').slice(0, 3);
+    sampleErrors.forEach((error, index) => {
+      logger.error(`  Sample lost error ${index + 1}: ${error.url} - ${error.error.message}`);
     });
   }
 }

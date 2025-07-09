@@ -239,13 +239,16 @@ export interface PrebidExplorerStats {
 export async function prebidExplorer(
   options: PrebidExplorerOptions
 ): Promise<PrebidExplorerStats> {
-  logger = initializeLogger(options.logDir); // Initialize the global logger
-  initializeTelemetry('prebid-integration-monitor');
+  // Initialize logger first so we can use it in the catch block
+  logger = initializeLogger(options.logDir);
+  
+  try {
+    initializeTelemetry('prebid-integration-monitor');
 
-  // Install global error handlers to catch puppeteer-cluster errors
-  installProcessErrorHandler(logger);
+    // Install global error handlers to catch puppeteer-cluster errors
+    installProcessErrorHandler(logger);
 
-  logger.info('Starting Prebid Explorer with options:', options);
+    logger.info('Starting Prebid Explorer with options:', options);
 
   // Initialize error file headers for better organization
   createErrorFileHeaders(logger);
@@ -1598,4 +1601,34 @@ export async function prebidExplorer(
     errors: errorCount,
     noAdTech: noDataCount,
   };
+  } catch (error) {
+    // Log catastrophic error with full details
+    logger.error('CRITICAL: prebidExplorer encountered a fatal error:', error);
+    
+    if (error instanceof Error) {
+      logger.error(`Error type: ${error.constructor.name}`);
+      logger.error(`Error message: ${error.message}`);
+      if (error.stack) {
+        logger.error(`Stack trace:\n${error.stack}`);
+      }
+    }
+    
+    // Try to clean up resources
+    try {
+      closeUrlTracker();
+      uninstallProcessErrorHandler();
+    } catch (cleanupError) {
+      logger.error('Error during cleanup:', cleanupError);
+    }
+    
+    // Return empty statistics to prevent batch processing from crashing
+    logger.error('Returning empty statistics due to critical error');
+    return {
+      urlsProcessed: 0,
+      urlsSkipped: 0,
+      successfulExtractions: 0,
+      errors: 0,
+      noAdTech: 0,
+    };
+  }
 }
