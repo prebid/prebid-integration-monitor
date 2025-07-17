@@ -354,3 +354,11 @@
 [2025-07-15T19:54:37.403Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://duowa.net | Message: Execution context was destroyed, most likely because of a navigation.
 [2025-07-15T20:14:10.602Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://vidi.hu | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-07-15T20:41:53.241Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://zvw.de | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-16T15:31:20.444Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://wheatonworldwide.com | Message: Attempted to use detached Frame '8573AA752FFB35D847C046B1D7D6E172'.
+[2025-07-16T17:21:53.355Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://viviallestero.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-16T19:06:54.931Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://lepape-info.com | Message: Attempted to use detached Frame '99D966EEB079B9BF2C89B04A3F752EF9'.
+[2025-07-16T19:13:03.224Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://h2g2.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-16T20:15:07.257Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://ildispaccio.it | Message: Attempted to use detached Frame '5C539646ECAEDD7FF5E52F1D01D53C98'.
+[2025-07-16T20:38:51.300Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://kozelben.hu | Message: Attempted to use detached Frame '8147E66A64C88D06F23F846A5B33F704'.
+[2025-07-16T21:29:28.779Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://fashiontimes.it | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-16T22:00:26.830Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://beloitdailynews.com | Message: Attempted to use detached Frame '68474C64A15FE1080905321BAB202B1C'.
