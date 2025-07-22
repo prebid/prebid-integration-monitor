@@ -1,0 +1,5946 @@
+[
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://plustransfer.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AAGABCENB0FgAAAAAAAAACiQAAAAAAAA.YAAAAAAAAAAA",
+      "cmpId": 6,
+      "version": "1",
+      "name": "Sourcepoint"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://elektrobike-online.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://kininaru-kininaru.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://gimmiefreebies.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://logoeps.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://evolo.us"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://trucsdenana.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://puzzlefry.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://amotherworld.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://doctorandroid.gr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://pursuingmydreams.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.40.0",
+        "modules": [
+          "allowActivities",
+          "appnexusBidAdapter",
+          "connectIdSystem",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "genericAnalyticsAdapter",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "pairIdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "merkleIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "ozoneBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "stackadaptBidAdapter",
+          "sizeMapping",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "yahooAdsBidAdapter",
+          "fabrickIdSystem",
+          "ftrackIdSystem",
+          "33acrossIdSystem",
+          "33acrossBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "lmpIdSystem",
+          "linkedInAdsIdSystem",
+          "currency"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://pocketchangegourmet.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://interstateplastics.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://online-converting.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://enciclopedia.cat"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 340,
+      "version": "1",
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.40.0",
+        "modules": [
+          "33acrossIdSystem",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adyoulikeBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "connectIdSystem",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "intentIqAnalyticsAdapter",
+          "intentIqIdSystem",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "medianetBidAdapter",
+          "nativoBidAdapter",
+          "openwebBidAdapter",
+          "openxBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "raynRtdProvider",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "smartadserverBidAdapter",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "yahooAdsBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "tbpbjs",
+        "version": "v8.52.2",
+        "modules": [
+          "schain",
+          "consentManagement",
+          "userId",
+          "intentIqIdSystem",
+          "id5IdSystem",
+          "priceFloors",
+          "schain",
+          "consentManagement",
+          "userId",
+          "intentIqIdSystem",
+          "id5IdSystem",
+          "priceFloors",
+          "cadentApertureMXBidAdapter",
+          "cadentApertureMXBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "tbpbjs",
+        "version": "v8.52.2",
+        "modules": [
+          "schain",
+          "consentManagement",
+          "userId",
+          "intentIqIdSystem",
+          "id5IdSystem",
+          "priceFloors",
+          "schain",
+          "consentManagement",
+          "userId",
+          "intentIqIdSystem",
+          "id5IdSystem",
+          "priceFloors",
+          "cadentApertureMXBidAdapter",
+          "cadentApertureMXBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete",
+        "tbpbjs": "complete"
+      }
+    },
+    "url": "https://myfox28columbus.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 279,
+      "version": "2785",
+      "ccpaApplies": true,
+      "uspString": "1---",
+      "name": "Osano"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.39.0",
+        "modules": [
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "newspassidBidAdapter",
+          "ozoneBidAdapter",
+          "priceFloors",
+          "sharedIdSystem",
+          "tcfControl",
+          "ttdBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://godanriver.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://emersonkent.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://hotelscombined.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://mrplc.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "epbjs",
+        "version": "v9.43.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adyoulikeBidAdapter",
+          "allowActivities",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "cadentApertureMXBidAdapter",
+          "colossussspBidAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "euidIdSystem",
+          "fpdModule",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "inmobiBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "resetdigitalBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videojsVideoProvider",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "epbjs": "complete"
+      }
+    },
+    "url": "https://ajournalofmusicalthings.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://davescomputertips.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://projecttimes.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://usskiteam.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://greenandgoldrugby.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://jabuka.tv"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://animenb.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://coachingtoolbox.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://meteocentre.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "stpd",
+        "version": "v9.27.0",
+        "modules": [
+          "currency",
+          "rtdModule",
+          "userId",
+          "33acrossIdSystem",
+          "lotamePanoramaIdSystem",
+          "hadronIdSystem",
+          "adagioRtdProvider",
+          "id5IdSystem",
+          "sharedIdSystem",
+          "schain",
+          "criteoIdSystem",
+          "smilewantedBidAdapter",
+          "sparteoBidAdapter",
+          "vidazooBidAdapter",
+          "sizeMappingV2",
+          "admaticBidAdapter",
+          "riseBidAdapter",
+          "medianetBidAdapter",
+          "appnexusBidAdapter",
+          "adagioBidAdapter",
+          "prebidServerBidAdapter",
+          "amxBidAdapter",
+          "luponmediaBidAdapter",
+          "nobidBidAdapter",
+          "rtbhouseBidAdapter",
+          "sovrnBidAdapter",
+          "criteoBidAdapter",
+          "smartadserverBidAdapter",
+          "openxBidAdapter",
+          "adfBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "stpd": "complete"
+      }
+    },
+    "url": "https://bolivia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://code-bude.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://kulinarneprzeboje.pl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://reteteangela.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 92,
+      "version": "10",
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://passionetennis.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://sehrivangazetesi.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://croisieurope.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://jewelryexchange.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0",
+      "ID5"
+    ],
+    "cdpPlatforms": [
+      "Segment"
+    ],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "owpbjs",
+        "version": "v6.18.0",
+        "modules": [
+          "33acrossIdSystem",
+          "consentManagement",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "lotamePanoramaIdSystem",
+          "parrableIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "ihowpbjs",
+        "version": "v9.27.0",
+        "modules": [
+          "criteoIdSystem",
+          "id5IdSystem",
+          "lotamePanoramaIdSystem",
+          "pubmaticIHAnalyticsAdapter",
+          "sharedIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "voltaxPlayerPrebid-hvBc-cee0-DIG4-2bGJ",
+        "version": "v9.42.0",
+        "modules": [
+          "adyoulikeBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "colossussspBidAdapter",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "tcfControl",
+          "gridBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "atsAnalyticsAdapter",
+          "ixBidAdapter",
+          "kueezRtbBidAdapter",
+          "minutemediaBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "tripleliftBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "unrulyBidAdapter",
+          "yieldmoBidAdapter",
+          "gptPreAuction",
+          "dfpAdServerVideo",
+          "onetagBidAdapter",
+          "improvedigitalBidAdapter",
+          "vidazooBidAdapter",
+          "pulsepointBidAdapter",
+          "freewheel-sspBidAdapter",
+          "nextMillenniumBidAdapter",
+          "teadsBidAdapter",
+          "hadronIdSystem",
+          "rtdModule",
+          "permutiveRtdProvider",
+          "hadronRtdProvider",
+          "carbonRtdProvider",
+          "carbonAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "imdsBidAdapter",
+          "medianetBidAdapter",
+          "telariaBidAdapter",
+          "riseBidAdapter",
+          "pgamsspBidAdapter",
+          "aniviewBidAdapter",
+          "conversantBidAdapter",
+          "insticatorBidAdapter",
+          "sparteoBidAdapter",
+          "cadentApertureMXBidAdapter",
+          "ttdBidAdapter",
+          "sovrnBidAdapter",
+          "kargoBidAdapter",
+          "acuityadsBidAdapter",
+          "nexx360BidAdapter",
+          "mediafuseBidAdapter",
+          "deepintentBidAdapter",
+          "smilewantedBidAdapter",
+          "resetdigitalBidAdapter",
+          "seedtagBidAdapter",
+          "admaticBidAdapter",
+          "copper6sspBidAdapter",
+          "nobidBidAdapter",
+          "sharedIdSystem",
+          "topicsFpdModule",
+          "inmobiBidAdapter",
+          "pangleBidAdapter",
+          "nativoBidAdapter",
+          "amxIdSystem",
+          "adipoloBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "owpbjs": "complete",
+        "ihowpbjs": "complete",
+        "voltaxPlayerPrebid-hvBc-cee0-DIG4-2bGJ": "complete"
+      }
+    },
+    "url": "https://goskagit.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://ciphertrick.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://superstockscreener.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://voltemosaoevangelho.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://yemeneconomist.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://serbestiyet.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AAHABBENBzFgAAAAAAAgAAAAAAAKagDgA1AGWAO4AjgCPQExAKaAFJQAYAAgtgUgAwABBbAdABgACC2BCADAAEFsAkAGAAILYAAA.YAAAAAQAAAAA",
+      "cmpId": 7,
+      "version": "1",
+      "name": "Didomi"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://trucmuche.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AAcABBENB0FgAAAAAEPgAChQAAAWwABMNCogjLIgRCJQMIIEACgrCACgQBAAAkDRAQAmDApyBgAusJkAIAUAAwQAgABBgACAAASABCIAKACAQAAQCBQABgAQBAQAMDAAGACwEAgABAdAxTAggECwASMyKDTAlAASCAlsqEEgCBBXCEIs8AggREwUAAAIABQEAADwWAhJICViQQBcQTQAAEAAAUQIECKRswBBQGaLQXgyfRkaYBg-YJklMgyAJgjIyTYhN-Ew8chRCghyAAAA.YAAACHwAAAAA",
+      "cmpId": 28,
+      "version": "1",
+      "name": "OneTrust"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://spearswms.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://sporticos.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://jacketflap.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "fsprebid",
+        "version": "v9.44.1",
+        "modules": [
+          "33acrossIdSystem",
+          "adyoulikeBidAdapter",
+          "appnexusBidAdapter",
+          "carbonAnalyticsAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "fabrickIdSystem",
+          "fpdModule",
+          "gameraRtdProvider",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "liveIntentIdSystem",
+          "medianetBidAdapter",
+          "openxBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "riseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "sovrnBidAdapter",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "videoModule",
+          "videojsVideoProvider",
+          "yahooAdsBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "fsprebid": "complete"
+      }
+    },
+    "url": "https://riddles.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://cmportugal.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "hb_ice",
+        "version": "v9.5.0",
+        "modules": [
+          "cadentApertureMXBidAdapter",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "experianRtdProvider",
+          "identityLinkIdSystem",
+          "oguryBidAdapter",
+          "rtdModule",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "smartadserverBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "hb_ice": "complete"
+      }
+    },
+    "url": "https://auburnjournal.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://wajyutu.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "",
+      "cmpId": 10,
+      "version": "61",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.17.0",
+        "modules": [
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "gptPreAuction",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "prebidServerBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "schain",
+          "smartadserverBidAdapter",
+          "tripleliftBidAdapter",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.50.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "euidIdSystem",
+          "fabrickIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gptPreAuction",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "improvedigitalBidAdapter",
+          "inmobiBidAdapter",
+          "ixBidAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "naveggIdSystem",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubmaticIdSystem",
+          "quantcastIdSystem",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldmoBidAdapter",
+          "zeta_global_sspBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete",
+        "vidoomy_pbjs": "complete"
+      }
+    },
+    "url": "https://sampdorianews.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://wittyprofiles.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.53.1",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "schain",
+          "topicsFpdModule",
+          "rtdModule",
+          "contxtfulRtdProvider",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "pubProvidedIdSystem",
+          "fpdModule",
+          "id5IdSystem"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://mrscriddleskitchen.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://andinet.de"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "fsprebid",
+        "version": "v9.44.1",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "appnexusBidAdapter",
+          "bidResponseFilter",
+          "carbonAnalyticsAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "fabrickIdSystem",
+          "fpdModule",
+          "gameraRtdProvider",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "liveIntentIdSystem",
+          "medianetBidAdapter",
+          "openxBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "sovrnBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "videoModule",
+          "videojsVideoProvider",
+          "yahooAdsBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "fsprebid": "complete"
+      }
+    },
+    "url": "https://correctionsone.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://decameron.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "Sovrn"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 92,
+      "version": "10",
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "owpbjs",
+        "version": "v6.18.0",
+        "modules": [
+          "consentManagement",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "ga_pbjs",
+        "version": "v9.3.0-pre",
+        "modules": [
+          "1plusXRtdProvider",
+          "33acrossAnalyticsAdapter",
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "51DegreesRtdProvider",
+          "AsteriobidPbmAnalyticsAdapter",
+          "BTBidAdapter",
+          "a1MediaBidAdapter",
+          "a1MediaRtdProvider",
+          "a4gBidAdapter",
+          "aaxBlockmeterRtdProvider",
+          "ablidaBidAdapter",
+          "acuityadsBidAdapter",
+          "ad2ictionBidAdapter",
+          "adWMGAnalyticsAdapter",
+          "adWMGBidAdapter",
+          "adagioAnalyticsAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adbutlerBidAdapter",
+          "addefendBidAdapter",
+          "adfBidAdapter",
+          "adfusionBidAdapter",
+          "adgenerationBidAdapter",
+          "adhashBidAdapter",
+          "adheseBidAdapter",
+          "adkernelAdnAnalyticsAdapter",
+          "adkernelAdnBidAdapter",
+          "adkernelBidAdapter",
+          "adlooxAnalyticsAdapter",
+          "adlooxAdServerVideo",
+          "adlooxRtdProvider",
+          "admanBidAdapter",
+          "admaruBidAdapter",
+          "admaticBidAdapter",
+          "admediaBidAdapter",
+          "admixerBidAdapter",
+          "admixerIdSystem",
+          "adnowBidAdapter",
+          "adnuntiusBidAdapter",
+          "adnuntiusRtdProvider",
+          "adoceanBidAdapter",
+          "adotBidAdapter",
+          "adpartnerBidAdapter",
+          "adplusBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "adprimeBidAdapter",
+          "adqueryBidAdapter",
+          "adqueryIdSystem",
+          "adrelevantisBidAdapter",
+          "adrinoBidAdapter",
+          "adriverBidAdapter",
+          "adriverIdSystem",
+          "adsinteractiveBidAdapter",
+          "adspiritBidAdapter",
+          "adstirBidAdapter",
+          "adtargetBidAdapter",
+          "adtelligentBidAdapter",
+          "adtelligentIdSystem",
+          "adtrgtmeBidAdapter",
+          "adtrueBidAdapter",
+          "aduptechBidAdapter",
+          "advangelistsBidAdapter",
+          "adxcgAnalyticsAdapter",
+          "adxcgBidAdapter",
+          "adxpremiumAnalyticsAdapter",
+          "adyoulikeBidAdapter",
+          "afpBidAdapter",
+          "agmaAnalyticsAdapter",
+          "aidemBidAdapter",
+          "airgridRtdProvider",
+          "ajaBidAdapter",
+          "akamaiDapRtdProvider",
+          "alkimiBidAdapter",
+          "allowActivities",
+          "ampliffyBidAdapter",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "anPspParamsConverter",
+          "aniviewBidAdapter",
+          "anonymisedRtdProvider",
+          "anyclipBidAdapter",
+          "apacdexBidAdapter",
+          "appierAnalyticsAdapter",
+          "appierBidAdapter",
+          "appnexusAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "appushBidAdapter",
+          "apstreamBidAdapter",
+          "arcspanRtdProvider",
+          "asealBidAdapter",
+          "asoBidAdapter",
+          "asteriobidAnalyticsAdapter",
+          "astraoneBidAdapter",
+          "atsAnalyticsAdapter",
+          "audiencerunBidAdapter",
+          "automatadAnalyticsAdapter",
+          "automatadBidAdapter",
+          "axisBidAdapter",
+          "axonixBidAdapter",
+          "azerionedgeRtdProvider",
+          "beachfrontBidAdapter",
+          "bedigitechBidAdapter",
+          "beopBidAdapter",
+          "betweenBidAdapter",
+          "beyondmediaBidAdapter",
+          "bidViewability",
+          "bidViewabilityIO",
+          "biddoBidAdapter",
+          "bidglassBidAdapter",
+          "bidmaticBidAdapter",
+          "bidscubeBidAdapter",
+          "bidwatchAnalyticsAdapter",
+          "big-richmediaBidAdapter",
+          "blastoBidAdapter",
+          "bliinkBidAdapter",
+          "blueconicRtdProvider",
+          "boldwinBidAdapter",
+          "brandmetricsRtdProvider",
+          "braveBidAdapter",
+          "bridBidAdapter",
+          "bridgewellBidAdapter",
+          "brightMountainMediaBidAdapter",
+          "browsiBidAdapter",
+          "browsiRtdProvider",
+          "bucksenseBidAdapter",
+          "buzzoolaBidAdapter",
+          "byDataAnalyticsAdapter",
+          "c1xBidAdapter",
+          "cadentApertureMXBidAdapter",
+          "carodaBidAdapter",
+          "categoryTranslation",
+          "ccxBidAdapter",
+          "ceeIdSystem",
+          "chtnwBidAdapter",
+          "cleanioRtdProvider",
+          "cleanmedianetBidAdapter",
+          "clickforceBidAdapter",
+          "codefuelBidAdapter",
+          "cointrafficBidAdapter",
+          "coinzillaBidAdapter",
+          "colombiaBidAdapter",
+          "colossussspBidAdapter",
+          "compassBidAdapter",
+          "conceptxBidAdapter",
+          "concertAnalyticsAdapter",
+          "concertBidAdapter",
+          "confiantRtdProvider",
+          "connatixBidAdapter",
+          "connectIdSystem",
+          "connectadBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consumableBidAdapter",
+          "contentexchangeBidAdapter",
+          "contxtfulRtdProvider",
+          "conversantAnalyticsAdapter",
+          "conversantBidAdapter",
+          "copper6sspBidAdapter",
+          "cpmstarBidAdapter",
+          "craftBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "cwireBidAdapter",
+          "czechAdIdSystem",
+          "dacIdSystem",
+          "dailyhuntBidAdapter",
+          "dailymotionBidAdapter",
+          "dataControllerModule",
+          "datablocksAnalyticsAdapter",
+          "datablocksBidAdapter",
+          "datawrkzBidAdapter",
+          "dchain",
+          "debugging",
+          "deepintentBidAdapter",
+          "deepintentDpesIdSystem",
+          "deltaprojectsBidAdapter",
+          "dfpAdServerVideo",
+          "dfpAdpod",
+          "dgkeywordRtdProvider",
+          "dianomiBidAdapter",
+          "discoveryBidAdapter",
+          "displayioBidAdapter",
+          "distroscaleBidAdapter",
+          "dmdIdSystem",
+          "docereeAdManagerBidAdapter",
+          "docereeBidAdapter",
+          "driftpixelBidAdapter",
+          "dsaControl",
+          "dsp_genieeBidAdapter",
+          "dspxBidAdapter",
+          "dxkultureBidAdapter",
+          "dynamicAdBoostRtdProvider",
+          "e_volutionBidAdapter",
+          "edge226BidAdapter",
+          "eightPodAnalyticsAdapter",
+          "eightPodBidAdapter",
+          "emtvBidAdapter",
+          "engageyaBidAdapter",
+          "eplanningBidAdapter",
+          "eskimiBidAdapter",
+          "etargetBidAdapter",
+          "uid2IdSystem_shared",
+          "euidIdSystem",
+          "exadsBidAdapter",
+          "experianRtdProvider",
+          "express",
+          "fabrickIdSystem",
+          "feedadBidAdapter",
+          "finativeBidAdapter",
+          "fintezaAnalyticsAdapter",
+          "flippBidAdapter",
+          "fluctBidAdapter",
+          "fpdModule",
+          "freeWheelAdserverVideo",
+          "freepassBidAdapter",
+          "freepassIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gammaBidAdapter",
+          "gamoshiBidAdapter",
+          "genericAnalyticsAdapter",
+          "geoedgeRtdProvider",
+          "geolocationRtdProvider",
+          "getintentBidAdapter",
+          "gjirafaBidAdapter",
+          "globalsunBidAdapter",
+          "glomexBidAdapter",
+          "gmosspBidAdapter",
+          "gnetBidAdapter",
+          "goldbachBidAdapter",
+          "goldfishAdsRtdProvider",
+          "gothamadsBidAdapter",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "gravitoIdSystem",
+          "greenbidsAnalyticsAdapter",
+          "greenbidsRtdProvider",
+          "gridBidAdapter",
+          "growadvertisingBidAdapter",
+          "growthCodeAnalyticsAdapter",
+          "growthCodeIdSystem",
+          "growthCodeRtdProvider",
+          "gumgumBidAdapter",
+          "h12mediaBidAdapter",
+          "hadronAnalyticsAdapter",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "holidBidAdapter",
+          "hybridBidAdapter",
+          "hypelabBidAdapter",
+          "iasRtdProvider",
+          "id5AnalyticsAdapter",
+          "id5IdSystem",
+          "idImportLibrary",
+          "identityLinkIdSystem",
+          "idxBidAdapter",
+          "idxIdSystem",
+          "illuminBidAdapter",
+          "imRtdProvider",
+          "imdsBidAdapter",
+          "impactifyBidAdapter",
+          "improvedigitalBidAdapter",
+          "imuIdSystem",
+          "incrxBidAdapter",
+          "innityBidAdapter",
+          "insticatorBidAdapter",
+          "instreamTracking",
+          "integr8BidAdapter",
+          "intentIqIdSystem",
+          "interactiveOffersBidAdapter",
+          "intersectionRtdProvider",
+          "invamiaBidAdapter",
+          "invibesBidAdapter",
+          "invisiblyAnalyticsAdapter",
+          "ipromBidAdapter",
+          "iqxBidAdapter",
+          "iqzoneBidAdapter",
+          "ivsBidAdapter",
+          "ixBidAdapter",
+          "jixieBidAdapter",
+          "justIdSystem",
+          "justpremiumBidAdapter",
+          "jwplayerBidAdapter",
+          "jwplayerRtdProvider",
+          "jwplayerVideoProvider",
+          "kargoAnalyticsAdapter",
+          "kargoBidAdapter",
+          "kimberliteBidAdapter",
+          "kinessoIdSystem",
+          "kiviadsBidAdapter",
+          "koblerBidAdapter",
+          "konduitAnalyticsAdapter",
+          "konduitWrapper",
+          "krushmediaBidAdapter",
+          "kubientBidAdapter",
+          "kueezBidAdapter",
+          "kueezRtbBidAdapter",
+          "lassoBidAdapter",
+          "lemmaDigitalBidAdapter",
+          "lifestreetBidAdapter",
+          "limelightDigitalBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "livewrappedAnalyticsAdapter",
+          "livewrappedBidAdapter",
+          "lkqdBidAdapter",
+          "lm_kiviadsBidAdapter",
+          "lmpIdSystem",
+          "lockerdomeBidAdapter",
+          "lockrAIMIdSystem",
+          "loganBidAdapter",
+          "logicadBidAdapter",
+          "loglyliftBidAdapter",
+          "lotamePanoramaIdSystem",
+          "loyalBidAdapter",
+          "luceadBidAdapter",
+          "lunamediahbBidAdapter",
+          "luponmediaBidAdapter",
+          "mabidderBidAdapter",
+          "madvertiseBidAdapter",
+          "magniteAnalyticsAdapter",
+          "malltvAnalyticsAdapter",
+          "malltvBidAdapter",
+          "mantisBidAdapter",
+          "marsmediaBidAdapter",
+          "mathildeadsBidAdapter",
+          "mediabramaBidAdapter",
+          "mediafilterRtdProvider",
+          "mediaforceBidAdapter",
+          "mediafuseBidAdapter",
+          "mediagoBidAdapter",
+          "mediaimpactBidAdapter",
+          "mediakeysBidAdapter",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "medianetRtdProvider",
+          "mediasniperBidAdapter",
+          "mediasquareBidAdapter",
+          "merkleIdSystem",
+          "mgidBidAdapter",
+          "mgidRtdProvider",
+          "mgidXBidAdapter",
+          "microadBidAdapter",
+          "minutemediaBidAdapter",
+          "missenaBidAdapter",
+          "mobfoxpbBidAdapter",
+          "mobianRtdProvider",
+          "multibid",
+          "mwOpenLinkIdSystem",
+          "my6senseBidAdapter",
+          "mygaruIdSystem",
+          "mytargetBidAdapter",
+          "nativeRendering",
+          "nativoBidAdapter",
+          "naveggIdSystem",
+          "netIdSystem",
+          "neuwoRtdProvider",
+          "newspassidBidAdapter",
+          "nextMillenniumBidAdapter",
+          "nextrollBidAdapter",
+          "nexx360BidAdapter",
+          "nobidAnalyticsAdapter",
+          "nobidBidAdapter",
+          "novatiqIdSystem",
+          "oguryBidAdapter",
+          "omsBidAdapter",
+          "oneKeyIdSystem",
+          "oneKeyRtdProvider",
+          "onetagBidAdapter",
+          "onomagicBidAdapter",
+          "ooloAnalyticsAdapter",
+          "open8BidAdapter",
+          "openwebBidAdapter",
+          "openxBidAdapter",
+          "operaadsBidAdapter",
+          "operaadsIdSystem",
+          "opscoBidAdapter",
+          "optableBidAdapter",
+          "optidigitalBidAdapter",
+          "optimeraRtdProvider",
+          "optimonAnalyticsAdapter",
+          "optoutBidAdapter",
+          "orakiBidAdapter",
+          "orbidderBidAdapter",
+          "orbitsoftBidAdapter",
+          "otmBidAdapter",
+          "outbrainBidAdapter",
+          "oxxionAnalyticsAdapter",
+          "oxxionRtdProvider",
+          "ozoneBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "padsquadBidAdapter",
+          "pairIdSystem",
+          "pangleBidAdapter",
+          "performaxBidAdapter",
+          "permutiveRtdProvider",
+          "pgamsspBidAdapter",
+          "pianoDmpAnalyticsAdapter",
+          "pilotxBidAdapter",
+          "pixfutureBidAdapter",
+          "playdigoBidAdapter",
+          "prebidServerBidAdapter",
+          "precisoBidAdapter",
+          "priceFloors",
+          "prismaBidAdapter",
+          "programmaticaBidAdapter",
+          "proxistoreBidAdapter",
+          "pstudioBidAdapter",
+          "pubCircleBidAdapter",
+          "pubProvidedIdSystem",
+          "pubgeniusBidAdapter",
+          "publinkIdSystem",
+          "publirBidAdapter",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "pubperfAnalyticsAdapter",
+          "pubstackAnalyticsAdapter",
+          "pubwiseAnalyticsAdapter",
+          "pubwiseBidAdapter",
+          "pubxBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "pulsepointAnalyticsAdapter",
+          "pulsepointBidAdapter",
+          "pxyzBidAdapter",
+          "qortexRtdProvider",
+          "qtBidAdapter",
+          "quantcastBidAdapter",
+          "quantcastIdSystem",
+          "qwarryBidAdapter",
+          "r2b2BidAdapter",
+          "radsBidAdapter",
+          "rakutenBidAdapter",
+          "raynRtdProvider",
+          "readpeakBidAdapter",
+          "reconciliationRtdProvider",
+          "redtramBidAdapter",
+          "relaidoBidAdapter",
+          "relayBidAdapter",
+          "relevadRtdProvider",
+          "relevantAnalyticsAdapter",
+          "relevantdigitalBidAdapter",
+          "relevatehealthBidAdapter",
+          "resetdigitalBidAdapter",
+          "retailspotBidAdapter",
+          "revcontentBidAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "ringieraxelspringerBidAdapter",
+          "riseBidAdapter",
+          "rivrAnalyticsAdapter",
+          "rixengineBidAdapter",
+          "roxotAnalyticsAdapter",
+          "rtbhouseBidAdapter",
+          "rtbsapeBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "saambaaBidAdapter",
+          "scaleableAnalyticsAdapter",
+          "scatteredBidAdapter",
+          "schain",
+          "seedingAllianceBidAdapter",
+          "seedtagBidAdapter",
+          "setupadBidAdapter",
+          "sharedIdSystem",
+          "sharethroughAnalyticsAdapter",
+          "sharethroughBidAdapter",
+          "shinezBidAdapter",
+          "shinezRtbBidAdapter",
+          "showheroes-bsBidAdapter",
+          "silvermobBidAdapter",
+          "silverpushBidAdapter",
+          "sirdataRtdProvider",
+          "sizeMapping",
+          "sizeMappingV2",
+          "slimcutBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smarthubBidAdapter",
+          "smarticoBidAdapter",
+          "smartxBidAdapter",
+          "smartyadsAnalyticsAdapter",
+          "smartyadsBidAdapter",
+          "smartytechBidAdapter",
+          "smilewantedBidAdapter",
+          "snigelBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "ssmasBidAdapter",
+          "sspBCBidAdapter",
+          "stnBidAdapter",
+          "stroeerCoreBidAdapter",
+          "stvBidAdapter",
+          "sublimeBidAdapter",
+          "taboolaBidAdapter",
+          "tagorasBidAdapter",
+          "talkadsBidAdapter",
+          "tapadIdSystem",
+          "tappxBidAdapter",
+          "targetVideoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "telariaBidAdapter",
+          "temedyaBidAdapter",
+          "terceptAnalyticsAdapter",
+          "theAdxBidAdapter",
+          "themoneytizerBidAdapter",
+          "timeoutRtdProvider",
+          "tncIdSystem",
+          "topLevelPaapi",
+          "topicsFpdModule",
+          "tpmnBidAdapter",
+          "trafficgateBidAdapter",
+          "trionBidAdapter",
+          "tripleliftBidAdapter",
+          "truereachBidAdapter",
+          "ttdBidAdapter",
+          "twistDigitalBidAdapter",
+          "ucfunnelAnalyticsAdapter",
+          "ucfunnelBidAdapter",
+          "uid2IdSystem",
+          "underdogmediaBidAdapter",
+          "undertoneBidAdapter",
+          "unicornBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "utiqIdSystem",
+          "utiqMtpIdSystem",
+          "validationFpdModule",
+          "vdoaiBidAdapter",
+          "ventesBidAdapter",
+          "verizonMediaIdSystem",
+          "viantOrtbBidAdapter",
+          "vibrantmediaBidAdapter",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videobyteBidAdapter",
+          "videoheroesBidAdapter",
+          "videojsVideoProvider",
+          "videonowBidAdapter",
+          "videoreachBidAdapter",
+          "vidoomyBidAdapter",
+          "viewdeosDXBidAdapter",
+          "viouslyBidAdapter",
+          "viqeoBidAdapter",
+          "visiblemeasuresBidAdapter",
+          "visxBidAdapter",
+          "vlybyBidAdapter",
+          "voxBidAdapter",
+          "vrtcalBidAdapter",
+          "vuukleBidAdapter",
+          "waardexBidAdapter",
+          "weboramaRtdProvider",
+          "welectBidAdapter",
+          "widespaceBidAdapter",
+          "winrBidAdapter",
+          "wipesBidAdapter",
+          "xeBidAdapter",
+          "yahooAdsBidAdapter",
+          "yandexAnalyticsAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldlabBidAdapter",
+          "yieldliftBidAdapter",
+          "yieldloveBidAdapter",
+          "yieldmoBidAdapter",
+          "yieldmoSyntheticInventoryModule",
+          "yieldoneAnalyticsAdapter",
+          "yieldoneBidAdapter",
+          "yuktamediaAnalyticsAdapter",
+          "zeotapIdPlusIdSystem",
+          "zetaBidAdapter",
+          "zeta_global_sspAnalyticsAdapter",
+          "zeta_global_sspBidAdapter",
+          "zmaticooBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "eyewisePbjs",
+        "version": "v8.32.0-pre",
+        "modules": [
+          "consentManagement",
+          "consentManagementUsp",
+          "id5IdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "owpbjs": "complete",
+        "ga_pbjs": "complete",
+        "eyewisePbjs": "complete"
+      }
+    },
+    "url": "https://thebaseballpage.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "name": "TrustArc"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v3.7.1",
+        "modules": []
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "partial"
+      }
+    },
+    "url": "https://annonces-marine.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://buyon.pk"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.28.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "appnexusBidAdapter",
+          "automatadAnalyticsAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "identityLinkIdSystem",
+          "ixBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "publinkIdSystem",
+          "pubmaticBidAdapter",
+          "riseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://dootalk.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://intomobile.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v7.54.5",
+        "modules": [
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "brightcomSSPBidAdapter",
+          "consentManagement",
+          "consentManagementGpp",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "distroscaleBidAdapter",
+          "enrichmentFpdModule",
+          "eplanningBidAdapter",
+          "gdprEnforcement",
+          "googleAnalyticsAdapter",
+          "gptPreAuction",
+          "medianetBidAdapter",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sovrnBidAdapter",
+          "teadsBidAdapter",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "ihowpbjs",
+        "version": "v9.13.0",
+        "modules": [
+          "33acrossIdSystem",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "lotamePanoramaIdSystem",
+          "pubmaticIHAnalyticsAdapter",
+          "sharedIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete",
+        "ihowpbjs": "complete"
+      }
+    },
+    "url": "https://oldhouseonline.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://toptropicals.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://monologuearchive.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://hemmetsjournal.se"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AAHABBENBzFgAAAAAAAAAAqIAAAAAACkoAMAAQWwKQAYAAgtgOgAwABBbAhABgACC2ASADAAEFsA.YAAAAAAAAAAA",
+      "cmpId": 7,
+      "version": "1",
+      "name": "Didomi"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://achatpublic.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "name": "TrustArc",
+      "gdprApplies": false
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://oldelpaso.com"
+  },
+  {
+    "libraries": [],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "",
+      "cmpId": 10,
+      "version": "53",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.20.0",
+        "modules": [
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "connectadBidAdapter",
+          "consentManagementTcf",
+          "currency",
+          "id5IdSystem",
+          "justIdSystem",
+          "onetagBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "relevantModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "teadsBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://suomifutis.com"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "ocmpbjs",
+        "version": "v9.37.0",
+        "modules": [
+          "adfBidAdapter",
+          "adsquirrelRtdProvider",
+          "amznBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewabilityIO",
+          "connectadBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dchain",
+          "dfpAdServerVideo",
+          "equativBidAdapter",
+          "fpdModule",
+          "gptPreAuction",
+          "id5IdSystem",
+          "ipromBidAdapter",
+          "ixBidAdapter",
+          "limelightDigitalBidAdapter",
+          "lotamePanoramaIdSystem",
+          "nativeRendering",
+          "ocmPbaAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "outbrainBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "smartadserverBidAdapter",
+          "sovrnBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "ocmpbjs": "complete"
+      }
+    },
+    "url": "https://portalanalitika.me"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://valoresreais.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://turkudostlari.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://filmcrave.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://agentiadepresamondena.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.40.0",
+        "modules": [
+          "allowActivities",
+          "appnexusBidAdapter",
+          "connectIdSystem",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "genericAnalyticsAdapter",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "pairIdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "merkleIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "ozoneBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "stackadaptBidAdapter",
+          "sizeMapping",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "yahooAdsBidAdapter",
+          "fabrickIdSystem",
+          "ftrackIdSystem",
+          "33acrossIdSystem",
+          "33acrossBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "lmpIdSystem",
+          "linkedInAdsIdSystem",
+          "currency"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://whistleandivy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://sc2casts.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://p4panorama.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 6,
+      "version": "1",
+      "name": "Sourcepoint"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://thestrad.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://carlogos.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://fulbox.com"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 10,
+      "version": "53",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "bppbjs",
+        "version": "v4.19.0-pre",
+        "modules": []
+      },
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.50.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "euidIdSystem",
+          "fabrickIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gptPreAuction",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "improvedigitalBidAdapter",
+          "inmobiBidAdapter",
+          "ixBidAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "naveggIdSystem",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubmaticIdSystem",
+          "quantcastIdSystem",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldmoBidAdapter",
+          "zeta_global_sspBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "bppbjs": "partial",
+        "vidoomy_pbjs": "complete"
+      }
+    },
+    "url": "https://diariodearousa.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://e-ohaka.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://ab-ilan.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://kafanews.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://echaimutenan.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://elvikom.pl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://tsware.jp"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "name": "OneTrust"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://forthepeople.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AAHABBENBzFgAAAAAAAgAAAAAAAJigBAEcATEAKSgAwABBbApABgACC2A6ADAAEFsCEAGAAILYBIAMAAQWwA.YAAAAAQAAAAA",
+      "cmpId": 7,
+      "version": "1",
+      "name": "Didomi"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v8.45.0",
+        "modules": [
+          "adfBidAdapter",
+          "adheseBidAdapter",
+          "adomikAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoBidAdapter",
+          "currency",
+          "paapi",
+          "fledgeForGpt",
+          "gdprEnforcement",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "ixBidAdapter",
+          "priceFloors",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "spotxBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://roomed.nl"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "stpd",
+        "version": "v9.27.0",
+        "modules": [
+          "consentManagementTcf",
+          "currency",
+          "userId",
+          "gptPreAuction",
+          "33acrossIdSystem",
+          "lotamePanoramaIdSystem",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "sharedIdSystem",
+          "schain",
+          "criteoIdSystem",
+          "medianetBidAdapter",
+          "prebidServerBidAdapter",
+          "amxBidAdapter",
+          "luponmediaBidAdapter",
+          "rtbhouseBidAdapter",
+          "pulsepointBidAdapter",
+          "criteoBidAdapter",
+          "smartadserverBidAdapter",
+          "pubmaticBidAdapter",
+          "openxBidAdapter",
+          "adfBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "stpd": "complete"
+      }
+    },
+    "url": "https://tritaskis.lt"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://beritatrans.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0",
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "__pmc_atlasmg_pbjs",
+        "version": "v9.36.0",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementGpp",
+          "tcfControl",
+          "unifiedIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "identityLinkIdSystem",
+          "liveIntentIdSystem",
+          "userId",
+          "priceFloors",
+          "schain",
+          "fpdModule",
+          "topicsFpdModule",
+          "paapi",
+          "paapiForGpt",
+          "amxBidAdapter",
+          "criteoBidAdapter",
+          "kargoBidAdapter",
+          "prebidServerBidAdapter",
+          "rubiconBidAdapter",
+          "ttdBidAdapter",
+          "seedtagBidAdapter",
+          "teadsBidAdapter",
+          "telariaBidAdapter",
+          "undertoneBidAdapter",
+          "permutiveRtdProvider",
+          "rtdModule",
+          "pubProvidedIdSystem",
+          "tripleliftBidAdapter",
+          "sovrnBidAdapter",
+          "gumgumBidAdapter",
+          "appnexusBidAdapter",
+          "ixBidAdapter"
+        ]
+      },
+      {
+        "globalVarName": "scpbjs",
+        "version": "v8.40.0",
+        "modules": [
+          "appnexusBidAdapter",
+          "consentManagement",
+          "consentManagementGpp",
+          "consentManagementUsp",
+          "enrichmentFpdModule",
+          "fpdModule",
+          "gdprEnforcement",
+          "gridBidAdapter",
+          "ixBidAdapter",
+          "kargoAnalyticsAdapter",
+          "kargoBidAdapter",
+          "medianetBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "sharedIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "__pmc_atlasmg_pbjs": "complete",
+        "scpbjs": "complete"
+      }
+    },
+    "url": "https://njfamily.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://beautytester.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://shothotspot.com"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "",
+      "cmpId": 10,
+      "version": "61",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.11.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "adqueryBidAdapter",
+          "adrinoBidAdapter",
+          "adtelligentBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "connectadBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "etargetBidAdapter",
+          "id5IdSystem",
+          "justIdSystem",
+          "openxBidAdapter",
+          "richaudienceBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sovrnBidAdapter",
+          "sspBCBidAdapter",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "userId",
+          "visxBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://ekai.pl"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://otyrar.kz"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "1.x"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.53.1",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "schain",
+          "topicsFpdModule",
+          "rtdModule",
+          "contxtfulRtdProvider",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "pubProvidedIdSystem",
+          "fpdModule",
+          "id5IdSystem"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://ourpaleolife.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://thetechmentor.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "1.x"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.53.1",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "schain",
+          "topicsFpdModule",
+          "rtdModule",
+          "contxtfulRtdProvider",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "pubProvidedIdSystem",
+          "fpdModule",
+          "id5IdSystem"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://thecrazytourist.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://trash-mail.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 92,
+      "version": "10",
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbams",
+        "version": "v9.51.0-pre",
+        "modules": [
+          "adagioBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "currency",
+          "equativBidAdapter",
+          "gptPreAuction",
+          "improvedigitalBidAdapter",
+          "justpremiumBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "priceFloors",
+          "quantcastBidAdapter",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sirdataRtdProvider",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sublimeBidAdapter",
+          "teadsBidAdapter",
+          "timeoutRtdProvider",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "eanpbjs",
+        "version": "v8.39.0-pre",
+        "modules": [
+          "appnexusBidAdapter",
+          "consentManagement",
+          "criteoIdSystem",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "lotamePanoramaIdSystem",
+          "outbrainBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      },
+      {
+        "globalVarName": "vidoomy_pbjs",
+        "version": "v9.50.0-pre",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "bidViewability",
+          "consentManagementTcf",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "euidIdSystem",
+          "fabrickIdSystem",
+          "freewheel-sspBidAdapter",
+          "ftrackIdSystem",
+          "gptPreAuction",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "improvedigitalBidAdapter",
+          "inmobiBidAdapter",
+          "ixBidAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "mediagoBidAdapter",
+          "medianetBidAdapter",
+          "naveggIdSystem",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubmaticIdSystem",
+          "quantcastIdSystem",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharethroughBidAdapter",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "tripleliftBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidoomyBidAdapter",
+          "yandexBidAdapter",
+          "yandexIdSystem",
+          "yieldmoBidAdapter",
+          "zeta_global_sspBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbams": "complete",
+        "eanpbjs": "complete",
+        "vidoomy_pbjs": "complete"
+      }
+    },
+    "url": "https://theriderpost.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0",
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "epbjs",
+        "version": "v9.43.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adyoulikeBidAdapter",
+          "allowActivities",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "cadentApertureMXBidAdapter",
+          "colossussspBidAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "euidIdSystem",
+          "fpdModule",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "inmobiBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "resetdigitalBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videojsVideoProvider",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "epbjs": "complete"
+      }
+    },
+    "url": "https://calendariodecolombia.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://zohreanaforum.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://darktarot.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://slevajakbrno.cz"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://easybird.in"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://magiclen.org"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 21,
+      "version": "2"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.32.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "adyoulikeBidAdapter",
+          "agmaAnalyticsAdapter",
+          "appnexusBidAdapter",
+          "connectadBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "defineMediaBidAdapter",
+          "dfpAdServerVideo",
+          "dspxBidAdapter",
+          "freewheel-sspBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "impactifyBidAdapter",
+          "improvedigitalBidAdapter",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "justpremiumBidAdapter",
+          "medianetBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "orbidderBidAdapter",
+          "outbrainBidAdapter",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "sparteoBidAdapter",
+          "targetVideoBidAdapter",
+          "teadsBidAdapter",
+          "telariaBidAdapter",
+          "ttdBidAdapter",
+          "unifiedIdSystem",
+          "userId",
+          "utiqIdSystem",
+          "visxBidAdapter",
+          "yieldlabBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://boyens-medien.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://motionnemotions.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v10.2.0",
+        "modules": [
+          "advertisingBidAdapter",
+          "appnexusBidAdapter",
+          "colombiaBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "gamAdServerVideo",
+          "dfpAdServerVideo",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "inmobiBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "medianetBidAdapter",
+          "openxBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "smarthubBidAdapter",
+          "smilewantedBidAdapter",
+          "taboolaBidAdapter",
+          "taboolaIdSystem",
+          "tcfControl",
+          "teadsBidAdapter",
+          "teadsIdSystem",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://toi.in"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "",
+      "cmpId": 10,
+      "version": "61",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "r89_pbjs",
+        "version": "v9.35",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adfBidAdapter",
+          "adheseBidAdapter",
+          "adpod",
+          "adponeBidAdapter",
+          "anPspParamsConverter",
+          "appnexusBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "currency",
+          "dfpAdServerVideo",
+          "equativBidAdapter",
+          "freewheel-sspBidAdapter",
+          "genericAnalyticsAdapter",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "improvedigitalBidAdapter",
+          "invibesBidAdapter",
+          "justpremiumBidAdapter",
+          "kueezRtbBidAdapter",
+          "missenaBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "outbrainBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "rhythmoneBidAdapter",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "showheroes-bsBidAdapter",
+          "sizeMappingV2",
+          "smaatoBidAdapter",
+          "smartadserverBidAdapter",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "teadsBidAdapter",
+          "timeoutRtdProvider",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "r89_pbjs": "complete"
+      }
+    },
+    "url": "https://vemostv.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://skiutah.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YN-"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://fratellirossetti.com"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "epbjs",
+        "version": "v9.43.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adyoulikeBidAdapter",
+          "allowActivities",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "cadentApertureMXBidAdapter",
+          "colossussspBidAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "euidIdSystem",
+          "fpdModule",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "inmobiBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "resetdigitalBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videojsVideoProvider",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "epbjs": "complete"
+      }
+    },
+    "url": "https://psdtemplatesblog.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://wetpixel.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.52.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "appnexusBidAdapter",
+          "automatadAnalyticsAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "identityLinkIdSystem",
+          "ixBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "publinkIdSystem",
+          "pubmaticBidAdapter",
+          "riseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://chryslerminivan.net"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 9,
+      "version": "6"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.53.1",
+        "modules": [
+          "33acrossIdSystem",
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "adgridBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "deepintentDpesIdSystem",
+          "dfpAdServerVideo",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "humansecurityRtdProvider",
+          "id5IdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "medianetBidAdapter",
+          "openxBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sovrnBidAdapter",
+          "tcfControl",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://equalizersoccer.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AA_AFAITB0FgAAAAAEPgAAAAAAATVaD-N-62uLd4HCuw_bIcxAvj7AG1YhCCA0SQsgLkHUl6RgtLMBkSAEAQUQAMiAARmiCQAJQIDCAiKBAAQACSgGYAIABAGAQQMBBAGQigICAAACeExKGMAAzydT8YCrzEhIZySXNuJkAAzBHamBSAsgCAREgEwAKIdLAgAABxGAorIiFpBKB4YXQAAUAACN_INDDRKwdxZOSjDQiwAAAA.YAAAD_wAAAAA",
+      "cmpId": 63,
+      "version": "5"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pgPrebid",
+        "version": "v9.41.0",
+        "modules": [
+          "adfBidAdapter",
+          "appnexusBidAdapter",
+          "cointrafficBidAdapter",
+          "consentManagementTcf",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "fpdModule",
+          "gptPreAuction",
+          "id5IdSystem",
+          "idImportLibrary",
+          "improvedigitalBidAdapter",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "oguryBidAdapter",
+          "openxBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "pubxaiRtdProvider",
+          "r2b2BidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "smartadserverBidAdapter",
+          "sublimeBidAdapter",
+          "taboolaBidAdapter",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pgPrebid": "complete"
+      }
+    },
+    "url": "https://dizy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://stylishlyme.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://fungooms.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 10,
+      "version": "53",
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.28.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "appnexusBidAdapter",
+          "automatadAnalyticsAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "identityLinkIdSystem",
+          "ixBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "publinkIdSystem",
+          "pubmaticBidAdapter",
+          "riseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://routerforums.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://otdelka-expert.ru"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://stechno.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://aakashweb.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://hanakuro.jp"
+  },
+  {
+    "libraries": [
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [
+      "Tealium"
+    ],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "CQU9E0AQU9E0AB7FnBITB0FsAP_gAEPgAAAAJltB7C7NaWFCyKR3YLsEMIwDxdBAQsQgAASAAGABQAKQIJQCgkAYJAyABCACAAIAIGRBIQIECABAAUAAAAAAAAAEAACAAAAIAAAAgAAAAQAIAAgCAIEAEAAIgAAAEgAQmAgAAAAAWAAAgAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAICgAAQIQQAAAAAAAQAAAAAAAAAAAAAAgAACC1cEkABYADwAKgAXAA4ACAAEgAKgAZAA0ABwADwAIYATAAoABVAC6AGIANAAfgBCACIAEcAJwAUYArQBgADDAGaAOQAewA_QCEAEWAI4ASYAxQBnwDaAHEAReAjwBKoChwFIgKbAXmAvoBf4DJIGTAZOA1UBuYDtgHigPPAgoBCECNIEiAJKASjAmSBMsCiwFHAKpAVZArABXMCvoFigLVgAA",
+      "cmpId": 123,
+      "version": "359"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "owpbjs",
+        "version": "v9.41.0",
+        "modules": [
+          "anonymisedRtdProvider",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "auctionUserDetails",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "fpdModule",
+          "geoDetection",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "instreamTracking",
+          "invibesBidAdapter",
+          "ixBidAdapter",
+          "lotamePanoramaIdSystem",
+          "pairIdSystem",
+          "prebidJSDebugUI",
+          "priceFloors",
+          "pubmaticAnalyticsAdapter",
+          "pubmaticAutoRefresh",
+          "pubmaticBidAdapter",
+          "rtdModule",
+          "schain",
+          "tcfControl",
+          "topicsFpdModule",
+          "unifiedIdSystem",
+          "userId"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "owpbjs": "complete"
+      }
+    },
+    "url": "https://crocierissime.it"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "1.x"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.53.1",
+        "modules": [
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "consentManagementGpp",
+          "ixBidAdapter",
+          "pubmaticBidAdapter",
+          "rubiconBidAdapter",
+          "tripleliftBidAdapter",
+          "schain",
+          "topicsFpdModule",
+          "rtdModule",
+          "contxtfulRtdProvider",
+          "userId",
+          "identityLinkIdSystem",
+          "unifiedIdSystem",
+          "sharedIdSystem",
+          "criteoIdSystem",
+          "33acrossIdSystem",
+          "pairIdSystem",
+          "pubProvidedIdSystem",
+          "fpdModule",
+          "id5IdSystem"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://savoredjourneys.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 92,
+      "version": "10",
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.36.0",
+        "modules": [
+          "adyoulikeBidAdapter",
+          "appnexusBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "fpdModule",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "improvedigitalBidAdapter",
+          "luceadBidAdapter",
+          "mediasquareBidAdapter",
+          "multibid",
+          "priceFloors",
+          "richaudienceBidAdapter",
+          "smilewantedBidAdapter",
+          "sublimeBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "validationFpdModule",
+          "videoModule",
+          "videojsVideoProvider"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://mijn-tv-gids.be"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.40.0",
+        "modules": [
+          "allowActivities",
+          "appnexusBidAdapter",
+          "connectIdSystem",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "genericAnalyticsAdapter",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "pairIdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "merkleIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "ozoneBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "stackadaptBidAdapter",
+          "sizeMapping",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "yahooAdsBidAdapter",
+          "fabrickIdSystem",
+          "ftrackIdSystem",
+          "33acrossIdSystem",
+          "33acrossBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "lmpIdSystem",
+          "linkedInAdsIdSystem",
+          "currency"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://mostlyhomemademom.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://beauty-park.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://vagarena.fi"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://verkehrsinfo.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://beijingiphonerepair.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://kodim3u.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://dbrnd.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://musicfm.hu"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---",
+      "name": "OneTrust",
+      "gdprApplies": false
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "mmPrebid",
+        "version": "v9.41.0",
+        "modules": [
+          "MMBidAdapter",
+          "acuityadsBidAdapter",
+          "adyoulikeBidAdapter",
+          "appnexusBidAdapter",
+          "cadentApertureMXBidAdapter",
+          "colossussspBidAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "conversantBidAdapter",
+          "criteoBidAdapter",
+          "feedadBidAdapter",
+          "fpdModule",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "improvedigitalBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentIdSystem",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nativoBidAdapter",
+          "nextMillenniumBidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pgamsspBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "richaudienceBidAdapter",
+          "riseBidAdapter",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharethroughBidAdapter",
+          "smartadserverBidAdapter",
+          "smilewantedBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "viantOrtbBidAdapter",
+          "vidazooBidAdapter",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "mmPrebid": "complete"
+      }
+    },
+    "url": "https://editorinleaf.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.40.0",
+        "modules": [
+          "allowActivities",
+          "appnexusBidAdapter",
+          "connectIdSystem",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "genericAnalyticsAdapter",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "pairIdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "merkleIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "ozoneBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "stackadaptBidAdapter",
+          "sizeMapping",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "yahooAdsBidAdapter",
+          "fabrickIdSystem",
+          "ftrackIdSystem",
+          "33acrossIdSystem",
+          "33acrossBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "lmpIdSystem",
+          "linkedInAdsIdSystem",
+          "currency"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://homecookingadventure.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [
+      "Segment",
+      "Adobe"
+    ],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://seomoz.org"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---",
+      "name": "Cookiebot",
+      "consentString": "0"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://neostar.hr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://urbania.cl"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 10,
+      "version": "56",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "fusePbjs",
+        "version": "v8.52.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "adagioBidAdapter",
+          "amxBidAdapter",
+          "appnexusBidAdapter",
+          "connectadBidAdapter",
+          "consentManagement",
+          "consentManagementGpp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "gameraRtdProvider",
+          "gptPreAuction",
+          "id5IdSystem",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "kueezRtbBidAdapter",
+          "limelightDigitalBidAdapter",
+          "medianetBidAdapter",
+          "nobidBidAdapter",
+          "oguryBidAdapter",
+          "omsBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "pairIdSystem",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "pubxaiAnalyticsAdapter",
+          "richaudienceBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "userId",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "fusePbjs": "complete"
+      }
+    },
+    "url": "https://hhhhappy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://emathima.gr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://eliteclubsnationalleague.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://wiemy.to"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://mrwgifs.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://purple.fr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://gamebusiness.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://pointchaser.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://finyear.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://domimmo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://blogadr.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNN"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://brooklynpaper.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---",
+      "name": "Cookiebot",
+      "consentString": "0"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://planungswelten.de"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://appsafari.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://laurasava.ro"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "name": "OneTrust",
+      "gdprApplies": false
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://inogen.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://gun-tests.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://newcar-design.com"
+  },
+  {
+    "libraries": [
+      "Criteo"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "consentString": "CQU9E0AQU9E0AAcABBROB0FgAAAAAEPgAChQAAAWwABMNCogjJIgRCJQMIIEACgrCACgQBAAAkBRAQAmDApyBgAusJkAIAUAAwQAgABBgACAAASABCIAKACAQAAACBQABgAAAAQAMDAAGACwEAgABAdAxTAggECwASMyKDSAlAASCAlsqEEgCBBXCEIs8AggREwUAAAIABQEAADwWAhJICViQQBcQTQAAEAAAUQIECKRowBBQGaLQXgyfRkaYBgaYBklMgyAJgjIyTYhN-Ew8chRCghyAKEgBgA0AGUAvMdADABoAMoBeZKACAvMpADABoAe0BeZQACAMoAA.YAAACHwAAAAA",
+      "cmpId": 28,
+      "version": "1",
+      "name": "OneTrust"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://livescore.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": true,
+      "consentString": "",
+      "cmpId": 10,
+      "version": "53",
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "AdmanpbjsV",
+        "version": "v9.27.0",
+        "modules": []
+      },
+      {
+        "globalVarName": "Admanpbjs",
+        "version": "v9.26.0",
+        "modules": []
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "AdmanpbjsV": "complete",
+        "Admanpbjs": "complete"
+      }
+    },
+    "url": "https://xanthinea.gr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://eskana.gr"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "UID2.0",
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "consentString": "",
+      "cmpId": 299,
+      "version": "10"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "epbjs",
+        "version": "v9.43.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adyoulikeBidAdapter",
+          "allowActivities",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "cadentApertureMXBidAdapter",
+          "colossussspBidAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "euidIdSystem",
+          "fpdModule",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "inmobiBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "resetdigitalBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videojsVideoProvider",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "epbjs": "complete"
+      }
+    },
+    "url": "https://sanovnik.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://aioucheats.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://care-mado.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://teknokenar.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://wineanorak.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://1dubaijobs.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://vitalitymagazine.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1---"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://worthplaying.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://wpteq.org"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://crafts-beautiful.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.40.0",
+        "modules": [
+          "allowActivities",
+          "appnexusBidAdapter",
+          "connectIdSystem",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "dfpAdServerVideo",
+          "genericAnalyticsAdapter",
+          "gptPreAuction",
+          "gridBidAdapter",
+          "gumgumBidAdapter",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "pairIdSystem",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "merkleIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "ozoneBidAdapter",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubmaticBidAdapter",
+          "rtbhouseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "stackadaptBidAdapter",
+          "sizeMapping",
+          "teadsBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "uid2IdSystem_shared",
+          "uid2IdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "yahooAdsBidAdapter",
+          "fabrickIdSystem",
+          "ftrackIdSystem",
+          "33acrossIdSystem",
+          "33acrossBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "lmpIdSystem",
+          "linkedInAdsIdSystem",
+          "currency"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://boysahoy.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://suomienglantisanakirja.fi"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "ats"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "cmpId": 10,
+      "version": "53",
+      "ccpaApplies": true,
+      "uspString": "1YNY"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "pbjs",
+        "version": "v9.52.0",
+        "modules": [
+          "adagioBidAdapter",
+          "adagioRtdProvider",
+          "appnexusBidAdapter",
+          "automatadAnalyticsAdapter",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoIdSystem",
+          "gppControl_usnat",
+          "gppControl_usstates",
+          "gptPreAuction",
+          "hadronIdSystem",
+          "hadronRtdProvider",
+          "identityLinkIdSystem",
+          "ixBidAdapter",
+          "kueezRtbBidAdapter",
+          "liveIntentIdSystem",
+          "nativoBidAdapter",
+          "openxBidAdapter",
+          "optidigitalBidAdapter",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "publinkIdSystem",
+          "pubmaticBidAdapter",
+          "riseBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "s2sTesting",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "sovrnBidAdapter",
+          "taboolaBidAdapter",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "unifiedIdSystem",
+          "userId",
+          "vidazooBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "pbjs": "complete"
+      }
+    },
+    "url": "https://volkszone.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://techyv.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://cartedipagamento.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://apnotes.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://raovatquynhon.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://sobreleyendas.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://objets-caches.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://florinrosoga.ro"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://tophealthnews.net"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://agrinioculture.gr"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://webplus.info"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://techwave.jp"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://annisast.com"
+  },
+  {
+    "libraries": [
+      "apstag",
+      "googletag",
+      "Criteo"
+    ],
+    "identitySolutions": [
+      "ID5"
+    ],
+    "cdpPlatforms": [],
+    "cmpInfo": {
+      "tcfVersion": "2.x",
+      "gdprApplies": false,
+      "consentString": "",
+      "cmpId": 299,
+      "version": "10"
+    },
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [
+      {
+        "globalVarName": "epbjs",
+        "version": "v9.43.0",
+        "modules": [
+          "33acrossBidAdapter",
+          "33acrossIdSystem",
+          "adyoulikeBidAdapter",
+          "allowActivities",
+          "amxBidAdapter",
+          "amxIdSystem",
+          "appnexusBidAdapter",
+          "atsAnalyticsAdapter",
+          "cadentApertureMXBidAdapter",
+          "colossussspBidAdapter",
+          "connectIdSystem",
+          "consentManagementGpp",
+          "consentManagementTcf",
+          "consentManagementUsp",
+          "criteoBidAdapter",
+          "criteoIdSystem",
+          "currency",
+          "dfpAdServerVideo",
+          "euidIdSystem",
+          "fpdModule",
+          "gptPreAuction",
+          "gumgumBidAdapter",
+          "hadronIdSystem",
+          "id5IdSystem",
+          "identityLinkIdSystem",
+          "inmobiBidAdapter",
+          "insticatorBidAdapter",
+          "ixBidAdapter",
+          "kargoBidAdapter",
+          "liveIntentAnalyticsAdapter",
+          "liveIntentIdSystem",
+          "lotamePanoramaIdSystem",
+          "medianetAnalyticsAdapter",
+          "medianetBidAdapter",
+          "minutemediaBidAdapter",
+          "nexx360BidAdapter",
+          "oguryBidAdapter",
+          "onetagBidAdapter",
+          "openxBidAdapter",
+          "paapi",
+          "paapiForGpt",
+          "pairIdSystem",
+          "prebidServerBidAdapter",
+          "priceFloors",
+          "pubProvidedIdSystem",
+          "pubmaticBidAdapter",
+          "quantcastIdSystem",
+          "resetdigitalBidAdapter",
+          "rtdModule",
+          "rubiconBidAdapter",
+          "schain",
+          "seedtagBidAdapter",
+          "sharedIdSystem",
+          "sharethroughBidAdapter",
+          "sizeMappingV2",
+          "smartadserverBidAdapter",
+          "sonobiBidAdapter",
+          "sovrnBidAdapter",
+          "sparteoBidAdapter",
+          "tcfControl",
+          "teadsBidAdapter",
+          "topicsFpdModule",
+          "tripleliftBidAdapter",
+          "ttdBidAdapter",
+          "uid2IdSystem",
+          "undertoneBidAdapter",
+          "unifiedIdSystem",
+          "unrulyBidAdapter",
+          "userId",
+          "vidazooBidAdapter",
+          "videoModule",
+          "videojsVideoProvider",
+          "yieldmoBidAdapter"
+        ]
+      }
+    ],
+    "toolMetadata": {
+      "prebidInitStates": {
+        "epbjs": "complete"
+      }
+    },
+    "url": "https://japonismo.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://cramgaming.com"
+  },
+  {
+    "libraries": [
+      "googletag"
+    ],
+    "identitySolutions": [],
+    "cdpPlatforms": [],
+    "cmpInfo": {},
+    "unknownAdTech": [],
+    "date": "2025-07-22",
+    "prebidInstances": [],
+    "url": "https://gedichte-fuer-alle-faelle.de"
+  }
+]
