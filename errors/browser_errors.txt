@@ -490,3 +490,9 @@
 [2025-07-23T18:29:08.223Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://wp-amazon-plugin.com | Message: Attempted to use detached Frame '71E9BACA9CFAEC7712241664CF0220AE'.
 [2025-07-23T18:56:52.081Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://goingnatural.it | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-07-23T19:54:46.842Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://pika.fr | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-24T14:25:40.939Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://tuttasalute.net | Message: Execution context was destroyed, most likely because of a navigation.
+[2025-07-24T15:42:47.496Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://creativespirits.info | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-24T17:00:57.617Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://cio-online.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-07-24T17:54:55.395Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://berkat.ru | Message: Attempted to use detached Frame '170AD9CD911E52A5FC995DDE8FCCA436'.
+[2025-07-24T19:16:56.165Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://watchtalkforums.info | Message: Attempted to use detached Frame '03E70CBFE01B2942FFD98ECAF15AC5FF'.
+[2025-07-24T20:54:43.101Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://dailyaudiophile.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
