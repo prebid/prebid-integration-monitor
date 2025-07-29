@@ -519,3 +519,9 @@
 [2025-07-28T14:58:17.144Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://ukrrudprom.ua | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-07-28T19:21:14.949Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://bebemaison.gr | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-07-28T20:11:36.226Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://koshervitamins.com | Message: Attempted to use detached Frame 'FA7039146BF480CA933B515298496733'.
+[2025-07-29T15:53:34.199Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://promart.pe | Message: Attempted to use detached Frame '55E9C7934D772DCB8FA0FE1DC422F43F'.
+[2025-07-29T18:32:31.243Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://kashannews.net | Message: Execution context was destroyed, most likely because of a navigation.
+[2025-07-29T19:07:19.646Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://frugalvillage.com | Message: Attempted to use detached Frame '7C83239E228B9AB0C01401DF8D7530CE'.
+[2025-07-29T21:01:18.405Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://cruzetalk.com | Message: Attempted to use detached Frame '46C703EB4AE9C23DE356A0447E46F8B9'.
+[2025-07-29T21:21:57.273Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://domestically-speaking.com | Message: Attempted to use detached Frame '366FC6BF0AC5B242572C6EE8B48456B1'.
+[2025-07-29T22:00:40.318Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://elbutanero.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
