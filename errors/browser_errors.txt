@@ -597,3 +597,5 @@
 [2025-08-03T13:44:30.317Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://economistgroup.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-08-03T18:27:17.635Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://evanstonnow.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-08-03T20:13:14.745Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://familyleisure.com | Message: Attempted to use detached Frame 'E815DA16590F953236D7DCEDD7F27E10'.
+[2025-08-03T21:59:14.257Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://afternoondc.in | Message: Attempted to use detached Frame 'D35B726791E543F098F069DFE2B9FC42'.
+[2025-08-04T00:49:59.093Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://mediamond.it | Message: Attempted to use detached Frame 'E24D00FED03261459FDC0A78D335E677'.
