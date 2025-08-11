@@ -634,3 +634,7 @@
 [2025-08-06T13:19:28.379Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://smalldogplace.com | Message: Attempted to use detached Frame '0191A1D4056B7026E532564D89DE1646'.
 [2025-08-06T16:40:58.163Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://mamanija.lt | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-08-06T18:24:19.211Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://booksjournal.gr | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-11T03:58:16.417Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://eaparts.gr | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-11T04:07:23.334Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://pentesteracademy.com | Message: Execution context was destroyed, most likely because of a navigation.
+[2025-08-11T04:31:05.664Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://latribunadelpaisvasco.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-11T05:27:39.548Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://activitytoysdirect.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
