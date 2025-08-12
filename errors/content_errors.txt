@@ -4,3 +4,5 @@
 [2025-06-29T03:48:51.140Z] | Category: content/availability | Phase: data_extraction | Code: PAGE_UNAVAILABLE | URL: https://google.com | Message: Page appears to be unavailable or redirected to error page (Google) | Metadata: {"pageTitle":"Google"}
 [2025-06-29T03:48:56.001Z] | Category: content/availability | Phase: data_extraction | Code: PAGE_UNAVAILABLE | URL: https://youtube.com | Message: Page appears to be unavailable or redirected to error page (YouTube) | Metadata: {"pageTitle":"YouTube"}
 [2025-06-29T03:48:59.089Z] | Category: content/availability | Phase: data_extraction | Code: PAGE_UNAVAILABLE | URL: https://facebook.com | Message: Page appears to be unavailable or redirected to error page (Facebook - log in or sign up) | Metadata: {"pageTitle":"Facebook - log in or sign up"}
+[2025-08-11T17:25:54.236Z] | Category: content/http_error | Phase: data_extraction | Code: SERVER_ERROR | URL: https://r500m.com | Message: net::ERR_TIMED_OUT at https://r500m.com
+[2025-08-12T06:47:56.834Z] | Category: content/http_error | Phase: data_extraction | Code: PAGE_NOT_FOUND | URL: https://yes2404.com | Message: net::ERR_ABORTED at https://yes2404.com
