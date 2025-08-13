@@ -672,3 +672,7 @@
 [2025-08-13T06:52:45.676Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://dfgay.net | Message: Execution context was destroyed, most likely because of a navigation.
 [2025-08-13T07:28:44.914Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://stavkiprognozy.ru | Message: Attempted to use detached Frame '6D8BA83C8BEA617FECB407C9496D18FD'.
 [2025-08-13T07:53:50.590Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://upb.ro | Message: Attempted to use detached Frame '20F577AF58846A56EC71B4419017BAB3'.
+[2025-08-13T16:45:47.929Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://yasisland.ae | Message: Attempted to use detached Frame '58DE9C16E1B16543FE3AB1B719049BA5'.
+[2025-08-13T19:41:34.867Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://routehappy.com | Message: Attempted to use detached Frame 'A7ABB6E2FC3527A944598D367D280D7D'.
+[2025-08-13T20:33:06.615Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://punkadeka.it | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-13T22:28:59.157Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://fayard.fr | Message: Protocol error (Runtime.callFunctionOn): Target closed
