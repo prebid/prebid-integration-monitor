@@ -751,3 +751,6 @@
 [2025-08-16T20:10:36.532Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://familienkultour.de | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-08-16T20:34:09.994Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://homesc.com | Message: Attempted to use detached Frame 'D6C525C75E7FC70CE75203B1463346B9'.
 [2025-08-16T21:37:57.476Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://motocrosscenter.com | Message: Attempted to use detached Frame '0A2182ECF1DD7BD5E74FB3D925EA6DE3'.
+[2025-08-18T15:06:33.694Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://dbalears.cat | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-18T15:39:44.604Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://travelbullz.com | Message: Attempted to use detached Frame '9F51E9A2607A952C901F7119BAA5A8D8'.
+[2025-08-18T16:55:44.888Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://quiparier.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
