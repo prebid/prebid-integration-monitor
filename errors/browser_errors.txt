@@ -767,3 +767,17 @@
 [2025-08-21T04:51:49.056Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://scoutsixteen.com | Message: Attempted to use detached Frame '2604CFD65C35E0430445FA242359BD7C'.
 [2025-08-21T04:52:55.328Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://relativelyinteresting.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
 [2025-08-21T05:47:15.863Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://josemief.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-22T22:32:00.870Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://soyyooestacaido.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-22T23:17:41.859Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://immi.se | Message: Attempted to use detached Frame '8670656F7A0D70AA9D98DC0DE16F6D5E'.
+[2025-08-23T00:16:52.794Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://racketspecialisten.se | Message: Attempted to use detached Frame 'D69EC53971204BBD1B834FEFC96558F9'.
+[2025-08-23T00:50:01.332Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://journalauto.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-23T00:53:34.649Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://driverdb.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-23T03:17:26.790Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://sat-tv-radio.hu | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-23T04:21:52.033Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://opptrends.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-08-23T04:41:47.459Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://kralici.cz | Message: Execution context was destroyed
+[2025-08-23T04:41:49.540Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://decathlon.hr | Message: Attempted to use detached Frame '4D2AAE158563339599E453E2203BBE5A'.
+[2025-08-23T04:41:50.680Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://loveineurope.com | Message: Attempted to use detached Frame 'B787EC9433A7C64D4DE7C24603BD08A0'.
+[2025-08-23T04:57:09.627Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://the-other-store.com | Message: Attempted to use detached Frame '28FE00788EA3D94019468C7824D199F2'.
+[2025-08-23T04:57:09.665Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://toyotapartznet.com | Message: Attempted to use detached Frame 'DA1C1277A4C43DE12EA85514CB051E69'.
+[2025-08-23T04:57:09.994Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://manjemedia.com | Message: Attempted to use detached Frame '9F9A5D0F4A8FA7EEE2EB8988D8B125B0'.
+[2025-08-23T05:46:56.394Z] | Category: browser/session | Phase: data_extraction | Code: BROWSER_SESSION_CLOSED | URL: https://adventureconseil.com | Message: Protocol error (Runtime.callFunctionOn): Target closed
