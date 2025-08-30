@@ -370,83 +370,30 @@ export interface PageData {
     };
   };
   /**
-   * Comprehensive Prebid configuration capture.
-   * Used when captureDetail is 'comprehensive'.
+   * Prebid configuration with source tracking.
+   * Used when prebidConfigDetail is 'raw'.
+   * Includes the config data, where it was found, and diagnostic info.
    */
   prebidConfig?: {
-    config: {
-      globalConfig: any;
-      bidderConfigs: Record<string, any>;
-      userSync: any;
-      priceGranularity: any;
-      mediaTypes: any;
-      timeouts: {
-        auction?: number;
-        bidder?: number;
-        render?: number;
-      };
-      floors: any;
-      analytics: any;
-      realTimeData: any;
-      s2sConfig: any;
-      consentManagement: {
-        gdpr?: any;
-        usp?: any;
-        gpp?: any;
-      };
-      userIds: any;
-      ortb2: any;
-      video: any;
-      currency: any;
-      cache: any;
-      targetingControls: any;
-      auctionOptions: any;
-      debugging: boolean;
-      bidderSequence: string;
-      publisherDomain: string;
-      pageUrl: string;
-      refererInfo: any;
-      coppa: boolean;
-      deviceAccess: boolean;
-      maxRequestsPerOrigin: number;
-      enableSendAllBids: boolean;
-      useBidCache: boolean;
-      bidderTimeout: number;
-      publisherSettings: any;
-      suppressAuctionKeys: boolean;
-      localStorageEnabled: boolean;
-      configuredBidders: string[];
-      activeModules: string[];
+    config: any | null;
+    configSource?: string;
+    configStatus: 'found' | 'partial' | 'not-found' | 'detected-not-extracted';
+    diagnostics?: {
+      triedMethods: string[];
+      prebidFound: boolean;
+      prebidVersion: string | null;
+      prebidState?: 'not-found' | 'queue' | 'partial' | 'loaded';
+      hasGetConfig: boolean;
+      hasSetConfig: boolean;
+      hasBidderSettings: boolean;
+      hasAdUnits: boolean;
+      hasQueue?: boolean;
+      queueLength?: number;
+      waitedMs?: number;
+      availableProperties?: string[];
+      errors: any[];
     };
-    insights: {
-      setupComplexity: 'basic' | 'intermediate' | 'advanced';
-      privacyConfig: {
-        hasGDPR: boolean;
-        hasUSP: boolean;
-        hasGPP: boolean;
-        consentRequired: boolean;
-      };
-      monetization: {
-        bidderCount: number;
-        hasHeaderBidding: boolean;
-        hasServerSide: boolean;
-        hasFloors: boolean;
-        hasAnalytics: boolean;
-      };
-      optimization: {
-        hasLazyLoad: boolean;
-        hasRefresh: boolean;
-        hasBidCaching: boolean;
-        hasTargetingControls: boolean;
-      };
-      dataEnrichment: {
-        hasRTD: boolean;
-        rtdModules: string[];
-        hasFirstPartyData: boolean;
-        hasContextualData: boolean;
-      };
-    };
-    raw?: any;
+    note?: string;
   };
   /**
    * An array of detected Customer Data Platforms.

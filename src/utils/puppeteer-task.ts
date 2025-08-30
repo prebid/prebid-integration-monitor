@@ -18,7 +18,7 @@ import {
 import { createAuthenticUserAgent } from './user-agent.js';
 import { ProcessingPhase, detectErrorType } from './error-types.js';
 import { createIdentityDetectionScript } from './identity-detection.js';
-import { createPrebidConfigCaptureScript } from './prebid-config-capture.js';
+import { createFastPrebidConfigCaptureScript } from './prebid-config-capture.js';
 import { createIdentityUsageDetectionScript } from './identity-usage-detector.js';
 import { analyzeUnidentified } from './analyze-unidentified.js';
 
@@ -249,12 +249,64 @@ export async function navigateWithRetry(
       const timeout =
         attempt === 1 ? 60000 : Math.max(30000, 60000 - attempt * 10000);
 
-      // Use multiple wait conditions for better reliability
+      // Use domcontentloaded for initial navigation (faster)
       await page.goto(url, {
         timeout,
-        waitUntil: ['networkidle2', 'domcontentloaded'],
+        waitUntil: 'domcontentloaded',
       });
-
+      
+      // Wait for document.readyState to be complete
+      await page.waitForFunction(
+        () => document.readyState === 'complete',
+        { timeout: 10000 }
+      ).catch(() => {});
+      
+      // Additional wait for lazy-loaded identity solutions and CDPs
+      // Many identity providers and CDPs load after DOMContentLoaded
+      await page.waitForFunction(
+        () => {
+          interface ExtendedWindow extends Window {
+            // Identity solutions
+            __uid2?: unknown;
+            __uid2_advertising_token?: unknown;
+            ID5?: unknown;
+            __tcfapi?: unknown;
+            __lotl?: unknown;
+            lotamePanorama?: unknown;
+            criteo_pubtag?: unknown;
+            pubcid?: unknown;
+            sharedId?: unknown;
+            __liQ?: unknown; // LiveIntent
+            // CDP platforms
+            analytics?: { track?: Function };
+            _satellite?: unknown; // Adobe
+            utag?: unknown; // Tealium
+            tealiumCDH?: unknown;
+          }
+          const win = window as ExtendedWindow;
+          
+          // Check if any common identity or CDP solutions are still loading
+          const hasIdentity = win.__uid2 !== undefined || 
+                            win.ID5 !== undefined || 
+                            win.__tcfapi !== undefined ||
+                            win.__lotl !== undefined ||
+                            win.criteo_pubtag !== undefined ||
+                            win.pubcid !== undefined ||
+                            win.__liQ !== undefined;
+          
+          const hasCDP = win.analytics !== undefined ||
+                        win._satellite !== undefined ||
+                        win.utag !== undefined;
+          
+          // Wait until we find at least one, or document is complete
+          return hasIdentity || hasCDP || document.readyState === 'complete';
+        },
+        { timeout: 3000 }
+      ).catch(() => {});
+      
+      // Brief wait for final async operations
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
       // Enhanced post-navigation checks
       await performPostNavigationChecks(page, url, logger);
 
@@ -334,14 +386,19 @@ async function performPostNavigationChecks(
   originalUrl: string,
   logger?: WinstonLogger
 ): Promise<void> {
-  // Wait for initial page stabilization
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  // Minimal stabilization wait since we already waited in navigation
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   // Dismiss popups that might interfere with content detection
   await dismissPopups(page, logger);
 
   // Only check for domain parking redirects, not page content
   const currentUrl = page.url();
+  
+  // Quick frame check before proceeding
+  if (page.isClosed()) {
+    throw new Error('Page was closed during navigation checks');
+  }
 
   // Check for major redirects that might indicate issues
   const originalDomain = new URL(originalUrl).hostname;
@@ -692,6 +749,21 @@ export async function extractDataSafely(
   identityUsageDetail: 'none' | 'comprehensive' = 'none'
 ): Promise<any> {
   let lastError: Error | null = null;
+  
+  // Early frame check to fail fast
+  if (page.isClosed()) {
+    throw new Error('Page was closed before data extraction');
+  }
+  
+  // Quick frame validity test
+  try {
+    await page.evaluate(() => document.readyState).catch((e) => {
+      throw new Error(`Frame not accessible: ${e.message}`);
+    });
+  } catch (frameError) {
+    logger?.info(`Frame check failed, skipping extraction`);
+    throw frameError;
+  }
 
   for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
     try {
@@ -1329,19 +1401,74 @@ export async function extractDataSafely(
       }
       
       // Handle Prebid config capture based on flag
-      if (prebidConfigDetail !== 'none') {
+      if (prebidConfigDetail !== 'none' && extractedPageData.prebidInstances && extractedPageData.prebidInstances.length > 0) {
         try {
-          const prebidConfigScript = createPrebidConfigCaptureScript();
-          const prebidConfigResult: any = await page.evaluate(prebidConfigScript);
+          // Extract global variable names from prebidInstances
+          const globalNames = extractedPageData.prebidInstances.map((instance: any) => instance.globalVarName).filter(Boolean);
           
-          logger?.debug(`Prebid config capture result: ${JSON.stringify(prebidConfigResult ? 'exists' : 'null')}`);
+          logger?.info(`🔍 TRACE [PREBID_CONFIG] Starting capture with known globals: ${globalNames.join(', ')}`);
           
-          if (prebidConfigResult && !prebidConfigResult.error) {
-            // Store raw config directly
-            extractedPageData.prebidConfig = prebidConfigResult;
-            logger?.debug('Prebid config stored in extractedPageData');
-          } else if (prebidConfigResult?.error) {
-            logger?.debug(`Prebid config error: ${prebidConfigResult.error}`);
+          // Test basic string evaluation first
+          const testEval = await page.evaluate('(function() { return "test-success"; })()');
+          logger?.info(`🔍 TRACE [PREBID_CONFIG] Test eval result: ${testEval}`);
+          
+          // Use minimal fast script for better performance
+        const prebidConfigScript = createFastPrebidConfigCaptureScript(globalNames);
+          logger?.info(`🔍 TRACE [PREBID_CONFIG] Script generated, length: ${prebidConfigScript.length} chars`);
+          
+          // Log first 200 chars of script to verify it's correct
+          logger?.debug(`🔍 TRACE [PREBID_CONFIG] Script preview: ${prebidConfigScript.substring(0, 200)}...`);
+          
+          // Execute the IIFE directly - Puppeteer evaluates strings as JavaScript
+          let prebidConfigResult: any;
+          try {
+            prebidConfigResult = await page.evaluate(prebidConfigScript);
+          } catch (evalError) {
+            logger?.error(`🔍 TRACE [PREBID_CONFIG] ❌ Evaluation error:`, evalError);
+            throw evalError;
+          }
+          
+          // Debug logging with telemetry
+          if (!prebidConfigResult) {
+            logger?.warn('🔍 TRACE [PREBID_CONFIG] ❌ Capture returned null/undefined');
+          } else {
+            logger?.info(`🔍 TRACE [PREBID_CONFIG] ✅ Capture returned result:`, {
+              status: prebidConfigResult.configStatus,
+              source: prebidConfigResult.configSource || 'none',
+              hasConfig: !!prebidConfigResult.config,
+              diagnostics: prebidConfigResult.diagnostics ? {
+                prebidFound: prebidConfigResult.diagnostics.prebidFound,
+                prebidState: prebidConfigResult.diagnostics.prebidState,
+                triedMethods: prebidConfigResult.diagnostics.triedMethods?.length || 0
+              } : null
+            });
+          }
+          
+          if (prebidConfigResult) {
+            // Store the entire result including config, source, and diagnostics
+            if (prebidConfigResult.configStatus === 'found' || prebidConfigResult.configStatus === 'partial') {
+              extractedPageData.prebidConfig = {
+                config: prebidConfigResult.config,
+                configSource: prebidConfigResult.configSource,
+                configStatus: prebidConfigResult.configStatus
+              };
+            } else if (prebidConfigResult.configStatus === 'detected-not-extracted') {
+              // Config was detected but couldn't be extracted
+              extractedPageData.prebidConfig = {
+                config: null,
+                configSource: prebidConfigResult.configSource,
+                configStatus: prebidConfigResult.configStatus,
+                note: 'Config detected in inline scripts but could not be safely extracted'
+              };
+            } else {
+              // No config found - include diagnostics for debugging
+              extractedPageData.prebidConfig = {
+                config: null,
+                configStatus: 'not-found',
+                diagnostics: prebidConfigResult.diagnostics
+              };
+              logger?.debug(`Prebid config not found. Diagnostics: ${JSON.stringify(prebidConfigResult.diagnostics)}`);
+            }
           }
         } catch (error) {
           logger?.debug('Prebid config capture failed:', error);
@@ -1387,20 +1514,17 @@ export async function extractDataSafely(
         metadata: detailedError.metadata,
       });
 
-      // Check if this is a detached frame error that we can retry
-      if (error instanceof Error && error.message.includes('detached Frame')) {
-        if (attempt <= maxRetries) {
-          logger?.debug(
-            `Detached frame error detected, retrying in ${attempt * 500}ms...`
-          );
-          await new Promise((resolve) => setTimeout(resolve, attempt * 500));
-
-          // Wait for DOM to stabilize before retry
-          await waitForDOMStability(page, logger, 2000);
-          continue;
-        }
+      // Check if this is a detached frame error - don't retry these
+      if (error instanceof Error && 
+          (error.message.includes('detached Frame') || 
+           error.message.includes('frame was detached') ||
+           error.message.includes('Navigating frame'))) {
+        logger?.info(`Frame detached during data extraction - not retrying`);
+        // Don't retry frame errors - they indicate the page is problematic
+        (error as any).detailedError = detailedError;
+        throw error;
       } else {
-        // For non-frame errors, don't retry
+        // For other errors, don't retry either
         (error as any).detailedError = detailedError;
         throw error;
       }
@@ -1505,8 +1629,45 @@ export const processPageTask = async ({
     // Trigger dynamic content loading (lazy loading, etc.)
     await triggerDynamicContent(page, logger);
 
-    // Wait for DOM to stabilize before data extraction
-    await waitForDOMStability(page, logger);
+    // Wait for DOM to stabilize and identity solutions to load
+    await waitForDOMStability(page, logger, 3000);
+    
+    // Wait for consent management and identity solutions to initialize
+    await page.evaluate(() => {
+      return new Promise((resolve) => {
+        let consentReady = false;
+        
+        // Check for standard consent APIs
+        setTimeout(() => {
+          // TCF v2 API (GDPR) - industry standard
+          if (typeof (window as any).__tcfapi === 'function') {
+            (window as any).__tcfapi('addEventListener', 2, (tcData: any, success: boolean) => {
+              if (success && (tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete')) {
+                consentReady = true;
+                setTimeout(resolve, 500); // Allow time for consent-dependent operations
+              }
+            });
+            // Timeout if consent doesn't load
+            setTimeout(() => { if (!consentReady) resolve(undefined); }, 2000);
+          } 
+          // USP API (CCPA) - industry standard
+          else if (typeof (window as any).__uspapi === 'function') {
+            (window as any).__uspapi('getUSPData', 1, () => {
+              setTimeout(resolve, 500);
+            });
+            setTimeout(resolve, 1500); // Fallback timeout
+          }
+          // GPP API (Global Privacy Platform) - newer standard
+          else if (typeof (window as any).__gpp === 'function') {
+            setTimeout(resolve, 1000);
+          }
+          // No consent API detected, proceed after brief wait
+          else {
+            setTimeout(resolve, 1000);
+          }
+        }, 500);
+      });
+    }).catch(() => {});
 
     // Use frame-safe data extraction with retry logic for detached frame errors
     const extractedPageData: PageData = (await extractDataSafely(
@@ -1525,19 +1686,71 @@ export const processPageTask = async ({
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data
 
     // Handle Prebid config capture based on flag
-    if (prebidConfigDetail !== 'none') {
+    if (prebidConfigDetail !== 'none' && extractedPageData.prebidInstances && extractedPageData.prebidInstances.length > 0) {
       try {
-        const prebidConfigScript = createPrebidConfigCaptureScript();
-        const prebidConfigResult: any = await page.evaluate(prebidConfigScript);
+        // Extract global variable names from prebidInstances
+        const globalNames = extractedPageData.prebidInstances.map((instance: any) => instance.globalVarName).filter(Boolean);
         
-        logger.debug(`Prebid config capture result (processPageTask): ${JSON.stringify(prebidConfigResult ? 'exists' : 'null')}`);
+        logger.info(`🔍 TRACE [PREBID_CONFIG] Starting capture in processPageTask for ${trimmedUrl} with globals: ${globalNames.join(', ')}`);
         
-        if (prebidConfigResult && !prebidConfigResult.error) {
-          // Store raw config directly
-          extractedPageData.prebidConfig = prebidConfigResult;
-          logger.debug('Prebid config stored in extractedPageData (processPageTask)');
-        } else if (prebidConfigResult?.error) {
-          logger.debug(`Prebid config error (processPageTask): ${prebidConfigResult.error}`);
+        // Test basic string evaluation first
+        const testEval = await page.evaluate('(function() { return "test-success"; })()');
+        logger.info(`🔍 TRACE [PREBID_CONFIG] Test eval result in processPageTask: ${testEval}`);
+        
+        // Use minimal fast script for better performance
+        const prebidConfigScript = createFastPrebidConfigCaptureScript(globalNames);
+        logger.info(`🔍 TRACE [PREBID_CONFIG] Script generated in processPageTask, length: ${prebidConfigScript.length} chars`);
+        
+        // Execute the IIFE directly - Puppeteer evaluates strings as JavaScript
+        let prebidConfigResult: any;
+        try {
+          prebidConfigResult = await page.evaluate(prebidConfigScript);
+        } catch (evalError) {
+          logger.error(`🔍 TRACE [PREBID_CONFIG] ❌ Evaluation error in processPageTask:`, evalError);
+          throw evalError;
+        }
+        
+        // Debug logging with telemetry
+        if (!prebidConfigResult) {
+          logger.warn('🔍 TRACE [PREBID_CONFIG] ❌ Capture returned null/undefined in processPageTask');
+        } else {
+          logger.info(`🔍 TRACE [PREBID_CONFIG] ✅ Capture in processPageTask returned:`, {
+            status: prebidConfigResult.configStatus,
+            source: prebidConfigResult.configSource || 'none',
+            hasConfig: !!prebidConfigResult.config,
+            diagnostics: prebidConfigResult.diagnostics ? {
+              prebidFound: prebidConfigResult.diagnostics.prebidFound,
+              prebidState: prebidConfigResult.diagnostics.prebidState,
+              triedMethods: prebidConfigResult.diagnostics.triedMethods?.length || 0
+            } : null
+          });
+        }
+        
+        if (prebidConfigResult) {
+          // Store the entire result including config, source, and diagnostics
+          if (prebidConfigResult.configStatus === 'found' || prebidConfigResult.configStatus === 'partial') {
+            extractedPageData.prebidConfig = {
+              config: prebidConfigResult.config,
+              configSource: prebidConfigResult.configSource,
+              configStatus: prebidConfigResult.configStatus
+            };
+          } else if (prebidConfigResult.configStatus === 'detected-not-extracted') {
+            // Config was detected but couldn't be extracted
+            extractedPageData.prebidConfig = {
+              config: null,
+              configSource: prebidConfigResult.configSource,
+              configStatus: prebidConfigResult.configStatus,
+              note: 'Config detected in inline scripts but could not be safely extracted'
+            };
+          } else {
+            // No config found - include diagnostics for debugging
+            extractedPageData.prebidConfig = {
+              config: null,
+              configStatus: 'not-found',
+              diagnostics: prebidConfigResult.diagnostics
+            };
+            logger.debug(`Prebid config not found. Diagnostics: ${JSON.stringify(prebidConfigResult.diagnostics)}`);
+          }
         }
       } catch (error) {
         logger.debug('Prebid config capture failed (processPageTask):', error);

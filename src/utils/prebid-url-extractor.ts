@@ -8,16 +8,22 @@ import type { Logger as WinstonLogger } from 'winston';
 
 export interface PrebidUrlExtractorOptions {
   outputDir: string;
+  limit: number; // Required to prevent loading all URLs
+  logger?: WinstonLogger;
+}
+
+export interface PrebidUrlSummaryOptions {
+  outputDir: string;
   logger?: WinstonLogger;
 }
 
 /**
- * Extracts all URLs where Prebid was detected from stored JSON results
- * @param options - Configuration options
- * @returns Array of URLs where Prebid was found
+ * Extracts URLs where Prebid was detected from stored JSON results
+ * @param options - Configuration options including required limit
+ * @returns Array of URLs where Prebid was found (up to limit)
  */
 export async function extractPrebidUrls(options: PrebidUrlExtractorOptions): Promise<string[]> {
-  const { outputDir, logger } = options;
+  const { outputDir, limit, logger } = options;
   const prebidUrls = new Set<string>();
 
   try {
@@ -63,6 +69,12 @@ export async function extractPrebidUrls(options: PrebidUrlExtractorOptions): Pro
             if (entry && entry.prebidInstances && Array.isArray(entry.prebidInstances) && 
                 entry.prebidInstances.length > 0 && entry.url) {
               prebidUrls.add(entry.url);
+              
+              // Check if we've reached the limit
+              if (prebidUrls.size >= limit) {
+                logger?.info(`Reached limit of ${limit} URLs, stopping extraction`);
+                return Array.from(prebidUrls).sort();
+              }
             }
           }
         } catch (error) {
@@ -72,8 +84,8 @@ export async function extractPrebidUrls(options: PrebidUrlExtractorOptions): Pro
       }
     }
 
-    const urlArray = Array.from(prebidUrls).sort();
-    logger?.info(`Found ${urlArray.length} unique URLs with Prebid across all stored results`);
+    const urlArray = Array.from(prebidUrls).sort().slice(0, limit);
+    logger?.info(`Extracted ${urlArray.length} unique Prebid URLs (limit: ${limit})`);
     
     return urlArray;
   } catch (error) {
@@ -87,7 +99,7 @@ export async function extractPrebidUrls(options: PrebidUrlExtractorOptions): Pro
  * @param options - Configuration options
  * @returns Summary statistics of Prebid URLs
  */
-export async function getPrebidUrlSummary(options: PrebidUrlExtractorOptions): Promise<{
+export async function getPrebidUrlSummary(options: PrebidUrlSummaryOptions): Promise<{
   total: number;
   byMonth: Record<string, number>;
   dateRange?: { earliest: string; latest: string };

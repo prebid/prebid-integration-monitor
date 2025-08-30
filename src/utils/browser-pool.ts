@@ -13,6 +13,13 @@ export interface BrowserPoolOptions {
   maxBrowsers: number;
   puppeteerOptions: any;
   logger: WinstonLogger;
+  discoveryMode?: boolean;
+  extractMetadata?: boolean;
+  adUnitDetail?: 'basic' | 'standard' | 'full';
+  moduleDetail?: 'simple' | 'categorized';
+  identityDetail?: 'basic' | 'enhanced';
+  prebidConfigDetail?: 'none' | 'raw';
+  identityUsageDetail?: 'none' | 'comprehensive';
 }
 
 interface BrowserInstance {
@@ -123,7 +130,17 @@ export class BrowserPool {
 
       const result = await processPageTask({
         page,
-        data: { url, logger: this.logger, discoveryMode },
+        data: { 
+          url, 
+          logger: this.logger, 
+          discoveryMode: this.options.discoveryMode || false,
+          extractMetadata: this.options.extractMetadata || false,
+          adUnitDetail: this.options.adUnitDetail || 'basic',
+          moduleDetail: this.options.moduleDetail || 'simple',
+          identityDetail: this.options.identityDetail || 'basic',
+          prebidConfigDetail: this.options.prebidConfigDetail || 'none',
+          identityUsageDetail: this.options.identityUsageDetail || 'none',
+        },
       });
 
       pageTracer.finish(
@@ -199,6 +216,13 @@ export async function processUrlsWithBrowserPool(
     concurrency: number;
     puppeteerOptions: any;
     logger: WinstonLogger;
+    discoveryMode?: boolean;
+    extractMetadata?: boolean;
+    adUnitDetail?: 'basic' | 'standard' | 'full';
+    moduleDetail?: 'simple' | 'categorized';
+    identityDetail?: 'basic' | 'enhanced';
+    prebidConfigDetail?: 'none' | 'raw';
+    identityUsageDetail?: 'none' | 'comprehensive';
   },
   onProgress?: (processed: number, total: number) => void
 ): Promise<TaskResult[]> {
@@ -208,6 +232,13 @@ export async function processUrlsWithBrowserPool(
     maxBrowsers: Math.max(1, Math.floor(concurrency / 5)), // Fewer browsers, more pages each
     puppeteerOptions: options.puppeteerOptions,
     logger,
+    discoveryMode: options.discoveryMode,
+    extractMetadata: options.extractMetadata,
+    adUnitDetail: options.adUnitDetail,
+    moduleDetail: options.moduleDetail,
+    identityDetail: options.identityDetail,
+    prebidConfigDetail: options.prebidConfigDetail,
+    identityUsageDetail: options.identityUsageDetail,
   });
 
   try {

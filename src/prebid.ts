@@ -371,19 +371,12 @@ export async function prebidExplorer(
   );
 
   if (options.prebidOnly) {
-    // Load URLs from store where Prebid was previously detected
-    urlSourceType = 'PrebidStore';
+    // Load URLs from database where has_prebid = 1
+    urlSourceType = 'PrebidDatabase';
     
-    const { extractPrebidUrls, getPrebidUrlSummary } = await import('./utils/prebid-url-extractor.js');
-    
-    // First get summary for logging
-    const summary = await getPrebidUrlSummary({
-      outputDir: options.outputDir,
-      logger
-    });
-    
-    if (summary.total === 0) {
-      logger.warn('No Prebid URLs found in store directory. Have you run a scan first?');
+    // Check that numUrls is specified for prebidOnly mode
+    if (!options.numUrls) {
+      logger.error('--numUrls is required when using --prebidOnly flag');
       urlLoadingTracer.finish(0);
       return {
         urlsProcessed: 0,
@@ -394,19 +387,38 @@ export async function prebidExplorer(
       };
     }
     
-    logger.info(`Found ${summary.total} unique Prebid URLs across ${Object.keys(summary.byMonth).length} month(s)`);
-    if (summary.dateRange) {
-      logger.info(`Date range: ${summary.dateRange.earliest} to ${summary.dateRange.latest}`);
+    // Get count of Prebid URLs in database
+    const prebidUrlCount = urlTracker.getPrebidUrlCount();
+    
+    if (prebidUrlCount === 0) {
+      logger.warn('No Prebid URLs found in database. Have you run a scan first?');
+      urlLoadingTracer.finish(0);
+      return {
+        urlsProcessed: 0,
+        urlsSkipped: 0,
+        successfulExtractions: 0,
+        errors: 0,
+        noAdTech: 0,
+      };
     }
     
-    // Extract all Prebid URLs
-    allUrls = await extractPrebidUrls({
-      outputDir: options.outputDir,
-      logger
-    });
+    logger.info(`Found ${prebidUrlCount} URLs with Prebid in database`);
     
-    urlLoadingTracer.recordUrlCount(allUrls.length, 'prebid_store');
-    logger.info(`Loaded ${allUrls.length} URLs where Prebid was previously detected`);
+    // Calculate offset based on range if provided
+    let offset = 0;
+    let limit = options.numUrls;
+    
+    if (options.range) {
+      const [startStr] = options.range.split('-');
+      const start = startStr ? parseInt(startStr, 10) : 1;
+      offset = start > 0 ? start - 1 : 0; // Convert 1-based to 0-based
+    }
+    
+    // Load Prebid URLs from database with limit and offset
+    allUrls = urlTracker.getPrebidUrls(limit, offset);
+    
+    urlLoadingTracer.recordUrlCount(allUrls.length, 'prebid_database');
+    logger.info(`Loaded ${allUrls.length} URLs where Prebid was detected (offset: ${offset}, limit: ${limit})`);
     
     // Always use forceReprocess when prebidOnly is set
     if (!options.forceReprocess) {
@@ -972,6 +984,13 @@ export async function prebidExplorer(
               puppeteerOptions: basePuppeteerOptions,
               logger,
               maxRetries: 2,
+              discoveryMode: options.discoveryMode,
+              extractMetadata: options.extractMetadata,
+              adUnitDetail: options.adUnitDetail,
+              moduleDetail: options.moduleDetail,
+              identityDetail: options.identityDetail,
+              prebidConfigDetail: options.prebidConfigDetail,
+              identityUsageDetail: options.identityUsageDetail,
               onTaskComplete: (result) => {
                 // Track results as they complete
                 taskResults.push(result);
@@ -1087,6 +1106,13 @@ export async function prebidExplorer(
             puppeteerOptions: basePuppeteerOptions,
             logger,
             maxRetries: 2,
+            discoveryMode: options.discoveryMode,
+            extractMetadata: options.extractMetadata,
+            adUnitDetail: options.adUnitDetail,
+            moduleDetail: options.moduleDetail,
+            identityDetail: options.identityDetail,
+            prebidConfigDetail: options.prebidConfigDetail,
+            identityUsageDetail: options.identityUsageDetail,
           },
           (processed, total) => {
             if (processed % 10 === 0) {
@@ -1112,6 +1138,13 @@ export async function prebidExplorer(
               concurrency: options.concurrency,
               puppeteerOptions: basePuppeteerOptions,
               logger,
+              discoveryMode: options.discoveryMode,
+              extractMetadata: options.extractMetadata,
+              adUnitDetail: options.adUnitDetail,
+              moduleDetail: options.moduleDetail,
+              identityDetail: options.identityDetail,
+              prebidConfigDetail: options.prebidConfigDetail,
+              identityUsageDetail: options.identityUsageDetail,
             },
             (processed, total) => {
               if (processed % 10 === 0) {

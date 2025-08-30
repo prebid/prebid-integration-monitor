@@ -14,7 +14,7 @@ import type { TaskResult } from '../common/types.js';
 /**
  * URL processing status enumeration
  */
-export type UrlStatus = 'success' | 'no_data' | 'error' | 'retry';
+export type UrlStatus = 'success' | 'no_data' | 'error';
 
 /**
  * Interface for URL tracking record
@@ -24,7 +24,7 @@ export interface UrlRecord {
   status: UrlStatus;
   timestamp: string;
   errorCode?: string;
-  retryCount: number;
+  hasPrebid?: boolean;
 }
 
 /**
@@ -33,8 +33,6 @@ export interface UrlRecord {
 export interface UrlTrackerConfig {
   /** Database file path. Defaults to './data/url-tracker.db' */
   dbPath?: string;
-  /** Maximum retry attempts for failed URLs. Defaults to 3 */
-  maxRetries?: number;
   /** Whether to enable debug logging. Defaults to false */
   debug?: boolean;
 }
@@ -59,7 +57,6 @@ export class UrlTracker {
     this.config = {
       dbPath:
         config.dbPath || path.join(process.cwd(), 'data', 'url-tracker.db'),
-      maxRetries: config.maxRetries || 3,
       debug: config.debug || false,
     };
 
@@ -96,7 +93,7 @@ export class UrlTracker {
         status TEXT NOT NULL,
         timestamp TEXT NOT NULL,
         error_code TEXT,
-        retry_count INTEGER DEFAULT 0,
+        has_prebid INTEGER DEFAULT 0,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
       );
@@ -104,11 +101,11 @@ export class UrlTracker {
       -- Primary indexes for fast lookups
       CREATE INDEX IF NOT EXISTS idx_status ON processed_urls(status);
       CREATE INDEX IF NOT EXISTS idx_timestamp ON processed_urls(timestamp);
-      CREATE INDEX IF NOT EXISTS idx_retry ON processed_urls(retry_count);
+      CREATE INDEX IF NOT EXISTS idx_has_prebid ON processed_urls(has_prebid);
       
       -- Composite indexes for complex queries
       CREATE INDEX IF NOT EXISTS idx_status_timestamp ON processed_urls(status, timestamp);
-      CREATE INDEX IF NOT EXISTS idx_status_retry ON processed_urls(status, retry_count);
+      CREATE INDEX IF NOT EXISTS idx_status_prebid ON processed_urls(status, has_prebid);
       
       -- Analyze table for query optimizer
       ANALYZE processed_urls;
@@ -123,13 +120,13 @@ export class UrlTracker {
   private prepareSqlStatements(): void {
     this.insertStmt = this.db.prepare(`
       INSERT OR REPLACE INTO processed_urls 
-      (url, status, timestamp, error_code, retry_count, updated_at)
+      (url, status, timestamp, error_code, has_prebid, updated_at)
       VALUES (?, ?, ?, ?, ?, datetime('now'))
     `);
 
     this.updateStmt = this.db.prepare(`
       UPDATE processed_urls 
-      SET status = ?, timestamp = ?, error_code = ?, retry_count = ?, updated_at = datetime('now')
+      SET status = ?, timestamp = ?, error_code = ?, has_prebid = ?, updated_at = datetime('now')
       WHERE url = ?
     `);
 
@@ -197,30 +194,29 @@ export class UrlTracker {
   public markUrlProcessed(
     url: string,
     status: UrlStatus,
-    errorCode?: string
+    errorCode?: string,
+    hasPrebid: boolean = false
   ): void {
     try {
       const trimmedUrl = url.trim();
       const timestamp = new Date().toISOString();
 
-      // Get existing record to determine retry count
+      // Get existing record to preserve has_prebid if it was previously true
       const existing = this.selectStmt.get(trimmedUrl) as UrlRecord | undefined;
-      const retryCount = existing
-        ? existing.retryCount + (status === 'retry' ? 1 : 0)
-        : 0;
+      const prebidDetected = hasPrebid || (existing?.hasPrebid ?? false);
 
       this.insertStmt.run(
         trimmedUrl,
         status,
         timestamp,
         errorCode ?? null,
-        retryCount
+        prebidDetected ? 1 : 0
       );
 
       if (this.config.debug) {
         this.logger.debug(`Marked URL as ${status}: ${trimmedUrl}`, {
           errorCode,
-          retryCount,
+          hasPrebid: prebidDetected,
         });
       }
     } catch (error) {
@@ -244,20 +240,17 @@ export class UrlTracker {
         switch (result.type) {
           case 'success':
             if (result.data.url) {
-              this.markUrlProcessed(result.data.url, 'success');
+              const hasPrebid = result.data.prebidInstances && result.data.prebidInstances.length > 0;
+              this.markUrlProcessed(result.data.url, 'success', undefined, hasPrebid);
             }
             break;
           case 'no_data':
             this.markUrlProcessed(result.url, 'no_data');
             break;
           case 'error':
-            const shouldRetry = this.shouldRetryUrl(
-              result.url,
-              result.error.code
-            );
             this.markUrlProcessed(
               result.url,
-              shouldRetry ? 'retry' : 'error',
+              'error',
               result.error.code
             );
             break;
@@ -277,49 +270,7 @@ export class UrlTracker {
     }
   }
 
-  /**
-   * Determine if a failed URL should be retried
-   * @param url The URL that failed
-   * @param errorCode The error code
-   * @returns true if URL should be retried
-   */
-  private shouldRetryUrl(url: string, errorCode: string): boolean {
-    const existing = this.selectStmt.get(url.trim()) as UrlRecord | undefined;
-    const currentRetryCount = existing ? existing.retryCount : 0;
 
-    // Don't retry permanent failures
-    const permanentErrors = ['ERR_NAME_NOT_RESOLVED', 'ERR_CONNECTION_REFUSED'];
-    if (permanentErrors.includes(errorCode)) {
-      return false;
-    }
-
-    // Retry timeouts and temporary failures up to max retries
-    return currentRetryCount < this.config.maxRetries;
-  }
-
-  /**
-   * Get URLs that should be retried
-   * @param limit Maximum number of URLs to return
-   * @returns Array of URLs marked for retry
-   */
-  public getUrlsForRetry(limit: number = 1000): string[] {
-    try {
-      const stmt = this.db.prepare(`
-        SELECT url FROM processed_urls 
-        WHERE status = 'retry' AND retry_count < ?
-        ORDER BY updated_at ASC
-        LIMIT ?
-      `);
-
-      const results = stmt.all(this.config.maxRetries, limit) as {
-        url: string;
-      }[];
-      return results.map((r) => r.url);
-    } catch (error) {
-      this.logger.error('Error getting URLs for retry', { error });
-      return [];
-    }
-  }
 
   /**
    * Get processing statistics
@@ -404,7 +355,7 @@ export class UrlTracker {
         const cleanupStmt = this.db.prepare(`
           DELETE FROM processed_urls 
           WHERE created_at < datetime('now', '-${daysThreshold} days')
-          AND status IN ('error', 'retry')
+          AND status = 'error'
         `);
         const cleanupResult = cleanupStmt.run();
         this.logger.info(
@@ -441,19 +392,19 @@ export class UrlTracker {
    * Get database performance statistics
    */
   public getDatabaseStats(): {
-    size: number;
-    pageCount: number;
-    pageSize: number;
-    indexCount: number;
-    walSize?: number;
+    path: string;
+    sizeBytes: number;
+    totalUrls: number;
+    urlsByStatus: Record<string, number>;
+    cacheStats: { hits: number; misses: number; hitRate: number };
   } {
     try {
       const stats = {
-        size: 0,
-        pageCount: 0,
-        pageSize: 0,
-        indexCount: 0,
-        walSize: 0,
+        path: this.config.dbPath,
+        sizeBytes: 0,
+        totalUrls: 0,
+        urlsByStatus: {} as Record<string, number>,
+        cacheStats: { hits: 0, misses: 0, hitRate: 0 },
       };
 
       // Get basic database info
@@ -464,25 +415,19 @@ export class UrlTracker {
         simple: true,
       }) as number;
 
-      stats.pageCount = pageCountResult;
-      stats.pageSize = pageSizeResult;
-      stats.size = pageCountResult * pageSizeResult;
+      stats.sizeBytes = pageCountResult * pageSizeResult;
 
-      // Get index count
-      const indexResult = this.db
-        .prepare(
-          `
-        SELECT COUNT(*) as count FROM sqlite_master WHERE type = 'index'
-      `
-        )
-        .get() as { count: number };
-      stats.indexCount = indexResult.count;
+      // Get total URL count
+      stats.totalUrls = this.getTotalCount();
+      
+      // Get counts by status
+      stats.urlsByStatus = this.getStats();
 
-      // Get WAL file size if it exists
+      // Add WAL file size if exists
       try {
         const walPath = this.config.dbPath + '-wal';
         if (fs.existsSync(walPath)) {
-          stats.walSize = fs.statSync(walPath).size;
+          stats.sizeBytes += fs.statSync(walPath).size;
         }
       } catch (e) {
         // WAL file might not exist
@@ -491,7 +436,13 @@ export class UrlTracker {
       return stats;
     } catch (error) {
       this.logger.error('Error getting database stats', { error });
-      return { size: 0, pageCount: 0, pageSize: 0, indexCount: 0 };
+      return {
+        path: this.config.dbPath,
+        sizeBytes: 0,
+        totalUrls: 0,
+        urlsByStatus: {},
+        cacheStats: { hits: 0, misses: 0, hitRate: 0 },
+      };
     }
   }
 
@@ -756,6 +707,48 @@ export class UrlTracker {
       return result.count;
     } catch (error) {
       this.logger.error('Error getting total count', { error });
+      return 0;
+    }
+  }
+
+  /**
+   * Get URLs that have Prebid detected
+   * @param limit Maximum number of URLs to return
+   * @param offset Starting position (0-based)
+   * @returns Array of URLs where Prebid was detected
+   */
+  public getPrebidUrls(limit: number, offset: number = 0): string[] {
+    try {
+      const stmt = this.db.prepare(`
+        SELECT url FROM processed_urls 
+        WHERE has_prebid = 1
+        ORDER BY url
+        LIMIT ? OFFSET ?
+      `);
+      
+      const results = stmt.all(limit, offset) as Array<{ url: string }>;
+      return results.map(row => row.url);
+    } catch (error) {
+      this.logger.error('Error getting Prebid URLs', { error });
+      return [];
+    }
+  }
+
+  /**
+   * Get count of URLs with Prebid detected
+   * @returns Number of URLs where Prebid was detected
+   */
+  public getPrebidUrlCount(): number {
+    try {
+      const stmt = this.db.prepare(`
+        SELECT COUNT(*) as count FROM processed_urls 
+        WHERE has_prebid = 1
+      `);
+      
+      const result = stmt.get() as { count: number };
+      return result.count;
+    } catch (error) {
+      this.logger.error('Error getting Prebid URL count', { error });
       return 0;
     }
   }

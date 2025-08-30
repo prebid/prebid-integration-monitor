@@ -19,6 +19,13 @@ export interface SafeClusterOptions {
   logger: WinstonLogger;
   onTaskComplete?: (result: TaskResult) => void;
   maxRetries?: number;
+  discoveryMode?: boolean;
+  extractMetadata?: boolean;
+  adUnitDetail?: 'basic' | 'standard' | 'full';
+  moduleDetail?: 'simple' | 'categorized';
+  identityDetail?: 'basic' | 'enhanced';
+  prebidConfigDetail?: 'none' | 'raw';
+  identityUsageDetail?: 'none' | 'comprehensive';
 }
 
 /**
@@ -281,7 +288,13 @@ export async function processUrlsWithRecovery(
         .queue({
           url,
           logger: options.logger,
-          discoveryMode: false,
+          discoveryMode: options.discoveryMode || false,
+          extractMetadata: options.extractMetadata || false,
+          adUnitDetail: options.adUnitDetail || 'basic',
+          moduleDetail: options.moduleDetail || 'simple',
+          identityDetail: options.identityDetail || 'basic',
+          prebidConfigDetail: options.prebidConfigDetail || 'none',
+          identityUsageDetail: options.identityUsageDetail || 'none',
         })
         .catch((err) => {
           logger.error(`Failed to queue ${url}:`, err);

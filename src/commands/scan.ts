@@ -65,7 +65,7 @@ export default class Scan extends Command {
       monitor: flags.monitor,
       outputDir: flags.outputDir,
       logDir: flags.logDir,
-      numUrls: flags.range ? undefined : flags.numUrls, // Don't use numUrls if range is specified
+      numUrls: flags.prebidOnly ? flags.numUrls : (flags.range ? undefined : flags.numUrls), // prebidOnly always needs numUrls
       range: flags.range,
       chunkSize: flags.chunkSize,
       skipProcessed: flags.skipProcessed,
