@@ -182,6 +182,35 @@ export interface PrebidExplorerOptions {
    * Defaults to "simple".
    */
   moduleDetail?: 'simple' | 'categorized';
+  /**
+   * Level of identity provider detection:
+   * - "basic": Simple array of provider names (backward compatible)
+   * - "enhanced": Comprehensive classification with party type, ID type, consent requirements, etc.
+   * Defaults to "basic".
+   */
+  identityDetail?: 'basic' | 'enhanced';
+  /**
+   * Level of Prebid configuration capture:
+   * - "none": Disabled (default)
+   * - "raw": Raw config only
+   * - "analyzed": Config with insights and analysis
+   * Defaults to "none".
+   */
+  prebidConfigDetail?: 'none' | 'raw';
+  /**
+   * Level of identity usage and storage capture:
+   * - "none": Disabled (default)
+   * - "comprehensive": Full storage correlation, identity usage analysis, and unidentified pattern detection
+   * Defaults to "none".
+   */
+  identityUsageDetail?: 'none' | 'comprehensive';
+  /**
+   * Process only URLs where Prebid was previously detected.
+   * When true, loads URLs from the store directory instead of input file/GitHub.
+   * Works with range, batch, and other processing options.
+   * Defaults to false.
+   */
+  prebidOnly?: boolean;
 }
 
 let logger: WinstonLogger; // Global logger instance, initialized within prebidExplorer.
@@ -335,13 +364,56 @@ export async function prebidExplorer(
   /** @type {string} String to identify the source of URLs (e.g., 'GitHub', 'InputFile'). */
   let urlSourceType = ''; // To track the source for logging and file updates
 
-  // Determine the source of URLs (GitHub or local file) and fetch them.
+  // Determine the source of URLs (GitHub, local file, or Prebid-only) and fetch them.
   const urlLoadingTracer = new URLLoadingTracer(
-    options.githubRepo || options.inputFile || 'unknown',
+    options.prebidOnly ? 'prebid-store' : (options.githubRepo || options.inputFile || 'unknown'),
     logger
   );
 
-  if (options.githubRepo) {
+  if (options.prebidOnly) {
+    // Load URLs from store where Prebid was previously detected
+    urlSourceType = 'PrebidStore';
+    
+    const { extractPrebidUrls, getPrebidUrlSummary } = await import('./utils/prebid-url-extractor.js');
+    
+    // First get summary for logging
+    const summary = await getPrebidUrlSummary({
+      outputDir: options.outputDir,
+      logger
+    });
+    
+    if (summary.total === 0) {
+      logger.warn('No Prebid URLs found in store directory. Have you run a scan first?');
+      urlLoadingTracer.finish(0);
+      return {
+        urlsProcessed: 0,
+        urlsSkipped: 0,
+        successfulExtractions: 0,
+        errors: 0,
+        noAdTech: 0,
+      };
+    }
+    
+    logger.info(`Found ${summary.total} unique Prebid URLs across ${Object.keys(summary.byMonth).length} month(s)`);
+    if (summary.dateRange) {
+      logger.info(`Date range: ${summary.dateRange.earliest} to ${summary.dateRange.latest}`);
+    }
+    
+    // Extract all Prebid URLs
+    allUrls = await extractPrebidUrls({
+      outputDir: options.outputDir,
+      logger
+    });
+    
+    urlLoadingTracer.recordUrlCount(allUrls.length, 'prebid_store');
+    logger.info(`Loaded ${allUrls.length} URLs where Prebid was previously detected`);
+    
+    // Always use forceReprocess when prebidOnly is set
+    if (!options.forceReprocess) {
+      logger.info('Note: Enabling forceReprocess for Prebid-only mode to update existing data');
+      options.forceReprocess = true;
+    }
+  } else if (options.githubRepo) {
     urlSourceType = 'GitHub';
 
     // Parse range for optimization
@@ -969,7 +1041,9 @@ export async function prebidExplorer(
                   logger, 
                   discoveryMode: options.discoveryMode,
                   extractMetadata: options.extractMetadata,
-                  adUnitDetail: options.adUnitDetail 
+                  adUnitDetail: options.adUnitDetail,
+                  moduleDetail: options.moduleDetail,
+                  identityDetail: options.identityDetail
                 },
               });
               taskResults.push(result);
@@ -1057,7 +1131,7 @@ export async function prebidExplorer(
       }
     } else if (options.puppeteerType === 'cluster') {
       const cluster: Cluster<
-        { url: string; logger: WinstonLogger; discoveryMode?: boolean; extractMetadata?: boolean; adUnitDetail?: 'basic' | 'standard' | 'full'; moduleDetail?: 'simple' | 'categorized' },
+        { url: string; logger: WinstonLogger; discoveryMode?: boolean; extractMetadata?: boolean; adUnitDetail?: 'basic' | 'standard' | 'full'; moduleDetail?: 'simple' | 'categorized'; identityDetail?: 'basic' | 'enhanced'; prebidConfigDetail?: 'none' | 'raw'; identityUsageDetail?: 'none' | 'comprehensive' },
         TaskResult
       > = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_CONTEXT,
@@ -1134,7 +1208,14 @@ export async function prebidExplorer(
             }
           });
 
-          const result = await processPageTask({ page, data });
+          const result = await processPageTask({ 
+            page, 
+            data: {
+              ...data,
+              moduleDetail: options.moduleDetail,
+              identityDetail: options.identityDetail
+            }
+          });
           taskResults.push(result);
           pageTracer.finish(
             true,
@@ -1195,6 +1276,9 @@ export async function prebidExplorer(
                 extractMetadata: options.extractMetadata,
                 adUnitDetail: options.adUnitDetail,
                 moduleDetail: options.moduleDetail,
+                identityDetail: options.identityDetail,
+                prebidConfigDetail: options.prebidConfigDetail,
+                identityUsageDetail: options.identityUsageDetail,
               });
             } catch (queueError) {
               logger.error(`Failed to queue URL ${url}:`, queueError);
@@ -1250,7 +1334,9 @@ export async function prebidExplorer(
                 logger, 
                 discoveryMode: options.discoveryMode,
                 extractMetadata: options.extractMetadata,
-                adUnitDetail: options.adUnitDetail 
+                adUnitDetail: options.adUnitDetail,
+                moduleDetail: options.moduleDetail,
+                identityDetail: options.identityDetail
               },
             });
             taskResults.push(result);
@@ -1324,7 +1410,12 @@ export async function prebidExplorer(
                 url: data.url, 
                 logger, 
                 discoveryMode: options.discoveryMode,
-                extractMetadata: options.extractMetadata 
+                extractMetadata: options.extractMetadata,
+                adUnitDetail: options.adUnitDetail,
+                moduleDetail: options.moduleDetail,
+                identityDetail: options.identityDetail,
+                prebidConfigDetail: options.prebidConfigDetail,
+                identityUsageDetail: options.identityUsageDetail
               } 
             });
             retryResults.push(result);
@@ -1344,7 +1435,11 @@ export async function prebidExplorer(
             logger,
             discoveryMode: options.discoveryMode,
             extractMetadata: options.extractMetadata,
-            adUnitDetail: options.adUnitDetail
+            adUnitDetail: options.adUnitDetail,
+            moduleDetail: options.moduleDetail,
+            identityDetail: options.identityDetail,
+            prebidConfigDetail: options.prebidConfigDetail,
+            identityUsageDetail: options.identityUsageDetail
           });
         }
 
@@ -1374,7 +1469,9 @@ export async function prebidExplorer(
                 logger, 
                 discoveryMode: options.discoveryMode,
                 extractMetadata: options.extractMetadata,
-                adUnitDetail: options.adUnitDetail 
+                adUnitDetail: options.adUnitDetail,
+                moduleDetail: options.moduleDetail,
+                identityDetail: options.identityDetail
               },
             });
             retryResults.push(result);

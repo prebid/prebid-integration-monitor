@@ -163,6 +163,7 @@ prebid-integration-monitor/
 
 - `--prefilterProcessed` - Analyze ranges before processing
 - `--forceReprocess` - Explicitly reprocess URLs regardless of previous status
+- `--prebidOnly` - Process only URLs where Prebid was previously detected
 
 ### Batch Processing:
 
@@ -177,6 +178,11 @@ prebid-integration-monitor/
 - `--skipProcessed` - Skip already processed URLs
 - `--resetTracking` - Clear tracking database
 - `--range="start-end"` - Process specific URL range (positions refer to original file, not filtered list)
+
+### Configuration Capture:
+
+- `--prebidConfigDetail=none|raw` - Capture raw Prebid configuration from pbjs.getConfig()
+- `--identityUsageDetail=none|comprehensive` - Capture identity usage and storage correlation
 
 ## Data Storage Locations
 
@@ -196,6 +202,19 @@ project-root/
 ```
 
 ## Common Commands for Copy-Paste
+
+### Reprocess Known Prebid Sites:
+
+```bash
+# Process first 100 Prebid sites with config capture
+node ./bin/run.js scan --prebidOnly --range "1-100" --prebidConfigDetail=raw --headless
+
+# Process Prebid sites 1001-2000 with identity usage capture  
+node ./bin/run.js scan --prebidOnly --range "1001-2000" --identityUsageDetail=comprehensive --headless
+
+# Batch process all Prebid sites in chunks
+node ./bin/run.js scan --prebidOnly --batchMode --startUrl=1 --totalUrls=5000 --batchSize=500 --prebidConfigDetail=raw
+```
 
 ### Resume Batch Processing:
 

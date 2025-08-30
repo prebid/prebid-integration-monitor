@@ -80,6 +80,11 @@ export const scanFlags = {
       'Force reprocessing of URLs even if they were previously processed. Explicit alternative to --resetTracking.',
     default: false,
   }),
+  prebidOnly: Flags.boolean({
+    description:
+      'Process only URLs where Prebid was previously detected. Loads URLs from stored results. Use with --range to process specific subsets.',
+    default: false,
+  }),
   batchMode: Flags.boolean({
     description:
       'Enable batch processing mode. Processes URLs in multiple batches automatically.',
@@ -141,5 +146,23 @@ export const scanFlags = {
       'Level of module categorization: "simple" (all modules in single array), "categorized" (separate arrays for userIds, analytics, consent, etc.)',
     options: ['simple', 'categorized'],
     default: 'simple',
+  }),
+  identityDetail: Flags.string({
+    description:
+      'Level of identity provider detection: "basic" (simple array of provider names), "enhanced" (comprehensive classification with party type, ID type, consent requirements, etc.)',
+    options: ['basic', 'enhanced'],
+    default: 'basic',
+  }),
+  prebidConfigDetail: Flags.string({
+    description:
+      'Level of Prebid configuration capture: "none" (disabled), "raw" (capture raw config from pbjs.getConfig())',
+    options: ['none', 'raw'],
+    default: 'none',
+  }),
+  identityUsageDetail: Flags.string({
+    description:
+      'Level of identity usage and storage capture: "none" (disabled), "comprehensive" (full storage correlation, identity usage analysis, and unidentified pattern detection)',
+    options: ['none', 'comprehensive'],
+    default: 'none',
   }),
 };

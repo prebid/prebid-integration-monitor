@@ -282,9 +282,172 @@ export interface PageData {
   libraries: string[];
   /**
    * An array of detected identity solutions (UID2.0, ID5, Parrable, etc).
+   * Used when identityDetail is 'basic'.
    * @example ["UID2.0", "ID5"]
    */
   identitySolutions?: string[];
+  /**
+   * Enhanced identity provider detection with comprehensive classification.
+   * Used when identityDetail is 'enhanced'.
+   * Includes party type (1st/3rd), ID type (deterministic/probabilistic),
+   * detection methods, and privacy compliance information.
+   */
+  identityProviders?: {
+    providers: Array<{
+      name: string;
+      detected: boolean;
+      detectionMethods: Array<{
+        type: 'window' | 'cookie' | 'localStorage' | 'prebidModule' | 'script' | 'pixel';
+        details?: string;
+      }>;
+      classification: {
+        partyType: '1st' | '3rd' | 'hybrid';
+        idType: 'deterministic' | 'probabilistic' | 'both';
+        scope: 'site' | 'cross-site' | 'global';
+        technology: 'cookie' | 'localStorage' | 'server' | 'hybrid';
+        openSource: boolean;
+        requiresConsent: boolean;
+        privacyCompliant: string[];
+      };
+      metadata?: {
+        version?: string;
+        partnerId?: string;
+        configPresent?: boolean;
+        activeSync?: boolean;
+        lastSeen?: string;
+        additionalData?: Record<string, any>;
+      };
+    }>;
+    summary: {
+      totalProviders: number;
+      firstPartyCount: number;
+      thirdPartyCount: number;
+      deterministicCount: number;
+      probabilisticCount: number;
+      consentRequiredCount: number;
+    };
+    raw: {
+      windowObjects: string[];
+      cookies: string[];
+      localStorage: string[];
+      prebidModules: string[];
+    };
+  };
+  /**
+   * Identity usage data focusing on actual storage rather than installed modules.
+   * Used when captureDetail is 'comprehensive'.
+   */
+  identityUsage?: {
+    storageData: {
+      cookies: Array<{
+        name: string;
+        value: string;
+        provider?: string;
+      }>;
+      localStorage: Array<{
+        key: string;
+        value: string;
+        provider?: string;
+      }>;
+      sessionStorage: Array<{
+        key: string;
+        value: string;
+        provider?: string;
+      }>;
+    };
+    activeProviders: Array<{
+      name: string;
+      storageType: ('cookie' | 'localStorage' | 'sessionStorage')[];
+      dataFound: boolean;
+      orphaned: boolean;
+    }>;
+    inactiveModules: string[];
+    summary: {
+      totalStorageItems: number;
+      activeProvidersCount: number;
+      inactiveModulesCount: number;
+      orphanedDataCount: number;
+    };
+  };
+  /**
+   * Comprehensive Prebid configuration capture.
+   * Used when captureDetail is 'comprehensive'.
+   */
+  prebidConfig?: {
+    config: {
+      globalConfig: any;
+      bidderConfigs: Record<string, any>;
+      userSync: any;
+      priceGranularity: any;
+      mediaTypes: any;
+      timeouts: {
+        auction?: number;
+        bidder?: number;
+        render?: number;
+      };
+      floors: any;
+      analytics: any;
+      realTimeData: any;
+      s2sConfig: any;
+      consentManagement: {
+        gdpr?: any;
+        usp?: any;
+        gpp?: any;
+      };
+      userIds: any;
+      ortb2: any;
+      video: any;
+      currency: any;
+      cache: any;
+      targetingControls: any;
+      auctionOptions: any;
+      debugging: boolean;
+      bidderSequence: string;
+      publisherDomain: string;
+      pageUrl: string;
+      refererInfo: any;
+      coppa: boolean;
+      deviceAccess: boolean;
+      maxRequestsPerOrigin: number;
+      enableSendAllBids: boolean;
+      useBidCache: boolean;
+      bidderTimeout: number;
+      publisherSettings: any;
+      suppressAuctionKeys: boolean;
+      localStorageEnabled: boolean;
+      configuredBidders: string[];
+      activeModules: string[];
+    };
+    insights: {
+      setupComplexity: 'basic' | 'intermediate' | 'advanced';
+      privacyConfig: {
+        hasGDPR: boolean;
+        hasUSP: boolean;
+        hasGPP: boolean;
+        consentRequired: boolean;
+      };
+      monetization: {
+        bidderCount: number;
+        hasHeaderBidding: boolean;
+        hasServerSide: boolean;
+        hasFloors: boolean;
+        hasAnalytics: boolean;
+      };
+      optimization: {
+        hasLazyLoad: boolean;
+        hasRefresh: boolean;
+        hasBidCaching: boolean;
+        hasTargetingControls: boolean;
+      };
+      dataEnrichment: {
+        hasRTD: boolean;
+        rtdModules: string[];
+        hasFirstPartyData: boolean;
+        hasContextualData: boolean;
+      };
+    };
+    raw?: any;
+  };
   /**
    * An array of detected Customer Data Platforms.
    * @example ["Tealium", "Segment", "Adobe"]

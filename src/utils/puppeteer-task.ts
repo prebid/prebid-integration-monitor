@@ -17,6 +17,10 @@ import {
 } from '../config/app-config.js';
 import { createAuthenticUserAgent } from './user-agent.js';
 import { ProcessingPhase, detectErrorType } from './error-types.js';
+import { createIdentityDetectionScript } from './identity-detection.js';
+import { createPrebidConfigCaptureScript } from './prebid-config-capture.js';
+import { createIdentityUsageDetectionScript } from './identity-usage-detector.js';
+import { analyzeUnidentified } from './analyze-unidentified.js';
 
 /**
  * Configures a given Puppeteer {@link Page} instance with standard settings
@@ -682,7 +686,10 @@ export async function extractDataSafely(
   discoveryMode: boolean = false,
   extractMetadata: boolean = false,
   adUnitDetail: 'basic' | 'standard' | 'full' = 'basic',
-  moduleDetail: 'simple' | 'categorized' = 'simple'
+  moduleDetail: 'simple' | 'categorized' = 'simple',
+  identityDetail: 'basic' | 'enhanced' = 'basic',
+  prebidConfigDetail: 'none' | 'raw' | 'analyzed' = 'none',
+  identityUsageDetail: 'none' | 'comprehensive' = 'none'
 ): Promise<any> {
   let lastError: Error | null = null;
 
@@ -695,7 +702,7 @@ export async function extractDataSafely(
         await import('../config/app-config.js');
 
       const extractedPageData = await page.evaluate(
-        async (pbjsTimeoutMs, pbjsIntervalMs, discoveryMode, extractMetadata, adUnitDetail, moduleDetail) => {
+        async (pbjsTimeoutMs, pbjsIntervalMs, discoveryMode, extractMetadata, adUnitDetail, moduleDetail, identityDetail) => {
           // Define a type for the window object to avoid using 'any' repeatedly
           interface CustomWindow extends Window {
             apstag?: unknown; // Amazon Publisher Services UAM tag
@@ -773,11 +780,70 @@ export async function extractDataSafely(
               data.libraries.push('SmartAdServer');
             if (customWindow.xandr) data.libraries.push('Xandr');
 
-            // Identity solutions
-            if (customWindow.__uid2 || customWindow.__uid2_advertising_token)
-              data.identitySolutions.push('UID2.0');
-            if (customWindow.ID5) data.identitySolutions.push('ID5');
-            if (customWindow.parrable) data.identitySolutions.push('Parrable');
+            // Identity solutions - Basic mode (default)
+            if (identityDetail === 'basic') {
+              // Basic detection - simple array of provider names
+              if (customWindow.__uid2 || customWindow.__uid2_advertising_token)
+                data.identitySolutions.push('UID2.0');
+              if (customWindow.ID5) data.identitySolutions.push('ID5');
+              if (customWindow.parrable) data.identitySolutions.push('Parrable');
+              if (customWindow.__liQ) data.identitySolutions.push('LiveIntent');
+              if (customWindow.__lotl || customWindow.lotamePanorama) data.identitySolutions.push('Lotame Panorama');
+              if (customWindow.criteo_pubtag) data.identitySolutions.push('Criteo ID');
+              if (customWindow.merkleId) data.identitySolutions.push('Merkle ID');
+              if (customWindow.fabrickId) data.identitySolutions.push('Neustar Fabrick');
+              if (customWindow.zeotapIdPlus) data.identitySolutions.push('Zeotap ID+');
+              if (customWindow.quantcastId) data.identitySolutions.push('Quantcast ID');
+              if (customWindow.sharedId) data.identitySolutions.push('SharedID');
+              if (customWindow.pubcid) data.identitySolutions.push('PubCommon ID');
+              if (customWindow.unifiedId) data.identitySolutions.push('The Trade Desk UnifiedID');
+              if (customWindow.intentIqId) data.identitySolutions.push('IntentIQ');
+              if (customWindow.hadronId) data.identitySolutions.push('Hadron ID');
+              if (customWindow.connectId) data.identitySolutions.push('Yahoo ConnectID');
+              if (customWindow.tapadId) data.identitySolutions.push('Tapad Graph');
+              if (customWindow.idxId) data.identitySolutions.push('IDx');
+              if (customWindow.britepoolId) data.identitySolutions.push('BritePool');
+              if (customWindow.amxId) data.identitySolutions.push('AMX RTB');
+              if (customWindow.admixerId) data.identitySolutions.push('AdMixer');
+              if (customWindow.dmdId) data.identitySolutions.push('DMD ID');
+              if (customWindow.kpuid) data.identitySolutions.push('Kinesso ID');
+              if (customWindow.novatiq) data.identitySolutions.push('Novatiq Hyper ID');
+              
+              // Check cookies for additional identity solutions
+              try {
+                const cookies = document.cookie.split(';').map(c => c.trim());
+                for (const cookie of cookies) {
+                  const [name] = cookie.split('=');
+                  const cookieName = name.trim();
+                  
+                  // Map cookie names to identity solutions (avoid duplicates)
+                  if (cookieName.includes('uid2_advertising_token') && !data.identitySolutions.includes('UID2.0'))
+                    data.identitySolutions.push('UID2.0');
+                  if ((cookieName.includes('id5id') || cookieName === 'id5_consent') && !data.identitySolutions.includes('ID5'))
+                    data.identitySolutions.push('ID5');
+                  if ((cookieName === 'idex' || cookieName === 'tuuid' || cookieName === 'li_did') && !data.identitySolutions.includes('LiveIntent'))
+                    data.identitySolutions.push('LiveIntent');
+                  if ((cookieName === '_cc_id' || cookieName === 'panoramaId') && !data.identitySolutions.includes('Lotame Panorama'))
+                    data.identitySolutions.push('Lotame Panorama');
+                  if ((cookieName.includes('cto_bundle') || cookieName.includes('cto_idcpy')) && !data.identitySolutions.includes('Criteo ID'))
+                    data.identitySolutions.push('Criteo ID');
+                  if ((cookieName === 'sharedid' || cookieName === '_sharedid') && !data.identitySolutions.includes('SharedID'))
+                    data.identitySolutions.push('SharedID');
+                  if ((cookieName === '_pubcid' || cookieName === 'pubcid') && !data.identitySolutions.includes('PubCommon ID'))
+                    data.identitySolutions.push('PubCommon ID');
+                  if (cookieName === '__qca' && !data.identitySolutions.includes('Quantcast ID'))
+                    data.identitySolutions.push('Quantcast ID');
+                  if ((cookieName === '__uid' || cookieName === 'unified_id') && !data.identitySolutions.includes('The Trade Desk UnifiedID'))
+                    data.identitySolutions.push('The Trade Desk UnifiedID');
+                  if ((cookieName === 'intentIqId' || cookieName === 'iiq_id') && !data.identitySolutions.includes('IntentIQ'))
+                    data.identitySolutions.push('IntentIQ');
+                  if ((cookieName === '_parrable_id' || cookieName === 'tpc') && !data.identitySolutions.includes('Parrable'))
+                    data.identitySolutions.push('Parrable');
+                }
+              } catch (e) {
+                // Cookie access might be blocked
+              }
+            }
 
             // Customer Data Platforms
             if (customWindow.tealiumCDH || customWindow.utag)
@@ -1240,10 +1306,69 @@ export async function extractDataSafely(
         discoveryMode,
         extractMetadata,
         adUnitDetail,
-        moduleDetail
+        moduleDetail,
+        identityDetail
       );
 
       logger?.debug(`Data extraction attempt ${attempt} succeeded`);
+      
+      // If enhanced identity detection is enabled, run the comprehensive detection
+      if (identityDetail === 'enhanced') {
+        try {
+          const identityDetectionScript = createIdentityDetectionScript();
+          const enhancedIdentityResult: any = await page.evaluate(identityDetectionScript);
+          
+          if (enhancedIdentityResult && enhancedIdentityResult.providers) {
+            extractedPageData.identityProviders = enhancedIdentityResult;
+            // Also populate the basic array for backward compatibility
+            extractedPageData.identitySolutions = enhancedIdentityResult.providers.map((p: any) => p.name);
+          }
+        } catch (error) {
+          logger?.debug('Enhanced identity detection failed:', error);
+        }
+      }
+      
+      // Handle Prebid config capture based on flag
+      if (prebidConfigDetail !== 'none') {
+        try {
+          const prebidConfigScript = createPrebidConfigCaptureScript();
+          const prebidConfigResult: any = await page.evaluate(prebidConfigScript);
+          
+          logger?.debug(`Prebid config capture result: ${JSON.stringify(prebidConfigResult ? 'exists' : 'null')}`);
+          
+          if (prebidConfigResult && !prebidConfigResult.error) {
+            // Store raw config directly
+            extractedPageData.prebidConfig = prebidConfigResult;
+            logger?.debug('Prebid config stored in extractedPageData');
+          } else if (prebidConfigResult?.error) {
+            logger?.debug(`Prebid config error: ${prebidConfigResult.error}`);
+          }
+        } catch (error) {
+          logger?.debug('Prebid config capture failed:', error);
+        }
+      }
+      
+      // Handle identity usage capture separately
+      if (identityUsageDetail === 'comprehensive') {
+        try {
+          const identityUsageScript = createIdentityUsageDetectionScript();
+          const identityUsageResult: any = await page.evaluate(identityUsageScript);
+          
+          if (identityUsageResult && !identityUsageResult.error) {
+            // Add analysis of unidentified storage items if any exist
+            if (identityUsageResult.correlatedStorage?.unidentified?.length > 0) {
+              const unidentifiedAnalysis = analyzeUnidentified(
+                identityUsageResult.correlatedStorage.unidentified
+              );
+              identityUsageResult.correlatedStorage.unidentifiedAnalysis = unidentifiedAnalysis;
+            }
+            extractedPageData.identityUsage = identityUsageResult;
+          }
+        } catch (error) {
+          logger?.debug('Identity usage detection failed:', error);
+        }
+      }
+      
       return extractedPageData;
     } catch (error) {
       lastError = error as Error;
@@ -1348,7 +1473,7 @@ export async function extractDataSafely(
  */
 export const processPageTask = async ({
   page,
-  data: { url, logger, discoveryMode = false, extractMetadata = false, adUnitDetail = 'basic', moduleDetail = 'simple' },
+  data: { url, logger, discoveryMode = false, extractMetadata = false, adUnitDetail = 'basic', moduleDetail = 'simple', identityDetail = 'basic', prebidConfigDetail = 'none', identityUsageDetail = 'none' },
 }: {
   page: Page;
   data: { 
@@ -1358,6 +1483,9 @@ export const processPageTask = async ({
     extractMetadata?: boolean;
     adUnitDetail?: 'basic' | 'standard' | 'full';
     moduleDetail?: 'simple' | 'categorized';
+    identityDetail?: 'basic' | 'enhanced';
+    prebidConfigDetail?: 'none' | 'raw' | 'analyzed';
+    identityUsageDetail?: 'none' | 'comprehensive';
   };
 }): Promise<TaskResult> => {
   const trimmedUrl: string = url.trim(); // Ensure URL is trimmed before processing
@@ -1388,10 +1516,54 @@ export const processPageTask = async ({
       discoveryMode,
       extractMetadata,
       adUnitDetail,
-      moduleDetail
+      moduleDetail,
+      identityDetail,
+      prebidConfigDetail,
+      identityUsageDetail
     )) as PageData;
 
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data
+
+    // Handle Prebid config capture based on flag
+    if (prebidConfigDetail !== 'none') {
+      try {
+        const prebidConfigScript = createPrebidConfigCaptureScript();
+        const prebidConfigResult: any = await page.evaluate(prebidConfigScript);
+        
+        logger.debug(`Prebid config capture result (processPageTask): ${JSON.stringify(prebidConfigResult ? 'exists' : 'null')}`);
+        
+        if (prebidConfigResult && !prebidConfigResult.error) {
+          // Store raw config directly
+          extractedPageData.prebidConfig = prebidConfigResult;
+          logger.debug('Prebid config stored in extractedPageData (processPageTask)');
+        } else if (prebidConfigResult?.error) {
+          logger.debug(`Prebid config error (processPageTask): ${prebidConfigResult.error}`);
+        }
+      } catch (error) {
+        logger.debug('Prebid config capture failed (processPageTask):', error);
+      }
+    }
+    
+    // Handle identity usage capture separately
+    if (identityUsageDetail === 'comprehensive') {
+      try {
+        const identityUsageScript = createIdentityUsageDetectionScript();
+        const identityUsageResult: any = await page.evaluate(identityUsageScript);
+        
+        if (identityUsageResult && !identityUsageResult.error) {
+          // Add analysis of unidentified storage items if any exist
+          if (identityUsageResult.correlatedStorage?.unidentified?.length > 0) {
+            const unidentifiedAnalysis = analyzeUnidentified(
+              identityUsageResult.correlatedStorage.unidentified
+            );
+            identityUsageResult.correlatedStorage.unidentifiedAnalysis = unidentifiedAnalysis;
+          }
+          extractedPageData.identityUsage = identityUsageResult;
+        }
+      } catch (error) {
+        logger?.debug('Identity usage detection failed:', error);
+      }
+    }
 
     // Determine if meaningful data was extracted
     const hasLibraries =
@@ -1408,7 +1580,8 @@ export const processPageTask = async ({
       const cdpCount = extractedPageData.cdpPlatforms?.length || 0;
       const hasCMP = extractedPageData.cmpInfo ? 1 : 0;
 
-      logger.info(`✅ Successfully extracted ad tech data from ${trimmedUrl}`, {
+      // Enhanced logging if using enhanced identity detection
+      const logData: any = {
         libraries: libraryCount,
         prebidInstances: prebidCount,
         identitySolutions: identityCount,
@@ -1416,7 +1589,19 @@ export const processPageTask = async ({
         cmp: hasCMP,
         cmpName: extractedPageData.cmpInfo?.name,
         firstPrebidVersion: extractedPageData.prebidInstances?.[0]?.version,
-      });
+      };
+      
+      if (extractedPageData.identityProviders) {
+        logData.identityBreakdown = {
+          total: extractedPageData.identityProviders.summary.totalProviders,
+          firstParty: extractedPageData.identityProviders.summary.firstPartyCount,
+          thirdParty: extractedPageData.identityProviders.summary.thirdPartyCount,
+          deterministic: extractedPageData.identityProviders.summary.deterministicCount,
+          probabilistic: extractedPageData.identityProviders.summary.probabilisticCount,
+        };
+      }
+
+      logger.info(`✅ Successfully extracted ad tech data from ${trimmedUrl}`, logData);
       return { type: 'success', data: extractedPageData };
     } else {
       logger.warn(

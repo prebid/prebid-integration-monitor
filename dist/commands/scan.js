@@ -74,6 +74,10 @@ export default class Scan extends Command {
             skipSSLFailed: flags.skipSSLFailed,
             adUnitDetail: flags.adUnitDetail,
             moduleDetail: flags.moduleDetail,
+            identityDetail: flags.identityDetail,
+            prebidConfigDetail: flags.prebidConfigDetail,
+            identityUsageDetail: flags.identityUsageDetail,
+            prebidOnly: flags.prebidOnly,
             puppeteerLaunchOptions: {
                 headless: flags.headless, // Ensure headless state is consistent
                 args: ['--no-sandbox', '--disable-setuid-sandbox'], // Default args for broader compatibility
@@ -95,7 +99,20 @@ export default class Scan extends Command {
      * @throws {Error} If no input source (neither `inputFile` argument nor `githubRepo` flag) is specified.
      */
     _getInputSourceOptions(args, flags, options) {
-        if (flags.githubRepo) {
+        if (flags.prebidOnly) {
+            this.log('Processing only URLs where Prebid was previously detected');
+            options.prebidOnly = true;
+            // With prebidOnly, we don't need a traditional input source
+            // The URLs will be loaded from the store directory
+            // Warn if other input sources are provided
+            if (flags.githubRepo) {
+                this.warn('--prebidOnly provided, --githubRepo flag will be ignored.');
+            }
+            if (args.inputFile && args.inputFile !== scanArgs.inputFile.default) {
+                this.warn(`--prebidOnly provided, inputFile argument ('${args.inputFile}') will be ignored.`);
+            }
+        }
+        else if (flags.githubRepo) {
             this.log(`Fetching URLs from GitHub repository: ${flags.githubRepo}`);
             options.githubRepo = flags.githubRepo;
             // Warn if inputFile arg is provided but will be ignored (excluding default value for inputFile if that's how it's handled)
