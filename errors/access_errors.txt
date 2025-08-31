@@ -1,3 +1,5 @@
 # Access Control Errors
 # Authentication failures, rate limiting, bot detection, CDN protection
 # Format: [timestamp] | Category: access/<subcat> | Phase: <phase> | Code: <code> | URL: <url> | Message: <msg>
+[2025-08-31T19:41:18.087Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://alligator.org | Message: Page was closed during navigation checks
+[2025-08-31T19:46:29.319Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: http://www.alligator.org | Message: Page was closed during navigation checks

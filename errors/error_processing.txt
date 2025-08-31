@@ -20051,3 +20051,19 @@ Date.toJSON (<anonymous>)
 [2025-08-31T11:54:31.919Z] | Category: unknown/unclassified | Phase: data_extraction | Code: UNKNOWN_ERROR | URL: http://www.20min.dev | Message: net::ERR_INVALID_AUTH_CREDENTIALS at http://www.20min.dev
 [2025-08-31T13:03:20.788Z] | Category: unknown/unclassified | Phase: data_extraction | Code: UNKNOWN_ERROR | URL: http://www.100layercake.com | Message: Page was closed during navigation checks
 [2025-08-31T13:03:20.796Z] | Category: unknown/unclassified | Phase: data_extraction | Code: UNKNOWN_ERROR | URL: http://www.100pmagazine.nl | Message: Page was closed during navigation checks
+2025-08-31T19:27:24.154Z | URL: http://www.andrewzimmern.com | Message: Browser crashed - will not retry | Error: BROWSER_CRASH_NO_RETRY
+2025-08-31T19:27:24.154Z | URL: http://www.andreasnotebook.com | Message: Browser crashed - will not retry | Error: BROWSER_CRASH_NO_RETRY
+2025-08-31T19:27:24.154Z | URL: http://www.androidinfotech.com | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:27:24.154Z | URL: http://www.androidnature.com | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:27:24.154Z | URL: http://www.androidpc.com.br | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:27:24.154Z | URL: http://www.androidpc.es | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:27:24.154Z | URL: http://www.androidpctv.com | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:27:24.154Z | URL: http://www.androidpctv.com | Message: Browser crashed - will not retry | Error: BROWSER_CRASH_NO_RETRY
+[2025-08-31T19:27:24.134Z] | Category: unknown/unclassified | Phase: data_extraction | Code: UNKNOWN_ERROR | URL: http://www.androidnature.com | Message: Page was closed before data extraction
+[2025-08-31T19:27:24.142Z] | Category: unknown/unclassified | Phase: data_extraction | Code: UNKNOWN_ERROR | URL: http://www.androidpc.com.br | Message: Page was closed before data extraction
+2025-08-31T19:28:50.718Z | URL: http://www.andtheycookedhappilyeverafter.com | Message: Browser crashed - will not retry | Error: BROWSER_CRASH_NO_RETRY
+2025-08-31T19:28:50.718Z | URL: http://www.angelescape.com | Message: Site detected as malicious: excessive frame detachments | Error: MALICIOUS_FRAME_DETACHMENT
+2025-08-31T19:28:50.718Z | URL: http://www.angelnumber.net | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:28:50.718Z | URL: http://www.angelnumber.org | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+2025-08-31T19:28:50.718Z | URL: http://www.angelnumbersmeaning.com | Message: Processing timed out or was interrupted | Error: CLUSTER_IDLE_TIMEOUT
+[2025-08-31T19:46:29.327Z] | Category: unknown/unclassified | Phase: data_extraction | Code: UNKNOWN_ERROR | URL: http://www.allisrael.com | Message: Page was closed before data extraction

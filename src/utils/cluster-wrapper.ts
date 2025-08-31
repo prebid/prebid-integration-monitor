@@ -203,10 +203,23 @@ export async function createSafeCluster(
     }
 
     let result: TaskResult | null = null;
+    let hardTimeoutId: NodeJS.Timeout | null = null;
+    let isTimedOut = false;
 
     try {
       // Start tracing
       pageTracer.startPageProcessing();
+
+      // Create a hard timeout that will force cleanup after 65 seconds
+      hardTimeoutId = setTimeout(() => {
+        isTimedOut = true;
+        logger.error(`Page processing timeout for ${url} - forcing cleanup`);
+        
+        // Force close the page if it's still open
+        if (page && !page.isClosed()) {
+          page.close().catch(() => {});
+        }
+      }, 65000);
 
       // Create a timeout promise
       const timeoutPromise = new Promise<TaskResult>((_, reject) => {
@@ -219,6 +232,11 @@ export async function createSafeCluster(
         url,
         async (page) => {
           try {
+            // Check if we've already timed out
+            if (isTimedOut) {
+              throw new Error('Processing aborted due to timeout');
+            }
+
             // Set conservative page settings
             await page.setDefaultTimeout(20000);
             await page.setDefaultNavigationTimeout(20000);
@@ -245,6 +263,11 @@ export async function createSafeCluster(
       // Race between timeout and processing (with crash detection)
       result = await Promise.race([processingPromise, timeoutPromise]);
 
+      // Clear the hard timeout if we completed successfully
+      if (hardTimeoutId) {
+        clearTimeout(hardTimeoutId);
+      }
+
       pageTracer.finish(
         true,
         result.type === 'success' ? result.data : undefined
@@ -256,6 +279,26 @@ export async function createSafeCluster(
 
       return result;
     } catch (error: any) {
+      // Clear the hard timeout
+      if (hardTimeoutId) {
+        clearTimeout(hardTimeoutId);
+      }
+
+      // Check if we were forcefully timed out
+      if (isTimedOut) {
+        const timeoutResult: TaskResult = {
+          type: 'error',
+          url: url,
+          error: {
+            code: 'HARD_TIMEOUT',
+            message: 'Page processing exceeded maximum timeout and was forcefully terminated',
+            stack: undefined,
+          },
+        };
+        onTaskComplete?.(timeoutResult);
+        return timeoutResult;
+      }
+
       const err = error as Error;
       pageTracer.finishWithError(err);
 
