@@ -403,15 +403,16 @@ export interface PageData {
   /**
    * Detected Consent Management Platform information.
    * Always present but may be empty object if no CMP detected.
-   * @example { name: "OneTrust", version: "6.34.0", tcfVersion: "2.2" }
+   * @example { cmpId: 300, version: 2, tcfVersion: "2.x" }
    */
   cmpInfo: {
-    name?: string;
-    version?: string;
+    cmpId?: number;
+    version?: string | number;
     tcfVersion?: string;
     gdprApplies?: boolean;
     ccpaApplies?: boolean;
     consentString?: string;
+    uspString?: string;
   };
   /**
    * Unknown ad tech discovered in discovery mode.

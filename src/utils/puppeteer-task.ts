@@ -249,63 +249,96 @@ export async function navigateWithRetry(
       const timeout =
         attempt === 1 ? 60000 : Math.max(30000, 60000 - attempt * 10000);
 
+      // Add protection against infinite loops before navigation
+      await page.evaluateOnNewDocument(() => {
+        let loopCounter = 0;
+        const originalSetTimeout = window.setTimeout.bind(window);
+        const originalSetInterval = window.setInterval.bind(window);
+        
+        // Monitor for excessive timer creation (bot trap indicator)
+        (window as any).setTimeout = function(handler: any, timeout?: any, ...args: any[]) {
+          loopCounter++;
+          if (loopCounter > 1000) {
+            console.error('EXCESSIVE_TIMERS_DETECTED');
+            throw new Error('Possible infinite loop detected');
+          }
+          return originalSetTimeout(handler, timeout, ...args);
+        };
+        
+        (window as any).setInterval = function(handler: any, timeout?: any, ...args: any[]) {
+          loopCounter += 10; // Intervals are worse
+          if (loopCounter > 1000) {
+            console.error('EXCESSIVE_TIMERS_DETECTED');
+            throw new Error('Possible infinite loop detected');  
+          }
+          return originalSetInterval(handler, timeout, ...args);
+        };
+      });
+      
       // Use domcontentloaded for initial navigation (faster)
       await page.goto(url, {
         timeout,
         waitUntil: 'domcontentloaded',
       });
       
-      // Wait for document.readyState to be complete
-      await page.waitForFunction(
-        () => document.readyState === 'complete',
-        { timeout: 10000 }
-      ).catch(() => {});
-      
-      // Additional wait for lazy-loaded identity solutions and CDPs
-      // Many identity providers and CDPs load after DOMContentLoaded
-      await page.waitForFunction(
-        () => {
-          interface ExtendedWindow extends Window {
-            // Identity solutions
-            __uid2?: unknown;
-            __uid2_advertising_token?: unknown;
-            ID5?: unknown;
-            __tcfapi?: unknown;
-            __lotl?: unknown;
-            lotamePanorama?: unknown;
-            criteo_pubtag?: unknown;
-            pubcid?: unknown;
-            sharedId?: unknown;
-            __liQ?: unknown; // LiveIntent
-            // CDP platforms
-            analytics?: { track?: Function };
-            _satellite?: unknown; // Adobe
-            utag?: unknown; // Tealium
-            tealiumCDH?: unknown;
-          }
-          const win = window as ExtendedWindow;
+      // Run multiple checks in parallel for better performance
+      await Promise.all([
+        // Wait for document ready state
+        page.waitForFunction(
+          () => document.readyState === 'complete',
+          { timeout: 5000 } // Reduced from 10s
+        ).catch(() => {}),
+        
+        // Check for identity/CDP solutions and Prebid in parallel
+        Promise.race([
+          // Early exit if we find Prebid quickly
+          page.waitForFunction(
+            () => {
+              return typeof (window as any).pbjs !== 'undefined' ||
+                     typeof (window as any).apntag !== 'undefined' ||
+                     typeof (window as any).googletag !== 'undefined';
+            },
+            { timeout: 2000 }
+          ).catch(() => {}),
           
-          // Check if any common identity or CDP solutions are still loading
-          const hasIdentity = win.__uid2 !== undefined || 
-                            win.ID5 !== undefined || 
-                            win.__tcfapi !== undefined ||
-                            win.__lotl !== undefined ||
-                            win.criteo_pubtag !== undefined ||
-                            win.pubcid !== undefined ||
-                            win.__liQ !== undefined;
-          
-          const hasCDP = win.analytics !== undefined ||
-                        win._satellite !== undefined ||
-                        win.utag !== undefined;
-          
-          // Wait until we find at least one, or document is complete
-          return hasIdentity || hasCDP || document.readyState === 'complete';
-        },
-        { timeout: 3000 }
-      ).catch(() => {});
-      
-      // Brief wait for final async operations
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+          // Or wait for identity/CDP solutions
+          page.waitForFunction(
+            () => {
+              interface ExtendedWindow extends Window {
+                // Identity solutions
+                __uid2?: unknown;
+                ID5?: unknown;
+                __tcfapi?: unknown;
+                __lotl?: unknown;
+                criteo_pubtag?: unknown;
+                pubcid?: unknown;
+                __liQ?: unknown; // LiveIntent
+                // CDP platforms
+                analytics?: { track?: Function };
+                _satellite?: unknown; // Adobe
+                utag?: unknown; // Tealium
+              }
+              const win = window as ExtendedWindow;
+              
+              // Check if any common identity or CDP solutions are loaded
+              const hasIdentity = win.__uid2 !== undefined || 
+                                win.ID5 !== undefined || 
+                                win.__tcfapi !== undefined ||
+                                win.__lotl !== undefined ||
+                                win.criteo_pubtag !== undefined ||
+                                win.pubcid !== undefined ||
+                                win.__liQ !== undefined;
+              
+              const hasCDP = win.analytics !== undefined ||
+                            win._satellite !== undefined ||
+                            win.utag !== undefined;
+              
+              return hasIdentity || hasCDP || document.readyState === 'complete';
+            },
+            { timeout: 2000 } // Reduced from 3s
+          ).catch(() => {})
+        ])
+      ]);
       
       // Enhanced post-navigation checks
       await performPostNavigationChecks(page, url, logger);
@@ -386,11 +419,11 @@ async function performPostNavigationChecks(
   originalUrl: string,
   logger?: WinstonLogger
 ): Promise<void> {
-  // Minimal stabilization wait since we already waited in navigation
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // Very brief stabilization wait
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
-  // Dismiss popups that might interfere with content detection
-  await dismissPopups(page, logger);
+  // Dismiss popups asynchronously (don't wait for completion)
+  dismissPopups(page, logger).catch(() => {});
 
   // Only check for domain parking redirects, not page content
   const currentUrl = page.url();
@@ -513,11 +546,10 @@ async function simulateUserInteraction(
   logger?: WinstonLogger
 ): Promise<void> {
   try {
-    // Mouse movement to trigger hover events that might load ads
+    // Quick mouse movement to trigger hover events
     await page.mouse.move(100, 100);
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Reduced from 200ms
     await page.mouse.move(500, 300);
-    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Click on non-interactive areas to trigger focus events
     await page.evaluate(() => {
@@ -556,13 +588,29 @@ async function performSmartScrolling(
       return new Promise<void>((resolve) => {
         let totalHeight = 0;
         const distance = 150; // Slightly larger steps
-        const pauseDuration = 300; // Longer pause for ad loading
+        const pauseDuration = 100; // Reduced pause for faster scrolling
         let scrollCount = 0;
-        const maxScrolls = 20; // Prevent infinite scrolling
+        const maxScrolls = 15; // Reduced max scrolls
+        let adSlotsFound = false;
 
         const timer = setInterval(() => {
           const scrollHeight = document.body.scrollHeight;
           const viewportHeight = window.innerHeight;
+          
+          // Early exit if we find ad slots
+          if (!adSlotsFound && (
+            document.querySelector('[id^="div-gpt-ad"]') ||
+            document.querySelector('.adsbygoogle') ||
+            document.querySelector('[data-prebid-adunit]')
+          )) {
+            adSlotsFound = true;
+            // Do 2 more scrolls then exit
+            if (scrollCount > 2) {
+              clearInterval(timer);
+              resolve();
+              return;
+            }
+          }
 
           // Scroll by distance
           window.scrollBy(0, distance);
@@ -620,10 +668,18 @@ async function waitForAdTechInitialization(
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
         let checkCount = 0;
-        const maxChecks = 15; // 7.5 seconds total
+        const maxChecks = 10; // 2.5 seconds total (reduced from 7.5s)
 
         const checkInitialization = () => {
           checkCount++;
+          
+          // Early exit if Prebid is detected
+          if (typeof (window as any).pbjs !== 'undefined' && 
+              (window as any).pbjs.adUnits && 
+              (window as any).pbjs.adUnits.length > 0) {
+            resolve();
+            return;
+          }
 
           // Check for common ad tech initialization signals
           const signals = [
@@ -652,7 +708,7 @@ async function waitForAdTechInitialization(
           if (hasSignal || checkCount >= maxChecks) {
             resolve();
           } else {
-            setTimeout(checkInitialization, 500);
+            setTimeout(checkInitialization, 250); // Reduced from 500ms
           }
         };
 
@@ -755,12 +811,33 @@ export async function extractDataSafely(
     throw new Error('Page was closed before data extraction');
   }
   
-  // Quick frame validity test
+  // Quick frame validity test - handle browser crashes gracefully
   try {
     await page.evaluate(() => document.readyState).catch((e) => {
+      // Check for browser crash patterns
+      if (e.message.includes('Target closed') || 
+          e.message.includes('Session closed') ||
+          e.message.includes('Protocol error')) {
+        logger?.warn(`Browser crashed during frame check: ${e.message}`);
+        throw new Error('BROWSER_CRASH_NO_RETRY');
+      }
       throw new Error(`Frame not accessible: ${e.message}`);
     });
-  } catch (frameError) {
+  } catch (frameError: any) {
+    if (frameError.message === 'BROWSER_CRASH_NO_RETRY') {
+      // Return empty data for browser crashes - don't throw
+      logger?.info(`Browser crash detected - returning empty data`);
+      const emptyResult: PageData = {
+        url: page.url(),
+        date: new Date().toISOString().split('T')[0],
+        libraries: [],
+        prebidInstances: [],
+        cdpPlatforms: [],
+        identitySolutions: [],
+        cmpInfo: {},
+      };
+      return emptyResult;
+    }
     logger?.info(`Frame check failed, skipping extraction`);
     throw frameError;
   }
@@ -938,18 +1015,45 @@ export async function extractDataSafely(
 
                   if (typeof customWindow.__tcfapi === 'function') {
                     try {
-                      customWindow.__tcfapi('getTCData', 2, (tcData: any, success: boolean) => {
-                        clearTimeout(timeout);
-                        if (success && tcData) {
-                          resolve({
-                            tcfVersion: '2.x',
-                            gdprApplies: tcData.gdprApplies,
-                            consentString: tcData.tcString,
-                            cmpId: tcData.cmpId,
-                            version: tcData.cmpVersion ? String(tcData.cmpVersion) : undefined
-                          });
+                      // First ping to get CMP info
+                      customWindow.__tcfapi('ping', 2, (pingResult: any) => {
+                        const cmpId = pingResult?.cmpId;
+                        const cmpVersion = pingResult?.cmpVersion;
+                        
+                        // Then get consent data
+                        if (customWindow.__tcfapi) {
+                          customWindow.__tcfapi('getTCData', 2, (tcData: any, success: boolean) => {
+                          clearTimeout(timeout);
+                          if (success && tcData) {
+                            resolve({
+                              tcfVersion: '2.x',
+                              gdprApplies: tcData.gdprApplies,
+                              consentString: tcData.tcString,
+                              cmpId: cmpId || tcData.cmpId,
+                              version: cmpVersion || (tcData.cmpVersion ? String(tcData.cmpVersion) : undefined)
+                            });
+                          } else if (cmpId) {
+                            // Even if getTCData fails, we have CMP info from ping
+                            resolve({
+                              tcfVersion: '2.x',
+                              cmpId: cmpId,
+                              version: cmpVersion
+                            });
+                          } else {
+                            resolve(null);
+                          }
+                        });
                         } else {
-                          resolve(null);
+                          // __tcfapi not available after ping
+                          if (cmpId) {
+                            resolve({
+                              tcfVersion: '2.x',
+                              cmpId: cmpId,
+                              version: cmpVersion
+                            });
+                          } else {
+                            resolve(null);
+                          }
                         }
                       });
                     } catch {
@@ -1002,64 +1106,6 @@ export async function extractDataSafely(
                 Object.assign(data.cmpInfo, uspData);
               }
 
-              // OneTrust detection
-              if (customWindow.OneTrust || customWindow.OnetrustActiveGroups) {
-                data.cmpInfo.name = 'OneTrust';
-                if (customWindow.OneTrust && customWindow.OneTrust.getGeolocationData) {
-                  try {
-                    const geoData = customWindow.OneTrust.getGeolocationData();
-                    if (geoData && geoData.country) {
-                      data.cmpInfo.gdprApplies = ['EU', 'UK', 'GB'].includes(geoData.country);
-                    }
-                  } catch {}
-                }
-              }
-
-              // Quantcast Choice detection
-              if (customWindow.__qcCmpApi || customWindow.quantcastChoice) {
-                data.cmpInfo.name = 'Quantcast Choice';
-              }
-
-              // TrustArc detection  
-              if (customWindow.truste || customWindow.TrustArc) {
-                data.cmpInfo.name = 'TrustArc';
-              }
-
-              // Cookiebot detection
-              if (customWindow.Cookiebot) {
-                data.cmpInfo.name = 'Cookiebot';
-                if (customWindow.Cookiebot.consent) {
-                  data.cmpInfo.consentString = customWindow.Cookiebot.consent.stamp;
-                }
-              }
-
-              // Didomi detection
-              if (customWindow.Didomi || customWindow.didomiOnReady) {
-                data.cmpInfo.name = 'Didomi';
-                if (customWindow.Didomi && customWindow.Didomi.getUserStatus) {
-                  try {
-                    const userStatus = customWindow.Didomi.getUserStatus();
-                    if (userStatus) {
-                      data.cmpInfo.consentString = userStatus.consent_string;
-                    }
-                  } catch {}
-                }
-              }
-
-              // Usercentrics detection
-              if (customWindow.UC || customWindow.usercentrics) {
-                data.cmpInfo.name = 'Usercentrics';
-              }
-
-              // Sourcepoint detection
-              if (customWindow._sp_ || customWindow._sp_queue) {
-                data.cmpInfo.name = 'Sourcepoint';
-              }
-
-              // Osano detection
-              if (customWindow.Osano) {
-                data.cmpInfo.name = 'Osano';
-              }
 
               // Keep cmpInfo as empty object if no CMP detected (consistent with other fields)
               // This ensures the field is always present in the output
@@ -1514,17 +1560,49 @@ export async function extractDataSafely(
         metadata: detailedError.metadata,
       });
 
-      // Check if this is a detached frame error - don't retry these
+      // Check for browser crash errors - don't retry these
+      if (error instanceof Error && 
+          (error.message.includes('Target closed') ||
+           error.message.includes('Protocol error (Runtime.callFunctionOn)') ||
+           error.message.includes('Session closed'))) {
+        logger?.warn(`Browser crashed during data extraction - not retrying`);
+        // Return empty data instead of throwing for browser crashes
+        const emptyResult: PageData = {
+          url: page.url(),
+          date: new Date().toISOString().split('T')[0],
+          libraries: [],
+          prebidInstances: [],
+          cdpPlatforms: [],
+          identitySolutions: [],
+          cmpInfo: {},
+        };
+        return emptyResult;
+      }
+      
+      // Check if this is a detached frame error - limited retries
       if (error instanceof Error && 
           (error.message.includes('detached Frame') || 
            error.message.includes('frame was detached') ||
            error.message.includes('Navigating frame'))) {
-        logger?.info(`Frame detached during data extraction - not retrying`);
-        // Don't retry frame errors - they indicate the page is problematic
+        
+        // Try a limited number of retries for frame errors (fewer than other errors)
+        if (attempt <= 2) {
+          logger?.debug(
+            `Frame detached during data extraction, retrying (attempt ${attempt}/2)...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 500)); // Shorter wait
+          
+          // Wait for DOM to stabilize before retry
+          await waitForDOMStability(page, logger, 1000);
+          continue;
+        }
+        
+        // After retries exhausted, throw error
+        logger?.info(`Frame detached after ${attempt - 1} attempts - marking as error`);
         (error as any).detailedError = detailedError;
         throw error;
       } else {
-        // For other errors, don't retry either
+        // For non-frame errors, don't retry
         (error as any).detailedError = detailedError;
         throw error;
       }
@@ -1626,48 +1704,55 @@ export const processPageTask = async ({
     // Use enhanced navigation with retry logic
     await navigateWithRetry(page, trimmedUrl, logger);
 
-    // Trigger dynamic content loading (lazy loading, etc.)
-    await triggerDynamicContent(page, logger);
-
-    // Wait for DOM to stabilize and identity solutions to load
-    await waitForDOMStability(page, logger, 3000);
-    
-    // Wait for consent management and identity solutions to initialize
-    await page.evaluate(() => {
-      return new Promise((resolve) => {
-        let consentReady = false;
+    // Run multiple operations in parallel for better performance
+    await Promise.all([
+      // Trigger dynamic content loading
+      triggerDynamicContent(page, logger),
+      
+      // Wait for DOM stability and consent in parallel
+      Promise.all([
+        waitForDOMStability(page, logger, 2000), // Reduced from 3000ms
         
-        // Check for standard consent APIs
-        setTimeout(() => {
-          // TCF v2 API (GDPR) - industry standard
-          if (typeof (window as any).__tcfapi === 'function') {
-            (window as any).__tcfapi('addEventListener', 2, (tcData: any, success: boolean) => {
-              if (success && (tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete')) {
-                consentReady = true;
-                setTimeout(resolve, 500); // Allow time for consent-dependent operations
-              }
-            });
-            // Timeout if consent doesn't load
-            setTimeout(() => { if (!consentReady) resolve(undefined); }, 2000);
-          } 
-          // USP API (CCPA) - industry standard
-          else if (typeof (window as any).__uspapi === 'function') {
-            (window as any).__uspapi('getUSPData', 1, () => {
-              setTimeout(resolve, 500);
-            });
-            setTimeout(resolve, 1500); // Fallback timeout
+        // Conditional consent wait - only if CMP is detected
+        page.evaluate(() => {
+          // Quick check for consent management
+          const hasCMP = typeof (window as any).__tcfapi === 'function' ||
+                        typeof (window as any).__uspapi === 'function' ||
+                        typeof (window as any).__gpp === 'function';
+          
+          if (!hasCMP) {
+            return Promise.resolve(); // No CMP, skip wait
           }
-          // GPP API (Global Privacy Platform) - newer standard
-          else if (typeof (window as any).__gpp === 'function') {
-            setTimeout(resolve, 1000);
-          }
-          // No consent API detected, proceed after brief wait
-          else {
-            setTimeout(resolve, 1000);
-          }
-        }, 500);
-      });
-    }).catch(() => {});
+          
+          return new Promise((resolve) => {
+            let consentReady = false;
+            
+            // TCF v2 API (GDPR)
+            if (typeof (window as any).__tcfapi === 'function') {
+              (window as any).__tcfapi('addEventListener', 2, (tcData: any, success: boolean) => {
+                if (success && (tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete')) {
+                  consentReady = true;
+                  setTimeout(resolve, 200); // Reduced from 500ms
+                }
+              });
+              // Timeout if consent doesn't load
+              setTimeout(() => { if (!consentReady) resolve(undefined); }, 1500); // Reduced from 2000ms
+            } 
+            // USP API (CCPA)
+            else if (typeof (window as any).__uspapi === 'function') {
+              (window as any).__uspapi('getUSPData', 1, () => {
+                setTimeout(resolve, 200);
+              });
+              setTimeout(resolve, 1000); // Reduced from 1500ms
+            }
+            // GPP API
+            else if (typeof (window as any).__gpp === 'function') {
+              setTimeout(resolve, 500); // Reduced from 1000ms
+            }
+          });
+        }).catch(() => {})
+      ])
+    ]);
 
     // Use frame-safe data extraction with retry logic for detached frame errors
     const extractedPageData: PageData = (await extractDataSafely(
@@ -1684,6 +1769,32 @@ export const processPageTask = async ({
     )) as PageData;
 
     extractedPageData.url = trimmedUrl; // Assign the processed URL to the extracted data
+    
+    // Check if browser crashed (empty data returned)
+    if (extractedPageData.libraries.length === 0 && 
+        (!extractedPageData.prebidInstances || extractedPageData.prebidInstances.length === 0) &&
+        !extractedPageData.cdpPlatforms?.length &&
+        !extractedPageData.identitySolutions?.length) {
+      // This might be a browser crash result
+      let currentUrl = trimmedUrl;
+      try {
+        currentUrl = page.url();
+      } catch {
+        // Page is likely closed
+      }
+      if (currentUrl === 'about:blank' || page.isClosed()) {
+        logger.warn(`Browser appears to have crashed for ${trimmedUrl}`);
+        return {
+          type: 'error',
+          url: trimmedUrl,
+          error: {
+            code: 'BROWSER_CRASH_NO_RETRY',
+            message: 'Browser crashed during processing',
+            stack: undefined,
+          },
+        };
+      }
+    }
 
     // Handle Prebid config capture based on flag
     if (prebidConfigDetail !== 'none' && extractedPageData.prebidInstances && extractedPageData.prebidInstances.length > 0) {
@@ -1800,7 +1911,6 @@ export const processPageTask = async ({
         identitySolutions: identityCount,
         cdpPlatforms: cdpCount,
         cmp: hasCMP,
-        cmpName: extractedPageData.cmpInfo?.name,
         firstPrebidVersion: extractedPageData.prebidInstances?.[0]?.version,
       };
       

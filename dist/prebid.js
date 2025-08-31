@@ -115,20 +115,8 @@ export async function prebidExplorer(options) {
         // Determine the source of URLs (GitHub, local file, or Prebid-only) and fetch them.
         const urlLoadingTracer = new URLLoadingTracer(options.prebidOnly ? 'prebid-store' : (options.githubRepo || options.inputFile || 'unknown'), logger);
         if (options.prebidOnly) {
-            // Load URLs from database where has_prebid = 1
+            // Load URLs directly from database where has_prebid = 1
             urlSourceType = 'PrebidDatabase';
-            // Check that numUrls is specified for prebidOnly mode
-            if (!options.numUrls) {
-                logger.error('--numUrls is required when using --prebidOnly flag');
-                urlLoadingTracer.finish(0);
-                return {
-                    urlsProcessed: 0,
-                    urlsSkipped: 0,
-                    successfulExtractions: 0,
-                    errors: 0,
-                    noAdTech: 0,
-                };
-            }
             // Get count of Prebid URLs in database
             const prebidUrlCount = urlTracker.getPrebidUrlCount();
             if (prebidUrlCount === 0) {
@@ -143,19 +131,33 @@ export async function prebidExplorer(options) {
                 };
             }
             logger.info(`Found ${prebidUrlCount} URLs with Prebid in database`);
-            // Calculate offset based on range if provided
+            // Calculate offset and limit from range or numUrls
             let offset = 0;
-            let limit = options.numUrls;
+            let limit = options.numUrls || 100; // Default to 100 if not specified
             if (options.range) {
-                const [startStr] = options.range.split('-');
+                const [startStr, endStr] = options.range.split('-');
                 const start = startStr ? parseInt(startStr, 10) : 1;
-                offset = start > 0 ? start - 1 : 0; // Convert 1-based to 0-based
+                const end = endStr ? parseInt(endStr, 10) : start + limit - 1;
+                offset = start - 1; // Convert to 0-based
+                limit = end - start + 1;
+                logger.info(`Using range ${options.range}: offset=${offset}, limit=${limit}`);
             }
-            // Load Prebid URLs from database with limit and offset
+            // Load URLs directly from database
             allUrls = urlTracker.getPrebidUrls(limit, offset);
             urlLoadingTracer.recordUrlCount(allUrls.length, 'prebid_database');
-            logger.info(`Loaded ${allUrls.length} URLs where Prebid was detected (offset: ${offset}, limit: ${limit})`);
-            // Always use forceReprocess when prebidOnly is set
+            logger.info(`Loaded ${allUrls.length} Prebid URLs from database (offset: ${offset}, limit: ${limit})`);
+            if (allUrls.length === 0) {
+                logger.warn('No Prebid URLs found in the specified range. Database may not have enough URLs.');
+                urlLoadingTracer.finish(0);
+                return {
+                    urlsProcessed: 0,
+                    urlsSkipped: 0,
+                    successfulExtractions: 0,
+                    errors: 0,
+                    noAdTech: 0,
+                };
+            }
+            // Always use forceReprocess when prebidOnly is set to update existing data
             if (!options.forceReprocess) {
                 logger.info('Note: Enabling forceReprocess for Prebid-only mode to update existing data');
                 options.forceReprocess = true;
@@ -238,10 +240,10 @@ export async function prebidExplorer(options) {
             logger.error(`Amazon found at index ${amazonIndex}: ${allUrls[amazonIndex]}`);
         }
         // 1. URL Range Logic
-        // Apply URL range filtering if specified in options, but only for non-GitHub sources
-        // (GitHub sources already apply range optimization during fetching)
+        // Apply URL range filtering if specified in options, but only for non-GitHub and non-PrebidDatabase sources
+        // (GitHub and PrebidDatabase sources already apply range optimization during fetching)
         const filteringTracer = new URLFilteringTracer(allUrls.length, logger);
-        if (options.range && urlSourceType !== 'GitHub') {
+        if (options.range && urlSourceType !== 'GitHub' && urlSourceType !== 'PrebidDatabase') {
             logger.info(`Applying range: ${options.range}`);
             const originalUrlCount = allUrls.length;
             let [startStr, endStr] = options.range.split('-');
@@ -272,6 +274,10 @@ export async function prebidExplorer(options) {
         }
         else if (options.range && urlSourceType === 'GitHub') {
             logger.info(`Range ${options.range} already applied during GitHub fetch optimization. Skipping duplicate range filtering.`);
+            filteringTracer.recordRangeFiltering(allUrls.length, allUrls.length, options.range);
+        }
+        else if (options.range && urlSourceType === 'PrebidDatabase') {
+            logger.info(`Range ${options.range} already applied during database query. Skipping duplicate range filtering.`);
             filteringTracer.recordRangeFiltering(allUrls.length, allUrls.length, options.range);
         }
         if (allUrls.length === 0) {
@@ -733,7 +739,9 @@ export async function prebidExplorer(options) {
                     }
                 }
             }
-            else if (options.puppeteerType === 'cluster') {
+            else if (options.puppeteerType === 'cluster' && urlsToProcess.length === 0) {
+                // This block should only execute when there are NO URLs to process
+                logger.warn(`Cluster path for empty URL list`);
                 const cluster = await Cluster.launch({
                     concurrency: Cluster.CONCURRENCY_CONTEXT,
                     maxConcurrency: options.concurrency,
@@ -925,18 +933,47 @@ export async function prebidExplorer(options) {
                 }
             }
         }
-        // Separate timeout errors for retry
+        // Separate errors for intelligent retry decision
         const timeoutErrors = [];
+        const crashErrors = [];
         const nonTimeoutResults = [];
         for (const result of taskResults) {
-            if (result.type === 'error' &&
-                result.error.message &&
-                result.error.message.toLowerCase().includes('timeout')) {
-                timeoutErrors.push({ url: result.url, originalError: result });
+            if (result.type === 'error' && result.error.message) {
+                const msg = result.error.message;
+                const code = result.error.code;
+                // Separate browser crashes - NEVER retry these
+                if (msg.includes('Target closed') ||
+                    msg.includes('BROWSER_CRASH') ||
+                    code === 'BROWSER_CRASH_NO_RETRY' ||
+                    msg.includes('Protocol error (Runtime.callFunctionOn)') ||
+                    msg.includes('Session closed. Most likely the page has been closed')) {
+                    crashErrors.push(result);
+                    logger.warn(`⛔ Browser crash detected for ${result.url} - will not retry`);
+                }
+                // Regular timeouts - SHOULD retry as they might work
+                else if (msg.toLowerCase().includes('timeout')) {
+                    timeoutErrors.push({ url: result.url, originalError: result });
+                }
+                else {
+                    nonTimeoutResults.push(result);
+                }
             }
             else {
                 nonTimeoutResults.push(result);
             }
+        }
+        // Log crash sites that won't be retried
+        if (crashErrors.length > 0) {
+            logger.info(`========================================`);
+            logger.info(`SKIPPING ${crashErrors.length} BROWSER CRASH ERRORS`);
+            logger.info(`========================================`);
+            logger.info('These sites cause browser crashes and will not be retried:');
+            crashErrors.forEach(result => {
+                const url = result.type === 'error' ? result.url : '';
+                logger.info(`  ⛔ ${url}`);
+            });
+            // Add crash errors to final results without retry
+            nonTimeoutResults.push(...crashErrors);
         }
         // Retry timeout errors at the end of batch with more lenient settings
         if (timeoutErrors.length > 0) {
@@ -1004,7 +1041,13 @@ export async function prebidExplorer(options) {
                             identityUsageDetail: options.identityUsageDetail
                         });
                     }
+                    // Add timeout to prevent infinite hanging
+                    const idleTimeout = setTimeout(() => {
+                        logger.error('Retry cluster idle timeout - forcing close');
+                        cluster.close();
+                    }, 60000); // 60 second timeout for idle
                     await cluster.idle();
+                    clearTimeout(idleTimeout);
                     await cluster.close();
                 }
                 catch (error) {

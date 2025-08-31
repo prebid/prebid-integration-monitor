@@ -29,6 +29,75 @@ export interface SafeClusterOptions {
 }
 
 /**
+ * Wrap task execution with crash detection for fast abort
+ */
+async function wrapWithCrashDetection(
+  page: Page,
+  url: string,
+  task: (page: Page) => Promise<TaskResult>,
+  logger: WinstonLogger
+): Promise<TaskResult> {
+  let crashDetected = false;
+  let checkInterval: NodeJS.Timeout | null = null;
+  
+  // Monitor for the specific crash pattern
+  const crashHandler = (error: Error) => {
+    const msg = error.message;
+    // ONLY these specific patterns indicate browser being killed
+    if (msg.includes('Target closed') || 
+        msg.includes('Protocol error (Runtime.callFunctionOn)') ||
+        msg.includes('Session closed. Most likely the page has been closed')) {
+      crashDetected = true;
+      logger.warn(`Browser crash detected for ${url} - aborting immediately`);
+    }
+  };
+  
+  page.on('error', crashHandler);
+  page.on('pageerror', crashHandler);
+  
+  try {
+    // Set a reasonable timeout but let slow sites complete
+    const result = await Promise.race([
+      task(page),
+      new Promise<TaskResult>((_, reject) => {
+        // Check periodically for crash
+        checkInterval = setInterval(() => {
+          if (crashDetected || page.isClosed()) {
+            if (checkInterval) clearInterval(checkInterval);
+            reject(new Error('BROWSER_CRASHED_ABORT'));
+          }
+        }, 250); // Check 4x per second
+        
+        // Clean up after max time (keep existing 60s for slow sites)
+        setTimeout(() => {
+          if (checkInterval) clearInterval(checkInterval);
+        }, 60000);
+      })
+    ]);
+    return result;
+  } catch (error: any) {
+    if (error.message === 'BROWSER_CRASHED_ABORT') {
+      // Return error result for browser crashes - don't retry
+      return {
+        type: 'error',
+        url: url,
+        error: {
+          code: 'BROWSER_CRASH_NO_RETRY',
+          message: 'Browser crashed - will not retry',
+          stack: error.stack,
+        },
+      };
+    }
+    throw error;
+  } finally {
+    // Clean up
+    page.off('error', crashHandler);
+    page.off('pageerror', crashHandler);
+    if (checkInterval) clearInterval(checkInterval);
+  }
+}
+
+/**
  * Create a safer cluster with enhanced error handling
  */
 export async function createSafeCluster(
@@ -144,31 +213,36 @@ export async function createSafeCluster(
         setTimeout(() => reject(new Error('Page processing timeout')), 25000);
       });
 
-      // Create the processing promise
-      const processingPromise = (async () => {
-        try {
-          // Set conservative page settings
-          await page.setDefaultTimeout(20000);
-          await page.setDefaultNavigationTimeout(20000);
+      // Create the processing promise with crash detection
+      const processingPromise = wrapWithCrashDetection(
+        page,
+        url,
+        async (page) => {
+          try {
+            // Set conservative page settings
+            await page.setDefaultTimeout(20000);
+            await page.setDefaultNavigationTimeout(20000);
 
-          // Disable JavaScript execution that might cause issues
-          await page.evaluateOnNewDocument(() => {
-            // Disable problematic APIs
-            Object.defineProperty(navigator, 'webdriver', { get: () => false });
-          });
+            // Disable JavaScript execution that might cause issues
+            await page.evaluateOnNewDocument(() => {
+              // Disable problematic APIs
+              Object.defineProperty(navigator, 'webdriver', { get: () => false });
+            });
 
-          // Setup page event handlers
-          pageTracer.setupPageEventHandlers(page);
+            // Setup page event handlers
+            pageTracer.setupPageEventHandlers(page);
 
-          // Process the page
-          const taskResult = await processPageTask({ page, data });
-          return taskResult;
-        } catch (error) {
-          throw error;
-        }
-      })();
+            // Process the page
+            const taskResult = await processPageTask({ page, data });
+            return taskResult;
+          } catch (error) {
+            throw error;
+          }
+        },
+        logger
+      );
 
-      // Race between timeout and processing
+      // Race between timeout and processing (with crash detection)
       result = await Promise.race([processingPromise, timeoutPromise]);
 
       pageTracer.finish(

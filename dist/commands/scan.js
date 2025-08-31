@@ -60,7 +60,7 @@ export default class Scan extends Command {
             monitor: flags.monitor,
             outputDir: flags.outputDir,
             logDir: flags.logDir,
-            numUrls: flags.prebidOnly ? flags.numUrls : (flags.range ? undefined : flags.numUrls), // prebidOnly always needs numUrls
+            numUrls: flags.range ? undefined : flags.numUrls, // range takes precedence over numUrls
             range: flags.range,
             chunkSize: flags.chunkSize,
             skipProcessed: flags.skipProcessed,
@@ -102,14 +102,13 @@ export default class Scan extends Command {
         if (flags.prebidOnly) {
             this.log('Processing only URLs where Prebid was previously detected');
             options.prebidOnly = true;
-            // With prebidOnly, we don't need a traditional input source
-            // The URLs will be loaded from the store directory
-            // Warn if other input sources are provided
+            // With prebidOnly, URLs are loaded directly from the database
+            // No source file is needed
             if (flags.githubRepo) {
-                this.warn('--prebidOnly provided, --githubRepo flag will be ignored.');
+                this.warn('--githubRepo is ignored when using --prebidOnly (URLs come from database)');
             }
             if (args.inputFile && args.inputFile !== scanArgs.inputFile.default) {
-                this.warn(`--prebidOnly provided, inputFile argument ('${args.inputFile}') will be ignored.`);
+                this.warn(`Input file '${args.inputFile}' is ignored when using --prebidOnly (URLs come from database)`);
             }
         }
         else if (flags.githubRepo) {
@@ -221,7 +220,8 @@ export default class Scan extends Command {
             const batchOptions = {
                 ...baseOptions,
                 range: range,
-                numUrls: undefined, // Override numUrls to prevent interference with range
+                // Don't override numUrls for any mode - range takes precedence
+                numUrls: undefined,
                 logDir: `${flags.logDir}-batch-${batchNum.toString().padStart(3, '0')}`,
             };
             logger.info(`DEBUG: Batch options created with:`);
