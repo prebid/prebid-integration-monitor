@@ -293,6 +293,7 @@ export default class Scan extends Command {
           successfulExtractions: batchResult.successfulExtractions || 0,
           errors: batchResult.errors || 0,
           noAdTech: batchResult.noAdTech || 0,
+          urlsRetried: batchResult.urlsRetried || 0,
         };
 
         // If stats are all zeros, try to read from the batch log file as fallback
@@ -509,6 +510,7 @@ export default class Scan extends Command {
             successfulExtractions: batchStats.successfulExtractions,
             errors: batchStats.errors,
             noAdTech: batchStats.noAdTech,
+            urlsRetried: batchStats.urlsRetried,
             errorFilesUpdated: errorFilesUpdated,
             skipVerification: skipVerification.verified ? {
               expectedInDb: skipVerification.expectedInDb,
@@ -578,6 +580,7 @@ export default class Scan extends Command {
               successfulExtractions: recoveryResult.successfulExtractions || 0,
               errors: recoveryResult.errors || 0,
               noAdTech: recoveryResult.noAdTech || 0,
+              urlsRetried: recoveryResult.urlsRetried || 0,
             };
             
             batchTracer.recordUrlCounts(
@@ -650,6 +653,7 @@ export default class Scan extends Command {
     let totalSuccessfulExtractions = 0;
     let totalErrors = 0;
     let totalNoAdTech = 0;
+    let totalUrlsRetried = 0;
     let batchesWithErrorFileUpdates = 0;
     let batchesWithoutErrorFileUpdates = 0;
 
@@ -661,6 +665,7 @@ export default class Scan extends Command {
         totalSuccessfulExtractions += batch.statistics.successfulExtractions || 0;
         totalErrors += batch.statistics.errors || 0;
         totalNoAdTech += batch.statistics.noAdTech || 0;
+        totalUrlsRetried += batch.statistics.urlsRetried || 0;
         
         if (batch.statistics.errorFilesUpdated) {
           batchesWithErrorFileUpdates++;
@@ -771,6 +776,9 @@ export default class Scan extends Command {
     );
     logger.info(`   ⚠️  Errors encountered: ${totalErrors.toLocaleString()}`);
     logger.info(`   🚫 No ad tech found: ${totalNoAdTech.toLocaleString()}`);
+    if (totalUrlsRetried > 0) {
+      logger.info(`   🔁 URLs retried: ${totalUrlsRetried.toLocaleString()}`);
+    }
     
     // Add skip verification warnings if any discrepancies found
     let skipVerificationIssues = 0;
@@ -951,6 +959,12 @@ export default class Scan extends Command {
       try {
         await this._runBatchMode(flags, args, options);
         this.log('Batch processing completed successfully.');
+        
+        // Ensure clean process exit after batch processing
+        // Small delay to allow final I/O operations to complete
+        setTimeout(() => {
+          process.exit(0);
+        }, 100);
         return; // Exit after batch mode completes
       } catch (error: unknown) {
         this.error(
@@ -978,6 +992,11 @@ export default class Scan extends Command {
       try {
         await prebidExplorer(options);
         this.log('Prebid scan completed successfully.');
+        
+        // Ensure clean process exit after a short delay for I/O to complete
+        setTimeout(() => {
+          process.exit(0);
+        }, 100);
       } catch (error: unknown) {
         // Logger should already be initialized here.
         let userMessage =
