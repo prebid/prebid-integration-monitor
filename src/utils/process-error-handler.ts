@@ -22,10 +22,23 @@ export function installProcessErrorHandler(winstonLogger: WinstonLogger): void {
     if (
       error.message &&
       (error.message.includes('Unable to get browser page') ||
-        error.message.includes('Requesting main frame too early'))
+        error.message.includes('Requesting main frame too early') ||
+        error.message.includes('This socket has been ended') ||
+        error.message.includes('socket hang up') ||
+        error.message.includes('EPIPE') ||
+        error.message.includes('ECONNRESET') ||
+        error.message.includes('Protocol error') ||
+        error.message.includes('Session closed') ||
+        error.message.includes('Target closed') ||
+        error.message.includes('page has been closed') ||
+        error.message.includes('Page was closed') ||
+        error.message.includes('Navigating frame was detached') ||
+        error.message.includes('Navigation failed because browser has disconnected') ||
+        error.message.includes('Execution context was destroyed'))
     ) {
-      logger?.debug('Browser lifecycle error (uncaught):', error.message);
-      // For browser lifecycle errors, we don't exit - let the process continue
+      logger?.warn('Recoverable browser/socket error (uncaught):', error.message);
+      // For browser lifecycle and socket errors, we don't exit - let the process continue
+      // These errors typically occur when a browser crashes but the batch can continue
       return;
     }
 
@@ -42,10 +55,22 @@ export function installProcessErrorHandler(winstonLogger: WinstonLogger): void {
       reason &&
       reason.message &&
       (reason.message.includes('Unable to get browser page') ||
-        reason.message.includes('Requesting main frame too early'))
+        reason.message.includes('Requesting main frame too early') ||
+        reason.message.includes('This socket has been ended') ||
+        reason.message.includes('socket hang up') ||
+        reason.message.includes('EPIPE') ||
+        reason.message.includes('ECONNRESET') ||
+        reason.message.includes('Protocol error') ||
+        reason.message.includes('Session closed') ||
+        reason.message.includes('Target closed') ||
+        reason.message.includes('page has been closed') ||
+        reason.message.includes('Page was closed') ||
+        reason.message.includes('Navigating frame was detached') ||
+        reason.message.includes('Navigation failed because browser has disconnected') ||
+        reason.message.includes('Execution context was destroyed'))
     ) {
-      logger?.debug(
-        'Browser lifecycle error (unhandled rejection):',
+      logger?.warn(
+        'Recoverable browser/socket error (unhandled rejection):',
         reason.message
       );
       // Don't exit - let the process continue

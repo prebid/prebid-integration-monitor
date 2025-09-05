@@ -263,6 +263,7 @@ export interface PrebidExplorerStats {
   successfulExtractions: number;
   errors: number;
   noAdTech: number;
+  urlsRetried?: number;
 }
 
 export async function prebidExplorer(
@@ -270,6 +271,14 @@ export async function prebidExplorer(
 ): Promise<PrebidExplorerStats> {
   // Initialize logger first so we can use it in the catch block
   logger = initializeLogger(options.logDir);
+  
+  // Initialize counters at the top level so they're available in catch block
+  let processedUrlCount = 0;
+  let skippedUrlCount = 0;
+  let successfulExtractions = 0;
+  let errorCount = 0;
+  let noDataCount = 0;
+  let retriedUrlCount = 0;
   
   try {
     initializeTelemetry('prebid-integration-monitor');
@@ -757,8 +766,8 @@ export async function prebidExplorer(
 
       // Log summary even when exiting early
       const originalUrlCount = originalCount;
-      const skippedUrlCount = urlsSkippedProcessed;
-      const processedUrlCount = 0;
+      skippedUrlCount = urlsSkippedProcessed;
+      processedUrlCount = 0;
 
       logger.info('========================================');
       logger.info('SCAN SUMMARY');
@@ -1453,6 +1462,7 @@ export async function prebidExplorer(
     logger.info('========================================');
     logger.info('Using extended timeout and relaxed settings for retries...');
 
+    retriedUrlCount = timeoutErrors.length; // Track how many URLs we're retrying
     const retryResults: TaskResult[] = [];
     
     // Create a special puppeteer instance with even more lenient settings for retries
@@ -1519,18 +1529,64 @@ export async function prebidExplorer(
         }
 
         // Add timeout to prevent infinite hanging
-        const idleTimeout = setTimeout(() => {
-          logger.error('Retry cluster idle timeout - forcing close');
-          cluster.close();
-        }, 60000); // 60 second timeout for idle
+        // Must be longer than the hard timeout for individual pages (65s)
+        let idleTimedOut = false;
+        let timeoutHandle: NodeJS.Timeout | null = null;
         
-        await cluster.idle();
-        clearTimeout(idleTimeout);
-        await cluster.close();
+        // Create a timeout promise that will resolve after 90 seconds
+        const timeoutPromise = new Promise<void>((resolve) => {
+          timeoutHandle = setTimeout(() => {
+            // Only log if we actually timed out (not if already cleared)
+            if (!idleTimedOut) {
+              logger.warn('Retry cluster idle timeout - forcing close (will continue with batch)');
+              idleTimedOut = true;
+            }
+            resolve();
+          }, 90000); // 90 second timeout for idle (longer than 65s hard timeout)
+        });
+        
+        try {
+          // Race between cluster.idle() and timeout
+          await Promise.race([
+            cluster.idle(),
+            timeoutPromise
+          ]);
+          
+          // Clear the timeout if cluster.idle() completed first
+          if (timeoutHandle && !idleTimedOut) {
+            clearTimeout(timeoutHandle);
+          }
+          
+          // Close the cluster regardless of which promise won
+          await cluster.close().catch((e: any) => {
+            logger.debug('Error during cluster close:', e.message);
+          });
+        } catch (idleError: any) {
+          // Clear the timeout on error
+          if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+          }
+          
+          logger.debug('Cluster idle error:', idleError.message);
+          // Try to close anyway
+          await cluster.close().catch((e: any) => {
+            logger.debug('Error during cluster close after error:', e.message);
+          });
+        }
+        
+        // If we timed out, log it but don't fail the batch
+        if (idleTimedOut) {
+          logger.warn('Retry cluster timed out - keeping original errors for timeout URLs');
+          // Push original errors for URLs that couldn't be retried
+          retryResults.push(...timeoutErrors.map(e => e.originalError));
+        }
       } catch (error) {
         logger.error('Retry cluster failed:', error);
         // Keep original errors if retry cluster fails
         retryResults.push(...timeoutErrors.map(e => e.originalError));
+        
+        // Don't propagate the error - just continue with what we have
+        logger.warn('Continuing batch despite retry cluster failure');
       }
     } else {
       // Vanilla puppeteer retry
@@ -1585,7 +1641,9 @@ export async function prebidExplorer(
     logger.info(`❌ Still failed: ${retryFailures}`);
     logger.info('========================================');
 
-    // Merge retry results with non-timeout results
+    // Replace timeout results with retry results (no double counting)
+    // nonTimeoutResults contains everything except the URLs we retried
+    // retryResults contains the final results for the retried URLs
     taskResults = [...nonTimeoutResults, ...retryResults];
   }
 
@@ -1644,8 +1702,8 @@ export async function prebidExplorer(
   // Generate comprehensive processing summary
   const originalUrlCount =
     allUrls.length + (preFilterCount - allUrls.length) + urlsSkippedProcessed; // Total before any filtering
-  const skippedUrlCount = urlsSkippedProcessed;
-  const processedUrlCount = taskResults.length;
+  skippedUrlCount = urlsSkippedProcessed;
+  processedUrlCount = taskResults.length;
 
   // Debug logging to understand what's happening
   logger.debug('Processing summary calculation:', {
@@ -1656,9 +1714,9 @@ export async function prebidExplorer(
     processedUrlCount: processedUrlCount,
     'taskResults.length': taskResults.length,
   });
-  const successfulExtractions = successfulResults.length;
-  const errorCount = taskResults.filter((r) => r.type === 'error').length;
-  const noDataCount = taskResults.filter((r) => r.type === 'no_data').length;
+  successfulExtractions = successfulResults.length;
+  errorCount = taskResults.filter((r) => r.type === 'error').length;
+  noDataCount = taskResults.filter((r) => r.type === 'no_data').length;
 
   // Get final database statistics
   const finalStats = urlTracker.getStats();
@@ -1779,9 +1837,40 @@ export async function prebidExplorer(
     successfulExtractions,
     errors: errorCount,
     noAdTech: noDataCount,
+    urlsRetried: retriedUrlCount,
   };
   } catch (error) {
-    // Log catastrophic error with full details
+    // Check if this is a non-critical error that we can recover from
+    const isRecoverableError = error instanceof Error && (
+      error.message.includes('Retry cluster exceeded idle timeout') ||
+      error.message.includes('retry cluster idle timeout') ||
+      error.message.includes('cluster idle timeout')
+    );
+    
+    if (isRecoverableError) {
+      // For recoverable errors like retry timeouts, log but don't throw
+      logger.warn('Recoverable error encountered, continuing with partial results:', error);
+      
+      // Try to clean up resources
+      try {
+        closeUrlTracker();
+        uninstallProcessErrorHandler();
+      } catch (cleanupError) {
+        logger.error('Error during cleanup:', cleanupError);
+      }
+      
+      // Return whatever results we have
+      return {
+        urlsProcessed: processedUrlCount || 0,
+        urlsSkipped: skippedUrlCount || 0,
+        successfulExtractions: successfulExtractions || 0,
+        errors: errorCount || 0,
+        noAdTech: noDataCount || 0,
+        urlsRetried: retriedUrlCount || 0,
+      };
+    }
+    
+    // For critical errors, log and re-throw
     logger.error('CRITICAL: prebidExplorer encountered a fatal error:', error);
     
     if (error instanceof Error) {
@@ -1800,14 +1889,8 @@ export async function prebidExplorer(
       logger.error('Error during cleanup:', cleanupError);
     }
     
-    // Return empty statistics to prevent batch processing from crashing
-    logger.error('Returning empty statistics due to critical error');
-    return {
-      urlsProcessed: 0,
-      urlsSkipped: 0,
-      successfulExtractions: 0,
-      errors: 0,
-      noAdTech: 0,
-    };
+    // Re-throw the error so batch processing can handle it properly
+    // This will trigger the recovery mechanism in batch mode
+    throw error;
   }
 }
