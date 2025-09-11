@@ -959,3 +959,4 @@
 [2025-09-05T00:45:40.665Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://thatdrop.com | Message: Frame not accessible: Attempted to use detached Frame 'EBD7759B2B088A54692D015D7A60D9D8'.
 [2025-09-05T00:45:40.666Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://thatoregonlife.com | Message: Frame not accessible: Attempted to use detached Frame '9B83DC2A9D7A0020AE91D809D82A3A60'.
 [2025-09-05T00:45:40.667Z] | Category: browser/frame | Phase: data_extraction | Code: FRAME_DETACHED | URL: https://thatgrapejuice.net | Message: Frame not accessible: Attempted to use detached Frame 'B8041B5812AF285750CB334591CFC33E'.
+[2025-09-11T16:09:02.311Z] | Category: browser/context | Phase: data_extraction | Code: CONTEXT_DESTROYED | URL: https://edu-lib.net | Message: Frame not accessible: Execution context was destroyed, most likely because of a navigation.
