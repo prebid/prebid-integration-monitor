@@ -1,0 +1,346 @@
+{
+  "completedBatches": [
+    {
+      "batchNumber": 1,
+      "range": "465000-465249",
+      "completedAt": "2025-09-14T22:05:28.923Z",
+      "duration": 575.494,
+      "statistics": {
+        "urlsProcessed": 217,
+        "urlsSkipped": 0,
+        "successfulExtractions": 17,
+        "errors": 86,
+        "noAdTech": 114,
+        "urlsRetried": 20,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 2,
+      "range": "465250-465499",
+      "completedAt": "2025-09-14T22:15:16.101Z",
+      "duration": 581.171,
+      "statistics": {
+        "urlsProcessed": 227,
+        "urlsSkipped": 0,
+        "successfulExtractions": 16,
+        "errors": 88,
+        "noAdTech": 123,
+        "urlsRetried": 23,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 3,
+      "range": "465500-465749",
+      "completedAt": "2025-09-14T22:25:31.733Z",
+      "duration": 609.627,
+      "statistics": {
+        "urlsProcessed": 219,
+        "urlsSkipped": 0,
+        "successfulExtractions": 16,
+        "errors": 84,
+        "noAdTech": 119,
+        "urlsRetried": 22,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 4,
+      "range": "465750-465999",
+      "completedAt": "2025-09-14T22:34:51.597Z",
+      "duration": 553.859,
+      "statistics": {
+        "urlsProcessed": 214,
+        "urlsSkipped": 0,
+        "successfulExtractions": 16,
+        "errors": 79,
+        "noAdTech": 119,
+        "urlsRetried": 17,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 5,
+      "range": "466000-466249",
+      "completedAt": "2025-09-14T22:44:17.659Z",
+      "duration": 560.056,
+      "statistics": {
+        "urlsProcessed": 218,
+        "urlsSkipped": 0,
+        "successfulExtractions": 12,
+        "errors": 80,
+        "noAdTech": 126,
+        "urlsRetried": 22,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 6,
+      "range": "466250-466499",
+      "completedAt": "2025-09-14T22:53:55.848Z",
+      "duration": 572.183,
+      "statistics": {
+        "urlsProcessed": 222,
+        "urlsSkipped": 0,
+        "successfulExtractions": 18,
+        "errors": 80,
+        "noAdTech": 124,
+        "urlsRetried": 15,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 7,
+      "range": "466500-466749",
+      "completedAt": "2025-09-14T23:03:21.732Z",
+      "duration": 559.88,
+      "statistics": {
+        "urlsProcessed": 215,
+        "urlsSkipped": 0,
+        "successfulExtractions": 18,
+        "errors": 88,
+        "noAdTech": 109,
+        "urlsRetried": 22,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 8,
+      "range": "466750-466999",
+      "completedAt": "2025-09-14T23:12:26.460Z",
+      "duration": 538.723,
+      "statistics": {
+        "urlsProcessed": 224,
+        "urlsSkipped": 0,
+        "successfulExtractions": 19,
+        "errors": 105,
+        "noAdTech": 100,
+        "urlsRetried": 19,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 9,
+      "range": "467000-467249",
+      "completedAt": "2025-09-14T23:21:27.047Z",
+      "duration": 534.586,
+      "statistics": {
+        "urlsProcessed": 217,
+        "urlsSkipped": 0,
+        "successfulExtractions": 11,
+        "errors": 89,
+        "noAdTech": 117,
+        "urlsRetried": 15,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 10,
+      "range": "467250-467499",
+      "completedAt": "2025-09-14T23:31:06.646Z",
+      "duration": 573.594,
+      "statistics": {
+        "urlsProcessed": 228,
+        "urlsSkipped": 0,
+        "successfulExtractions": 13,
+        "errors": 91,
+        "noAdTech": 124,
+        "urlsRetried": 20,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 11,
+      "range": "467500-467749",
+      "completedAt": "2025-09-14T23:40:14.574Z",
+      "duration": 541.925,
+      "statistics": {
+        "urlsProcessed": 222,
+        "urlsSkipped": 0,
+        "successfulExtractions": 15,
+        "errors": 91,
+        "noAdTech": 116,
+        "urlsRetried": 22,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 12,
+      "range": "467750-467999",
+      "completedAt": "2025-09-14T23:49:18.734Z",
+      "duration": 538.156,
+      "statistics": {
+        "urlsProcessed": 214,
+        "urlsSkipped": 0,
+        "successfulExtractions": 24,
+        "errors": 87,
+        "noAdTech": 103,
+        "urlsRetried": 21,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 13,
+      "range": "468000-468249",
+      "completedAt": "2025-09-14T23:59:47.519Z",
+      "duration": 622.782,
+      "statistics": {
+        "urlsProcessed": 223,
+        "urlsSkipped": 0,
+        "successfulExtractions": 22,
+        "errors": 81,
+        "noAdTech": 120,
+        "urlsRetried": 21,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 14,
+      "range": "468250-468499",
+      "completedAt": "2025-09-15T00:08:41.933Z",
+      "duration": 528.411,
+      "statistics": {
+        "urlsProcessed": 221,
+        "urlsSkipped": 0,
+        "successfulExtractions": 16,
+        "errors": 88,
+        "noAdTech": 117,
+        "urlsRetried": 16,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 15,
+      "range": "468500-468749",
+      "completedAt": "2025-09-15T00:18:18.099Z",
+      "duration": 570.162,
+      "statistics": {
+        "urlsProcessed": 210,
+        "urlsSkipped": 0,
+        "successfulExtractions": 17,
+        "errors": 93,
+        "noAdTech": 100,
+        "urlsRetried": 23,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 16,
+      "range": "468750-468999",
+      "completedAt": "2025-09-15T00:27:01.602Z",
+      "duration": 517.499,
+      "statistics": {
+        "urlsProcessed": 209,
+        "urlsSkipped": 0,
+        "successfulExtractions": 10,
+        "errors": 95,
+        "noAdTech": 104,
+        "urlsRetried": 19,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 17,
+      "range": "469000-469249",
+      "completedAt": "2025-09-15T00:35:41.177Z",
+      "duration": 513.571,
+      "statistics": {
+        "urlsProcessed": 212,
+        "urlsSkipped": 0,
+        "successfulExtractions": 24,
+        "errors": 77,
+        "noAdTech": 111,
+        "urlsRetried": 13,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 18,
+      "range": "469250-469499",
+      "completedAt": "2025-09-15T00:44:46.822Z",
+      "duration": 539.64,
+      "statistics": {
+        "urlsProcessed": 214,
+        "urlsSkipped": 0,
+        "successfulExtractions": 17,
+        "errors": 85,
+        "noAdTech": 112,
+        "urlsRetried": 22,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 19,
+      "range": "469500-469749",
+      "completedAt": "2025-09-15T00:54:20.380Z",
+      "duration": 567.552,
+      "statistics": {
+        "urlsProcessed": 226,
+        "urlsSkipped": 0,
+        "successfulExtractions": 21,
+        "errors": 95,
+        "noAdTech": 110,
+        "urlsRetried": 24,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    },
+    {
+      "batchNumber": 20,
+      "range": "469750-469999",
+      "completedAt": "2025-09-15T01:03:03.092Z",
+      "duration": 516.706,
+      "statistics": {
+        "urlsProcessed": 218,
+        "urlsSkipped": 0,
+        "successfulExtractions": 10,
+        "errors": 89,
+        "noAdTech": 119,
+        "urlsRetried": 18,
+        "errorFilesUpdated": false,
+        "skipVerification": null,
+        "note": "Detailed logs in individual batch directories"
+      }
+    }
+  ],
+  "failedBatches": [],
+  "startTime": "2025-09-14T21:55:52.415Z"
+}
