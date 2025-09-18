@@ -1857,3 +1857,259 @@
 [2025-09-17T20:58:08.884Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://csgv.org | Message: net::ERR_INVALID_AUTH_CREDENTIALS at https://csgv.org
 [2025-09-17T20:59:57.058Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://arfny.com | Message: Redirected to problematic domain: www.godaddy.com
 [2025-09-17T21:03:50.861Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ruzzit.com | Message: net::ERR_ABORTED at https://ruzzit.com
+[2025-09-17T21:10:13.363Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://tv3.dk | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://tv3.dk
+[2025-09-17T21:10:21.038Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://virtualinspire.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:11:41.802Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://konsultanstatistik.com | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://konsultanstatistik.com
+[2025-09-17T21:13:48.000Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://multibook.pl | Message: net::ERR_CONNECTION_CLOSED at https://multibook.pl
+[2025-09-17T21:14:42.369Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://thebeautythesis.com | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://thebeautythesis.com
+[2025-09-17T21:16:02.921Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mtlindex.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:18:48.557Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://2zhk.com | Message: net::ERR_ABORTED at https://2zhk.com
+[2025-09-17T21:19:46.940Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://siththarkal.com | Message: net::ERR_CONNECTION_CLOSED at https://siththarkal.com
+[2025-09-17T21:23:33.309Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://cam111.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:24:09.081Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://paragon-servers.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:28:51.250Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://wedspace.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:29:36.254Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://seacargotracking.net | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://seacargotracking.net
+[2025-09-17T21:31:40.592Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://globaledgesoft.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:31:49.509Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ebookdownl.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://ebookdownl.com
+[2025-09-17T21:32:45.977Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://xworld.us | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:33:48.844Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://brandt.fr | Message: net::ERR_ABORTED at https://brandt.fr
+[2025-09-17T21:33:55.678Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://feitsui.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://feitsui.com
+[2025-09-17T21:36:56.802Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://chennaiclips.com | Message: net::ERR_ABORTED at https://chennaiclips.com
+[2025-09-17T21:36:56.806Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://votebar.com | Message: net::ERR_ABORTED at https://votebar.com
+[2025-09-17T21:38:07.877Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://qcidirect.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:39:08.789Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://fotosearch.ae | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:39:09.871Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://gamefie.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:39:52.325Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://superwebportal.com | Message: net::ERR_CONNECTION_RESET at https://superwebportal.com
+[2025-09-17T21:39:56.575Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://isoroot.jp | Message: net::ERR_ABORTED at https://isoroot.jp
+[2025-09-17T21:40:01.023Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://bogotto.de | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://bogotto.de
+[2025-09-17T21:41:06.245Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://brewlife.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T21:45:33.812Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://onceuponmytime.com | Message: net::ERR_ABORTED at https://onceuponmytime.com
+[2025-09-17T21:45:33.821Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://philosophy-online.com | Message: net::ERR_ABORTED at https://philosophy-online.com
+[2025-09-17T21:45:43.861Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://voentorg.ru | Message: net::ERR_HTTP2_PROTOCOL_ERROR at https://voentorg.ru
+[2025-09-17T21:47:35.989Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sexovideo.tv | Message: net::ERR_TOO_MANY_REDIRECTS at https://sexovideo.tv
+[2025-09-17T21:48:42.390Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mokaoba.com | Message: net::ERR_HTTP2_PROTOCOL_ERROR at https://mokaoba.com
+[2025-09-17T21:55:42.960Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://quwenqishi.com | Message: net::ERR_DNS_NO_MATCHING_SUPPORTED_ALPN at https://quwenqishi.com
+[2025-09-17T21:55:57.462Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://jfsa.ca | Message: net::ERR_ABORTED at https://jfsa.ca
+[2025-09-17T21:57:09.379Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://umluj.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:00:24.458Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://spidertracker.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:00:36.470Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://unilever.pk | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://unilever.pk
+[2025-09-17T22:02:37.563Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://connectindia.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:05:00.128Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://theoldermature.com | Message: net::ERR_ABORTED at https://theoldermature.com
+[2025-09-17T22:05:26.435Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://expatescort.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:06:57.161Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://qj401420.com | Message: net::ERR_CONNECTION_RESET at https://qj401420.com
+[2025-09-17T22:07:13.222Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://newzealandbustravel.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://newzealandbustravel.com
+[2025-09-17T22:07:16.099Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://cryptodatabase.net | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:08:30.926Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://programmingbot.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:13:53.114Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://bbes.cn | Message: net::ERR_ABORTED at https://bbes.cn
+[2025-09-17T22:13:53.120Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://skodaxanthifc.gr | Message: net::ERR_ABORTED at https://skodaxanthifc.gr
+[2025-09-17T22:16:44.650Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://7api.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:19:10.493Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://filedrivers.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:21:00.983Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://dditscdn.com | Message: net::ERR_INVALID_RESPONSE at https://dditscdn.com
+[2025-09-17T22:23:40.199Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://alpha-capitalmarkets.com | Message: net::ERR_ABORTED at https://alpha-capitalmarkets.com
+[2025-09-17T22:24:20.759Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://allday.news | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:25:36.699Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sunsky.me | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:26:24.126Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://kestile.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:26:55.747Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://dfwwebpages.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:29:55.017Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://globoxhost.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:30:16.297Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://griyakuliner.com | Message: net::ERR_TOO_MANY_REDIRECTS at https://griyakuliner.com
+[2025-09-17T22:32:08.846Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://blingcity.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://blingcity.com
+[2025-09-17T22:33:52.107Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://loginserver.ch | Message: net::ERR_ABORTED at https://loginserver.ch
+[2025-09-17T22:33:52.111Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://hyundaimail.com | Message: net::ERR_ABORTED at https://hyundaimail.com
+[2025-09-17T22:36:12.448Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://onlinemetatag.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://onlinemetatag.com
+[2025-09-17T22:37:24.354Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://zaincam.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:37:27.252Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://integral-geo.ru | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://integral-geo.ru
+[2025-09-17T22:38:40.904Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://snap.do | Message: net::ERR_ABORTED at https://snap.do
+[2025-09-17T22:39:22.852Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://yeniokul.com | Message: net::ERR_CONNECTION_RESET at https://yeniokul.com
+[2025-09-17T22:43:05.620Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ti-took.net | Message: net::ERR_ABORTED at https://ti-took.net
+[2025-09-17T22:44:53.864Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://myfairbet.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:46:08.059Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://upologus.de | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://upologus.de
+[2025-09-17T22:47:40.441Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://09th.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:50:06.529Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://securedurl.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://securedurl.com
+[2025-09-17T22:50:28.996Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://guidecentr.al | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://guidecentr.al
+[2025-09-17T22:53:06.137Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://vologda-portal.ru | Message: net::ERR_ABORTED at https://vologda-portal.ru
+[2025-09-17T22:53:06.140Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://myvzw.com | Message: net::ERR_ABORTED at https://myvzw.com
+[2025-09-17T22:53:23.322Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://yappyz.com | Message: net::ERR_CONNECTION_CLOSED at https://yappyz.com
+[2025-09-17T22:54:43.455Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://synapsyl.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://synapsyl.com
+[2025-09-17T22:55:21.309Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://justjuice.org | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T22:57:09.421Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://alamedasocialservices.org | Message: net::ERR_CONNECTION_RESET at https://alamedasocialservices.org
+[2025-09-17T22:58:13.475Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://shopintra.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:02:36.732Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://atrixnet.com | Message: net::ERR_ABORTED at https://atrixnet.com
+[2025-09-17T23:02:36.734Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ahref.com | Message: net::ERR_ABORTED at https://ahref.com
+[2025-09-17T23:02:51.914Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://smartcart.io | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:02:54.784Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://inmobiliaria24.com | Message: net::ERR_TOO_MANY_REDIRECTS at https://inmobiliaria24.com
+[2025-09-17T23:04:28.650Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://cinemaflix.net | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:05:47.792Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://letterwhiz.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:05:59.138Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://venatra.com | Message: net::ERR_INVALID_AUTH_CREDENTIALS at https://venatra.com
+[2025-09-17T23:06:08.315Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://customstitchers.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:08:11.672Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://eseguo.it | Message: net::ERR_CONNECTION_RESET at https://eseguo.it
+[2025-09-17T23:08:51.173Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://foxitos.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:10:22.007Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://studytable.in | Message: net::ERR_CONNECTION_CLOSED at https://studytable.in
+[2025-09-17T23:12:31.263Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://agzakhana.com | Message: net::ERR_ABORTED at https://agzakhana.com
+[2025-09-17T23:12:31.266Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://lingerie-photos.com | Message: net::ERR_ABORTED at https://lingerie-photos.com
+[2025-09-17T23:15:01.353Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://hourlybtc.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://hourlybtc.com
+[2025-09-17T23:16:51.346Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://likewatch.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://likewatch.com
+[2025-09-17T23:19:28.878Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://34551.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:20:26.884Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://coltulcameliei.com | Message: net::ERR_CONNECTION_CLOSED at https://coltulcameliei.com
+[2025-09-17T23:22:27.861Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://svgjs.com | Message: net::ERR_ABORTED at https://svgjs.com
+[2025-09-17T23:25:37.653Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://tvseries.in | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://tvseries.in
+[2025-09-17T23:26:07.253Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://hack50.com | Message: net::ERR_CONNECTION_RESET at https://hack50.com
+[2025-09-17T23:27:25.001Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://dailyjav.net | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://dailyjav.net
+[2025-09-17T23:28:02.827Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://funeralplan.com | Message: net::ERR_CONNECTION_RESET at https://funeralplan.com
+[2025-09-17T23:28:12.219Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://boerne-isd.net | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://boerne-isd.net
+[2025-09-17T23:29:10.132Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://xn--bankffnungszeiten-2zb.de | Message: net::ERR_ABORTED at https://xn--bankffnungszeiten-2zb.de
+[2025-09-17T23:31:02.949Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://boommy.ru | Message: net::ERR_ABORTED at https://boommy.ru
+[2025-09-17T23:31:02.952Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ecommerce-site-search.com | Message: net::ERR_ABORTED at https://ecommerce-site-search.com
+[2025-09-17T23:32:42.590Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://qudaih.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:36:37.858Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://fullreleases.ws | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://fullreleases.ws
+[2025-09-17T23:36:53.149Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://freeware-download.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://freeware-download.com
+[2025-09-17T23:39:35.703Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://itxueyuan.org | Message: net::ERR_TIMED_OUT at https://itxueyuan.org
+[2025-09-17T23:46:28.253Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://rsvpu.ru | Message: net::ERR_HTTP2_PROTOCOL_ERROR at https://rsvpu.ru
+[2025-09-17T23:47:20.675Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://lakmebridalstylist.in | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://lakmebridalstylist.in
+[2025-09-17T23:49:35.780Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://juliusex.ru | Message: net::ERR_TIMED_OUT at https://juliusex.ru
+[2025-09-17T23:50:05.351Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://twgogo.org | Message: net::ERR_TIMED_OUT at https://twgogo.org
+[2025-09-17T23:50:35.407Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://minecraftupdates.com | Message: net::ERR_ABORTED at https://minecraftupdates.com
+[2025-09-17T23:50:51.615Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://czj.jp | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://czj.jp
+[2025-09-17T23:52:43.057Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://usthemes.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:57:57.415Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://studiostays.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-17T23:58:47.900Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://pitterandglink.com | Message: net::ERR_CONNECTION_CLOSED at https://pitterandglink.com
+[2025-09-18T00:02:23.833Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://vseokna64.ru | Message: net::ERR_SSL_SERVER_CERT_BAD_FORMAT at https://vseokna64.ru
+[2025-09-18T00:03:57.664Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://tonetoatl.com | Message: net::ERR_CONNECTION_CLOSED at https://tonetoatl.com
+[2025-09-18T00:05:20.678Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://skibig3.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://skibig3.com
+[2025-09-18T00:05:33.009Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://keencams.com | Message: net::ERR_CONNECTION_CLOSED at https://keencams.com
+[2025-09-18T00:06:34.960Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://usiter.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://usiter.com
+[2025-09-18T00:06:41.706Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://reservasonlinecntravel.com | Message: net::ERR_CONNECTION_RESET at https://reservasonlinecntravel.com
+[2025-09-18T00:07:28.663Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ytcvn.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://ytcvn.com
+[2025-09-18T00:10:22.883Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://web5ngay.com | Message: net::ERR_ABORTED at https://web5ngay.com
+[2025-09-18T00:10:51.198Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://aazon.net | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T00:10:57.458Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mltours.ma | Message: net::ERR_CONNECTION_CLOSED at https://mltours.ma
+[2025-09-18T00:11:18.685Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://free-online-veterinarian-advice.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://free-online-veterinarian-advice.com
+[2025-09-18T00:11:38.197Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://933university.biz | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T00:13:55.852Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://encognitive.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T00:20:16.655Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://amscontrolpanel.com | Message: net::ERR_ABORTED at https://amscontrolpanel.com
+[2025-09-18T00:20:16.701Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://webpo.jp | Message: Page was closed during navigation checks
+[2025-09-18T00:34:33.347Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://thaicraft.org | Message: net::ERR_CONNECTION_RESET at https://thaicraft.org
+[2025-09-18T00:34:55.820Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://e-cigareta-shop.com | Message: net::ERR_INVALID_AUTH_CREDENTIALS at https://e-cigareta-shop.com
+[2025-09-18T00:36:14.165Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://altiria.com | Message: net::ERR_ABORTED at https://altiria.com
+[2025-09-18T00:37:10.294Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://credem.net | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://credem.net
+[2025-09-18T00:37:11.296Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://19lou.tw | Message: net::ERR_HTTP2_PROTOCOL_ERROR at https://19lou.tw
+[2025-09-18T00:37:18.689Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://offermag.com | Message: net::ERR_CONNECTION_RESET at https://offermag.com
+[2025-09-18T00:40:14.192Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ambitionlibre.com | Message: net::ERR_INVALID_AUTH_CREDENTIALS at https://ambitionlibre.com
+[2025-09-18T00:42:07.741Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://dvdadvdr.com | Message: net::ERR_ABORTED at https://dvdadvdr.com
+[2025-09-18T00:42:50.917Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://paragontraffic.com | Message: net::ERR_CONNECTION_RESET at https://paragontraffic.com
+[2025-09-18T00:42:53.941Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://xiaomayi.net | Message: net::ERR_ABORTED at https://xiaomayi.net
+[2025-09-18T00:45:31.502Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mlmbaza.ru | Message: net::ERR_TOO_MANY_REDIRECTS at https://mlmbaza.ru
+[2025-09-18T00:47:03.971Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://uecs.ru | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://uecs.ru
+[2025-09-18T00:48:01.363Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sunsilk.in | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://sunsilk.in
+[2025-09-18T00:48:03.369Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://vvcap.net | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T00:51:25.125Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mcdonalds.by | Message: net::ERR_ABORTED at https://mcdonalds.by
+[2025-09-18T00:51:25.127Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ipadvideolessons.com | Message: net::ERR_ABORTED at https://ipadvideolessons.com
+[2025-09-18T00:52:02.529Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://gamefiz.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T00:53:50.950Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://flat101.es | Message: net::ERR_ABORTED at https://flat101.es
+[2025-09-18T00:54:11.061Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ph-commute.com | Message: net::ERR_CONNECTION_CLOSED at https://ph-commute.com
+[2025-09-18T00:55:46.111Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://kezakoo.com | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://kezakoo.com
+[2025-09-18T00:56:41.581Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://petitexplorador.com | Message: net::ERR_TIMED_OUT at https://petitexplorador.com
+[2025-09-18T00:58:32.086Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://diaoyula.com | Message: net::ERR_TIMED_OUT at https://diaoyula.com
+[2025-09-18T00:59:40.608Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://criminaljusticedegreesguide.com | Message: net::ERR_CONNECTION_CLOSED at https://criminaljusticedegreesguide.com
+[2025-09-18T01:01:59.746Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://backlink.app | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T01:02:30.143Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://gameaction.xyz | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T01:03:15.414Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://lamvisaonline.com | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://lamvisaonline.com
+[2025-09-18T01:03:58.452Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://hellojaa.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T01:06:03.750Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://seteviki.biz | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://seteviki.biz
+[2025-09-18T01:08:15.503Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://silkroad-europe.com | Message: net::ERR_ABORTED at https://silkroad-europe.com
+[2025-09-18T01:08:15.507Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://aplusex.com | Message: net::ERR_ABORTED at https://aplusex.com
+[2025-09-18T01:08:15.513Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://parfumidee.ch | Message: net::ERR_ABORTED at https://parfumidee.ch
+[2025-09-18T01:10:25.140Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://arkansasnews.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://arkansasnews.com
+[2025-09-18T01:11:06.108Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://alles-mit-stecker.de | Message: net::ERR_ABORTED at https://alles-mit-stecker.de
+[2025-09-18T01:13:11.428Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://freeukcompetition.com | Message: net::ERR_ABORTED at https://freeukcompetition.com
+[2025-09-18T01:14:36.234Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://elgrandatero.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T01:17:41.685Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://tianbaomall.cn | Message: net::ERR_ABORTED at https://tianbaomall.cn
+[2025-09-18T01:20:25.318Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://bramka.pl | Message: net::ERR_TIMED_OUT at https://bramka.pl
+[2025-09-18T01:20:45.928Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://timelot.ru | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://timelot.ru
+[2025-09-18T01:21:48.165Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://shuaxinyong.net | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://shuaxinyong.net
+[2025-09-18T01:22:47.975Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://culblog.com | Message: net::ERR_CONNECTION_RESET at https://culblog.com
+[2025-09-18T01:24:45.673Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sofree.tw | Message: net::ERR_TOO_MANY_REDIRECTS at https://sofree.tw
+[2025-09-18T01:27:28.237Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://openwpthemes.com | Message: net::ERR_ABORTED at https://openwpthemes.com
+[2025-09-18T01:27:28.241Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://eiberico.es | Message: net::ERR_ABORTED at https://eiberico.es
+[2025-09-18T01:30:55.139Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://carltonhotel.sg | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://carltonhotel.sg
+[2025-09-18T01:34:16.546Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://pective.com | Message: net::ERR_CONNECTION_CLOSED at https://pective.com
+[2025-09-18T01:36:44.491Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ganpatrimoine.fr | Message: net::ERR_ABORTED at https://ganpatrimoine.fr
+[2025-09-18T01:36:44.493Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://koddunyasi.net | Message: net::ERR_ABORTED at https://koddunyasi.net
+[2025-09-18T01:36:44.495Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://magazines-pdf.com | Message: net::ERR_ABORTED at https://magazines-pdf.com
+[2025-09-18T01:36:58.025Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://amtek.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T01:38:03.693Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://cerchiperauto.it | Message: net::ERR_ABORTED at https://cerchiperauto.it
+[2025-09-18T01:45:55.290Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://esa-aalsmeer.nl | Message: net::ERR_ABORTED at https://esa-aalsmeer.nl
+[2025-09-18T01:45:55.323Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://gsamhospital.com | Message: net::ERR_ABORTED at https://gsamhospital.com
+[2025-09-18T01:46:54.205Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://ismmedia.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://ismmedia.com
+[2025-09-18T01:47:05.619Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://aiprx.com | Message: net::ERR_CONNECTION_CLOSED at https://aiprx.com
+[2025-09-18T01:50:22.620Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://pikdit.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T01:51:13.165Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://shoppkg.com | Message: net::ERR_CONNECTION_RESET at https://shoppkg.com
+[2025-09-18T01:52:17.951Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://advogadoonline.net | Message: net::ERR_ABORTED at https://advogadoonline.net
+[2025-09-18T01:55:13.262Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://expertbank.com | Message: net::ERR_ABORTED at https://expertbank.com
+[2025-09-18T01:55:13.266Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://babes-club.com | Message: net::ERR_ABORTED at https://babes-club.com
+[2025-09-18T01:58:31.518Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://artillegence.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://artillegence.com
+[2025-09-18T02:02:07.009Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://tld.social | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:04:34.247Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://privetstudent.com | Message: net::ERR_ABORTED at https://privetstudent.com
+[2025-09-18T02:04:58.027Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://hedayatco.ir | Message: net::ERR_HTTP2_PROTOCOL_ERROR at https://hedayatco.ir
+[2025-09-18T02:08:30.151Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://resortscasino.com | Message: net::ERR_ABORTED at https://resortscasino.com
+[2025-09-18T02:09:28.601Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://columbiasportswear.hk | Message: net::ERR_ABORTED at https://columbiasportswear.hk
+[2025-09-18T02:10:15.776Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mo3alem.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:11:43.682Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://libreriadesnivel.com | Message: net::ERR_ABORTED at https://libreriadesnivel.com
+[2025-09-18T02:14:08.775Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://blogdesvoyageurs.com | Message: net::ERR_ABORTED at https://blogdesvoyageurs.com
+[2025-09-18T02:14:08.777Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://50plusmatch.se | Message: net::ERR_ABORTED at https://50plusmatch.se
+[2025-09-18T02:14:48.267Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://oldmo.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:20:25.186Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://aboutdharma.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:23:22.367Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://cipherlab.com | Message: net::ERR_CONNECTION_RESET at https://cipherlab.com
+[2025-09-18T02:24:33.595Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://aptalks.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:25:57.244Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sabrinatajudin.com | Message: net::ERR_CONNECTION_CLOSED at https://sabrinatajudin.com
+[2025-09-18T02:26:14.779Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://goldenbet.eu | Message: Redirected to problematic domain: sedo.com
+[2025-09-18T02:28:29.811Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mentalflare.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:29:25.430Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://nahalyavu.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:31:50.684Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://epostgplus.com | Message: net::ERR_ABORTED at https://epostgplus.com
+[2025-09-18T02:31:50.686Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://terransforce.com | Message: net::ERR_ABORTED at https://terransforce.com
+[2025-09-18T02:34:01.931Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://kombiveklima.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:35:24.858Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://mysteepedtea.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://mysteepedtea.com
+[2025-09-18T02:35:38.160Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sos-childrensvillages.org | Message: net::ERR_ABORTED at https://sos-childrensvillages.org
+[2025-09-18T02:35:41.493Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://pixvenue.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:37:48.298Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://regio-abo.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://regio-abo.com
+[2025-09-18T02:42:03.121Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://avnam.net | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://avnam.net
+[2025-09-18T02:43:25.724Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://fotologue.jp | Message: net::ERR_CONNECTION_RESET at https://fotologue.jp
+[2025-09-18T02:44:02.151Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://linkreit.com | Message: net::ERR_CONNECTION_RESET at https://linkreit.com
+[2025-09-18T02:44:04.459Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://frautulpe.de | Message: net::ERR_ABORTED at https://frautulpe.de
+[2025-09-18T02:44:17.282Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://happysocks.in | Message: net::ERR_CONNECTION_RESET at https://happysocks.in
+[2025-09-18T02:44:50.198Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://airtexproducts.com | Message: net::ERR_CONNECTION_RESET at https://airtexproducts.com
+[2025-09-18T02:44:54.142Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://99laundry.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:45:16.690Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://vankepl.com | Message: net::ERR_CONNECTION_RESET at https://vankepl.com
+[2025-09-18T02:47:08.157Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://emailinvest.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:48:18.176Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://43423.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T02:48:48.655Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://graphicstoll.com | Message: net::ERR_CONNECTION_CLOSED at https://graphicstoll.com
+[2025-09-18T02:50:49.121Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://webcomcpq.com | Message: net::ERR_ABORTED at https://webcomcpq.com
+[2025-09-18T02:53:15.502Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://t2b.click | Message: net::ERR_CONNECTION_RESET at https://t2b.click
+[2025-09-18T02:56:36.779Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://jliedu.com | Message: net::ERR_TIMED_OUT at https://jliedu.com
+[2025-09-18T03:00:20.523Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://madhulata.org | Message: net::ERR_ABORTED at https://madhulata.org
+[2025-09-18T03:01:00.323Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://detektivi.net | Message: net::ERR_QUIC_PROTOCOL_ERROR at https://detektivi.net
+[2025-09-18T03:03:48.132Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://91162.com | Message: net::ERR_HTTP2_PROTOCOL_ERROR at https://91162.com
+[2025-09-18T03:07:52.511Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://smeoa.com | Message: net::ERR_TIMED_OUT at https://smeoa.com
+[2025-09-18T03:08:41.283Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://muhammadali.com | Message: net::ERR_ABORTED at https://muhammadali.com
+[2025-09-18T03:08:41.285Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://trade200.com | Message: net::ERR_ABORTED at https://trade200.com
+[2025-09-18T03:12:15.634Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://trahh.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T03:13:49.097Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://firstplaceparts.com | Message: net::ERR_CONNECTION_RESET at https://firstplaceparts.com
+[2025-09-18T03:14:09.626Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://daitec.jp | Message: net::ERR_CONNECTION_RESET at https://daitec.jp
+[2025-09-18T03:14:50.063Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://tolive.eu | Message: Redirected to problematic domain: sedo.com
+[2025-09-18T03:15:33.099Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://lirica.xyz | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T03:18:08.466Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://kurogami.com | Message: net::ERR_ABORTED at https://kurogami.com
+[2025-09-18T03:19:13.860Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://vaginalane.com | Message: net::ERR_CONNECTION_RESET at https://vaginalane.com
+[2025-09-18T03:19:48.596Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://wola.org | Message: net::ERR_TIMED_OUT at https://wola.org
+[2025-09-18T03:20:00.145Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://carriere-uitzendbureau.nl | Message: net::ERR_CONNECTION_RESET at https://carriere-uitzendbureau.nl
+[2025-09-18T03:20:18.151Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://sosbettingtips.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://sosbettingtips.com
+[2025-09-18T03:21:21.029Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://slink.us | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T03:22:03.707Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://iceagemovies.com | Message: net::ERR_CONNECTION_CLOSED at https://iceagemovies.com
+[2025-09-18T03:23:00.351Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://supplygeeks.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T03:23:46.042Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://coloralia.com | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://coloralia.com
+[2025-09-18T03:27:53.493Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://yes.bg | Message: net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH at https://yes.bg
+[2025-09-18T03:29:59.374Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://alipaydev.com | Message: net::ERR_INVALID_RESPONSE at https://alipaydev.com
+[2025-09-18T03:30:00.092Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://nightmarecreators.com | Message: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://nightmarecreators.com
+[2025-09-18T03:31:37.698Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://byrinc.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T03:32:00.636Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://guustore.com | Message: Redirected to problematic domain: www.godaddy.com
+[2025-09-18T03:32:29.680Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://meufilme.tv | Message: net::ERR_CONNECTION_RESET at https://meufilme.tv
+[2025-09-18T03:32:57.306Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://math-blog.com | Message: net::ERR_CONNECTION_CLOSED at https://math-blog.com
+[2025-09-18T03:36:40.699Z] | Category: access/http_error | Phase: data_extraction | Code: ACCESS_FORBIDDEN | URL: https://securityinnovationeurope.com | Message: net::ERR_ABORTED at https://securityinnovationeurope.com
